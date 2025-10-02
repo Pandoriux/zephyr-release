@@ -1,0 +1,32 @@
+{
+  "name": "zephyr-release",
+  "version": "0.1.0",
+  "description": "Zephyr Release is yet another automated tool for version bumping, changelog generation, and release publishing.",
+  "license": "Apache-2.0",
+
+  "exports": "./README.md",
+
+  "tasks": {
+    "prebuild": "deno run --allow-run --allow-write scripts/prebuild.ts",
+    "build": {
+      "command": "tsdown",
+      "dependencies": ["prebuild"]
+    }
+  },
+
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@actions/core": "npm:@actions/core@^1.11.1",
+
+    "@std/path": "jsr:@std/path@^1.1.2",
+    "tsdown": "npm:tsdown@^0.15.6"
+  },
+
+  "exclude": [
+    "dist"
+  ],
+
+  "compilerOptions": {
+    "lib": ["deno.ns"]
+  }
+}

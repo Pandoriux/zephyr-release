@@ -1,0 +1,17 @@
+name: Zephyr Release
+description: Automates version bumps, changelogs, and releases.
+author: Pandoriux
+
+branding:
+  icon: wind
+  color: blue
+
+inputs:
+  name:
+    description: Your name.
+    required: false
+    default: ""
+
+runs:
+  using: "node20"
+  main: "dist/main.mjs"
