@@ -7,5 +7,5 @@ export default defineConfig({
   fixedExtension: true,
 
   platform: "node",
-  target: "node20.19",
+  target: "node24",
 });

@@ -16970,18 +16970,27 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 }) });
 
 //#endregion
-//#region src/main.ts
+//#region src/version.ts
 var import_core = /* @__PURE__ */ __toESM(require_core());
-function main() {
+/**
+* Mirrors deno.json { version }
+*/
+const VERSION = "0.2.0";
+
+//#endregion
+//#region src/run.ts
+async function run() {}
+
+//#endregion
+//#region src/main.ts
+async function main() {
+	import_core.info(`🔹 Start zephyr-release - version: ${VERSION} 🍃`);
 	try {
-		const name = import_core.getInput("name", { required: true });
-		import_core.info("We are special because we were born into this world.");
-		import_core.info(`Don't you agree, ${name}?`);
-		import_core.info("=======================================================");
-		import_core.notice("Zephyr Release run successfully!");
+		await /* @__PURE__ */ run();
 	} catch (error$1) {
 		import_core.setFailed("❌ An unexpected error occurred:\n" + error$1);
 	}
+	import_core.info(`🔹 Finished zephyr-release - version: ${VERSION} ✔`);
 }
 main();
 

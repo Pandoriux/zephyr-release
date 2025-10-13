@@ -1,16 +1,19 @@
+import process from "node:process";
 import core from "@actions/core";
+import { VERSION } from "./action-version.ts"; // run build once to generate this file
+import { run } from "./run.ts";
 
-function main() {
+async function main() {
+  core.info(`🔹 Start zephyr-release - version: ${VERSION} 🍃`);
+
   try {
-    const name = core.getInput("name", { required: true });
-
-    core.info("We are special because we were born into this world.");
-    core.info(`Don't you agree, ${name}?`);
-    core.info("=======================================================");
-    core.notice("Zephyr Release run successfully!");
+    await run();
   } catch (error) {
     core.setFailed("❌ An unexpected error occurred:\n" + error);
+    process.exit();
   }
+
+  core.info(`🔹 Finished zephyr-release - version: ${VERSION} ✔`);
 }
 
 main();

@@ -11,6 +11,4 @@ await new Deno.Command(Deno.execPath(), {
 // Delete old dist directory before building
 try {
   Deno.removeSync(join(import.meta.dirname!, "../dist"), { recursive: true });
-} catch {
-  // ignore
-}
+} catch { /* ignore */ }
