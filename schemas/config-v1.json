@@ -7,27 +7,60 @@
       "default": "",
       "description": "Project name."
     },
-    "initialVersion": {
+    "time-zone": {
+      "$ref": "#/$defs/time-zone",
+      "default": "UTC",
+      "description": "IANA timezone used to display times. Default: `UTC`."
+    },
+    "commit-types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "default": [
+        {
+          "type": "feat",
+          "title": ""
+        }
+      ],
+      "description": "List of commit types used for version calculation and changelog generation. Default: []."
+    },
+    "initial-version": {
       "type": "string",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
       "default": "0.1.0",
-      "description": "Initial version semver to be used when the main"
+      "description": "Initial SemVer version applied when no existing version is found. Default: `0.1.0`"
     },
-    "timeZone": {
-      "$ref": "#/$defs/timeZone",
-      "default": "UTC",
-      "description": "IANA timezone used to display times. Defaults: `UTC`."
+    "bump-strategy": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "description": "Configuration options to calculate the next version number.",
+      "default": {}
     },
-    "pullRequest": {
+    "pull-request": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Project name used in pull requests."
-        },
-        "timeZone": {
-          "$ref": "#/$defs/timeZone",
-          "description": "IANA timezone used to display times in pull requests. Falls back to base config if not set."
         }
       },
       "required": [],
@@ -40,10 +73,6 @@
         "name": {
           "type": "string",
           "description": "Project name used in tags."
-        },
-        "timeZone": {
-          "$ref": "#/$defs/timeZone",
-          "description": "IANA timezone used to display times in tags. Falls back to base config if not set."
         }
       },
       "required": [],
@@ -56,10 +85,6 @@
         "name": {
           "type": "string",
           "description": "Project name used in releases."
-        },
-        "timeZone": {
-          "$ref": "#/$defs/timeZone",
-          "description": "IANA timezone used to display times in releases. Falls back to base config if not set."
         }
       },
       "required": [],
@@ -71,7 +96,7 @@
   "title": "Zephyr Release configuration file schema",
   "description": "A JSON representation of a Zephyr Release configuration file.",
   "$defs": {
-    "timeZone": {
+    "time-zone": {
       "enum": [
         "UTC",
         "Africa/Abidjan",
