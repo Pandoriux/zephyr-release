@@ -10,7 +10,7 @@
     "time-zone": {
       "$ref": "#/$defs/time-zone",
       "default": "UTC",
-      "description": "IANA timezone used to display times. Default: `UTC`."
+      "description": "IANA timezone used to display times.\nDefault: `UTC`."
     },
     "commit-types": {
       "type": "array",
@@ -19,15 +19,18 @@
         "properties": {
           "type": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Commit type."
           },
-          "title": {
+          "section": {
             "type": "string",
-            "default": ""
+            "default": "",
+            "description": "Changelog section heading for this commit type."
           },
-          "hidden": {
+          "changelog-hidden": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "description": "Exclude this commit type from changelog generation."
           }
         },
         "required": [
@@ -37,10 +40,22 @@
       "default": [
         {
           "type": "feat",
-          "title": ""
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "perf",
+          "section": "Performance Improvements"
+        },
+        {
+          "type": "revert",
+          "section": "Reverts"
         }
       ],
-      "description": "List of commit types used for version calculation and changelog generation. Default: []."
+      "description": "List of commit types used for version calculation and changelog generation. Default: `[! (breaking), feat, fix, perf, revert]`."
     },
     "initial-version": {
       "type": "string",
@@ -50,7 +65,195 @@
     },
     "bump-strategy": {
       "type": "object",
-      "properties": {},
+      "properties": {
+        "major": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "!"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping major version (x.0.0). Default: `[!]`."
+        },
+        "minor": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "feat"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping minor version (0.x.0). Default: `[feat]`."
+        },
+        "patch": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "fix",
+              "perf"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping patch version (0.0.x). Default: `[fix, perf]`."
+        },
+        "prerelease": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping prerelease version (x.x.x-alpha.x). Default: `[]`."
+        },
+        "build": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping build metadata (x.x.x+meta). Default: `[]`."
+        },
+        "bump-minor-for-major-pre-stable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.x). Default: `true`."
+        },
+        "bump-patch-for-minor-pre-stable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Redirects minor version bumps to patch in pre-1.0 (0.x.x). Default: `false`."
+        }
+      },
       "required": [],
       "description": "Configuration options to calculate the next version number.",
       "default": {}
@@ -58,6 +261,11 @@
     "pull-request": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable pull request creation. If disabled, version changes, changelog, tags, and releaseswill be committed and created directly."
+        },
         "name": {
           "type": "string",
           "description": "Project name used in pull requests."
@@ -82,6 +290,11 @@
     "release": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable release creation. If disabled, version changes, changelog, tags, and releaseswill be committed and created directly."
+        },
         "name": {
           "type": "string",
           "description": "Project name used in releases."

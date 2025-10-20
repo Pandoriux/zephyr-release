@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
-import { TimeZoneSchema } from "./parts/timeZone.ts";
-import { CommitTypeSchema } from "./parts/commit.ts";
+import { TimeZoneSchema } from "./parts/timezone.ts";
+import { CommitTypeSchema } from "./parts/commit-type.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/commit.ts";
 
@@ -12,7 +12,8 @@ export const BaseConfigSchema = v.object({
   timeZone: v.pipe(
     v.optional(TimeZoneSchema, "UTC"),
     v.metadata({
-      description: "IANA timezone used to display times. Default: `UTC`.",
+      description: "IANA timezone used to display times." + 
+        "\nDefault: `UTC`.",
     }),
   ),
 
@@ -20,7 +21,8 @@ export const BaseConfigSchema = v.object({
     v.optional(CommitTypeSchema, DEFAULT_COMMIT_TYPES),
     v.metadata({
       description:
-        "List of commit types used for version calculation and changelog generation. Default: [].",
+        "List of commit types used for version calculation and changelog generation." + 
+        "\nDefault: `[! (breaking), feat, fix, perf, revert]`.",
     }),
   ),
 
@@ -28,7 +30,8 @@ export const BaseConfigSchema = v.object({
     v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"),
     v.metadata({
       description:
-        "Initial SemVer version applied when no existing version is found. Default: `0.1.0`",
+        "Initial SemVer version applied when no existing version is found." + 
+        "\nDefault: `0.1.0`",
     }),
   ),
 });
