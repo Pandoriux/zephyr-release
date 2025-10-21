@@ -1,5 +1,6 @@
 export const DEFAULT_MAJOR_BUMP_STRATEGY = {
-  types: ["!"],
+  types: [],
+  countBreakingAsBump: true,
   commitsPerBump: 1,
 };
 

@@ -7,6 +7,22 @@ export const BumpStrategyObjectSchema = v.object({
       description: "Commit types that count toward version bumping.",
     }),
   ),
+  countBreakingAsCommit: v.pipe(
+    v.optional(v.boolean(), false),
+    v.metadata({
+      description:
+        "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list."
+        + "Default: `false`",
+    }),
+  ),
+  countBreakingAsBump: v.pipe(
+    v.optional(v.boolean(), false),
+    v.metadata({
+      description:
+        "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list."
+        + "Default: `false`",
+    }),
+  ),
   commitsPerBump: v.pipe(
     v.optional(
       v.union([
@@ -19,8 +35,8 @@ export const BumpStrategyObjectSchema = v.object({
     v.transform((value) => typeof value === "string" ? Infinity : value),
     v.metadata({
       description:
-        "Number of commits required for additional version bump after the first. Use Infinity to always bump once." + 
-        "\nDefault: `1`.",
+        "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps."
+        + "\nDefault: `1`.",
     }),
   ),
 });

@@ -6,14 +6,9 @@ export const TagConfigSchema = v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable tag creation. If disabled, release will also be disabled."
+          "Enable/disable tag. If disabled, release will also be disabled."
           + "\nDefault: `true`.",
       }),
-    ),
-
-    name: v.pipe(
-      v.optional(v.string()),
-      v.metadata({ description: "Project name used in tags." }),
     ),
   }),
   v.metadata({

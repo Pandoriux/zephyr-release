@@ -5,14 +5,9 @@ export const ReleaseConfigSchema = v.pipe(
     enabled: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "Enable/disable release creation."
+        description: "Enable/disable release."
           + "\nDefault: `true`.",
       }),
-    ),
-
-    name: v.pipe(
-      v.optional(v.string()),
-      v.metadata({ description: "Project name used in releases." }),
     ),
   }),
   v.metadata({
