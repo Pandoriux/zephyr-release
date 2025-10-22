@@ -6,15 +6,14 @@ import {
   DEFAULT_MINOR_BUMP_STRATEGY,
   DEFAULT_PATCH_BUMP_STRATEGY,
   DEFAULT_PRERELEASE_BUMP_STRATEGY,
-} from "../../../constants/bump-strategy.ts";
+} from "../../../constants/defaults/bump-strategy.ts";
 
 export const BumpStrategySchema = v.pipe(
   v.object({
     major: v.pipe(
       v.optional(BumpStrategyObjectSchema, DEFAULT_MAJOR_BUMP_STRATEGY),
       v.metadata({
-        description: "Strategy for bumping major version (x.0.0)."
-          + "\nDefault: `[]`.",
+        description: "Strategy for bumping major version (x.0.0).",
       }),
     ),
     minor: v.pipe(

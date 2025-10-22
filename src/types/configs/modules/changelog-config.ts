@@ -2,7 +2,7 @@ import * as v from "@valibot/valibot";
 import {
   DEFAULT_CHANGELOG_BODY_PATTERN,
   DEFAULT_CHANGELOG_HEADING_PATTERN,
-} from "../../../constants/string-pattern.ts";
+} from "../../../constants/defaults/string-pattern.ts";
 
 export const ChangelogConfigSchema = v.pipe(
   v.object({
@@ -46,7 +46,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "Path to text file containing changelog body pattern. Overrides `bodyPattern` if both are provided.",
+          "Path to text file containing changelog body pattern. Overrides body pattern if both are provided.",
       }),
     ),
   }),

@@ -12,7 +12,7 @@ export const BumpStrategyObjectSchema = v.object({
     v.metadata({
       description:
         "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list."
-        + "Default: `false`",
+        + "\nDefault: `false`",
     }),
   ),
   countBreakingAsBump: v.pipe(
@@ -20,7 +20,7 @@ export const BumpStrategyObjectSchema = v.object({
     v.metadata({
       description:
         "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list."
-        + "Default: `false`",
+        + "\nDefault: `false`",
     }),
   ),
   commitsPerBump: v.pipe(

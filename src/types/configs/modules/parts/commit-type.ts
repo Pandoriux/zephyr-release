@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 
-export const CommitTypeSchema = v.array(v.object({
+export const CommitTypeSchema = v.object({
   type: v.pipe(
     v.string(),
     v.nonEmpty(),
@@ -18,7 +18,7 @@ export const CommitTypeSchema = v.array(v.object({
       description: "Exclude this commit type from changelog generation.",
     }),
   ),
-}));
+});
 
 type _CommitTypeInput = v.InferInput<typeof CommitTypeSchema>;
 type _CommitTypeOutput = v.InferOutput<typeof CommitTypeSchema>;

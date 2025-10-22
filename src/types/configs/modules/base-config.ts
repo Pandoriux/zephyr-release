@@ -2,7 +2,7 @@ import * as v from "@valibot/valibot";
 import { TimeZoneSchema } from "./parts/timezone.ts";
 import { CommitTypeSchema } from "./parts/commit-type.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
-import { DEFAULT_COMMIT_TYPES } from "../../../constants/commit.ts";
+import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
@@ -21,7 +21,7 @@ export const BaseConfigSchema = v.object({
   ),
 
   commitTypes: v.pipe(
-    v.optional(CommitTypeSchema, DEFAULT_COMMIT_TYPES),
+    v.optional(v.array(CommitTypeSchema), DEFAULT_COMMIT_TYPES),
     v.metadata({
       description:
         "List of commit types used for version calculation and changelog generation."
