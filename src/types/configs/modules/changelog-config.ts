@@ -16,30 +16,33 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
 
-    providedChangelog: v.pipe(
+    contentOverride: v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "User-provided changelog content. If set, completely skips the built-in generation process and uses this value "
-          + "as the changelog content. Should only be set dynamically in workflow input, not json config.",
+          "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the "
+          + "built-in generation process and uses this value as the changelog content. Should only be set dynamically "
+          + "in workflow input, not json config.",
       }),
     ),
-    changelogPath: v.pipe(
-      v.optional(v.string(), ""),
+    filePath: v.pipe(
+      v.optional(v.string(), "CHANGELOG.md"),
       v.metadata({
-        description: "Path to changelog file, relative to project root.",
+        description:
+          "Path to the file where the generated changelog will be written to, relative to the project root."
+          + "\nDefault: `CHANGELOG.md`",
       }),
     ),
     headingPattern: v.pipe(
       v.optional(v.string(), DEFAULT_CHANGELOG_HEADING_PATTERN),
       v.metadata({
-        description: "Pattern for changelog section heading.",
+        description: "Pattern for changelog heading.",
       }),
     ),
     bodyPattern: v.pipe(
       v.optional(v.string(), DEFAULT_CHANGELOG_BODY_PATTERN),
       v.metadata({
-        description: "Pattern for changelog section body.",
+        description: "Pattern for changelog body.",
       }),
     ),
     bodyPatternPath: v.pipe(

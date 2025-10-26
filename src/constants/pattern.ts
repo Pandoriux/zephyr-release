@@ -2,6 +2,8 @@ export const StringPatterns = {
   // Project info
   name: "name", // ${name}
   timeZone: "timeZone", // ${timeZone}
+  repoOwner: "repoOwner", // ${repoOwner}
+  repoName: "repoName", // ${repoName}
 
   // Date components (ISO format)
   fullDateISO: "YYYY-MM-DD", // ${YYYY-MM-DD}
@@ -24,6 +26,7 @@ export const StringPatterns = {
 
   // Generated content
   changelog: "changelog", // ${changelog}
+  tagName: "tagName", // ${tagName}. Also support dynamic modifier ${tagName:prev:<N>}
 } as const;
 
 export type StringPattern = typeof StringPatterns[keyof typeof StringPatterns];

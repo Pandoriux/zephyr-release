@@ -109,7 +109,7 @@
             "countBreakingAsBump": true,
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping major version (x.0.0).\nDefault: `[]`."
+          "description": "Strategy for bumping major version (x.0.0)."
         },
         "minor": {
           "type": "object",
@@ -353,7 +353,13 @@
           "default": true,
           "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`."
         },
-        "pending-labels": {
+        "branch-name-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "release/zephyr-release",
+          "description": "Pattern for branch name that Zephyr Release is gonna use."
+        },
+        "labels-on-create": {
           "anyOf": [
             {
               "type": "object",
@@ -367,8 +373,9 @@
                 },
                 "color": {
                   "type": "string",
-                  "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                  "default": ""
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
                 }
               },
               "required": [
@@ -389,8 +396,9 @@
                   },
                   "color": {
                     "type": "string",
-                    "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                    "default": ""
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
                   }
                 },
                 "required": [
@@ -399,10 +407,71 @@
               }
             }
           ],
-          "description": "color"
+          "default": {
+            "name": "zp-release: pending",
+            "description": "Indicates that the pull request is pending release.",
+            "color": "FBCA04"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is created"
+        },
+        "labels-on-close": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "default": ""
+                },
+                "color": {
+                  "type": "string",
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          ],
+          "default": {
+            "name": "zp-release: released",
+            "description": "Indicates that the pull request is closed and the release has completed.",
+            "color": "0E8A16"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed."
         },
         "title-pattern": {
           "type": "string",
+          "minLength": 1,
           "default": "chore: release v${version}",
           "description": "Pattern for pull request title."
         },

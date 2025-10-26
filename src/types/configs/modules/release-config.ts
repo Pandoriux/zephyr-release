@@ -1,17 +1,62 @@
 import * as v from "@valibot/valibot";
+import {
+  DEFAULT_RELEASE_BODY_PATTERN,
+  DEFAULT_RELEASE_TITLE_PATTERN,
+  DEFAULT_TAG_NAME_PATTERN,
+} from "../../../constants/defaults/string-pattern.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
     enabled: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "Enable/disable release."
+        description: "Enable/disable tag and release."
           + "\nDefault: `true`.",
       }),
     ),
+    skipRelease: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description:
+          "If enabled, only the tag will be created, no release will be made."
+          + "\nDefault: `false`.",
+      }),
+    ),
+
+    prerelease: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description: "If enabled, the release will be marked as prerelease."
+          + "\nDefault: `false`.",
+      }),
+    ),
+    draft: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description: "If enabled, the release will be created as draft."
+          + "\nDefault: `false`.",
+      }),
+    ),
+
+    tagNamePattern: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty()), DEFAULT_TAG_NAME_PATTERN),
+      v.metadata({
+        description:
+          "Pattern for tag name, available in string pattern as `${tagName}`.",
+      }),
+    ),
+
+    titlePattern: v.pipe(
+      v.optional(v.string(), DEFAULT_RELEASE_TITLE_PATTERN),
+      v.metadata({ description: "Pattern for release title." }),
+    ),
+    bodyPattern: v.pipe(
+      v.optional(v.string(), DEFAULT_RELEASE_BODY_PATTERN),
+      v.metadata({ description: "Pattern for release body." }),
+    ),
   }),
   v.metadata({
-    description: "Configuration specific to releases.",
+    description: "Configuration specific to tags and releases.",
   }),
 );
 
