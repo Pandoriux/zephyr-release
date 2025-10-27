@@ -3,14 +3,12 @@ import { join } from "@std/path";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import traverse from "@json-schema-tools/traverse";
 import { ConfigSchema } from "../src/types/configs/config.ts";
-import { TimeZoneSchema } from "../src/types/configs/modules/parts/timezone.ts";
 
 const OUTPUT_CONFIG_FILE = "config-v1.json";
 
 // Config json schema based on valibot schema
 const schema = toJsonSchema(ConfigSchema, {
   typeMode: "input",
-  definitions: { timeZone: TimeZoneSchema },
 });
 
 // Transform function (schema keys from camelCase to kebab-case)

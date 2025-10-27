@@ -25,14 +25,16 @@ export const BumpStrategyObjectSchema = v.object({
   ),
   commitsPerBump: v.pipe(
     v.optional(
-      v.union([
-        v.pipe(v.number(), v.minValue(0), v.integer()),
-        v.literal(Infinity),
-        v.literal("Infinity"),
-      ]),
+      v.pipe(
+        v.union([
+          v.pipe(v.number(), v.minValue(0), v.integer()),
+          v.literal(Infinity),
+          v.literal("Infinity"),
+        ]),
+        v.transform((value) => typeof value === "string" ? Infinity : value),
+      ),
       1,
     ),
-    v.transform((value) => typeof value === "string" ? Infinity : value),
     v.metadata({
       description:
         "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps."

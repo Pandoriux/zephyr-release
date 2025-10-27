@@ -8,540 +8,6 @@
       "description": "Project name, available in string pattern as ${name}."
     },
     "time-zone": {
-      "$ref": "#/$defs/time-zone",
-      "default": "UTC",
-      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: `UTC`."
-    },
-    "commit-types": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Commit type."
-          },
-          "section": {
-            "type": "string",
-            "default": "",
-            "description": "Changelog section heading for this commit type."
-          },
-          "changelog-hidden": {
-            "type": "boolean",
-            "default": false,
-            "description": "Exclude this commit type from changelog generation."
-          }
-        },
-        "required": [
-          "type"
-        ]
-      },
-      "default": [
-        {
-          "type": "feat",
-          "section": "Features"
-        },
-        {
-          "type": "fix",
-          "section": "Bug Fixes"
-        },
-        {
-          "type": "perf",
-          "section": "Performance Improvements"
-        },
-        {
-          "type": "revert",
-          "section": "Reverts"
-        }
-      ],
-      "description": "List of commit types used for version calculation and changelog generation.\nDefault: `[! (breaking), feat, fix, perf, revert]`."
-    },
-    "initial-version": {
-      "type": "string",
-      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
-      "default": "0.1.0",
-      "description": "Initial SemVer version applied when no existing version is found.\nDefault: `0.1.0`"
-    },
-    "bump-strategy": {
-      "type": "object",
-      "properties": {
-        "major": {
-          "type": "object",
-          "properties": {
-            "types": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commit types that count toward version bumping."
-            },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "commits-per-bump": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                }
-              ],
-              "default": 1
-            }
-          },
-          "required": [],
-          "default": {
-            "types": [],
-            "countBreakingAsBump": true,
-            "commitsPerBump": 1
-          },
-          "description": "Strategy for bumping major version (x.0.0)."
-        },
-        "minor": {
-          "type": "object",
-          "properties": {
-            "types": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commit types that count toward version bumping."
-            },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "commits-per-bump": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                }
-              ],
-              "default": 1
-            }
-          },
-          "required": [],
-          "default": {
-            "types": [
-              "feat"
-            ],
-            "commitsPerBump": 1
-          },
-          "description": "Strategy for bumping minor version (0.x.0).\nDefault: `[feat]`."
-        },
-        "patch": {
-          "type": "object",
-          "properties": {
-            "types": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commit types that count toward version bumping."
-            },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "commits-per-bump": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                }
-              ],
-              "default": 1
-            }
-          },
-          "required": [],
-          "default": {
-            "types": [
-              "fix",
-              "perf"
-            ],
-            "commitsPerBump": 1
-          },
-          "description": "Strategy for bumping patch version (0.0.x).\nDefault: `[fix, perf]`."
-        },
-        "prerelease": {
-          "type": "object",
-          "properties": {
-            "types": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commit types that count toward version bumping."
-            },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "commits-per-bump": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                }
-              ],
-              "default": 1
-            }
-          },
-          "required": [],
-          "default": {
-            "types": [],
-            "commitsPerBump": 1
-          },
-          "description": "Strategy for bumping prerelease version (x.x.x-alpha.x).\nDefault: `[]`."
-        },
-        "build": {
-          "type": "object",
-          "properties": {
-            "types": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commit types that count toward version bumping."
-            },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "commits-per-bump": {
-              "anyOf": [
-                {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                }
-              ],
-              "default": 1
-            }
-          },
-          "required": [],
-          "default": {
-            "types": [],
-            "commitsPerBump": 1
-          },
-          "description": "Strategy for bumping build metadata (x.x.x+meta).\nDefault: `[]`."
-        },
-        "bump-minor-for-major-pre-stable": {
-          "type": "boolean",
-          "default": true,
-          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.x).\nDefault: `true`."
-        },
-        "bump-patch-for-minor-pre-stable": {
-          "type": "boolean",
-          "default": false,
-          "description": "Redirects minor version bumps to patch in pre-1.0 (0.x.x).\nDefault: `false`."
-        }
-      },
-      "required": [],
-      "description": "Configuration options to calculate the next version number.",
-      "default": {}
-    },
-    "changelog": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: `true`."
-        },
-        "provided-changelog": {
-          "type": "string",
-          "default": "",
-          "description": "User-provided changelog content. If set, completely skips the built-in generation process and uses this value as the changelog content. Should only be set dynamically in workflow input, not json config."
-        },
-        "changelog-path": {
-          "type": "string",
-          "default": "",
-          "description": "Path to changelog file, relative to project root."
-        },
-        "heading-pattern": {
-          "type": "string",
-          "default": "${version} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
-          "description": "Pattern for changelog section heading."
-        },
-        "body-pattern": {
-          "type": "string",
-          "default": "${changelog}",
-          "description": "Pattern for changelog section body."
-        },
-        "body-pattern-path": {
-          "type": "string",
-          "default": "",
-          "description": "Path to text file containing changelog body pattern. Overrides body pattern if both are provided."
-        }
-      },
-      "required": [],
-      "description": "Configuration specific to changelogs. All generated changelog lines are available in string pattern as ${changelog}",
-      "default": {}
-    },
-    "pull-request": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`."
-        },
-        "branch-name-pattern": {
-          "type": "string",
-          "minLength": 1,
-          "default": "release/zephyr-release",
-          "description": "Pattern for branch name that Zephyr Release is gonna use."
-        },
-        "labels-on-create": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string",
-                  "default": ""
-                },
-                "color": {
-                  "type": "string",
-                  "minLength": 1,
-                  "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string",
-                    "default": ""
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 1,
-                    "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
-                  }
-                },
-                "required": [
-                  "name"
-                ]
-              }
-            }
-          ],
-          "default": {
-            "name": "zp-release: pending",
-            "description": "Indicates that the pull request is pending release.",
-            "color": "FBCA04"
-          },
-          "description": "A label or an array of labels to add to the pull request when it is created"
-        },
-        "labels-on-close": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string",
-                  "default": ""
-                },
-                "color": {
-                  "type": "string",
-                  "minLength": 1,
-                  "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string",
-                    "default": ""
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 1,
-                    "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
-                  }
-                },
-                "required": [
-                  "name"
-                ]
-              }
-            }
-          ],
-          "default": {
-            "name": "zp-release: released",
-            "description": "Indicates that the pull request is closed and the release has completed.",
-            "color": "0E8A16"
-          },
-          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed."
-        },
-        "title-pattern": {
-          "type": "string",
-          "minLength": 1,
-          "default": "chore: release v${version}",
-          "description": "Pattern for pull request title."
-        },
-        "header-pattern": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          ],
-          "default": "🤖 New release created. Stand by for approval",
-          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it."
-        },
-        "body-pattern": {
-          "type": "string",
-          "default": "${changelog}",
-          "description": "Pattern for pull request body."
-        },
-        "body-pattern-path": {
-          "type": "string",
-          "default": "",
-          "description": "Path to text file containing pull request body pattern. Overrides body pattern if both are provided."
-        },
-        "footer-pattern": {
-          "type": "string",
-          "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
-          "description": "Pattern for pull request footer."
-        }
-      },
-      "required": [],
-      "description": "Configuration specific to pull requests.",
-      "default": {}
-    },
-    "tag": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable tag. If disabled, release will also be disabled.\nDefault: `true`."
-        }
-      },
-      "required": [],
-      "description": "Configuration specific to tags.",
-      "default": {}
-    },
-    "release": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable release.\nDefault: `true`."
-        }
-      },
-      "required": [],
-      "description": "Configuration specific to releases.",
-      "default": {}
-    }
-  },
-  "required": [],
-  "title": "Zephyr Release configuration file schema",
-  "description": "A JSON representation of a Zephyr Release configuration file.",
-  "$defs": {
-    "time-zone": {
       "enum": [
         "UTC",
         "Africa/Abidjan",
@@ -962,7 +428,613 @@
         "Pacific/Truk",
         "Pacific/Wake",
         "Pacific/Wallis"
-      ]
+      ],
+      "default": "UTC",
+      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: `UTC`."
+    },
+    "initial-version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "default": "0.1.0",
+      "description": "Initial SemVer version applied when no existing version is found.\nDefault: `0.1.0`"
+    },
+    "version-files": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "type type"
+            },
+            "type": {
+              "type": "string",
+              "description": ""
+            },
+            "default": {
+              "type": "boolean",
+              "default": false,
+              "description": ""
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "type type"
+              },
+              "type": {
+                "type": "string",
+                "description": ""
+              },
+              "default": {
+                "type": "boolean",
+                "default": false,
+                "description": ""
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      ],
+      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the default. If arrays, the first file with `default: true` becomes the default; if none are marked, the first file will be chosen.\nAbout default: link-to-inert-later"
+    },
+    "commit-types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Commit type."
+          },
+          "section": {
+            "type": "string",
+            "default": "",
+            "description": "Changelog section heading for this commit type."
+          },
+          "changelog-hidden": {
+            "type": "boolean",
+            "default": false,
+            "description": "Exclude this commit type from changelog generation."
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "default": [
+        {
+          "type": "feat",
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "perf",
+          "section": "Performance Improvements"
+        },
+        {
+          "type": "revert",
+          "section": "Reverts"
+        }
+      ],
+      "description": "List of commit types used for version calculation and changelog generation.\nDefault: `[! (breaking), feat, fix, perf, revert]`."
+    },
+    "bump-strategy": {
+      "type": "object",
+      "properties": {
+        "major": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "count-breaking-as-commit": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "count-breaking-as-bump": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "countBreakingAsBump": true,
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping major version (x.0.0)."
+        },
+        "minor": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "count-breaking-as-commit": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "count-breaking-as-bump": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "feat"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping minor version (0.x.0).\nDefault: `[feat]`."
+        },
+        "patch": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "count-breaking-as-commit": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "count-breaking-as-bump": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "fix",
+              "perf"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping patch version (0.0.x).\nDefault: `[fix, perf]`."
+        },
+        "prerelease": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "count-breaking-as-commit": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "count-breaking-as-bump": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping prerelease version (x.x.x-alpha.x).\nDefault: `[]`."
+        },
+        "build": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping."
+            },
+            "count-breaking-as-commit": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "count-breaking-as-bump": {
+              "type": "boolean",
+              "default": false,
+              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping build metadata (x.x.x+meta).\nDefault: `[]`."
+        },
+        "bump-minor-for-major-pre-stable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.x).\nDefault: `true`."
+        },
+        "bump-patch-for-minor-pre-stable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Redirects minor version bumps to patch in pre-1.0 (0.x.x).\nDefault: `false`."
+        }
+      },
+      "required": [],
+      "description": "Configuration options to calculate the next version number.",
+      "default": {}
+    },
+    "changelog": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: `true`."
+        },
+        "content-override": {
+          "type": "string",
+          "default": "",
+          "description": "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the built-in generation process and uses this value as the changelog content. Should only be set dynamically in workflow input, not json config."
+        },
+        "file-path": {
+          "type": "string",
+          "default": "CHANGELOG.md",
+          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: `CHANGELOG.md`"
+        },
+        "heading-pattern": {
+          "type": "string",
+          "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
+          "description": "Pattern for changelog heading."
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelogContent}",
+          "description": "Pattern for changelog body."
+        },
+        "body-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing changelog body pattern. Overrides body pattern if both are provided."
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to changelogs. All generated changelog lines are available in string pattern as ${changelog}",
+      "default": {}
+    },
+    "pull-request": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`."
+        },
+        "branch-name-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "release/zephyr-release",
+          "description": "Pattern for branch name that Zephyr Release is gonna use."
+        },
+        "labels-on-create": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "default": ""
+                },
+                "color": {
+                  "type": "string",
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          ],
+          "default": {
+            "name": "zp-release: pending",
+            "description": "Indicates that the pull request is pending release.",
+            "color": "FBCA04"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is created"
+        },
+        "labels-on-close": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "default": ""
+                },
+                "color": {
+                  "type": "string",
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          ],
+          "default": {
+            "name": "zp-release: released",
+            "description": "Indicates that the pull request is closed and the release has completed.",
+            "color": "0E8A16"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed."
+        },
+        "title-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "chore: release v${version}",
+          "description": "Pattern for pull request title."
+        },
+        "header-pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "default": "🤖 New release created. Stand by for approval",
+          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it."
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelog}",
+          "description": "Pattern for pull request body."
+        },
+        "body-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing pull request body pattern. Overrides body pattern if both are provided."
+        },
+        "footer-pattern": {
+          "type": "string",
+          "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
+          "description": "Pattern for pull request footer."
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to pull requests.",
+      "default": {}
+    },
+    "release": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable tag and release.\nDefault: `true`."
+        },
+        "skip-release": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, only the tag will be created, no release will be made.\nDefault: `false`."
+        },
+        "prerelease": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, the release will be marked as prerelease.\nDefault: `false`."
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, the release will be created as draft.\nDefault: `false`."
+        },
+        "tag-name-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "v${version}",
+          "description": "Pattern for tag name, available in string pattern as `${tagName}`."
+        },
+        "title-pattern": {
+          "type": "string",
+          "default": "${tagName}",
+          "description": "Pattern for release title."
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelog}",
+          "description": "Pattern for release body."
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to tags and releases.",
+      "default": {}
     }
-  }
+  },
+  "required": [
+    "version-files"
+  ],
+  "title": "Zephyr Release configuration file",
+  "description": "A JSON representation of a Zephyr Release configuration file."
 }
