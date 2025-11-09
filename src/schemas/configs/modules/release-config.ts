@@ -4,6 +4,7 @@ import {
   DEFAULT_RELEASE_TITLE_PATTERN,
   DEFAULT_TAG_NAME_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
+import { CommandsSchema } from "./parts/commands.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
@@ -20,6 +21,13 @@ export const ReleaseConfigSchema = v.pipe(
         description:
           "If enabled, only the tag will be created, no release will be made."
           + "\nDefault: `false`.",
+      }),
+    ),
+    commands: v.pipe(
+      v.optional(CommandsSchema, {}),
+      v.metadata({
+        description:
+          "Pre/post command lists to run around the release operation. Each command runs from the repository root.",
       }),
     ),
 

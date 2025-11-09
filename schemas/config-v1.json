@@ -432,6 +432,30 @@
       "default": "UTC",
       "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: `UTC`."
     },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "pre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Commands to run before the operation.\nDefault: `[]`"
+        },
+        "post": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Commands to run after the operation.\nDefault: `[]`"
+        }
+      },
+      "required": [],
+      "default": {},
+      "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root."
+    },
     "initial-version": {
       "type": "string",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
@@ -446,20 +470,33 @@
             "path": {
               "type": "string",
               "minLength": 1,
-              "description": "type type"
+              "description": "Path to the version file, relative to the project root."
             },
-            "type": {
+            "resolver": {
+              "enum": [
+                "auto",
+                "json",
+                "yaml",
+                "toml",
+                "regex"
+              ],
+              "default": "auto",
+              "description": "Defines how to resolve the version from this file.\nDefault: `auto`"
+            },
+            "selector": {
               "type": "string",
-              "description": ""
+              "minLength": 1,
+              "description": "Json path to locates the version field. For regex resolver, supply a regex string."
             },
-            "default": {
+            "primary": {
               "type": "boolean",
               "default": false,
-              "description": ""
+              "description": "Marks this file as the primary source of truth for the current version."
             }
           },
           "required": [
-            "path"
+            "path",
+            "selector"
           ]
         },
         {
@@ -470,25 +507,38 @@
               "path": {
                 "type": "string",
                 "minLength": 1,
-                "description": "type type"
+                "description": "Path to the version file, relative to the project root."
               },
-              "type": {
+              "resolver": {
+                "enum": [
+                  "auto",
+                  "json",
+                  "yaml",
+                  "toml",
+                  "regex"
+                ],
+                "default": "auto",
+                "description": "Defines how to resolve the version from this file.\nDefault: `auto`"
+              },
+              "selector": {
                 "type": "string",
-                "description": ""
+                "minLength": 1,
+                "description": "Json path to locates the version field. For regex resolver, supply a regex string."
               },
-              "default": {
+              "primary": {
                 "type": "boolean",
                 "default": false,
-                "description": ""
+                "description": "Marks this file as the primary source of truth for the current version."
               }
             },
             "required": [
-              "path"
+              "path",
+              "selector"
             ]
           }
         }
       ],
-      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the default. If arrays, the first file with `default: true` becomes the default; if none are marked, the first file will be chosen.\nAbout default: link-to-inert-later"
+      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be.\nAbout default: link-to-inert-later"
     },
     "commit-types": {
       "type": "array",
@@ -792,6 +842,30 @@
           "default": true,
           "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: `true`."
         },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: `[]`"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: `[]`"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the changelog operation. Each command runs from the repository root."
+        },
         "content-override": {
           "type": "string",
           "default": "",
@@ -829,6 +903,30 @@
           "type": "boolean",
           "default": true,
           "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`."
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: `[]`"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: `[]`"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root."
         },
         "branch-name-pattern": {
           "type": "string",
@@ -999,6 +1097,30 @@
           "type": "boolean",
           "default": false,
           "description": "If enabled, only the tag will be created, no release will be made.\nDefault: `false`."
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: `[]`"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: `[]`"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the release operation. Each command runs from the repository root."
         },
         "prerelease": {
           "type": "boolean",

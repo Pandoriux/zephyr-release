@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { VersionFileResolvers } from "../../../../constants/version-file-type.ts";
 
-export const VersionFileObjectSchema = v.object({
+export const VersionFileSchema = v.object({
   path: v.pipe(
     v.string(),
     v.nonEmpty(),
@@ -33,5 +33,5 @@ export const VersionFileObjectSchema = v.object({
   ),
 });
 
-type _VersionFileObjectInput = v.InferInput<typeof VersionFileObjectSchema>;
-type _VersionFileObjectOutput = v.InferOutput<typeof VersionFileObjectSchema>;
+type _VersionFileInput = v.InferInput<typeof VersionFileSchema>;
+type _VersionFileOutput = v.InferOutput<typeof VersionFileSchema>;

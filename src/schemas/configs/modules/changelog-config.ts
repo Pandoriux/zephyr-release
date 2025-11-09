@@ -3,6 +3,7 @@ import {
   DEFAULT_CHANGELOG_BODY_PATTERN,
   DEFAULT_CHANGELOG_HEADING_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
+import { CommandsSchema } from "./parts/commands.ts";
 
 export const ChangelogConfigSchema = v.pipe(
   v.object({
@@ -13,6 +14,13 @@ export const ChangelogConfigSchema = v.pipe(
           "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern "
           + "but they won't be written to file."
           + "\nDefault: `true`.",
+      }),
+    ),
+    commands: v.pipe(
+      v.optional(CommandsSchema, {}),
+      v.metadata({
+        description:
+          "Pre/post command lists to run around the changelog operation. Each command runs from the repository root.",
       }),
     ),
 

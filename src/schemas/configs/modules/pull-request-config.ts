@@ -10,6 +10,7 @@ import {
   DEFAULT_LABEL_ON_CLOSE,
   DEFAULT_LABEL_ON_CREATE,
 } from "../../../constants/defaults/label.ts";
+import { CommandsSchema } from "./parts/commands.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
@@ -20,6 +21,13 @@ export const PullRequestConfigSchema = v.pipe(
           "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases "
           + "will be committed and created directly."
           + "\nDefault: `true`.",
+      }),
+    ),
+    commands: v.pipe(
+      v.optional(CommandsSchema, {}),
+      v.metadata({
+        description:
+          "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
       }),
     ),
 

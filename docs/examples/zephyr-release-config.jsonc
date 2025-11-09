@@ -1,0 +1,162 @@
+{
+  "$schema": "../../schemas/config-v1.json",
+
+  "name": "project name",
+  "time-zone": "UTC",
+
+  // Ex: Run commands before and after the main operation
+  "commands": {
+    "pre": ["npm run build", "npm test"],
+    "post": ["npm run deploy"]
+  },
+
+  "initial-version": "0.1.0",
+  // Ex: Multiple version files with primary source
+  "version-files": [
+    {
+      "path": "deno.json",
+      "resolver": "json",
+      "selector": "version",
+      "primary": true
+    },
+    {
+      "path": "package.json",
+      // "resolver": "auto", // default value is auto
+      "selector": "version"
+    },
+    {
+      // Ex: Using regex to find version in a text file
+      "path": "version.txt",
+      "resolver": "regex",
+      "selector": "^v?(\\d+\\.\\d+\\.\\d+)$"
+    }
+  ],
+
+  "commit-types": [
+    {
+      "type": "feat",
+      "section": "✨ Features",
+      "changelog-hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "🐛 Bug Fixes",
+      "changelog-hidden": false
+    },
+    {
+      // Ex: A custom commit type that won't appear in changelog
+      "type": "custom",
+      "section": "🛠 Custom",
+      "changelog-hidden": true
+    }
+  ],
+
+  "bump-strategy": {
+    // Ex: This strategy will trigger major bump only on breaking changes
+    "major": {
+      "types": [],
+      "count-breaking-as-commit": false,
+      "count-breaking-as-bump": true,
+      "commits-per-bump": "Infinity"
+    },
+    // Ex: This strategy will bump minor version after every 10 feat commits
+    "minor": {
+      "types": ["feat"],
+      "count-breaking-as-commit": false,
+      "count-breaking-as-bump": false,
+      "commits-per-bump": 10
+    },
+    // Ex: This strategy treats breaking changes as regular commits for patch
+    "patch": {
+      "types": ["fix", "perf"],
+      "count-breaking-as-commit": true,
+      "count-breaking-as-bump": false,
+      "commits-per-bump": 10
+    },
+    "prerelease": {
+      "types": [],
+      "count-breaking-as-commit": false,
+      "count-breaking-as-bump": false,
+      "commits-per-bump": "Infinity"
+    },
+    "build": {
+      "types": [],
+      "count-breaking-as-commit": false,
+      "count-breaking-as-bump": false,
+      "commits-per-bump": 1
+    },
+
+    // This setting will convert major bumps to minor in 0.x.x versions
+    "bump-minor-for-major-pre-stable": true,
+
+    // This setting will convert minor bumps to patch in 0.x.x versions
+    "bump-patch-for-minor-pre-stable": false
+  },
+
+  "changelog": {
+    "enabled": true,
+
+    // Ex: Run commands before and after changelog generation
+    "commands": {
+      "pre": ["npm run format:changelog"],
+      "post": []
+    },
+
+    // This setting should only be used in workflow inputs, not in config file
+    "content-override": "",
+
+    "file-path": "CHANGELOG.md",
+    "heading-pattern": "${version} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
+    "body-pattern": "${changelog}",
+    "body-pattern-path": ""
+  },
+
+  "pull-request": {
+    "enabled": true,
+
+    // Ex: Run commands before and after pull request creation
+    "commands": {
+      "pre": [],
+      "post": ["npm run notify:pr"]
+    },
+
+    "branch-name-pattern": "release/zephyr-release",
+
+    "labels-on-create": {
+      "name": "zp-release: pending",
+      "description": "Indicates that the pull request is pending release",
+      "color": "FBCA04"
+    },
+    "labels-on-close": {
+      "name": "zp-release: released",
+      "description": "Indicates that the pull request is closed and released",
+      "color": "0E8A16"
+    },
+
+    "title-pattern": "chore: release v${version}",
+    "header-pattern": "🤖 New release created. Stand by for approval",
+    "body-pattern": "${changelog}",
+    "body-pattern-path": "",
+    "footer-pattern": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"
+  },
+
+  "release": {
+    "enabled": true,
+    "skip-release": false,
+
+    // Ex: Run commands before and after release creation
+    "commands": {
+      "pre": ["npm run pre-release"],
+      "post": ["npm run post-release", "npm run publish"]
+    },
+
+    "draft": false,
+    "prerelease": false,
+
+    // This pattern's value will be available as ${tagName} in other patterns
+    "tag-name-pattern": "v${version}",
+
+    "title-pattern": "${tagName}",
+    "body-pattern": "${changelog}"
+  }
+}

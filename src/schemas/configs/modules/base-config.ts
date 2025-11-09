@@ -1,9 +1,10 @@
 import * as v from "@valibot/valibot";
 import { TimeZoneSchema } from "./parts/timezone.ts";
 import { CommitTypeSchema } from "./parts/commit-type.ts";
-import { VersionFileObjectSchema } from "./parts/version-file-object.ts";
+import { VersionFileSchema } from "./parts/version-file.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
+import { CommandsSchema } from "./parts/commands.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
@@ -20,6 +21,13 @@ export const BaseConfigSchema = v.object({
         + "\nDefault: `UTC`.",
     }),
   ),
+  commands: v.pipe(
+    v.optional(CommandsSchema, {}),
+    v.metadata({
+      description:
+        "Pre/post command lists to run around the main operation. Each command runs from the repository root.",
+    }),
+  ),
 
   initialVersion: v.pipe(
     v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"),
@@ -30,7 +38,7 @@ export const BaseConfigSchema = v.object({
     }),
   ),
   versionFiles: v.pipe(
-    v.union([VersionFileObjectSchema, v.array(VersionFileObjectSchema)]),
+    v.union([VersionFileSchema, v.array(VersionFileSchema)]),
     v.metadata({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the "

@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 
-export const BumpStrategyObjectSchema = v.object({
+export const BumpRuleSchema = v.object({
   types: v.pipe(
     v.optional(v.array(v.string()), []),
     v.metadata({
@@ -43,5 +43,5 @@ export const BumpStrategyObjectSchema = v.object({
   ),
 });
 
-type _BumpStrategyObjectInput = v.InferInput<typeof BumpStrategyObjectSchema>;
-type _BumpStrategyObjectOutput = v.InferOutput<typeof BumpStrategyObjectSchema>;
+type _BumpRuleInput = v.InferInput<typeof BumpRuleSchema>;
+type _BumpRuleOutput = v.InferOutput<typeof BumpRuleSchema>;

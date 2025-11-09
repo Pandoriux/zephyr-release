@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import process$1 from "node:process";
 
 //#region rolldown:runtime
 var __create = Object.create;
@@ -2347,14 +2348,13 @@ var require_multipart = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@fastif
 		this._cb = void 0;
 		this._nparts = 0;
 		this._boy = boy;
-		const parserCfg = {
+		this.parser = new Dicer$1({
 			boundary,
 			maxHeaderPairs: headerPairsLimit,
 			maxHeaderSize: headerSizeLimit,
 			partHwm: fileOpts.highWaterMark,
 			highWaterMark: cfg.highWaterMark
-		};
-		this.parser = new Dicer$1(parserCfg);
+		});
 		this.parser.on("drain", function() {
 			self._needDrain = false;
 			if (self._cb && !self._pause) {
@@ -3414,8 +3414,7 @@ var require_util$5 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 		const parsedMetadata = parseMetadata(metadataList);
 		if (parsedMetadata === "no metadata") return true;
 		if (parsedMetadata.length === 0) return true;
-		const strongest = getStrongestMetadata(parsedMetadata);
-		const metadata = filterMetadataListByAlgorithm(parsedMetadata, strongest);
+		const metadata = filterMetadataListByAlgorithm(parsedMetadata, getStrongestMetadata(parsedMetadata));
 		for (const item of metadata) {
 			const algorithm = item.algo;
 			const expectedValue = item.hash;
@@ -3559,8 +3558,7 @@ var require_util$5 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 				if (Object.getPrototypeOf(this) !== i) throw new TypeError(`'next' called on an object that does not implement interface ${name} Iterator.`);
 				const { index, kind: kind$1, target } = object;
 				const values = target();
-				const len = values.length;
-				if (index >= len) return {
+				if (index >= values.length) return {
 					value: void 0,
 					done: true
 				};
@@ -3605,8 +3603,7 @@ var require_util$5 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			return;
 		}
 		try {
-			const result = await readAllBytes$1(reader);
-			successSteps(result);
+			successSteps(await readAllBytes$1(reader));
 		} catch (e) {
 			errorSteps(e);
 		}
@@ -4047,11 +4044,9 @@ var require_dataURL = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.
 		mimeType = removeASCIIWhitespace(mimeType, true, true);
 		if (position.position >= input.length) return "failure";
 		position.position++;
-		const encodedBody = input.slice(mimeTypeLength + 1);
-		let body = stringPercentDecode(encodedBody);
+		let body = stringPercentDecode(input.slice(mimeTypeLength + 1));
 		if (/;(\u0020){0,}base64$/i.test(mimeType)) {
-			const stringBody = isomorphicDecode(body);
-			body = forgivingBase64(stringBody);
+			body = forgivingBase64(isomorphicDecode(body));
 			if (body === "failure") return "failure";
 			mimeType = mimeType.slice(0, -6);
 			mimeType = mimeType.replace(/(\u0020)+$/, "");
@@ -4106,8 +4101,7 @@ var require_dataURL = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.
 	}
 	/** @param {string} input */
 	function stringPercentDecode(input) {
-		const bytes = encoder$1.encode(input);
-		return percentDecode(bytes);
+		return percentDecode(encoder$1.encode(input));
 	}
 	/** @param {Uint8Array} input */
 	function percentDecode(input) {
@@ -4329,14 +4323,11 @@ var require_file = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.29.
 	};
 	var FileLike$1 = class FileLike$1 {
 		constructor(blobLike, fileName, options = {}) {
-			const n = fileName;
-			const t = options.type;
-			const d = options.lastModified ?? Date.now();
 			this[kState$9] = {
 				blobLike,
-				name: n,
-				type: t,
-				lastModified: d
+				name: fileName,
+				type: options.type,
+				lastModified: options.lastModified ?? Date.now()
 			};
 		}
 		stream(...args) {
@@ -8761,10 +8752,7 @@ var require_mock_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici
 		}
 		if (typeof mockDispatch$1.headers === "undefined") return true;
 		if (typeof headers !== "object" || typeof mockDispatch$1.headers !== "object") return false;
-		for (const [matchHeaderName, matchHeaderValue] of Object.entries(mockDispatch$1.headers)) {
-			const headerValue = getHeaderByName(headers, matchHeaderName);
-			if (!matchValue$1(matchHeaderValue, headerValue)) return false;
-		}
+		for (const [matchHeaderName, matchHeaderValue] of Object.entries(mockDispatch$1.headers)) if (!matchValue$1(matchHeaderValue, getHeaderByName(headers, matchHeaderName))) return false;
 		return true;
 	}
 	function safeUrl(path$5) {
@@ -9011,20 +8999,18 @@ var require_mock_interceptor = /* @__PURE__ */ __commonJS({ "node_modules/.deno/
 		createMockScopeDispatchData(statusCode, data, responseOptions = {}) {
 			const responseData = getResponseData(data);
 			const contentLength = this[kContentLength] ? { "content-length": responseData.length } : {};
-			const headers = {
-				...this[kDefaultHeaders],
-				...contentLength,
-				...responseOptions.headers
-			};
-			const trailers = {
-				...this[kDefaultTrailers],
-				...responseOptions.trailers
-			};
 			return {
 				statusCode,
 				data,
-				headers,
-				trailers
+				headers: {
+					...this[kDefaultHeaders],
+					...contentLength,
+					...responseOptions.headers
+				},
+				trailers: {
+					...this[kDefaultTrailers],
+					...responseOptions.trailers
+				}
 			};
 		}
 		validateReplyParameters(statusCode, data, responseOptions) {
@@ -9044,22 +9030,19 @@ var require_mock_interceptor = /* @__PURE__ */ __commonJS({ "node_modules/.deno/
 					this.validateReplyParameters(statusCode$1, data$1, responseOptions$1);
 					return { ...this.createMockScopeDispatchData(statusCode$1, data$1, responseOptions$1) };
 				};
-				const newMockDispatch$1 = addMockDispatch(this[kDispatches$3], this[kDispatchKey], wrappedDefaultsCallback);
-				return new MockScope(newMockDispatch$1);
+				return new MockScope(addMockDispatch(this[kDispatches$3], this[kDispatchKey], wrappedDefaultsCallback));
 			}
 			const [statusCode, data = "", responseOptions = {}] = [...arguments];
 			this.validateReplyParameters(statusCode, data, responseOptions);
 			const dispatchData = this.createMockScopeDispatchData(statusCode, data, responseOptions);
-			const newMockDispatch = addMockDispatch(this[kDispatches$3], this[kDispatchKey], dispatchData);
-			return new MockScope(newMockDispatch);
+			return new MockScope(addMockDispatch(this[kDispatches$3], this[kDispatchKey], dispatchData));
 		}
 		/**
 		* Mock an undici request with a defined error.
 		*/
 		replyWithError(error$1) {
 			if (typeof error$1 === "undefined") throw new InvalidArgumentError$6("error must be defined");
-			const newMockDispatch = addMockDispatch(this[kDispatches$3], this[kDispatchKey], { error: error$1 });
-			return new MockScope(newMockDispatch);
+			return new MockScope(addMockDispatch(this[kDispatches$3], this[kDispatchKey], { error: error$1 }));
 		}
 		/**
 		* Set default reply headers on the interceptor for subsequent replies
@@ -10106,8 +10089,7 @@ var require_response = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5
 		static json(data, init = {}) {
 			webidl$9.argumentLengthCheck(arguments, 1, { header: "Response.json" });
 			if (init !== null) init = webidl$9.converters.ResponseInit(init);
-			const bytes = textEncoder.encode(serializeJavascriptValueToJSONString(data));
-			const body = extractBody$1(bytes);
+			const body = extractBody$1(textEncoder.encode(serializeJavascriptValueToJSONString(data)));
 			const relevantRealm = { settingsObject: {} };
 			const responseObject = new Response$2();
 			responseObject[kRealm$3] = relevantRealm;
@@ -10262,11 +10244,10 @@ var require_response = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5
 		};
 	}
 	function makeNetworkError$1(reason) {
-		const isError = isErrorLike$1(reason);
 		return makeResponse$1({
 			type: "error",
 			status: 0,
-			error: isError ? reason : new Error(reason ? String(reason) : reason),
+			error: isErrorLike$1(reason) ? reason : new Error(reason ? String(reason) : reason),
 			aborted: reason && reason.name === "AbortError"
 		});
 	}
@@ -10962,8 +10943,7 @@ var require_fetch = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.29
 			taskDestination = request$1.client.globalObject;
 			crossOriginIsolatedCapability = request$1.client.crossOriginIsolatedCapability;
 		}
-		const currenTime = coarsenedSharedCurrentTime(crossOriginIsolatedCapability);
-		const timingInfo = createOpaqueTimingInfo({ startTime: currenTime });
+		const timingInfo = createOpaqueTimingInfo({ startTime: coarsenedSharedCurrentTime(crossOriginIsolatedCapability) });
 		const fetchParams = {
 			controller: new Fetch(dispatcher),
 			request: request$1,
@@ -11077,8 +11057,7 @@ var require_fetch = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.29
 				return Promise.resolve(response);
 			}
 			case "data:": {
-				const currentURL = requestCurrentURL(request$1);
-				const dataURLStruct = dataURLProcessor(currentURL);
+				const dataURLStruct = dataURLProcessor(requestCurrentURL(request$1));
 				if (dataURLStruct === "failure") return Promise.resolve(makeNetworkError("failed to fetch the data URL"));
 				const mimeType = serializeAMimeType$1(dataURLStruct.mimeType);
 				return Promise.resolve(makeResponse({
@@ -12232,9 +12211,7 @@ var require_util$2 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 	* @returns {boolean}
 	*/
 	function urlEquals$1(A, B, excludeFragment = false) {
-		const serializedA = URLSerializer$1(A, excludeFragment);
-		const serializedB = URLSerializer$1(B, excludeFragment);
-		return serializedA === serializedB;
+		return URLSerializer$1(A, excludeFragment) === URLSerializer$1(B, excludeFragment);
 	}
 	/**
 	* @see https://github.com/chromium/chromium/blob/694d20d134cb553d8d89e5500b9148012b1ba299/content/browser/cache_storage/cache_storage_cache.cc#L260-L262
@@ -12451,10 +12428,8 @@ var require_cache = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.29
 			});
 			const clonedResponse = cloneResponse(innerResponse);
 			const bodyReadPromise = createDeferredPromise();
-			if (innerResponse.body != null) {
-				const reader = innerResponse.body.stream.getReader();
-				readAllBytes(reader).then(bodyReadPromise.resolve, bodyReadPromise.reject);
-			} else bodyReadPromise.resolve(void 0);
+			if (innerResponse.body != null) readAllBytes(innerResponse.body.stream.getReader()).then(bodyReadPromise.resolve, bodyReadPromise.reject);
+			else bodyReadPromise.resolve(void 0);
 			/** @type {CacheBatchOperation[]} */
 			const operations = [];
 			/** @type {CacheBatchOperation} */
@@ -12659,9 +12634,7 @@ var require_cache = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.29
 			const fieldValues$1 = getFieldValues(response.headersList.get("vary"));
 			for (const fieldValue of fieldValues$1) {
 				if (fieldValue === "*") return false;
-				const requestValue = request$1.headersList.get(fieldValue);
-				const queryValue = requestQuery.headersList.get(fieldValue);
-				if (requestValue !== queryValue) return false;
+				if (request$1.headersList.get(fieldValue) !== requestQuery.headersList.get(fieldValue)) return false;
 			}
 			return true;
 		}
@@ -12728,10 +12701,7 @@ var require_cachestorage = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undi
 			request$1 = webidl$3.converters.RequestInfo(request$1);
 			options = webidl$3.converters.MultiCacheQueryOptions(options);
 			if (options.cacheName != null) {
-				if (this.#caches.has(options.cacheName)) {
-					const cacheList = this.#caches.get(options.cacheName);
-					return await new Cache(kConstruct, cacheList).match(request$1, options);
-				}
+				if (this.#caches.has(options.cacheName)) return await new Cache(kConstruct, this.#caches.get(options.cacheName)).match(request$1, options);
 			} else for (const cacheList of this.#caches.values()) {
 				const response = await new Cache(kConstruct, cacheList).match(request$1, options);
 				if (response !== void 0) return response;
@@ -12757,10 +12727,7 @@ var require_cachestorage = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undi
 			webidl$3.brandCheck(this, CacheStorage);
 			webidl$3.argumentLengthCheck(arguments, 1, { header: "CacheStorage.open" });
 			cacheName = webidl$3.converters.DOMString(cacheName);
-			if (this.#caches.has(cacheName)) {
-				const cache$1 = this.#caches.get(cacheName);
-				return new Cache(kConstruct, cache$1);
-			}
+			if (this.#caches.has(cacheName)) return new Cache(kConstruct, this.#caches.get(cacheName));
 			const cache = [];
 			this.#caches.set(cacheName, cache);
 			return new Cache(kConstruct, cache);
@@ -12911,7 +12878,7 @@ var require_util$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 	*/
 	function toIMFDate(date) {
 		if (typeof date === "number") date = new Date(date);
-		const days = [
+		return `${[
 			"Sun",
 			"Mon",
 			"Tue",
@@ -12919,8 +12886,7 @@ var require_util$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			"Thu",
 			"Fri",
 			"Sat"
-		];
-		const months = [
+		][date.getUTCDay()]}, ${date.getUTCDate().toString().padStart(2, "0")} ${[
 			"Jan",
 			"Feb",
 			"Mar",
@@ -12933,15 +12899,7 @@ var require_util$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			"Oct",
 			"Nov",
 			"Dec"
-		];
-		const dayName = days[date.getUTCDay()];
-		const day = date.getUTCDate().toString().padStart(2, "0");
-		const month = months[date.getUTCMonth()];
-		const year = date.getUTCFullYear();
-		const hour = date.getUTCHours().toString().padStart(2, "0");
-		const minute = date.getUTCMinutes().toString().padStart(2, "0");
-		const second = date.getUTCSeconds().toString().padStart(2, "0");
-		return `${dayName}, ${day} ${month} ${year} ${hour}:${minute}:${second} GMT`;
+		][date.getUTCMonth()]} ${date.getUTCFullYear()} ${date.getUTCHours().toString().padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}:${date.getUTCSeconds().toString().padStart(2, "0")} GMT`;
 	}
 	/**
 	max-age-av        = "Max-Age=" non-zero-digit *DIGIT
@@ -13724,9 +13682,7 @@ var require_connection = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici
 					failWebsocketConnection$2(ws, "Server did not set Connection header to \"upgrade\".");
 					return;
 				}
-				const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-				const digest = crypto$1.createHash("sha1").update(keyValue + uid).digest("base64");
-				if (secWSAccept !== digest) {
+				if (response.headersList.get("Sec-WebSocket-Accept") !== crypto$1.createHash("sha1").update(keyValue + uid).digest("base64")) {
 					failWebsocketConnection$2(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
 					return;
 				}
@@ -14850,8 +14806,7 @@ var require_lib = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+http
 				}
 			}
 			const req = info$1.httpModule.request(info$1.options, (msg) => {
-				const res = new HttpClientResponse(msg);
-				handleResult(void 0, res);
+				handleResult(void 0, new HttpClientResponse(msg));
 			});
 			let socket;
 			req.on("socket", (sock) => {
@@ -15919,13 +15874,10 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 	}
 	exports.findInPath = findInPath;
 	function readCopyOptions(options) {
-		const force = options.force == null ? true : options.force;
-		const recursive = Boolean(options.recursive);
-		const copySourceDirectory = options.copySourceDirectory == null ? true : Boolean(options.copySourceDirectory);
 		return {
-			force,
-			recursive,
-			copySourceDirectory
+			force: options.force == null ? true : options.force,
+			recursive: Boolean(options.recursive),
+			copySourceDirectory: options.copySourceDirectory == null ? true : Boolean(options.copySourceDirectory)
 		};
 	}
 	function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
@@ -16066,8 +16018,7 @@ var require_toolrunner = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 				let s = strBuffer + data.toString();
 				let n = s.indexOf(os$1.EOL);
 				while (n > -1) {
-					const line = s.substring(0, n);
-					onLine(line);
+					onLine(s.substring(0, n));
 					s = s.substring(n + os$1.EOL.length);
 					n = s.indexOf(os$1.EOL);
 				}
@@ -16970,12 +16921,12 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 }) });
 
 //#endregion
-//#region src/version.ts
+//#region src/action-version.ts
 var import_core = /* @__PURE__ */ __toESM(require_core());
 /**
-* Mirrors deno.json { version }
+* Mirrors deno.json { version }.
 */
-const VERSION = "0.2.0";
+const VERSION = "0.1.0";
 
 //#endregion
 //#region src/run.ts
@@ -16989,6 +16940,7 @@ async function main() {
 		await /* @__PURE__ */ run();
 	} catch (error$1) {
 		import_core.setFailed("❌ An unexpected error occurred:\n" + error$1);
+		process$1.exit();
 	}
 	import_core.info(`🔹 Finished zephyr-release - version: ${VERSION} ✔`);
 }

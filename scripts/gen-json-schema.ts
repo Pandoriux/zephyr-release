@@ -2,7 +2,7 @@ import { toKebabCase } from "@std/text";
 import { join } from "@std/path";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import traverse from "@json-schema-tools/traverse";
-import { ConfigSchema } from "../src/types/configs/config.ts";
+import { ConfigSchema } from "../src/schemas/configs/config.ts";
 
 const OUTPUT_CONFIG_FILE = "config-v1.json";
 
