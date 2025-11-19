@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
+import { CommandsSchema } from "./components/commands.ts";
 import {
   DEFAULT_RELEASE_BODY_PATTERN,
   DEFAULT_RELEASE_TITLE_PATTERN,
   DEFAULT_TAG_NAME_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
-import { CommandsSchema } from "./parts/commands.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({

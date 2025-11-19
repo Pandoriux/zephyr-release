@@ -1,16 +1,16 @@
 import * as v from "@valibot/valibot";
+import { LabelSchema } from "./components/label.ts";
+import { CommandsSchema } from "./components/commands.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_PATTERN,
   DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
   DEFAULT_PULL_REQUEST_HEADER_PATTERN,
   DEFAULT_PULL_REQUEST_TITLE_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
-import { LabelSchema } from "./parts/label.ts";
 import {
   DEFAULT_LABEL_ON_CLOSE,
   DEFAULT_LABEL_ON_CREATE,
 } from "../../../constants/defaults/label.ts";
-import { CommandsSchema } from "./parts/commands.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({

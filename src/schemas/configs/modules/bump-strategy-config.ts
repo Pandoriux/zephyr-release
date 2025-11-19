@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { BumpRuleSchema } from "./parts/bump-rule.ts";
+import { BumpRuleSchema } from "./components/bump-rule.ts";
 import {
   DEFAULT_BUILD_BUMP_STRATEGY,
   DEFAULT_MAJOR_BUMP_STRATEGY,

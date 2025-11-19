@@ -1,9 +1,9 @@
 import * as v from "@valibot/valibot";
+import { CommandsSchema } from "./components/commands.ts";
 import {
   DEFAULT_CHANGELOG_BODY_PATTERN,
   DEFAULT_CHANGELOG_HEADING_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
-import { CommandsSchema } from "./parts/commands.ts";
 
 export const ChangelogConfigSchema = v.pipe(
   v.object({

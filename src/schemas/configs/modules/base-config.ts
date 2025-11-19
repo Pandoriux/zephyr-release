@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
-import { TimeZoneSchema } from "./parts/timezone.ts";
-import { CommitTypeSchema } from "./parts/commit-type.ts";
-import { VersionFileSchema } from "./parts/version-file.ts";
+import { TimeZoneSchema } from "./components/timezone.ts";
+import { CommitTypeSchema } from "./components/commit-type.ts";
+import { VersionFileSchema } from "./components/version-file.ts";
+import { CommandsSchema } from "./components/commands.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
-import { CommandsSchema } from "./parts/commands.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
