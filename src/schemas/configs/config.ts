@@ -4,6 +4,7 @@ import { BumpStrategyConfigSchema } from "./modules/bump-strategy-config.ts";
 import { PullRequestConfigSchema } from "./modules/pull-request-config.ts";
 import { ReleaseConfigSchema } from "./modules/release-config.ts";
 import { ChangelogConfigSchema } from "./modules/changelog-config.ts";
+import { toCamelCase } from "@std/text";
 
 export const ConfigSchema = v.pipe(
   v.object({
@@ -25,4 +26,20 @@ export const ConfigSchema = v.pipe(
 );
 
 type _ConfigInput = v.InferInput<typeof ConfigSchema>;
-type _ConfigOutput = v.InferOutput<typeof ConfigSchema>;
+export type ConfigOutput = v.InferOutput<typeof ConfigSchema>;
+
+export const ParseJsonConfigSchema = v.pipe(
+  v.string(),
+  v.parseJson({
+    reviver: (_key, value) => {
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        return Object.fromEntries(
+          Object.entries(value).map(([k, v]) => [toCamelCase(k), v]),
+        );
+      }
+
+      return value;
+    },
+  }),
+  ConfigSchema,
+);
