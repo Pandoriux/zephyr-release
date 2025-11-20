@@ -15,8 +15,8 @@ inputs:
     description: Path to config file, relative to project root.
     required: false
     default: ""
-  config-inline:
-    description: Config written in literal block scalar ( | ), will merge with config from config-path and override duplicate keys.
+  config-override:
+    description: Config written in literal block scalar ( | ), will merge with config file and override duplicate keys.
     required: false
     default: ""
 

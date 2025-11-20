@@ -4,7 +4,6 @@ import { deepMerge } from "@std/collections";
 import core from "@actions/core";
 import * as v from "@valibot/valibot";
 import {
-  type ConfigOutput,
   ConfigSchema,
   ParseJsonConfigSchema,
 } from "./schemas/configs/config.ts";
@@ -14,12 +13,12 @@ export function resolveConfig(
   configPath: string,
   configInlineJson: string,
 ) {
-  let configFile: ConfigOutput | undefined;
-  let configInline: ConfigOutput | undefined;
-  let finalConfig: ConfigOutput;
+  let configFile: unknown;
+  let configInline: unknown;
+  let finalConfig: unknown;
 
   if (configPath) {
-    core.info("Reading config json from config path...");
+    core.info("Reading config file from config path...");
 
     const configJson = fs.readFileSync(path.join(workspace, configPath), {
       encoding: "utf8",
@@ -27,16 +26,16 @@ export function resolveConfig(
 
     configFile = v.parse(ParseJsonConfigSchema, configJson);
 
-    core.info("Config parsed successfully from config json path.");
+    core.info("Config parsed successfully.");
     core.debug(JSON.stringify(configFile, null, 2));
   }
 
   if (configInlineJson) {
-    core.info("Reading config json from config inline...");
+    core.info("Reading config override from action input...");
 
     configInline = v.parse(ParseJsonConfigSchema, configInlineJson);
 
-    core.info("Config parsed successfully from config inline.");
+    core.info("Config override parsed successfully.");
     core.debug(JSON.stringify(configInline, null, 2));
   }
 

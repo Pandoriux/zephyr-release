@@ -30,11 +30,13 @@ async function main() {
   } catch (error) {
     endTime = new Date();
 
-    core.setFailed("❌ An unexpected error occurred:\n" + error);
+    core.setFailed("❌ An unexpected error occurred:");
     if (error instanceof Error && error.stack) {
       core.startGroup("Error stack:");
       core.info(error.stack);
       core.endGroup();
+    } else {
+      core.info(String(error));
     }
 
     core.info(

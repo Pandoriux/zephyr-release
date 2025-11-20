@@ -7,11 +7,11 @@ export function GetActionInputs() {
 
   const token = core.getInput("token", { required: true });
   const configPath = core.getInput("config-path");
-  const configInline = core.getInput("config-inline");
+  const configInline = core.getInput("config-override");
 
   if (!configPath && !configInline) {
     manualExit(
-      "Missing required input. Must set either `config-path` or `config-inline`.",
+      "Missing required input. Must set either `config-path` or `config-override`.",
     );
   }
 

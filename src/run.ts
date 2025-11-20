@@ -11,7 +11,7 @@ export async function run() {
 
   throwIfRepoNotCheckedOut(inputs.workspace);
 
-  core.info("Resolving configuration from config path or inline JSON...");
+  core.info("Resolving configuration from config file and config override...");
   const config = resolveConfig(
     inputs.workspace,
     inputs.configPath,
