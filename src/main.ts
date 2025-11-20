@@ -1,5 +1,5 @@
 import process from "node:process";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { VERSION } from "./action-version.ts"; // run build once to generate this file
 import { run } from "./run.ts";
 

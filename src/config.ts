@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { deepMerge } from "@std/collections";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import * as v from "@valibot/valibot";
 import {
   ConfigSchema,

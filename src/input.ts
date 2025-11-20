@@ -1,5 +1,5 @@
 import process from "node:process";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { manualExit } from "./main.ts";
 
 export function GetActionInputs() {

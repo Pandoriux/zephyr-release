@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { throwIfRepoNotCheckedOut } from "./checkout.ts";
 import { GetActionInputs } from "./input.ts";
 import { resolveConfig } from "./config.ts";
