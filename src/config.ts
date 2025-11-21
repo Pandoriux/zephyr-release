@@ -33,9 +33,9 @@ export function resolveConfig(
 
     configFile = JSON.parse(configJson, reviveKeysToCamelCase);
 
-    core.info("Config parsed successfully.");
+    core.info("Config file parsed successfully.");
     if (core.isDebug()) {
-      core.startGroup("[DEBUG] Parsed config:");
+      core.startGroup("[DEBUG] Parsed config file:");
       core.debug(JSON.stringify(configFile, null, 2));
       core.endGroup();
     }
@@ -49,7 +49,7 @@ export function resolveConfig(
 
     core.info("Config override parsed successfully.");
     if (core.isDebug()) {
-      core.startGroup("[DEBUG] Parsed override:");
+      core.startGroup("[DEBUG] Parsed config override:");
       core.debug(JSON.stringify(configOverride, null, 2));
       core.endGroup();
     }
