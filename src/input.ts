@@ -23,7 +23,9 @@ export function GetActionInputs(): ActionInputs {
   }
 
   const inputs = { workspace, token, configPath, configOverrideStr };
-  core.debug(JSON.stringify(inputs, null, 2));
+  core.startGroup("Parsed inputs:");
+  core.info(JSON.stringify(inputs, null, 2));
+  core.endGroup();
 
   return inputs;
 }

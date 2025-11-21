@@ -34,7 +34,11 @@ export function resolveConfig(
     configFile = JSON.parse(configJson, reviveKeysToCamelCase);
 
     core.info("Config parsed successfully.");
-    core.debug(JSON.stringify(configFile, null, 2));
+    if (core.isDebug()) {
+      core.startGroup("[DEBUG] Parsed config:");
+      core.debug(JSON.stringify(configFile, null, 2));
+      core.endGroup();
+    }
   } else {
     core.info("Config path not provided. Skipping...");
   }
@@ -44,7 +48,11 @@ export function resolveConfig(
     configOverride = JSON.parse(configOverrideStr, reviveKeysToCamelCase);
 
     core.info("Config override parsed successfully.");
-    core.debug(JSON.stringify(configOverride, null, 2));
+    if (core.isDebug()) {
+      core.startGroup("[DEBUG] Parsed override:");
+      core.debug(JSON.stringify(configOverride, null, 2));
+      core.endGroup();
+    }
   } else {
     core.info("Config override not provided. Skipping...");
   }
@@ -66,7 +74,9 @@ export function resolveConfig(
   }
 
   const resolvedConfig = v.parse(ConfigSchema, finalConfig);
-  core.debug(JSON.stringify(resolvedConfig, null, 2));
+  core.startGroup("Resolved config:");
+  core.info(JSON.stringify(resolvedConfig, null, 2));
+  core.endGroup();
 
   return resolvedConfig;
 }

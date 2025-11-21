@@ -32,6 +32,15 @@
     }
   ],
 
+  // Ex: Include base files plus additional docs/artifacts
+  "files-to-commit": [
+    "base",
+    "docs/**/*.md",
+    "dist/**"
+  ],
+  // Ex: Only custom paths (no keywords)
+  // "files-to-commit": ["CHANGELOG.md", "package.json"],
+
   "commit-types": [
     {
       "type": "feat",

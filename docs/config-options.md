@@ -16,6 +16,7 @@ Some example config JSON files: `example links to be inserted later`
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
     - [VersionFile](#versionfile)
+  - [files-to-commit (Optional)](#files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
@@ -124,6 +125,25 @@ Type: `object`
 - `resolver` (Optional): Defines how to resolve the version from this file. Default: `"auto"`
 - `selector` (Required): Json path to locates the version field. For regex resolver, supply a regex string.
 - `primary` (Optional): Marks this file as the primary source of truth for the current version. Default: `false`
+
+### files-to-commit (Optional)
+
+Type: `"base" | "all" | string[]`  
+Default: `"base"`
+
+Files to include in the commit. Accepts `base`, `all` or an array of paths/globs. Paths are relative to the repo root.
+
+- **`base`**: Includes files affected by the script, such as:
+  - Changelog file (defined in [`changelog > file-path`](#changelog--file-path-optional))
+  - Version files (defined in [`version-files`](#version-files-required))
+  
+- **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
+  - Base [`commands`](#commands-optional)
+  - [`changelog > commands`](#changelog--commands-optional)
+  - [`pull-request > commands`](#pull--commands-optional)
+  - [`release > commands`](#release--commands-optional)
+
+- **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
 
 ### commit-types (Optional)
 
