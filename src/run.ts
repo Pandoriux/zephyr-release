@@ -7,7 +7,6 @@ export async function run() {
   core.info("Reading inputs...");
   const inputs = GetActionInputs();
   core.info("Inputs parsed successfully.");
-  core.debug(JSON.stringify(inputs, null, 2));
 
   throwIfRepoNotCheckedOut(inputs.workspace);
 
@@ -15,8 +14,7 @@ export async function run() {
   const config = resolveConfig(
     inputs.workspace,
     inputs.configPath,
-    inputs.configInline,
+    inputs.configOverrideStr,
   );
   core.info("Configuration resolved successfully.");
-  core.debug(JSON.stringify(config, null, 2));
 }

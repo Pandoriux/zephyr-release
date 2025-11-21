@@ -1,5 +1,10 @@
 import { createRequire } from "node:module";
 import process$1 from "node:process";
+import fs from "node:fs";
+import path from "node:path";
+import { deepMerge } from "@std/collections";
+import * as v from "@valibot/valibot";
+import { toCamelCase } from "@std/text";
 
 //#region rolldown:runtime
 var __create = Object.create;
@@ -78,13 +83,13 @@ var require_command = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$9 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$9 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$9 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -168,13 +173,13 @@ var require_file_command = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@act
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$8 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$8 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$8 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -187,14 +192,14 @@ var require_file_command = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@act
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const crypto$3 = __importStar$8(__require("crypto"));
-	const fs$1 = __importStar$8(__require("fs"));
+	const fs$2 = __importStar$8(__require("fs"));
 	const os$2 = __importStar$8(__require("os"));
 	const utils_1$2 = require_utils$1();
 	function issueFileCommand(command, message) {
 		const filePath = process.env[`GITHUB_${command}`];
 		if (!filePath) throw new Error(`Unable to find environment variable for file command ${command}`);
-		if (!fs$1.existsSync(filePath)) throw new Error(`Missing file at path: ${filePath}`);
-		fs$1.appendFileSync(filePath, `${(0, utils_1$2.toCommandValue)(message)}${os$2.EOL}`, { encoding: "utf8" });
+		if (!fs$2.existsSync(filePath)) throw new Error(`Missing file at path: ${filePath}`);
+		fs$2.appendFileSync(filePath, `${(0, utils_1$2.toCommandValue)(message)}${os$2.EOL}`, { encoding: "utf8" });
 	}
 	exports.issueFileCommand = issueFileCommand;
 	function prepareKeyValueMessage(key, value) {
@@ -877,7 +882,7 @@ var require_util$6 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 	const nodeUtil = __require("util");
 	const { stringify: stringify$2 } = __require("querystring");
 	const { headerNameLowerCasedRecord } = require_constants$4();
-	const [nodeMajor$1, nodeMinor$1] = process.versions.node.split(".").map((v) => Number(v));
+	const [nodeMajor$1, nodeMinor$1] = process.versions.node.split(".").map((v$1) => Number(v$1));
 	function nop$1() {}
 	function isStream(obj) {
 		return obj && typeof obj === "object" && typeof obj.pipe === "function" && typeof obj.on === "function";
@@ -907,10 +912,10 @@ var require_util$6 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			if (url.origin != null && typeof url.origin !== "string") throw new InvalidArgumentError$21("Invalid URL origin: the origin must be a string or null/undefined.");
 			const port = url.port != null ? url.port : url.protocol === "https:" ? 443 : 80;
 			let origin = url.origin != null ? url.origin : `${url.protocol}//${url.hostname}:${port}`;
-			let path$5 = url.path != null ? url.path : `${url.pathname || ""}${url.search || ""}`;
+			let path$6 = url.path != null ? url.path : `${url.pathname || ""}${url.search || ""}`;
 			if (origin.endsWith("/")) origin = origin.substring(0, origin.length - 1);
-			if (path$5 && !path$5.startsWith("/")) path$5 = `/${path$5}`;
-			url = new URL(origin + path$5);
+			if (path$6 && !path$6.startsWith("/")) path$6 = `/${path$6}`;
+			url = new URL(origin + path$6);
 		}
 		return url;
 	}
@@ -2280,15 +2285,15 @@ var require_parseParams = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@fast
 //#endregion
 //#region node_modules/.deno/@fastify+busboy@2.1.1/node_modules/@fastify/busboy/lib/utils/basename.js
 var require_basename = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@fastify+busboy@2.1.1/node_modules/@fastify/busboy/lib/utils/basename.js": ((exports, module) => {
-	module.exports = function basename$1(path$5) {
-		if (typeof path$5 !== "string") return "";
-		for (var i = path$5.length - 1; i >= 0; --i) switch (path$5.charCodeAt(i)) {
+	module.exports = function basename$1(path$6) {
+		if (typeof path$6 !== "string") return "";
+		for (var i = path$6.length - 1; i >= 0; --i) switch (path$6.charCodeAt(i)) {
 			case 47:
 			case 92:
-				path$5 = path$5.slice(i + 1);
-				return path$5 === ".." || path$5 === "." ? "" : path$5;
+				path$6 = path$6.slice(i + 1);
+				return path$6 === ".." || path$6 === "." ? "" : path$6;
 		}
-		return path$5 === ".." || path$5 === "." ? "" : path$5;
+		return path$6 === ".." || path$6 === "." ? "" : path$6;
 	};
 }) });
 
@@ -4938,10 +4943,10 @@ var require_request$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@
 		channels$3.error = { hasSubscribers: false };
 	}
 	var Request$4 = class Request$4 {
-		constructor(origin, { path: path$5, method, body, headers, query, idempotent, blocking, upgrade: upgrade$1, headersTimeout, bodyTimeout, reset, throwOnError, expectContinue }, handler) {
-			if (typeof path$5 !== "string") throw new InvalidArgumentError$20("path must be a string");
-			else if (path$5[0] !== "/" && !(path$5.startsWith("http://") || path$5.startsWith("https://")) && method !== "CONNECT") throw new InvalidArgumentError$20("path must be an absolute URL or start with a slash");
-			else if (invalidPathRegex.exec(path$5) !== null) throw new InvalidArgumentError$20("invalid request path");
+		constructor(origin, { path: path$6, method, body, headers, query, idempotent, blocking, upgrade: upgrade$1, headersTimeout, bodyTimeout, reset, throwOnError, expectContinue }, handler) {
+			if (typeof path$6 !== "string") throw new InvalidArgumentError$20("path must be a string");
+			else if (path$6[0] !== "/" && !(path$6.startsWith("http://") || path$6.startsWith("https://")) && method !== "CONNECT") throw new InvalidArgumentError$20("path must be an absolute URL or start with a slash");
+			else if (invalidPathRegex.exec(path$6) !== null) throw new InvalidArgumentError$20("invalid request path");
 			if (typeof method !== "string") throw new InvalidArgumentError$20("method must be a string");
 			else if (tokenRegExp.exec(method) === null) throw new InvalidArgumentError$20("invalid request method");
 			if (upgrade$1 && typeof upgrade$1 !== "string") throw new InvalidArgumentError$20("upgrade must be a string");
@@ -4978,7 +4983,7 @@ var require_request$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@
 			this.completed = false;
 			this.aborted = false;
 			this.upgrade = upgrade$1 || null;
-			this.path = query ? util$15.buildURL(path$5, query) : path$5;
+			this.path = query ? util$15.buildURL(path$6, query) : path$6;
 			this.origin = origin;
 			this.idempotent = idempotent == null ? method === "HEAD" || method === "GET" : idempotent;
 			this.blocking = blocking == null ? false : blocking;
@@ -5869,9 +5874,9 @@ var require_RedirectHandler = /* @__PURE__ */ __commonJS({ "node_modules/.deno/u
 			if (this.opts.origin) this.history.push(new URL(this.opts.path, this.opts.origin));
 			if (!this.location) return this.handler.onHeaders(statusCode, headers, resume$1, statusText);
 			const { origin, pathname, search } = util$13.parseURL(new URL(this.location, this.opts.origin && new URL(this.opts.path, this.opts.origin)));
-			const path$5 = search ? `${pathname}${search}` : pathname;
+			const path$6 = search ? `${pathname}${search}` : pathname;
 			this.opts.headers = cleanRequestHeaders(this.opts.headers, statusCode === 303, this.opts.origin !== origin);
-			this.opts.path = path$5;
+			this.opts.path = path$6;
 			this.opts.origin = origin;
 			this.opts.maxRedirections = 0;
 			this.opts.query = null;
@@ -6811,7 +6816,7 @@ var require_client = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			writeH2(client, client[kHTTP2Session], request$1);
 			return;
 		}
-		const { body, method, path: path$5, host, upgrade: upgrade$1, headers, blocking, reset } = request$1;
+		const { body, method, path: path$6, host, upgrade: upgrade$1, headers, blocking, reset } = request$1;
 		const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH";
 		if (body && typeof body.read === "function") body.read(0);
 		const bodyLength$1 = util$12.bodyLength(body);
@@ -6841,7 +6846,7 @@ var require_client = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 		if (reset != null) socket[kReset] = reset;
 		if (client[kMaxRequests] && socket[kCounter]++ >= client[kMaxRequests]) socket[kReset] = true;
 		if (blocking) socket[kBlocking] = true;
-		let header = `${method} ${path$5} HTTP/1.1\r\n`;
+		let header = `${method} ${path$6} HTTP/1.1\r\n`;
 		if (typeof host === "string") header += `host: ${host}\r\n`;
 		else header += client[kHostHeader];
 		if (upgrade$1) header += `connection: upgrade\r\nupgrade: ${upgrade$1}\r\n`;
@@ -6910,7 +6915,7 @@ var require_client = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 		return true;
 	}
 	function writeH2(client, session, request$1) {
-		const { body, method, path: path$5, host, upgrade: upgrade$1, expectContinue, signal, headers: reqHeaders } = request$1;
+		const { body, method, path: path$6, host, upgrade: upgrade$1, expectContinue, signal, headers: reqHeaders } = request$1;
 		let headers;
 		if (typeof reqHeaders === "string") headers = Request$3[kHTTP2CopyHeaders](reqHeaders.trim());
 		else headers = reqHeaders;
@@ -6951,7 +6956,7 @@ var require_client = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			});
 			return true;
 		}
-		headers[HTTP2_HEADER_PATH] = path$5;
+		headers[HTTP2_HEADER_PATH] = path$6;
 		headers[HTTP2_HEADER_SCHEME] = "https";
 		const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH";
 		if (body && typeof body.read === "function") body.read(0);
@@ -8755,16 +8760,16 @@ var require_mock_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici
 		for (const [matchHeaderName, matchHeaderValue] of Object.entries(mockDispatch$1.headers)) if (!matchValue$1(matchHeaderValue, getHeaderByName(headers, matchHeaderName))) return false;
 		return true;
 	}
-	function safeUrl(path$5) {
-		if (typeof path$5 !== "string") return path$5;
-		const pathSegments = path$5.split("?");
-		if (pathSegments.length !== 2) return path$5;
+	function safeUrl(path$6) {
+		if (typeof path$6 !== "string") return path$6;
+		const pathSegments = path$6.split("?");
+		if (pathSegments.length !== 2) return path$6;
 		const qp = new URLSearchParams(pathSegments.pop());
 		qp.sort();
 		return [...pathSegments, qp.toString()].join("?");
 	}
-	function matchKey(mockDispatch$1, { path: path$5, method, body, headers }) {
-		const pathMatch = matchValue$1(mockDispatch$1.path, path$5);
+	function matchKey(mockDispatch$1, { path: path$6, method, body, headers }) {
+		const pathMatch = matchValue$1(mockDispatch$1.path, path$6);
 		const methodMatch = matchValue$1(mockDispatch$1.method, method);
 		const bodyMatch = typeof mockDispatch$1.body !== "undefined" ? matchValue$1(mockDispatch$1.body, body) : true;
 		const headersMatch = matchHeaders(mockDispatch$1, headers);
@@ -8778,7 +8783,7 @@ var require_mock_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici
 	function getMockDispatch(mockDispatches, key) {
 		const basePath = key.query ? buildURL$1(key.path, key.query) : key.path;
 		const resolvedPath = typeof basePath === "string" ? safeUrl(basePath) : basePath;
-		let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path$5 }) => matchValue$1(safeUrl(path$5), resolvedPath));
+		let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path$6 }) => matchValue$1(safeUrl(path$6), resolvedPath));
 		if (matchedMockDispatches.length === 0) throw new MockNotMatchedError(`Mock dispatch not matched for path '${resolvedPath}'`);
 		matchedMockDispatches = matchedMockDispatches.filter(({ method }) => matchValue$1(method, key.method));
 		if (matchedMockDispatches.length === 0) throw new MockNotMatchedError(`Mock dispatch not matched for method '${key.method}'`);
@@ -8816,9 +8821,9 @@ var require_mock_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici
 		if (index !== -1) mockDispatches.splice(index, 1);
 	}
 	function buildKey$1(opts) {
-		const { path: path$5, method, body, headers, query } = opts;
+		const { path: path$6, method, body, headers, query } = opts;
 		return {
-			path: path$5,
+			path: path$6,
 			method,
 			body,
 			headers,
@@ -9212,10 +9217,10 @@ var require_pending_interceptors_formatter = /* @__PURE__ */ __commonJS({ "node_
 			});
 		}
 		format(pendingInterceptors) {
-			const withPrettyHeaders = pendingInterceptors.map(({ method, path: path$5, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
+			const withPrettyHeaders = pendingInterceptors.map(({ method, path: path$6, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
 				Method: method,
 				Origin: origin,
-				Path: path$5,
+				Path: path$6,
 				"Status code": statusCode,
 				Persistent: persist ? "✅" : "❌",
 				Invocations: timesInvoked,
@@ -12824,8 +12829,8 @@ var require_util$1 = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 	* path-value        = <any CHAR except CTLs or ";">
 	* @param {string} path
 	*/
-	function validateCookiePath(path$5) {
-		for (const char of path$5) if (char.charCodeAt(0) < 33 || char === ";") throw new Error("Invalid cookie path");
+	function validateCookiePath(path$6) {
+		for (const char of path$6) if (char.charCodeAt(0) < 33 || char === ";") throw new Error("Invalid cookie path");
 	}
 	/**
 	* I have no idea why these values aren't allowed to be honest,
@@ -14365,9 +14370,9 @@ var require_undici = /* @__PURE__ */ __commonJS({ "node_modules/.deno/undici@5.2
 			if (opts != null && typeof opts !== "object") throw new InvalidArgumentError("invalid opts");
 			if (opts && opts.path != null) {
 				if (typeof opts.path !== "string") throw new InvalidArgumentError("invalid opts.path");
-				let path$5 = opts.path;
-				if (!opts.path.startsWith("/")) path$5 = `/${path$5}`;
-				url = new URL(util.parseOrigin(url).origin + path$5);
+				let path$6 = opts.path;
+				if (!opts.path.startsWith("/")) path$6 = `/${path$6}`;
+				url = new URL(util.parseOrigin(url).origin + path$6);
 			} else {
 				if (!opts) opts = typeof url === "object" ? url : {};
 				url = util.parseURL(url);
@@ -14450,13 +14455,13 @@ var require_lib = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+http
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$7 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$7 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$7 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -15453,13 +15458,13 @@ var require_path_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$6 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$6 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$6 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -15471,7 +15476,7 @@ var require_path_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 		return result;
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	const path$4 = __importStar$6(__require("path"));
+	const path$5 = __importStar$6(__require("path"));
 	/**
 	* toPosixPath converts the given path to the posix form. On Windows, \\ will be
 	* replaced with /.
@@ -15503,7 +15508,7 @@ var require_path_utils = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 	* @return string The platform-specific path.
 	*/
 	function toPlatformPath(pth) {
-		return pth.replace(/[/\\]/g, path$4.sep);
+		return pth.replace(/[/\\]/g, path$5.sep);
 	}
 	exports.toPlatformPath = toPlatformPath;
 }) });
@@ -15523,13 +15528,13 @@ var require_io_util = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$5 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$5 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$5 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -15570,12 +15575,12 @@ var require_io_util = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+
 	var _a;
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.READONLY = exports.UV_FS_O_EXLOCK = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rm = exports.rename = exports.readlink = exports.readdir = exports.open = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-	const fs = __importStar$5(__require("fs"));
-	const path$3 = __importStar$5(__require("path"));
-	_a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+	const fs$1 = __importStar$5(__require("fs"));
+	const path$4 = __importStar$5(__require("path"));
+	_a = fs$1.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
 	exports.IS_WINDOWS = process.platform === "win32";
 	exports.UV_FS_O_EXLOCK = 268435456;
-	exports.READONLY = fs.constants.O_RDONLY;
+	exports.READONLY = fs$1.constants.O_RDONLY;
 	function exists(fsPath) {
 		return __awaiter$5(this, void 0, void 0, function* () {
 			try {
@@ -15621,7 +15626,7 @@ var require_io_util = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+
 			}
 			if (stats && stats.isFile()) {
 				if (exports.IS_WINDOWS) {
-					const upperExt = path$3.extname(filePath).toUpperCase();
+					const upperExt = path$4.extname(filePath).toUpperCase();
 					if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) return filePath;
 				} else if (isUnixExecutable(stats)) return filePath;
 			}
@@ -15637,10 +15642,10 @@ var require_io_util = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+
 				if (stats && stats.isFile()) {
 					if (exports.IS_WINDOWS) {
 						try {
-							const directory = path$3.dirname(filePath);
-							const upperName = path$3.basename(filePath).toUpperCase();
+							const directory = path$4.dirname(filePath);
+							const upperName = path$4.basename(filePath).toUpperCase();
 							for (const actualName of yield exports.readdir(directory)) if (upperName === actualName.toUpperCase()) {
-								filePath = path$3.join(directory, actualName);
+								filePath = path$4.join(directory, actualName);
 								break;
 							}
 						} catch (err) {
@@ -15687,13 +15692,13 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$4 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$4 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$4 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -15733,7 +15738,7 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	const assert_1 = __require("assert");
-	const path$2 = __importStar$4(__require("path"));
+	const path$3 = __importStar$4(__require("path"));
 	const ioUtil$1 = __importStar$4(require_io_util());
 	/**
 	* Copies a file or folder.
@@ -15748,12 +15753,12 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 			const { force, recursive, copySourceDirectory } = readCopyOptions(options);
 			const destStat = (yield ioUtil$1.exists(dest)) ? yield ioUtil$1.stat(dest) : null;
 			if (destStat && destStat.isFile() && !force) return;
-			const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path$2.join(dest, path$2.basename(source)) : dest;
+			const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path$3.join(dest, path$3.basename(source)) : dest;
 			if (!(yield ioUtil$1.exists(source))) throw new Error(`no such file or directory: ${source}`);
 			if ((yield ioUtil$1.stat(source)).isDirectory()) if (!recursive) throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
 			else yield cpDirRecursive(source, newDest, 0, force);
 			else {
-				if (path$2.relative(source, newDest) === "") throw new Error(`'${newDest}' and '${source}' are the same file`);
+				if (path$3.relative(source, newDest) === "") throw new Error(`'${newDest}' and '${source}' are the same file`);
 				yield copyFile(source, newDest, force);
 			}
 		});
@@ -15771,13 +15776,13 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 			if (yield ioUtil$1.exists(dest)) {
 				let destExists = true;
 				if (yield ioUtil$1.isDirectory(dest)) {
-					dest = path$2.join(dest, path$2.basename(source));
+					dest = path$3.join(dest, path$3.basename(source));
 					destExists = yield ioUtil$1.exists(dest);
 				}
 				if (destExists) if (options.force == null || options.force) yield rmRF(dest);
 				else throw new Error("Destination already exists");
 			}
-			yield mkdirP(path$2.dirname(dest));
+			yield mkdirP(path$3.dirname(dest));
 			yield ioUtil$1.rename(source, dest);
 		});
 	}
@@ -15852,21 +15857,21 @@ var require_io = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+io@1.
 			if (!tool) throw new Error("parameter 'tool' is required");
 			const extensions = [];
 			if (ioUtil$1.IS_WINDOWS && process.env["PATHEXT"]) {
-				for (const extension of process.env["PATHEXT"].split(path$2.delimiter)) if (extension) extensions.push(extension);
+				for (const extension of process.env["PATHEXT"].split(path$3.delimiter)) if (extension) extensions.push(extension);
 			}
 			if (ioUtil$1.isRooted(tool)) {
 				const filePath = yield ioUtil$1.tryGetExecutablePath(tool, extensions);
 				if (filePath) return [filePath];
 				return [];
 			}
-			if (tool.includes(path$2.sep)) return [];
+			if (tool.includes(path$3.sep)) return [];
 			const directories = [];
 			if (process.env.PATH) {
-				for (const p of process.env.PATH.split(path$2.delimiter)) if (p) directories.push(p);
+				for (const p of process.env.PATH.split(path$3.delimiter)) if (p) directories.push(p);
 			}
 			const matches = [];
 			for (const directory of directories) {
-				const filePath = yield ioUtil$1.tryGetExecutablePath(path$2.join(directory, tool), extensions);
+				const filePath = yield ioUtil$1.tryGetExecutablePath(path$3.join(directory, tool), extensions);
 				if (filePath) matches.push(filePath);
 			}
 			return matches;
@@ -15929,13 +15934,13 @@ var require_toolrunner = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$3 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$3 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$3 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -15977,7 +15982,7 @@ var require_toolrunner = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 	const os$1 = __importStar$3(__require("os"));
 	const events = __importStar$3(__require("events"));
 	const child = __importStar$3(__require("child_process"));
-	const path$1 = __importStar$3(__require("path"));
+	const path$2 = __importStar$3(__require("path"));
 	const io = __importStar$3(require_io());
 	const ioUtil = __importStar$3(require_io_util());
 	const timers_1 = __require("timers");
@@ -16153,7 +16158,7 @@ var require_toolrunner = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actio
 		*/
 		exec() {
 			return __awaiter$3(this, void 0, void 0, function* () {
-				if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) this.toolPath = path$1.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+				if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) this.toolPath = path$2.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
 				this.toolPath = yield io.which(this.toolPath, true);
 				return new Promise((resolve, reject) => __awaiter$3(this, void 0, void 0, function* () {
 					this._debug(`exec tool: ${this.toolPath}`);
@@ -16328,13 +16333,13 @@ var require_exec = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+exe
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$2 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$2 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$2 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -16456,13 +16461,13 @@ var require_platform = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault$1 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault$1 = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar$1 = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -16572,13 +16577,13 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 		if (k2 === void 0) k2 = k;
 		o[k2] = m[k];
 	}));
-	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v$1) {
 		Object.defineProperty(o, "default", {
 			enumerable: true,
-			value: v
+			value: v$1
 		});
-	}) : function(o, v) {
-		o["default"] = v;
+	}) : function(o, v$1) {
+		o["default"] = v$1;
 	});
 	var __importStar = exports && exports.__importStar || function(mod) {
 		if (mod && mod.__esModule) return mod;
@@ -16622,7 +16627,7 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 	const file_command_1 = require_file_command();
 	const utils_1 = require_utils$1();
 	const os = __importStar(__require("os"));
-	const path = __importStar(__require("path"));
+	const path$1 = __importStar(__require("path"));
 	const oidc_utils_1 = require_oidc_utils();
 	/**
 	* The code to exit an action
@@ -16665,7 +16670,7 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 	function addPath(inputPath) {
 		if (process.env["GITHUB_PATH"] || "") (0, file_command_1.issueFileCommand)("PATH", inputPath);
 		else (0, command_1.issueCommand)("add-path", {}, inputPath);
-		process.env["PATH"] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
+		process.env["PATH"] = `${inputPath}${path$1.delimiter}${process.env["PATH"]}`;
 	}
 	exports.addPath = addPath;
 	/**
@@ -16921,28 +16926,338 @@ var require_core = /* @__PURE__ */ __commonJS({ "node_modules/.deno/@actions+cor
 }) });
 
 //#endregion
-//#region src/action-version.ts
-var import_core = /* @__PURE__ */ __toESM(require_core());
+//#region src/script-version.ts
+var import_core$4 = /* @__PURE__ */ __toESM(require_core());
 /**
+* Run build once to generate this file.
+*
 * Mirrors deno.json { version }.
 */
 const VERSION = "0.1.0";
 
 //#endregion
+//#region src/lifecycle.ts
+const startTime = /* @__PURE__ */ new Date();
+function markScriptStart() {
+	import_core$4.info(`🔹 Starting Zephyr Release 🍃 • version: ${VERSION} • at: ${startTime.toISOString()}`);
+}
+function markScriptEnd(reason) {
+	const endTime = /* @__PURE__ */ new Date();
+	import_core$4.info(`🔹 ${reason} Zephyr Release 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${endTime.getTime() - startTime.getTime()}ms)`);
+	process$1.exit();
+}
+
+//#endregion
+//#region src/checkout.ts
+function throwIfRepoNotCheckedOut(workspace) {
+	if (!fs.existsSync(path.join(workspace, ".git"))) manualExit$1("Repository not checked out. See: https://github.com/actions/checkout");
+}
+
+//#endregion
+//#region src/input.ts
+var import_core$3 = /* @__PURE__ */ __toESM(require_core());
+function GetActionInputs() {
+	const workspace = process$1.env.GITHUB_WORKSPACE;
+	const token = import_core$3.getInput("token", { required: true });
+	const configPath = import_core$3.getInput("config-path");
+	const configInline = import_core$3.getInput("config-override");
+	if (!configPath && !configInline) manualExit("Missing required input. Must set either `config-path` or `config-override`.");
+	return {
+		workspace,
+		token,
+		configPath,
+		configInline
+	};
+}
+
+//#endregion
+//#region src/schemas/configs/modules/components/timezone.ts
+const supportedIanaTimeZones = Intl.supportedValuesOf("timeZone");
+const TimeZoneSchema = v.picklist(["UTC", ...supportedIanaTimeZones]);
+
+//#endregion
+//#region src/schemas/configs/modules/components/commit-type.ts
+const CommitTypeSchema = v.object({
+	type: v.pipe(v.string(), v.nonEmpty(), v.metadata({ description: "Commit type." })),
+	section: v.pipe(v.optional(v.string(), ""), v.metadata({ description: "Changelog section heading for this commit type." })),
+	changelogHidden: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "Exclude this commit type from changelog generation." }))
+});
+
+//#endregion
+//#region src/constants/version-file-type.ts
+const VersionFileResolvers = {
+	auto: "auto",
+	json: "json",
+	yaml: "yaml",
+	toml: "toml",
+	regex: "regex"
+};
+
+//#endregion
+//#region src/schemas/configs/modules/components/version-file.ts
+const VersionFileSchema = v.object({
+	path: v.pipe(v.string(), v.nonEmpty(), v.metadata({ description: "Path to the version file, relative to the project root." })),
+	resolver: v.pipe(v.optional(v.enum(VersionFileResolvers), "auto"), v.metadata({ description: "Defines how to resolve the version from this file.\nDefault: `auto`" })),
+	selector: v.pipe(v.string(), v.nonEmpty(), v.metadata({ description: "Json path to locates the version field. For regex resolver, supply a regex string." })),
+	primary: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "Marks this file as the primary source of truth for the current version." }))
+});
+
+//#endregion
+//#region src/schemas/configs/modules/components/commands.ts
+const CommandsSchema = v.object({
+	pre: v.pipe(v.optional(v.array(v.string()), []), v.metadata({ description: "Commands to run before the operation.\nDefault: `[]`" })),
+	post: v.pipe(v.optional(v.array(v.string()), []), v.metadata({ description: "Commands to run after the operation.\nDefault: `[]`" }))
+});
+
+//#endregion
+//#region src/constants/regex.ts
+/**
+* Official full SemVer regex.
+*
+* See: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+*/
+const SEMVER_REGEX = /* @__PURE__ */ new RegExp("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+
+//#endregion
+//#region src/constants/defaults/commit.ts
+/**
+* See: https://git.io/JqCZL
+*/
+const DEFAULT_COMMIT_TYPES = [
+	{
+		type: "feat",
+		section: "Features"
+	},
+	{
+		type: "fix",
+		section: "Bug Fixes"
+	},
+	{
+		type: "perf",
+		section: "Performance Improvements"
+	},
+	{
+		type: "revert",
+		section: "Reverts"
+	}
+];
+
+//#endregion
+//#region src/schemas/configs/modules/base-config.ts
+const BaseConfigSchema = v.object({
+	name: v.pipe(v.optional(v.string(), ""), v.metadata({ description: "Project name, available in string pattern as ${name}." })),
+	timeZone: v.pipe(v.optional(TimeZoneSchema, "UTC"), v.metadata({ description: "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: `UTC`." })),
+	commands: v.pipe(v.optional(CommandsSchema, {}), v.metadata({ description: "Pre/post command lists to run around the main operation. Each command runs from the repository root." })),
+	initialVersion: v.pipe(v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"), v.metadata({ description: "Initial SemVer version applied when no existing version is found.\nDefault: `0.1.0`" })),
+	versionFiles: v.pipe(v.union([VersionFileSchema, v.array(VersionFileSchema)]), v.metadata({ description: "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be.\nAbout default: link-to-inert-later" })),
+	commitTypes: v.pipe(v.optional(v.array(CommitTypeSchema), DEFAULT_COMMIT_TYPES), v.metadata({ description: "List of commit types used for version calculation and changelog generation.\nDefault: `[! (breaking), feat, fix, perf, revert]`." }))
+});
+
+//#endregion
+//#region src/schemas/configs/modules/components/bump-rule.ts
+const BumpRuleSchema = v.object({
+	types: v.pipe(v.optional(v.array(v.string()), []), v.metadata({ description: "Commit types that count toward version bumping." })),
+	countBreakingAsCommit: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`" })),
+	countBreakingAsBump: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`" })),
+	commitsPerBump: v.pipe(v.optional(v.pipe(v.union([
+		v.pipe(v.number(), v.minValue(0), v.integer()),
+		v.literal(Infinity),
+		v.literal("Infinity")
+	]), v.transform((value) => typeof value === "string" ? Infinity : value)), 1), v.metadata({ description: "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`." }))
+});
+
+//#endregion
+//#region src/constants/defaults/bump-strategy.ts
+const DEFAULT_MAJOR_BUMP_STRATEGY = {
+	types: [],
+	countBreakingAsBump: true,
+	commitsPerBump: 1
+};
+const DEFAULT_MINOR_BUMP_STRATEGY = {
+	types: ["feat"],
+	commitsPerBump: 1
+};
+const DEFAULT_PATCH_BUMP_STRATEGY = {
+	types: ["fix", "perf"],
+	commitsPerBump: 1
+};
+const DEFAULT_PRERELEASE_BUMP_STRATEGY = {
+	types: [],
+	commitsPerBump: 1
+};
+const DEFAULT_BUILD_BUMP_STRATEGY = {
+	types: [],
+	commitsPerBump: 1
+};
+
+//#endregion
+//#region src/schemas/configs/modules/bump-strategy-config.ts
+const BumpStrategyConfigSchema = v.pipe(v.object({
+	major: v.pipe(v.optional(BumpRuleSchema, DEFAULT_MAJOR_BUMP_STRATEGY), v.metadata({ description: "Strategy for bumping major version (x.0.0)." })),
+	minor: v.pipe(v.optional(BumpRuleSchema, DEFAULT_MINOR_BUMP_STRATEGY), v.metadata({ description: "Strategy for bumping minor version (0.x.0).\nDefault: `[feat]`." })),
+	patch: v.pipe(v.optional(BumpRuleSchema, DEFAULT_PATCH_BUMP_STRATEGY), v.metadata({ description: "Strategy for bumping patch version (0.0.x).\nDefault: `[fix, perf]`." })),
+	prerelease: v.pipe(v.optional(BumpRuleSchema, DEFAULT_PRERELEASE_BUMP_STRATEGY), v.metadata({ description: "Strategy for bumping prerelease version (x.x.x-alpha.x).\nDefault: `[]`." })),
+	build: v.pipe(v.optional(BumpRuleSchema, DEFAULT_BUILD_BUMP_STRATEGY), v.metadata({ description: "Strategy for bumping build metadata (x.x.x+meta).\nDefault: `[]`." })),
+	bumpMinorForMajorPreStable: v.pipe(v.optional(v.boolean(), true), v.metadata({ description: "Redirects major version bumps to minor in pre-1.0 (0.x.x).\nDefault: `true`." })),
+	bumpPatchForMinorPreStable: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "Redirects minor version bumps to patch in pre-1.0 (0.x.x).\nDefault: `false`." }))
+}), v.metadata({ description: "Configuration options to calculate the next version number." }));
+
+//#endregion
+//#region src/schemas/configs/modules/components/label.ts
+const LabelSchema = v.object({
+	name: v.string(),
+	description: v.optional(v.string(), ""),
+	color: v.pipe(v.optional(v.pipe(v.string(), v.nonEmpty()), "ededed"), v.metadata({ description: "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`" }))
+});
+
+//#endregion
+//#region src/constants/defaults/string-pattern.ts
+const DEFAULT_CHANGELOG_HEADING_PATTERN = "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->";
+const DEFAULT_CHANGELOG_BODY_PATTERN = "${changelogContent}";
+const DEFAULT_PULL_REQUEST_TITLE_PATTERN = "chore: release v${version}";
+const DEFAULT_PULL_REQUEST_HEADER_PATTERN = "🤖 New release created. Stand by for approval";
+const DEFAULT_PULL_REQUEST_BODY_PATTERN = "${changelog}";
+const DEFAULT_PULL_REQUEST_FOOTER_PATTERN = "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)";
+const DEFAULT_TAG_NAME_PATTERN = "v${version}";
+const DEFAULT_RELEASE_TITLE_PATTERN = "${tagName}";
+const DEFAULT_RELEASE_BODY_PATTERN = "${changelog}";
+
+//#endregion
+//#region src/constants/defaults/label.ts
+const DEFAULT_LABEL_ON_CREATE = {
+	name: "zp-release: pending",
+	description: "Indicates that the pull request is pending release.",
+	color: "FBCA04"
+};
+const DEFAULT_LABEL_ON_CLOSE = {
+	name: "zp-release: released",
+	description: "Indicates that the pull request is closed and the release has completed.",
+	color: "0E8A16"
+};
+
+//#endregion
+//#region src/schemas/configs/modules/pull-request-config.ts
+const PullRequestConfigSchema = v.pipe(v.object({
+	enabled: v.pipe(v.optional(v.boolean(), true), v.metadata({ description: "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`." })),
+	commands: v.pipe(v.optional(CommandsSchema, {}), v.metadata({ description: "Pre/post command lists to run around the pull request operation. Each command runs from the repository root." })),
+	branchNamePattern: v.pipe(v.optional(v.pipe(v.string(), v.nonEmpty()), "release/zephyr-release"), v.metadata({ description: "Pattern for branch name that Zephyr Release is gonna use." })),
+	labelsOnCreate: v.pipe(v.optional(v.union([LabelSchema, v.array(LabelSchema)]), DEFAULT_LABEL_ON_CREATE), v.metadata({ description: "A label or an array of labels to add to the pull request when it is created" })),
+	labelsOnClose: v.pipe(v.optional(v.union([LabelSchema, v.array(LabelSchema)]), DEFAULT_LABEL_ON_CLOSE), v.metadata({ description: "A label or an array of labels to add to the pull request when it is closed and the release operation has completed." })),
+	titlePattern: v.pipe(v.optional(v.pipe(v.string(), v.nonEmpty()), DEFAULT_PULL_REQUEST_TITLE_PATTERN), v.metadata({ description: "Pattern for pull request title." })),
+	headerPattern: v.pipe(v.optional(v.union([v.string(), v.array(v.string())]), DEFAULT_PULL_REQUEST_HEADER_PATTERN), v.metadata({ description: "Pattern for pull request header. If an array is provided, it will randomly choose one from it." })),
+	bodyPattern: v.pipe(v.optional(v.string(), DEFAULT_PULL_REQUEST_BODY_PATTERN), v.metadata({ description: "Pattern for pull request body." })),
+	bodyPatternPath: v.pipe(v.optional(v.string(), ""), v.metadata({ description: "Path to text file containing pull request body pattern. Overrides body pattern if both are provided." })),
+	footerPattern: v.pipe(v.optional(v.string(), DEFAULT_PULL_REQUEST_FOOTER_PATTERN), v.metadata({ description: "Pattern for pull request footer." }))
+}), v.metadata({ description: "Configuration specific to pull requests." }));
+
+//#endregion
+//#region src/schemas/configs/modules/release-config.ts
+const ReleaseConfigSchema = v.pipe(v.object({
+	enabled: v.pipe(v.optional(v.boolean(), true), v.metadata({ description: "Enable/disable tag and release.\nDefault: `true`." })),
+	skipRelease: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "If enabled, only the tag will be created, no release will be made.\nDefault: `false`." })),
+	commands: v.pipe(v.optional(CommandsSchema, {}), v.metadata({ description: "Pre/post command lists to run around the release operation. Each command runs from the repository root." })),
+	prerelease: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "If enabled, the release will be marked as prerelease.\nDefault: `false`." })),
+	draft: v.pipe(v.optional(v.boolean(), false), v.metadata({ description: "If enabled, the release will be created as draft.\nDefault: `false`." })),
+	tagNamePattern: v.pipe(v.optional(v.pipe(v.string(), v.nonEmpty()), DEFAULT_TAG_NAME_PATTERN), v.metadata({ description: "Pattern for tag name, available in string pattern as `${tagName}`." })),
+	titlePattern: v.pipe(v.optional(v.string(), DEFAULT_RELEASE_TITLE_PATTERN), v.metadata({ description: "Pattern for release title." })),
+	bodyPattern: v.pipe(v.optional(v.string(), DEFAULT_RELEASE_BODY_PATTERN), v.metadata({ description: "Pattern for release body." }))
+}), v.metadata({ description: "Configuration specific to tags and releases." }));
+
+//#endregion
+//#region src/schemas/configs/modules/changelog-config.ts
+const ChangelogConfigSchema = v.pipe(v.object({
+	enabled: v.pipe(v.optional(v.boolean(), true), v.metadata({ description: "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: `true`." })),
+	commands: v.pipe(v.optional(CommandsSchema, {}), v.metadata({ description: "Pre/post command lists to run around the changelog operation. Each command runs from the repository root." })),
+	contentOverride: v.pipe(v.optional(v.string(), ""), v.metadata({ description: "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the built-in generation process and uses this value as the changelog content. Should only be set dynamically in workflow input, not json config." })),
+	filePath: v.pipe(v.optional(v.string(), "CHANGELOG.md"), v.metadata({ description: "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: `CHANGELOG.md`" })),
+	headingPattern: v.pipe(v.optional(v.string(), DEFAULT_CHANGELOG_HEADING_PATTERN), v.metadata({ description: "Pattern for changelog heading." })),
+	bodyPattern: v.pipe(v.optional(v.string(), DEFAULT_CHANGELOG_BODY_PATTERN), v.metadata({ description: "Pattern for changelog body." })),
+	bodyPatternPath: v.pipe(v.optional(v.string(), ""), v.metadata({ description: "Path to text file containing changelog body pattern. Overrides body pattern if both are provided." }))
+}), v.metadata({ description: "Configuration specific to changelogs. All generated changelog lines are available in string pattern as ${changelog}" }));
+
+//#endregion
+//#region src/schemas/configs/config.ts
+const ConfigSchema = v.pipe(v.object({
+	...BaseConfigSchema.entries,
+	bumpStrategy: v.optional(BumpStrategyConfigSchema, {}),
+	changelog: v.optional(ChangelogConfigSchema, {}),
+	pullRequest: v.optional(PullRequestConfigSchema, {}),
+	release: v.optional(ReleaseConfigSchema, {})
+}), v.metadata({
+	title: "Zephyr Release configuration file",
+	description: "A JSON representation of a Zephyr Release configuration file."
+}));
+const ParseJsonConfigSchema = v.pipe(v.string(), v.parseJson({ reviver: (_key, value) => {
+	if (value && typeof value === "object" && !Array.isArray(value)) return Object.fromEntries(Object.entries(value).map(([k, v$1]) => [toCamelCase(k), v$1]));
+	return value;
+} }), ConfigSchema);
+
+//#endregion
+//#region src/config.ts
+var import_core$2 = /* @__PURE__ */ __toESM(require_core());
+function resolveConfig(workspace, configPath, configInlineJson) {
+	let configFile;
+	let configInline;
+	let finalConfig;
+	if (configPath) {
+		import_core$2.info("Reading config file from config path...");
+		const configJson = fs.readFileSync(path.join(workspace, configPath), { encoding: "utf8" });
+		configFile = v.parse(ParseJsonConfigSchema, configJson);
+		import_core$2.info("Config parsed successfully.");
+		import_core$2.debug(JSON.stringify(configFile, null, 2));
+	}
+	if (configInlineJson) {
+		import_core$2.info("Reading config override from action input...");
+		configInline = v.parse(ParseJsonConfigSchema, configInlineJson);
+		import_core$2.info("Config override parsed successfully.");
+		import_core$2.debug(JSON.stringify(configInline, null, 2));
+	}
+	import_core$2.info("Resolving final config...");
+	if (configFile && configInline) {
+		import_core$2.info("Both config file and config inline exist, merging...");
+		finalConfig = deepMerge(configFile, configInline, { arrays: "replace" });
+	} else if (configFile) {
+		import_core$2.info(`Only config file exist, use config file as final config.`);
+		finalConfig = configFile;
+	} else if (configInline) {
+		import_core$2.info(`Only config inline exist, use config inline as final config.`);
+		finalConfig = configInline;
+	} else throw new Error("Both config file and config inline are not resolvable.");
+	return v.parse(ConfigSchema, finalConfig);
+}
+
+//#endregion
 //#region src/run.ts
-async function run() {}
+var import_core$1 = /* @__PURE__ */ __toESM(require_core());
+async function run() {
+	import_core$1.info("Reading inputs...");
+	const inputs = GetActionInputs();
+	import_core$1.info("Inputs parsed successfully.");
+	import_core$1.debug(JSON.stringify(inputs, null, 2));
+	throwIfRepoNotCheckedOut(inputs.workspace);
+	import_core$1.info("Resolving configuration from config file and config override...");
+	const config = resolveConfig(inputs.workspace, inputs.configPath, inputs.configInline);
+	import_core$1.info("Configuration resolved successfully.");
+	import_core$1.debug(JSON.stringify(config, null, 2));
+}
 
 //#endregion
 //#region src/main.ts
+var import_core = /* @__PURE__ */ __toESM(require_core());
 async function main() {
-	import_core.info(`🔹 Start zephyr-release - version: ${VERSION} 🍃`);
+	markScriptStart();
 	try {
-		await /* @__PURE__ */ run();
+		await run();
 	} catch (error$1) {
-		import_core.setFailed("❌ An unexpected error occurred:\n" + error$1);
-		process$1.exit();
+		import_core.setFailed("❌ An unexpected error occurred: " + error$1);
+		if (error$1 instanceof Error && error$1.stack) {
+			import_core.startGroup("Stack trace:");
+			import_core.info(error$1.stack);
+			import_core.endGroup();
+		}
+		markScriptEnd("Failed");
 	}
-	import_core.info(`🔹 Finished zephyr-release - version: ${VERSION} ✔`);
+	markScriptEnd("Finished");
 }
 main();
 

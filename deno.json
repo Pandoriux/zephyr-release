@@ -38,6 +38,10 @@
     "lib": ["deno.ns"]
   },
 
+  "lint": {
+    "include": ["src/"]
+  },
+
   "fmt": {
     "operatorPosition": "nextLine"
   }

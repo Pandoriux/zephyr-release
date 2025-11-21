@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { VersionFileResolvers } from "../../../../constants/version-file-type.ts";
+import { VersionFileResolvers } from "../../../../constants/version-file-resolvers.ts";
 
 export const VersionFileSchema = v.object({
   path: v.pipe(

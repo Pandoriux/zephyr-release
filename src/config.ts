@@ -1,58 +1,72 @@
 import fs from "node:fs";
 import path from "node:path";
+import { toCamelCase } from "@std/text";
 import { deepMerge } from "@std/collections";
 import * as core from "@actions/core";
 import * as v from "@valibot/valibot";
-import {
-  ConfigSchema,
-  ParseJsonConfigSchema,
-} from "./schemas/configs/config.ts";
+import { type ConfigOutput, ConfigSchema } from "./schemas/configs/config.ts";
+
+function reviveKeysToCamelCase(_key: string, value: unknown) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [toCamelCase(k), v]),
+    );
+  }
+
+  return value;
+}
 
 export function resolveConfig(
   workspace: string,
   configPath: string,
-  configInlineJson: string,
-) {
+  configOverrideStr: string,
+): ConfigOutput {
   let configFile: unknown;
-  let configInline: unknown;
+  let configOverride: unknown;
   let finalConfig: unknown;
 
+  core.info("Reading config file from config path...");
   if (configPath) {
-    core.info("Reading config file from config path...");
-
     const configJson = fs.readFileSync(path.join(workspace, configPath), {
       encoding: "utf8",
     });
 
-    configFile = v.parse(ParseJsonConfigSchema, configJson);
+    configFile = JSON.parse(configJson, reviveKeysToCamelCase);
 
     core.info("Config parsed successfully.");
     core.debug(JSON.stringify(configFile, null, 2));
+  } else {
+    core.info("Config path not provided. Skipping...");
   }
 
-  if (configInlineJson) {
-    core.info("Reading config override from action input...");
-
-    configInline = v.parse(ParseJsonConfigSchema, configInlineJson);
+  core.info("Reading config override from action input...");
+  if (configOverrideStr) {
+    configOverride = JSON.parse(configOverrideStr, reviveKeysToCamelCase);
 
     core.info("Config override parsed successfully.");
-    core.debug(JSON.stringify(configInline, null, 2));
+    core.debug(JSON.stringify(configOverride, null, 2));
+  } else {
+    core.info("Config override not provided. Skipping...");
   }
 
   core.info("Resolving final config...");
-
-  if (configFile && configInline) {
-    core.info("Both config file and config inline exist, merging...");
-    finalConfig = deepMerge(configFile, configInline, { arrays: "replace" });
+  if (configFile && configOverride) {
+    core.info("Both config file and config override exist, merging...");
+    finalConfig = deepMerge(configFile, configOverride, { arrays: "replace" });
   } else if (configFile) {
-    core.info(`Only config file exist, use config file as final config.`);
+    core.info("Only config file exist, use config file as final config.");
     finalConfig = configFile;
-  } else if (configInline) {
-    core.info(`Only config inline exist, use config inline as final config.`);
-    finalConfig = configInline;
+  } else if (configOverride) {
+    core.info(
+      "Only config override exist, use config override as final config.",
+    );
+    finalConfig = configOverride;
   } else {
-    throw new Error("Both config file and config inline are not resolvable.");
+    throw new Error("Both config file and config override are missing.");
   }
 
-  return v.parse(ConfigSchema, finalConfig);
+  const resolvedConfig = v.parse(ConfigSchema, finalConfig);
+  core.debug(JSON.stringify(resolvedConfig, null, 2));
+
+  return resolvedConfig;
 }

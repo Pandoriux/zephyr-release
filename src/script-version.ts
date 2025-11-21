@@ -2,6 +2,8 @@
 // No need to create or edit it manually.
 
 /**
+ * Run build once to generate this file.
+ *
  * Mirrors deno.json { version }.
  */
 export const VERSION = "0.1.0";

@@ -1,19 +1,29 @@
 import process from "node:process";
 import * as core from "@actions/core";
-import { manualExit } from "./main.ts";
+import { exitFailure } from "./lifecycle.ts";
 
-export function GetActionInputs() {
+interface ActionInputs {
+  workspace: string;
+  token: string;
+  configPath: string;
+  configOverrideStr: string;
+}
+
+export function GetActionInputs(): ActionInputs {
   const workspace = process.env.GITHUB_WORKSPACE!;
 
   const token = core.getInput("token", { required: true });
   const configPath = core.getInput("config-path");
-  const configInline = core.getInput("config-override");
+  const configOverrideStr = core.getInput("config-override");
 
-  if (!configPath && !configInline) {
-    manualExit(
+  if (!configPath && !configOverrideStr) {
+    exitFailure(
       "Missing required input. Must set either `config-path` or `config-override`.",
     );
   }
 
-  return { workspace, token, configPath, configInline };
+  const inputs = { workspace, token, configPath, configOverrideStr };
+  core.debug(JSON.stringify(inputs, null, 2));
+
+  return inputs;
 }

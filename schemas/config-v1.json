@@ -538,7 +538,38 @@
           }
         }
       ],
-      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be.\nAbout default: link-to-inert-later"
+      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be.\nAbout primary file: link-to-inert-later"
+    },
+    "files-to-commit": {
+      "anyOf": [
+        {
+          "enum": [
+            "base",
+            "all"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "enum": [
+                  "base",
+                  "all"
+                ]
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "default": "base",
+      "description": "Files to include in the commit. Accepts `base`, `all` options or an array of option and paths/globs.\nPaths are relative to the repo root.\nDefault: `base`",
+      "examples": [
+        []
+      ]
     },
     "commit-types": {
       "type": "array",
