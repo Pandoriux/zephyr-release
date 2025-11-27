@@ -117,13 +117,14 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 #### VersionFile
-
+ 
 Type: `object`  
 **Properties:**
-
+ 
 - `path` (Required): Path to the version file, relative to the project root.
-- `resolver` (Optional): Defines how to resolve the version from this file. Default: `"auto"`
-- `selector` (Required): Json path to locates the version field. For regex resolver, supply a regex string.
+- `parser` (Optional): Defines how the file should be parsed before extracting the version. Allowed values: `auto`, `json`, `yaml`, `toml`, `txt`. Default: `"auto"`
+- `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
+- `selector` (Required): The lookup used by the chosen extractor. For `json-path`, this is the JSON path string; for `regex`, supply the pattern.
 - `primary` (Optional): Marks this file as the primary source of truth for the current version. Default: `false`
 
 ### files-to-commit (Optional)

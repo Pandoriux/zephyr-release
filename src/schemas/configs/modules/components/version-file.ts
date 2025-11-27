@@ -1,5 +1,8 @@
 import * as v from "@valibot/valibot";
-import { VersionFileResolvers } from "../../../../constants/version-file-resolvers.ts";
+import {
+  VersionFileExtractors,
+  VersionFileParsers,
+} from "../../../../constants/version-file-options.ts";
 
 export const VersionFileSchema = v.object({
   path: v.pipe(
@@ -9,10 +12,17 @@ export const VersionFileSchema = v.object({
       description: "Path to the version file, relative to the project root.",
     }),
   ),
-  resolver: v.pipe(
-    v.optional(v.enum(VersionFileResolvers), "auto"),
+  parser: v.pipe(
+    v.optional(v.enum(VersionFileParsers), "auto"),
     v.metadata({
-      description: "Defines how to resolve the version from this file."
+      description: "Defines which parser should be used to parse the file."
+        + "\nDefault: `auto`",
+    }),
+  ),
+  extractor: v.pipe(
+    v.optional(v.enum(VersionFileExtractors), "auto"),
+    v.metadata({
+      description: "Defines how to extract the version from the parsed file."
         + "\nDefault: `auto`",
     }),
   ),
@@ -21,7 +31,7 @@ export const VersionFileSchema = v.object({
     v.nonEmpty(),
     v.metadata({
       description:
-        "Json path to locates the version field. For regex resolver, supply a regex string.",
+        "Defines how to locate the version field, depends on `extractor`.",
     }),
   ),
   primary: v.pipe(
