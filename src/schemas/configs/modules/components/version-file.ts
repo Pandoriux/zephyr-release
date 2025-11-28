@@ -1,8 +1,6 @@
 import * as v from "@valibot/valibot";
-import {
-  VersionFileExtractors,
-  VersionFileParsers,
-} from "../../../../constants/version-file-options.ts";
+import { FileFormats } from "../../../../constants/file-format.ts";
+import { VersionFileExtractors } from "../../../../constants/version-file-options.ts";
 
 export const VersionFileSchema = v.object({
   path: v.pipe(
@@ -12,10 +10,10 @@ export const VersionFileSchema = v.object({
       description: "Path to the version file, relative to the project root.",
     }),
   ),
-  parser: v.pipe(
-    v.optional(v.enum(VersionFileParsers), "auto"),
+  format: v.pipe(
+    v.optional(v.enum(FileFormats), "auto"),
     v.metadata({
-      description: "Defines which parser should be used to parse the file."
+      description: "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`."
         + "\nDefault: `auto`",
     }),
   ),

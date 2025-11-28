@@ -15,10 +15,18 @@ inputs:
     description: Path to config file, relative to project root.
     required: false
     default: ""
+  config-format:
+    description: The format of config file. Allowed values are `auto`, `json/jsonc/json5`, `yaml/yml`, `toml`.
+    required: false
+    default: "auto"
   config-override:
     description: Config written in literal block scalar ( | ), will merge with config file and override duplicate keys.
     required: false
     default: ""
+  config-override-format:
+    description: The format of config override. Allowed values are `auto`, `json/jsonc/json5`, `yaml/yml`, `toml`.
+    required: false
+    default: "auto"
 
 runs:
   using: "node24"

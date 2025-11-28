@@ -22,7 +22,7 @@ export function markScriptEnd(reason: "Finished" | "Failed") {
   process.exit();
 }
 
-export function exitFailure(message: string) {
+export function exitFailure(message: string): never {
   const endTime = new Date();
 
   core.setFailed(`❌ ${message}`);

@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
-import { throwIfRepoNotCheckedOut } from "./checkout.ts";
-import { GetActionInputs } from "./input.ts";
+import { throwIfRepoNotCheckedOut } from "./workflows/checkout.ts";
+import { GetActionInputs } from "./workflows/inputs.ts";
 import { resolveConfig } from "./config.ts";
 
 export async function run() {
@@ -14,7 +14,7 @@ export async function run() {
   const config = resolveConfig(
     inputs.workspace,
     inputs.configPath,
-    inputs.configOverrideStr,
+    inputs.configOverride,
   );
   core.info("Configuration resolved successfully.");
 }

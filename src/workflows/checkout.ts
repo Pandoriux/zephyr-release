@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { exitFailure } from "./lifecycle.ts";
+import { exitFailure } from "../lifecycle.ts";
 
 export function throwIfRepoNotCheckedOut(workspace: string) {
   if (!fs.existsSync(path.join(workspace, ".git"))) {

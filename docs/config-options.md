@@ -122,7 +122,7 @@ Type: `object`
 **Properties:**
  
 - `path` (Required): Path to the version file, relative to the project root.
-- `parser` (Optional): Defines how the file should be parsed before extracting the version. Allowed values: `auto`, `json`, `yaml`, `toml`, `txt`. Default: `"auto"`
+- `format` (Optional): Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`. Default: `"auto"`
 - `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
 - `selector` (Required): The lookup used by the chosen extractor. For `json-path`, this is the JSON path string; for `regex`, supply the pattern.
 - `primary` (Optional): Marks this file as the primary source of truth for the current version. Default: `false`

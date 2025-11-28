@@ -15,21 +15,21 @@
   "version-files": [
     {
       "path": "deno.json",
-      "parser": "json",
+      "format": "json",
       "extractor": "json-path",
       "selector": "version",
       "primary": true
     },
     {
       "path": "package.json",
-      // "parser": "auto", // default value is auto
+      // "format": "auto", // default value is auto
       // "extractor": "auto", // default value is auto
       "selector": "version"
     },
     {
       // Ex: Using regex to find version in a text file
       "path": "version.txt",
-      "parser": "txt",
+      "format": "txt",
       "extractor": "regex",
       "selector": "^v?(\\d+\\.\\d+\\.\\d+)$"
     }

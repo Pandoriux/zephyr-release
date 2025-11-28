@@ -43,6 +43,6 @@
   },
 
   "fmt": {
-    "operatorPosition": "nextLine"
+    "include": ["src/"]
   }
 }
