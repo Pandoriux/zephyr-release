@@ -7,8 +7,8 @@ export const LabelSchema = v.object({
     v.optional(v.pipe(v.string(), v.nonEmpty()), "ededed"),
     v.metadata({
       description:
-        "The hexadecimal color code for the label, without the leading #."
-        + "\nDefault: `ededed`",
+        "The hexadecimal color code for the label, without the leading #.\n" +
+        "Default: `ededed`",
     }),
   ),
 });

@@ -18,9 +18,9 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases "
-          + "will be committed and created directly."
-          + "\nDefault: `true`.",
+          "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases " +
+          "will be committed and created directly.\n" +
+          "Default: `true`.",
       }),
     ),
     commands: v.pipe(

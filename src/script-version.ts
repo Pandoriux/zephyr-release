@@ -1,4 +1,4 @@
-// This file is auto-generated during build. 
+// This file is auto-generated during build.
 // No need to create or edit it manually.
 
 /**

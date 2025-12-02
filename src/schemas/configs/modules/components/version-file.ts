@@ -13,15 +13,17 @@ export const VersionFileSchema = v.object({
   format: v.pipe(
     v.optional(v.enum(FileFormats), "auto"),
     v.metadata({
-      description: "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`."
-        + "\nDefault: `auto`",
+      description:
+        "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\n" +
+        "Default: `auto`",
     }),
   ),
   extractor: v.pipe(
     v.optional(v.enum(VersionFileExtractors), "auto"),
     v.metadata({
-      description: "Defines how to extract the version from the parsed file."
-        + "\nDefault: `auto`",
+      description:
+        "Defines how to extract the version from the parsed file.\n" +
+        "Default: `auto`",
     }),
   ),
   selector: v.pipe(

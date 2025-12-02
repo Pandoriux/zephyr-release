@@ -11,16 +11,16 @@ export const ReleaseConfigSchema = v.pipe(
     enabled: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "Enable/disable tag and release."
-          + "\nDefault: `true`.",
+        description: "Enable/disable tag and release.\n" +
+          "Default: `true`.",
       }),
     ),
     skipRelease: v.pipe(
       v.optional(v.boolean(), false),
       v.metadata({
         description:
-          "If enabled, only the tag will be created, no release will be made."
-          + "\nDefault: `false`.",
+          "If enabled, only the tag will be created, no release will be made.\n" +
+          "Default: `false`.",
       }),
     ),
     commands: v.pipe(
@@ -34,15 +34,15 @@ export const ReleaseConfigSchema = v.pipe(
     prerelease: v.pipe(
       v.optional(v.boolean(), false),
       v.metadata({
-        description: "If enabled, the release will be marked as prerelease."
-          + "\nDefault: `false`.",
+        description: "If enabled, the release will be marked as prerelease.\n" +
+          "Default: `false`.",
       }),
     ),
     draft: v.pipe(
       v.optional(v.boolean(), false),
       v.metadata({
-        description: "If enabled, the release will be created as draft."
-          + "\nDefault: `false`.",
+        description: "If enabled, the release will be created as draft.\n" +
+          "Default: `false`.",
       }),
     ),
 

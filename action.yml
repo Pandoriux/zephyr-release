@@ -16,7 +16,7 @@ inputs:
     required: false
     default: ""
   config-format:
-    description: The format of config file. Allowed values are `auto`, `json/jsonc/json5`, `yaml/yml`, `toml`.
+    description: The format of config file. Allowed formats are `auto`, `json/jsonc/json5`, `yaml`, `toml`.
     required: false
     default: "auto"
   config-override:

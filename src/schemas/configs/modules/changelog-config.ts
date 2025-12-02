@@ -11,9 +11,9 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern "
-          + "but they won't be written to file."
-          + "\nDefault: `true`.",
+          "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern " +
+          "but they won't be written to file.\n" +
+          "Default: `true`.",
       }),
     ),
     commands: v.pipe(
@@ -28,17 +28,17 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the "
-          + "built-in generation process and uses this value as the changelog content. Should only be set dynamically "
-          + "in workflow input, not json config.",
+          "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the " +
+          "built-in generation process and uses this value as the changelog content. Should only be set dynamically " +
+          "in workflow input, not json config.",
       }),
     ),
     filePath: v.pipe(
       v.optional(v.string(), "CHANGELOG.md"),
       v.metadata({
         description:
-          "Path to the file where the generated changelog will be written to, relative to the project root."
-          + "\nDefault: `CHANGELOG.md`",
+          "Path to the file where the generated changelog will be written to, relative to the project root.\n" +
+          "Default: `CHANGELOG.md`",
       }),
     ),
     headingPattern: v.pipe(
