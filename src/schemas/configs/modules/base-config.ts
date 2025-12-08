@@ -6,12 +6,14 @@ import { CommandsSchema } from "./components/commands.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
+import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
     v.optional(v.string(), ""),
     v.metadata({
-      description: "Project name, available in string pattern as ${name}.",
+      description: "Project name, available in string pattern as ${name}.\n" +
+        'Default: ""',
     }),
   ),
   timeZone: v.pipe(
@@ -19,7 +21,7 @@ export const BaseConfigSchema = v.object({
     v.metadata({
       description:
         "IANA timezone used to display times, available in string pattern as ${timeZone}.\n" +
-        "Default: `UTC`.",
+        'Default: "UTC"',
     }),
   ),
   commands: v.pipe(
@@ -35,7 +37,7 @@ export const BaseConfigSchema = v.object({
     v.metadata({
       description:
         "Initial SemVer version applied when no existing version is found.\n" +
-        "Default: `0.1.0`",
+        'Default: "0.1.0"',
     }),
   ),
   versionFiles: v.pipe(
@@ -44,8 +46,8 @@ export const BaseConfigSchema = v.object({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
         "primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, " +
-        "the first file in the array will be." +
-        "\nAbout primary file: link-to-inert-later",
+        "the first file in the array will be used.\n" +
+        "About primary file: link-to-be-insert-later",
     }),
   ),
 
@@ -59,10 +61,10 @@ export const BaseConfigSchema = v.object({
     ),
     v.metadata({
       description:
-        "Files to include in the commit. Accepts `base`, `all` options or an array of option and paths/globs. " +
+        'Files to include in the commit. Accepts "base", "all" options or an array of options and paths/globs. ' +
         "Paths are relative to the repo root.\n" +
-        "Default: `base`",
-      examples: [[]],
+        'Default: "base"',
+      examples: [[], ["base", "src/release-artifacts/*"]],
     }),
   ),
 
@@ -71,7 +73,13 @@ export const BaseConfigSchema = v.object({
     v.metadata({
       description:
         "List of commit types used for version calculation and changelog generation.\n" +
-        "Default: `[! (breaking), feat, fix, perf, revert]`.",
+        `Default: ${
+          JSON.stringify(
+            transformObjKeyToKebabCase(DEFAULT_COMMIT_TYPES),
+            null,
+            2,
+          )
+        }`,
     }),
   ),
 });

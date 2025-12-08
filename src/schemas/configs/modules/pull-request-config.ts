@@ -11,6 +11,7 @@ import {
   DEFAULT_LABEL_ON_CLOSE,
   DEFAULT_LABEL_ON_CREATE,
 } from "../../../constants/defaults/label.ts";
+import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
@@ -20,7 +21,7 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases " +
           "will be committed and created directly.\n" +
-          "Default: `true`.",
+          "Default: true",
       }),
     ),
     commands: v.pipe(
@@ -35,7 +36,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(v.pipe(v.string(), v.nonEmpty()), "release/zephyr-release"),
       v.metadata({
         description:
-          "Pattern for branch name that Zephyr Release is gonna use.",
+          "Pattern for branch name that Zephyr Release is gonna use.\n" +
+          'Default: "release/zephyr-release"',
       }),
     ),
 
@@ -46,7 +48,14 @@ export const PullRequestConfigSchema = v.pipe(
       ),
       v.metadata({
         description:
-          "A label or an array of labels to add to the pull request when it is created",
+          "A label or an array of labels to add to the pull request when it is created.\n" +
+          `Default: ${
+            JSON.stringify(
+              transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CREATE),
+              null,
+              2,
+            )
+          }`,
       }),
     ),
     labelsOnClose: v.pipe(
@@ -56,7 +65,14 @@ export const PullRequestConfigSchema = v.pipe(
       ),
       v.metadata({
         description:
-          "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.",
+          "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.\n" +
+          `Default: ${
+            JSON.stringify(
+              transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CLOSE),
+              null,
+              2,
+            )
+          }`,
       }),
     ),
 
@@ -66,7 +82,8 @@ export const PullRequestConfigSchema = v.pipe(
         DEFAULT_PULL_REQUEST_TITLE_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for pull request title.",
+        description: "Pattern for pull request title.\n" +
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_PATTERN)}`,
       }),
     ),
     headerPattern: v.pipe(
@@ -76,13 +93,15 @@ export const PullRequestConfigSchema = v.pipe(
       ),
       v.metadata({
         description:
-          "Pattern for pull request header. If an array is provided, it will randomly choose one from it.",
+          "Pattern for pull request header. If an array is provided, it will randomly choose one from it.\n" +
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_PATTERN)}`,
       }),
     ),
     bodyPattern: v.pipe(
       v.optional(v.string(), DEFAULT_PULL_REQUEST_BODY_PATTERN),
       v.metadata({
-        description: "Pattern for pull request body.",
+        description: "Pattern for pull request body.\n" +
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_PATTERN)}`,
       }),
     ),
     bodyPatternPath: v.pipe(
@@ -95,7 +114,8 @@ export const PullRequestConfigSchema = v.pipe(
     footerPattern: v.pipe(
       v.optional(v.string(), DEFAULT_PULL_REQUEST_FOOTER_PATTERN),
       v.metadata({
-        description: "Pattern for pull request footer.",
+        description: "Pattern for pull request footer.\n" +
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_PATTERN)}`,
       }),
     ),
   }),

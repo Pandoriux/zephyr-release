@@ -10,7 +10,7 @@ export function markScriptStart() {
   );
 }
 
-export function markScriptEnd(reason: "Finished" | "Failed") {
+export function markScriptEnd(reason: "Finished" | "Failed"): never {
   const endTime = new Date();
 
   core.info(

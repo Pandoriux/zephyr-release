@@ -115,11 +115,18 @@
     },
 
     // This setting should only be used in workflow inputs, not in config file
-    "content-override": "",
+    "content-body-override": "",
 
-    "file-path": "CHANGELOG.md",
-    "heading-pattern": "${version} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
-    "body-pattern": "${changelog}",
+    "path": "CHANGELOG.md",
+
+    "header-pattern": "# Changelog\\n",
+    "header-pattern-path": "",
+
+    "footer-pattern": "",
+    "footer-pattern-path": "",
+
+    "heading-pattern": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
+    "body-pattern": "${changelogContentBody}",
     "body-pattern-path": ""
   },
 

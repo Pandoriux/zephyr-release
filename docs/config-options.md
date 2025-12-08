@@ -33,8 +33,12 @@ Some example config JSON files: `example links to be inserted later`
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> enabled (Optional)](#changelog--enabled-optional)
     - [changelog \> commands (Optional)](#changelog--commands-optional)
-    - [changelog \> content-override (Optional)](#changelog--content-override-optional)
-    - [changelog \> file-path (Optional)](#changelog--file-path-optional)
+    - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
+    - [changelog \> path (Optional)](#changelog--path-optional)
+    - [changelog \> header-pattern (Optional)](#changelog--header-pattern-optional)
+    - [changelog \> header-pattern-path (Optional)](#changelog--header-pattern-path-optional)
+    - [changelog \> footer-pattern (Optional)](#changelog--footer-pattern-optional)
+    - [changelog \> footer-pattern-path (Optional)](#changelog--footer-pattern-path-optional)
     - [changelog \> heading-pattern (Optional)](#changelog--heading-pattern-optional)
     - [changelog \> body-pattern (Optional)](#changelog--body-pattern-optional)
     - [changelog \> body-pattern-path (Optional)](#changelog--body-pattern-path-optional)
@@ -117,10 +121,10 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 #### VersionFile
- 
+
 Type: `object`  
 **Properties:**
- 
+
 - `path` (Required): Path to the version file, relative to the project root.
 - `format` (Optional): Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`. Default: `"auto"`
 - `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
@@ -246,9 +250,9 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#changelog--enabled-optional), [`commands`](#changelog--commands-optional), [`content-override`](#changelog--content-override-optional), [`file-path`](#changelog--file-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
+**Properties:** [`enabled`](#changelog--enabled-optional), [`commands`](#changelog--commands-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
-Configuration specific to changelogs. All generated changelog lines are available in string pattern as `${changelog}`.
+Configuration specific to changelogs. All generated changelog content is available in string patterns as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
 #### changelog > enabled (Optional)
 
@@ -264,40 +268,68 @@ Default: `{}`
 
 Pre/post command lists to run around the changelog operation. Each command runs from the repository root.
 
-#### changelog > content-override (Optional)
+#### changelog > content-body-override (Optional)
 
 Type: `string`  
 Default: `""`
 
-User-provided changelog content. If set, completely skips the built-in generation process and uses this value as the changelog content. Should only be set dynamically in workflow input, not json config.
+User-provided changelog content body, available in string pattern as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically in workflow input, not in config.
 
-#### changelog > file-path (Optional)
+#### changelog > path (Optional)
 
 Type: `string`  
 Default: `"CHANGELOG.md"`
 
 Path to the file where the generated changelog will be written to, relative to the project root.
 
+#### changelog > header-pattern (Optional)
+
+Type: `string`  
+Default: `"# Changelog\n"`
+
+Pattern for header of changelog file. Placed above any changelog content sections.
+
+#### changelog > header-pattern-path (Optional)
+
+Type: `string`  
+Default: `""`
+
+Path to text file containing header of changelog file. Overrides `header-pattern` when both are provided.
+
+#### changelog > footer-pattern (Optional)
+
+Type: `string`  
+Default: `""`
+
+Pattern for footer of changelog file. Placed below any changelog content section.
+
+#### changelog > footer-pattern-path (Optional)
+
+Type: `string`  
+Default: `""`
+
+Path to text file containing footer of changelog file. Overrides `footer-pattern` when both are provided.
+
 #### changelog > heading-pattern (Optional)
 
 Type: `string`  
-Default: `"${version} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->"`
+Default: `"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"`
 
-Pattern for changelog section heading.
+Pattern for heading of a changelog content section.
 
 #### changelog > body-pattern (Optional)
 
 Type: `string`  
-Default: `"${changelog}"`
+Default: `"${changelogContentBody}"`
 
-Pattern for changelog section body.
+Pattern for body of a changelog content section.
 
 #### changelog > body-pattern-path (Optional)
 
 Type: `string`  
 Default: `""`
 
-Path to text file containing changelog body pattern. Overrides `body-pattern` if both are provided.
+Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided.
 
 ### pull-request (Optional)
 
@@ -491,9 +523,8 @@ These patterns are resolved based on the app code.
 
 <br/>
 
-- `${changelog}`: The full generated changelog (→ [heading](#changelog--heading-pattern-optional) + [body](#changelog--body-pattern-optional)).
-- `${changelogContent}`: The main generated changelog content, computed from parsing commits.  
-By default, this should be generated by the app, but you can also override it with your own computed changelog [[→ content-override](#changelog--content-override-optional)].
+- `${changelogContent}`: The generated changelog content section (→ [heading](#changelog--heading-pattern-optional) + [body](#changelog--body-pattern-optional)).
+- `${changelogContentBody}`: The generated changelog body. You can override it with your own computed content [[→ content-body-override](#changelog--content-body-override-optional)].
 
 <br/>
 

@@ -5,7 +5,7 @@
     "name": {
       "type": "string",
       "default": "",
-      "description": "Project name, available in string pattern as ${name}."
+      "description": "Project name, available in string pattern as ${name}.\nDefault: \"\""
     },
     "time-zone": {
       "enum": [
@@ -430,7 +430,7 @@
         "Pacific/Wallis"
       ],
       "default": "UTC",
-      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: `UTC`."
+      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: \"UTC\""
     },
     "commands": {
       "type": "object",
@@ -460,7 +460,7 @@
       "type": "string",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
       "default": "0.1.0",
-      "description": "Initial SemVer version applied when no existing version is found.\nDefault: `0.1.0`"
+      "description": "Initial SemVer version applied when no existing version is found.\nDefault: \"0.1.0\""
     },
     "version-files": {
       "anyOf": [
@@ -472,21 +472,32 @@
               "minLength": 1,
               "description": "Path to the version file, relative to the project root."
             },
-            "resolver": {
+            "format": {
               "enum": [
                 "auto",
                 "json",
+                "jsonc",
+                "json5",
                 "yaml",
                 "toml",
+                "txt"
+              ],
+              "default": "auto",
+              "description": "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\nDefault: `auto`"
+            },
+            "extractor": {
+              "enum": [
+                "auto",
+                "json-path",
                 "regex"
               ],
               "default": "auto",
-              "description": "Defines how to resolve the version from this file.\nDefault: `auto`"
+              "description": "Defines how to extract the version from the parsed file.\nDefault: `auto`"
             },
             "selector": {
               "type": "string",
               "minLength": 1,
-              "description": "Json path to locates the version field. For regex resolver, supply a regex string."
+              "description": "Defines how to locate the version field, depends on `extractor`."
             },
             "primary": {
               "type": "boolean",
@@ -509,21 +520,32 @@
                 "minLength": 1,
                 "description": "Path to the version file, relative to the project root."
               },
-              "resolver": {
+              "format": {
                 "enum": [
                   "auto",
                   "json",
+                  "jsonc",
+                  "json5",
                   "yaml",
                   "toml",
+                  "txt"
+                ],
+                "default": "auto",
+                "description": "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\nDefault: `auto`"
+              },
+              "extractor": {
+                "enum": [
+                  "auto",
+                  "json-path",
                   "regex"
                 ],
                 "default": "auto",
-                "description": "Defines how to resolve the version from this file.\nDefault: `auto`"
+                "description": "Defines how to extract the version from the parsed file.\nDefault: `auto`"
               },
               "selector": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Json path to locates the version field. For regex resolver, supply a regex string."
+                "description": "Defines how to locate the version field, depends on `extractor`."
               },
               "primary": {
                 "type": "boolean",
@@ -538,7 +560,7 @@
           }
         }
       ],
-      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be.\nAbout primary file: link-to-inert-later"
+      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be used.\nAbout primary file: link-to-be-insert-later"
     },
     "files-to-commit": {
       "anyOf": [
@@ -566,9 +588,13 @@
         }
       ],
       "default": "base",
-      "description": "Files to include in the commit. Accepts `base`, `all` options or an array of option and paths/globs.\nPaths are relative to the repo root.\nDefault: `base`",
+      "description": "Files to include in the commit. Accepts \"base\", \"all\" options or an array of options and paths/globs. Paths are relative to the repo root.\nDefault: \"base\"",
       "examples": [
-        []
+        [],
+        [
+          "base",
+          "src/release-artifacts/*"
+        ]
       ]
     },
     "commit-types": {
@@ -614,7 +640,7 @@
           "section": "Reverts"
         }
       ],
-      "description": "List of commit types used for version calculation and changelog generation.\nDefault: `[! (breaking), feat, fix, perf, revert]`."
+      "description": "List of commit types used for version calculation and changelog generation.\nDefault: [\n  {\n    \"type\": \"feat\",\n    \"section\": \"Features\"\n  },\n  {\n    \"type\": \"fix\",\n    \"section\": \"Bug Fixes\"\n  },\n  {\n    \"type\": \"perf\",\n    \"section\": \"Performance Improvements\"\n  },\n  {\n    \"type\": \"revert\",\n    \"section\": \"Reverts\"\n  }\n]"
     },
     "bump-strategy": {
       "type": "object",
@@ -663,7 +689,7 @@
             "countBreakingAsBump": true,
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping major version (x.0.0)."
+          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"types\": [],\n  \"count-breaking-as-bump\": true,\n  \"commits-per-bump\": 1\n}"
         },
         "minor": {
           "type": "object",
@@ -710,7 +736,7 @@
             ],
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping minor version (0.x.0).\nDefault: `[feat]`."
+          "description": "Strategy for bumping minor version (1.x.3).\nDefault: {\n  \"types\": [\n    \"feat\"\n  ],\n  \"commits-per-bump\": 1\n}"
         },
         "patch": {
           "type": "object",
@@ -758,7 +784,7 @@
             ],
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping patch version (0.0.x).\nDefault: `[fix, perf]`."
+          "description": "Strategy for bumping patch version (1.2.x).\nDefault: {\n  \"types\": [\n    \"fix\",\n    \"perf\"\n  ],\n  \"commits-per-bump\": 1\n}"
         },
         "prerelease": {
           "type": "object",
@@ -803,7 +829,7 @@
             "types": [],
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping prerelease version (x.x.x-alpha.x).\nDefault: `[]`."
+          "description": "Strategy for bumping prerelease version (1.2.3-alpha.x).\nDefault:  {\n  \"types\": [],\n  \"commits-per-bump\": 1\n}"
         },
         "build": {
           "type": "object",
@@ -848,17 +874,17 @@
             "types": [],
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping build metadata (x.x.x+meta).\nDefault: `[]`."
+          "description": "Strategy for bumping build metadata (1.2.3+meta.x).\nDefault: {\n  \"types\": [],\n  \"commits-per-bump\": 1\n}"
         },
         "bump-minor-for-major-pre-stable": {
           "type": "boolean",
           "default": true,
-          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.x).\nDefault: `true`."
+          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.3).\nDefault: true"
         },
         "bump-patch-for-minor-pre-stable": {
           "type": "boolean",
           "default": false,
-          "description": "Redirects minor version bumps to patch in pre-1.0 (0.x.x).\nDefault: `false`."
+          "description": "Redirects minor version bumps to patch in pre-1.0 (0.2.x).\nDefault: false"
         }
       },
       "required": [],
@@ -871,7 +897,7 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: `true`."
+          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: true"
         },
         "commands": {
           "type": "object",
@@ -897,34 +923,54 @@
           "default": {},
           "description": "Pre/post command lists to run around the changelog operation. Each command runs from the repository root."
         },
-        "content-override": {
+        "content-body-override": {
           "type": "string",
           "default": "",
-          "description": "User-provided changelog content, available in string pattern as `${changelogContent}`. If set, completely skips the built-in generation process and uses this value as the changelog content. Should only be set dynamically in workflow input, not json config."
+          "description": "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically in workflow input, not in config."
         },
-        "file-path": {
+        "path": {
           "type": "string",
           "default": "CHANGELOG.md",
-          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: `CHANGELOG.md`"
+          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
+        },
+        "header-pattern": {
+          "type": "string",
+          "default": "# Changelog\n\n",
+          "description": "Pattern for header of changelog file. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\\n\""
+        },
+        "header-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing header of changelog file. Overrides `headerPattern` when both are provided."
+        },
+        "footer-pattern": {
+          "type": "string",
+          "default": "",
+          "description": "Pattern for footer of changelog file. Placed below any changelog content section.\nDefault: \"\""
+        },
+        "footer-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing footer of changelog file. Overrides `footerPattern` when both are provided."
         },
         "heading-pattern": {
           "type": "string",
           "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
-          "description": "Pattern for changelog heading."
+          "description": "Pattern for heading of a changelog content section.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->\""
         },
         "body-pattern": {
           "type": "string",
-          "default": "${changelogContent}",
-          "description": "Pattern for changelog body."
+          "default": "${changelogContentBody}",
+          "description": "Pattern for body of a changelog content section.\nDefault: \"${changelogContentBody}\""
         },
         "body-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing changelog body pattern. Overrides body pattern if both are provided."
+          "description": "Path to text file containing body of a changelog content section. Overrides `bodyPattern` when both are provided."
         }
       },
       "required": [],
-      "description": "Configuration specific to changelogs. All generated changelog lines are available in string pattern as ${changelog}",
+      "description": "Configuration specific to changelogs. All generated changelog content are available in string pattern as ${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
       "default": {}
     },
     "pull-request": {
