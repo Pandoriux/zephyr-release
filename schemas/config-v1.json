@@ -9,116 +9,79 @@
     },
     "time-zone": {
       "enum": [
-        "UTC",
         "Africa/Abidjan",
-        "Africa/Accra",
-        "Africa/Addis_Ababa",
+        "Africa/Nairobi",
         "Africa/Algiers",
-        "Africa/Asmera",
-        "Africa/Bamako",
-        "Africa/Bangui",
-        "Africa/Banjul",
+        "Africa/Lagos",
         "Africa/Bissau",
-        "Africa/Blantyre",
-        "Africa/Brazzaville",
-        "Africa/Bujumbura",
+        "Africa/Maputo",
         "Africa/Cairo",
         "Africa/Casablanca",
         "Africa/Ceuta",
-        "Africa/Conakry",
-        "Africa/Dakar",
-        "Africa/Dar_es_Salaam",
-        "Africa/Djibouti",
-        "Africa/Douala",
         "Africa/El_Aaiun",
-        "Africa/Freetown",
-        "Africa/Gaborone",
-        "Africa/Harare",
         "Africa/Johannesburg",
         "Africa/Juba",
-        "Africa/Kampala",
         "Africa/Khartoum",
-        "Africa/Kigali",
-        "Africa/Kinshasa",
-        "Africa/Lagos",
-        "Africa/Libreville",
-        "Africa/Lome",
-        "Africa/Luanda",
-        "Africa/Lubumbashi",
-        "Africa/Lusaka",
-        "Africa/Malabo",
-        "Africa/Maputo",
-        "Africa/Maseru",
-        "Africa/Mbabane",
-        "Africa/Mogadishu",
         "Africa/Monrovia",
-        "Africa/Nairobi",
         "Africa/Ndjamena",
-        "Africa/Niamey",
-        "Africa/Nouakchott",
-        "Africa/Ouagadougou",
-        "Africa/Porto-Novo",
         "Africa/Sao_Tome",
         "Africa/Tripoli",
         "Africa/Tunis",
         "Africa/Windhoek",
         "America/Adak",
         "America/Anchorage",
-        "America/Anguilla",
-        "America/Antigua",
+        "America/Puerto_Rico",
         "America/Araguaina",
+        "America/Argentina/Buenos_Aires",
+        "America/Argentina/Catamarca",
+        "America/Argentina/Cordoba",
+        "America/Argentina/Jujuy",
         "America/Argentina/La_Rioja",
+        "America/Argentina/Mendoza",
         "America/Argentina/Rio_Gallegos",
         "America/Argentina/Salta",
         "America/Argentina/San_Juan",
         "America/Argentina/San_Luis",
         "America/Argentina/Tucuman",
         "America/Argentina/Ushuaia",
-        "America/Aruba",
         "America/Asuncion",
-        "America/Bahia",
+        "America/Panama",
         "America/Bahia_Banderas",
+        "America/Bahia",
         "America/Barbados",
         "America/Belem",
         "America/Belize",
-        "America/Blanc-Sablon",
         "America/Boa_Vista",
         "America/Bogota",
         "America/Boise",
-        "America/Buenos_Aires",
         "America/Cambridge_Bay",
         "America/Campo_Grande",
         "America/Cancun",
         "America/Caracas",
-        "America/Catamarca",
         "America/Cayenne",
-        "America/Cayman",
         "America/Chicago",
         "America/Chihuahua",
         "America/Ciudad_Juarez",
-        "America/Coral_Harbour",
-        "America/Cordoba",
         "America/Costa_Rica",
-        "America/Creston",
+        "America/Coyhaique",
+        "America/Phoenix",
         "America/Cuiaba",
-        "America/Curacao",
         "America/Danmarkshavn",
-        "America/Dawson",
         "America/Dawson_Creek",
+        "America/Dawson",
         "America/Denver",
         "America/Detroit",
-        "America/Dominica",
         "America/Edmonton",
         "America/Eirunepe",
         "America/El_Salvador",
+        "America/Tijuana",
         "America/Fort_Nelson",
+        "America/Fort_Wayne",
         "America/Fortaleza",
         "America/Glace_Bay",
         "America/Godthab",
         "America/Goose_Bay",
         "America/Grand_Turk",
-        "America/Grenada",
-        "America/Guadeloupe",
         "America/Guatemala",
         "America/Guayaquil",
         "America/Guyana",
@@ -132,27 +95,21 @@
         "America/Indiana/Vevay",
         "America/Indiana/Vincennes",
         "America/Indiana/Winamac",
-        "America/Indianapolis",
         "America/Inuvik",
         "America/Iqaluit",
         "America/Jamaica",
-        "America/Jujuy",
         "America/Juneau",
+        "America/Kentucky/Louisville",
         "America/Kentucky/Monticello",
-        "America/Kralendijk",
         "America/La_Paz",
         "America/Lima",
         "America/Los_Angeles",
-        "America/Louisville",
-        "America/Lower_Princes",
         "America/Maceio",
         "America/Managua",
         "America/Manaus",
-        "America/Marigot",
         "America/Martinique",
         "America/Matamoros",
         "America/Mazatlan",
-        "America/Mendoza",
         "America/Menominee",
         "America/Merida",
         "America/Metlakatla",
@@ -161,8 +118,7 @@
         "America/Moncton",
         "America/Monterrey",
         "America/Montevideo",
-        "America/Montserrat",
-        "America/Nassau",
+        "America/Toronto",
         "America/New_York",
         "America/Nome",
         "America/Noronha",
@@ -170,54 +126,41 @@
         "America/North_Dakota/Center",
         "America/North_Dakota/New_Salem",
         "America/Ojinaga",
-        "America/Panama",
         "America/Paramaribo",
-        "America/Phoenix",
         "America/Port-au-Prince",
-        "America/Port_of_Spain",
+        "America/Rio_Branco",
         "America/Porto_Velho",
-        "America/Puerto_Rico",
         "America/Punta_Arenas",
+        "America/Winnipeg",
         "America/Rankin_Inlet",
         "America/Recife",
         "America/Regina",
         "America/Resolute",
-        "America/Rio_Branco",
         "America/Santarem",
         "America/Santiago",
         "America/Santo_Domingo",
         "America/Sao_Paulo",
         "America/Scoresbysund",
         "America/Sitka",
-        "America/St_Barthelemy",
         "America/St_Johns",
-        "America/St_Kitts",
-        "America/St_Lucia",
-        "America/St_Thomas",
-        "America/St_Vincent",
         "America/Swift_Current",
         "America/Tegucigalpa",
         "America/Thule",
-        "America/Tijuana",
-        "America/Toronto",
-        "America/Tortola",
         "America/Vancouver",
         "America/Whitehorse",
-        "America/Winnipeg",
         "America/Yakutat",
         "Antarctica/Casey",
         "Antarctica/Davis",
-        "Antarctica/DumontDUrville",
+        "Pacific/Port_Moresby",
         "Antarctica/Macquarie",
         "Antarctica/Mawson",
-        "Antarctica/McMurdo",
+        "Pacific/Auckland",
         "Antarctica/Palmer",
         "Antarctica/Rothera",
-        "Antarctica/Syowa",
+        "Asia/Riyadh",
         "Antarctica/Troll",
         "Antarctica/Vostok",
-        "Arctic/Longyearbyen",
-        "Asia/Aden",
+        "Europe/Berlin",
         "Asia/Almaty",
         "Asia/Amman",
         "Asia/Anadyr",
@@ -226,64 +169,59 @@
         "Asia/Ashgabat",
         "Asia/Atyrau",
         "Asia/Baghdad",
-        "Asia/Bahrain",
+        "Asia/Qatar",
         "Asia/Baku",
         "Asia/Bangkok",
         "Asia/Barnaul",
         "Asia/Beirut",
         "Asia/Bishkek",
         "Asia/Brunei",
-        "Asia/Calcutta",
+        "Asia/Kolkata",
         "Asia/Chita",
-        "Asia/Choibalsan",
+        "Asia/Ulaanbaatar",
+        "Asia/Shanghai",
         "Asia/Colombo",
-        "Asia/Damascus",
         "Asia/Dhaka",
+        "Asia/Damascus",
         "Asia/Dili",
         "Asia/Dubai",
         "Asia/Dushanbe",
         "Asia/Famagusta",
         "Asia/Gaza",
         "Asia/Hebron",
+        "Asia/Ho_Chi_Minh",
         "Asia/Hong_Kong",
         "Asia/Hovd",
         "Asia/Irkutsk",
+        "Europe/Istanbul",
         "Asia/Jakarta",
         "Asia/Jayapura",
         "Asia/Jerusalem",
         "Asia/Kabul",
         "Asia/Kamchatka",
         "Asia/Karachi",
-        "Asia/Katmandu",
+        "Asia/Urumqi",
+        "Asia/Kathmandu",
         "Asia/Khandyga",
         "Asia/Krasnoyarsk",
         "Asia/Kuala_Lumpur",
-        "Asia/Kuching",
-        "Asia/Kuwait",
         "Asia/Macau",
         "Asia/Magadan",
         "Asia/Makassar",
         "Asia/Manila",
-        "Asia/Muscat",
         "Asia/Nicosia",
         "Asia/Novokuznetsk",
         "Asia/Novosibirsk",
         "Asia/Omsk",
         "Asia/Oral",
-        "Asia/Phnom_Penh",
         "Asia/Pontianak",
         "Asia/Pyongyang",
-        "Asia/Qatar",
         "Asia/Qostanay",
         "Asia/Qyzylorda",
         "Asia/Rangoon",
-        "Asia/Riyadh",
-        "Asia/Saigon",
         "Asia/Sakhalin",
         "Asia/Samarkand",
         "Asia/Seoul",
-        "Asia/Shanghai",
-        "Asia/Singapore",
         "Asia/Srednekolymsk",
         "Asia/Taipei",
         "Asia/Tashkent",
@@ -292,10 +230,7 @@
         "Asia/Thimphu",
         "Asia/Tokyo",
         "Asia/Tomsk",
-        "Asia/Ulaanbaatar",
-        "Asia/Urumqi",
         "Asia/Ust-Nera",
-        "Asia/Vientiane",
         "Asia/Vladivostok",
         "Asia/Yakutsk",
         "Asia/Yekaterinburg",
@@ -304,128 +239,371 @@
         "Atlantic/Bermuda",
         "Atlantic/Canary",
         "Atlantic/Cape_Verde",
-        "Atlantic/Faeroe",
+        "Atlantic/Faroe",
         "Atlantic/Madeira",
-        "Atlantic/Reykjavik",
         "Atlantic/South_Georgia",
-        "Atlantic/St_Helena",
         "Atlantic/Stanley",
+        "Australia/Sydney",
         "Australia/Adelaide",
         "Australia/Brisbane",
         "Australia/Broken_Hill",
+        "Australia/Hobart",
         "Australia/Darwin",
         "Australia/Eucla",
-        "Australia/Hobart",
-        "Australia/Lindeman",
         "Australia/Lord_Howe",
+        "Australia/Lindeman",
         "Australia/Melbourne",
         "Australia/Perth",
-        "Australia/Sydney",
-        "Europe/Amsterdam",
+        "Europe/Brussels",
+        "Pacific/Easter",
+        "Europe/Athens",
+        "Europe/Dublin",
+        "Etc/GMT-0",
+        "Etc/GMT-1",
+        "Etc/GMT-10",
+        "Etc/GMT-11",
+        "Etc/GMT-12",
+        "Etc/GMT-13",
+        "Etc/GMT-14",
+        "Etc/GMT-2",
+        "Etc/GMT-3",
+        "Etc/GMT-4",
+        "Etc/GMT-5",
+        "Etc/GMT-6",
+        "Etc/GMT-7",
+        "Etc/GMT-8",
+        "Etc/GMT-9",
+        "Etc/GMT+1",
+        "Etc/GMT+10",
+        "Etc/GMT+11",
+        "Etc/GMT+12",
+        "Etc/GMT+2",
+        "Etc/GMT+3",
+        "Etc/GMT+4",
+        "Etc/GMT+5",
+        "Etc/GMT+6",
+        "Etc/GMT+7",
+        "Etc/GMT+8",
+        "Etc/GMT+9",
+        "Etc/UCT",
         "Europe/Andorra",
         "Europe/Astrakhan",
-        "Europe/Athens",
+        "Europe/London",
         "Europe/Belgrade",
-        "Europe/Berlin",
-        "Europe/Bratislava",
-        "Europe/Brussels",
+        "Europe/Prague",
         "Europe/Bucharest",
         "Europe/Budapest",
-        "Europe/Busingen",
+        "Europe/Zurich",
         "Europe/Chisinau",
-        "Europe/Copenhagen",
-        "Europe/Dublin",
         "Europe/Gibraltar",
-        "Europe/Guernsey",
         "Europe/Helsinki",
-        "Europe/Isle_of_Man",
-        "Europe/Istanbul",
-        "Europe/Jersey",
         "Europe/Kaliningrad",
         "Europe/Kiev",
         "Europe/Kirov",
         "Europe/Lisbon",
-        "Europe/Ljubljana",
-        "Europe/London",
-        "Europe/Luxembourg",
         "Europe/Madrid",
         "Europe/Malta",
-        "Europe/Mariehamn",
         "Europe/Minsk",
-        "Europe/Monaco",
-        "Europe/Moscow",
-        "Europe/Oslo",
         "Europe/Paris",
-        "Europe/Podgorica",
-        "Europe/Prague",
+        "Europe/Moscow",
         "Europe/Riga",
         "Europe/Rome",
         "Europe/Samara",
-        "Europe/San_Marino",
-        "Europe/Sarajevo",
         "Europe/Saratov",
         "Europe/Simferopol",
-        "Europe/Skopje",
         "Europe/Sofia",
-        "Europe/Stockholm",
         "Europe/Tallinn",
         "Europe/Tirane",
         "Europe/Ulyanovsk",
-        "Europe/Vaduz",
-        "Europe/Vatican",
         "Europe/Vienna",
         "Europe/Vilnius",
         "Europe/Volgograd",
         "Europe/Warsaw",
-        "Europe/Zagreb",
-        "Europe/Zurich",
-        "Indian/Antananarivo",
+        "Pacific/Honolulu",
         "Indian/Chagos",
-        "Indian/Christmas",
-        "Indian/Cocos",
-        "Indian/Comoro",
-        "Indian/Kerguelen",
-        "Indian/Mahe",
         "Indian/Maldives",
         "Indian/Mauritius",
-        "Indian/Mayotte",
-        "Indian/Reunion",
-        "Pacific/Apia",
-        "Pacific/Auckland",
-        "Pacific/Bougainville",
+        "Pacific/Kwajalein",
         "Pacific/Chatham",
-        "Pacific/Easter",
+        "Pacific/Apia",
+        "Pacific/Bougainville",
         "Pacific/Efate",
         "Pacific/Enderbury",
         "Pacific/Fakaofo",
         "Pacific/Fiji",
-        "Pacific/Funafuti",
+        "Pacific/Tarawa",
         "Pacific/Galapagos",
         "Pacific/Gambier",
         "Pacific/Guadalcanal",
         "Pacific/Guam",
-        "Pacific/Honolulu",
         "Pacific/Kiritimati",
         "Pacific/Kosrae",
-        "Pacific/Kwajalein",
-        "Pacific/Majuro",
         "Pacific/Marquesas",
-        "Pacific/Midway",
+        "Pacific/Pago_Pago",
         "Pacific/Nauru",
         "Pacific/Niue",
         "Pacific/Norfolk",
         "Pacific/Noumea",
-        "Pacific/Pago_Pago",
         "Pacific/Palau",
         "Pacific/Pitcairn",
-        "Pacific/Ponape",
-        "Pacific/Port_Moresby",
         "Pacific/Rarotonga",
-        "Pacific/Saipan",
         "Pacific/Tahiti",
-        "Pacific/Tarawa",
         "Pacific/Tongatapu",
+        "Africa/Accra",
+        "Africa/Bamako",
+        "Africa/Banjul",
+        "Africa/Conakry",
+        "Africa/Dakar",
+        "Africa/Freetown",
+        "Africa/Lome",
+        "Africa/Nouakchott",
+        "Africa/Ouagadougou",
+        "Africa/Timbuktu",
+        "Atlantic/Reykjavik",
+        "Atlantic/St_Helena",
+        "Iceland",
+        "Egypt",
+        "Africa/Maseru",
+        "Africa/Mbabane",
+        "Africa/Bangui",
+        "Africa/Brazzaville",
+        "Africa/Douala",
+        "Africa/Kinshasa",
+        "Africa/Libreville",
+        "Africa/Luanda",
+        "Africa/Malabo",
+        "Africa/Niamey",
+        "Africa/Porto-Novo",
+        "Africa/Blantyre",
+        "Africa/Bujumbura",
+        "Africa/Gaborone",
+        "Africa/Harare",
+        "Africa/Kigali",
+        "Africa/Lubumbashi",
+        "Africa/Lusaka",
+        "Africa/Addis_Ababa",
+        "Africa/Asmara",
+        "Africa/Asmera",
+        "Africa/Dar_es_Salaam",
+        "Africa/Djibouti",
+        "Africa/Kampala",
+        "Africa/Mogadishu",
+        "Indian/Antananarivo",
+        "Indian/Comoro",
+        "Indian/Mayotte",
+        "Libya",
+        "America/Atka",
+        "US/Aleutian",
+        "US/Alaska",
+        "America/Buenos_Aires",
+        "America/Argentina/ComodRivadavia",
+        "America/Catamarca",
+        "America/Cordoba",
+        "America/Rosario",
+        "America/Jujuy",
+        "America/Mendoza",
+        "CST6CDT",
+        "US/Central",
+        "America/Shiprock",
+        "MST7MDT",
+        "Navajo",
+        "US/Mountain",
+        "US/Michigan",
+        "America/Yellowknife",
+        "Canada/Mountain",
+        "America/Indiana/Indianapolis",
+        "America/Indianapolis",
+        "US/East-Indiana",
+        "America/Nuuk",
+        "Canada/Atlantic",
+        "Cuba",
+        "America/Knox_IN",
+        "US/Indiana-Starke",
+        "America/Pangnirtung",
+        "Jamaica",
+        "America/Louisville",
+        "PST8PDT",
+        "US/Pacific",
+        "Brazil/West",
+        "Mexico/BajaSur",
+        "Mexico/General",
+        "EST5EDT",
+        "US/Eastern",
+        "Brazil/DeNoronha",
+        "America/Atikokan",
+        "America/Cayman",
+        "America/Coral_Harbour",
+        "EST",
+        "America/Creston",
+        "MST",
+        "US/Arizona",
+        "America/Anguilla",
+        "America/Antigua",
+        "America/Aruba",
+        "America/Blanc-Sablon",
+        "America/Curacao",
+        "America/Dominica",
+        "America/Grenada",
+        "America/Guadeloupe",
+        "America/Kralendijk",
+        "America/Lower_Princes",
+        "America/Marigot",
+        "America/Montserrat",
+        "America/Port_of_Spain",
+        "America/St_Barthelemy",
+        "America/St_Kitts",
+        "America/St_Lucia",
+        "America/St_Thomas",
+        "America/St_Vincent",
+        "America/Tortola",
+        "America/Virgin",
+        "Canada/Saskatchewan",
+        "America/Porto_Acre",
+        "Brazil/Acre",
+        "Chile/Continental",
+        "Brazil/East",
+        "Canada/Newfoundland",
+        "America/Ensenada",
+        "America/Santa_Isabel",
+        "Mexico/BajaNorte",
+        "America/Montreal",
+        "America/Nassau",
+        "America/Nipigon",
+        "America/Thunder_Bay",
+        "Canada/Eastern",
+        "Canada/Pacific",
+        "Canada/Yukon",
+        "America/Rainy_River",
+        "Canada/Central",
+        "Asia/Ashkhabad",
+        "Asia/Phnom_Penh",
+        "Asia/Vientiane",
+        "Indian/Christmas",
+        "Asia/Kuching",
+        "Asia/Dacca",
+        "Asia/Muscat",
+        "Indian/Mahe",
+        "Indian/Reunion",
+        "Asia/Saigon",
+        "Hongkong",
+        "Asia/Tel_Aviv",
+        "Israel",
+        "Asia/Katmandu",
+        "Asia/Calcutta",
+        "Asia/Singapore",
+        "Singapore",
+        "Asia/Macao",
+        "Asia/Ujung_Pandang",
+        "Europe/Nicosia",
+        "Asia/Bahrain",
+        "Asia/Yangon",
+        "Indian/Cocos",
+        "Antarctica/Syowa",
+        "Asia/Aden",
+        "Asia/Kuwait",
+        "ROK",
+        "Asia/Chongqing",
+        "Asia/Chungking",
+        "Asia/Harbin",
+        "PRC",
+        "ROC",
+        "Iran",
+        "Asia/Thimbu",
+        "Japan",
+        "Asia/Choibalsan",
+        "Asia/Ulan_Bator",
+        "Asia/Kashgar",
+        "Atlantic/Faeroe",
+        "Australia/South",
+        "Australia/Queensland",
+        "Australia/Yancowinna",
+        "Australia/North",
+        "Australia/Currie",
+        "Australia/Tasmania",
+        "Australia/LHI",
+        "Australia/Victoria",
+        "Australia/West",
+        "Australia/ACT",
+        "Australia/Canberra",
+        "Australia/NSW",
+        "Etc/GMT",
+        "Etc/GMT+0",
+        "Etc/GMT0",
+        "Etc/Greenwich",
+        "GMT",
+        "GMT+0",
+        "GMT-0",
+        "GMT0",
+        "Greenwich",
+        "Etc/UTC",
+        "Etc/Universal",
+        "Etc/Zulu",
+        "UCT",
+        "UTC",
+        "Universal",
+        "Zulu",
+        "EET",
+        "Europe/Ljubljana",
+        "Europe/Podgorica",
+        "Europe/Sarajevo",
+        "Europe/Skopje",
+        "Europe/Zagreb",
+        "Arctic/Longyearbyen",
+        "Atlantic/Jan_Mayen",
+        "Europe/Copenhagen",
+        "Europe/Oslo",
+        "Europe/Stockholm",
+        "CET",
+        "Europe/Amsterdam",
+        "Europe/Luxembourg",
+        "MET",
+        "Europe/Tiraspol",
+        "Eire",
+        "Europe/Mariehamn",
+        "Asia/Istanbul",
+        "Turkey",
+        "Europe/Kyiv",
+        "Europe/Uzhgorod",
+        "Europe/Zaporozhye",
+        "Portugal",
+        "WET",
+        "Europe/Belfast",
+        "Europe/Guernsey",
+        "Europe/Isle_of_Man",
+        "Europe/Jersey",
+        "GB",
+        "GB-Eire",
+        "W-SU",
+        "Europe/Monaco",
+        "Europe/Bratislava",
+        "Europe/San_Marino",
+        "Europe/Vatican",
+        "Poland",
+        "Europe/Busingen",
+        "Europe/Vaduz",
+        "Indian/Kerguelen",
+        "Antarctica/McMurdo",
+        "Antarctica/South_Pole",
+        "NZ",
+        "NZ-CHAT",
+        "Chile/EasterIsland",
+        "Pacific/Kanton",
+        "Pacific/Pohnpei",
+        "Pacific/Ponape",
+        "Pacific/Saipan",
+        "HST",
+        "Pacific/Johnston",
+        "US/Hawaii",
+        "Kwajalein",
+        "Pacific/Midway",
+        "Pacific/Samoa",
+        "US/Samoa",
+        "Antarctica/DumontDUrville",
+        "Pacific/Chuuk",
         "Pacific/Truk",
+        "Pacific/Yap",
+        "Pacific/Funafuti",
+        "Pacific/Majuro",
         "Pacific/Wake",
         "Pacific/Wallis"
       ],
@@ -441,7 +619,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Commands to run before the operation.\nDefault: `[]`"
+          "description": "Commands to run before the operation.\nDefault: []"
         },
         "post": {
           "type": "array",
@@ -449,7 +627,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Commands to run after the operation.\nDefault: `[]`"
+          "description": "Commands to run after the operation.\nDefault: []"
         }
       },
       "required": [],
@@ -483,7 +661,7 @@
                 "txt"
               ],
               "default": "auto",
-              "description": "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\nDefault: `auto`"
+              "description": "Defines the file format. Allowed values: \"auto\", \"json\", \"jsonc\", \"json5\", \"yaml\", \"toml\", \"txt\".\nDefault: \"auto\""
             },
             "extractor": {
               "enum": [
@@ -492,7 +670,7 @@
                 "regex"
               ],
               "default": "auto",
-              "description": "Defines how to extract the version from the parsed file.\nDefault: `auto`"
+              "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
             },
             "selector": {
               "type": "string",
@@ -531,7 +709,7 @@
                   "txt"
                 ],
                 "default": "auto",
-                "description": "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\nDefault: `auto`"
+                "description": "Defines the file format. Allowed values: \"auto\", \"json\", \"jsonc\", \"json5\", \"yaml\", \"toml\", \"txt\".\nDefault: \"auto\""
               },
               "extractor": {
                 "enum": [
@@ -540,7 +718,7 @@
                   "regex"
                 ],
                 "default": "auto",
-                "description": "Defines how to extract the version from the parsed file.\nDefault: `auto`"
+                "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
               },
               "selector": {
                 "type": "string",
@@ -605,17 +783,17 @@
           "type": {
             "type": "string",
             "minLength": 1,
-            "description": "Commit type."
+            "description": "Commit type name."
           },
           "section": {
             "type": "string",
             "default": "",
-            "description": "Changelog section heading for this commit type."
+            "description": "Changelog section heading for this commit type. When empty, `type` value is used.\nDefault: \"\""
           },
-          "changelog-hidden": {
+          "hidden": {
             "type": "boolean",
             "default": false,
-            "description": "Exclude this commit type from changelog generation."
+            "description": "Exclude this commit type from changelog generation (does not affect version bump calculation).\nDefault: false"
           }
         },
         "required": [
@@ -654,17 +832,16 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping."
+              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
             },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -677,19 +854,22 @@
                 },
                 {
                   "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
                 }
               ],
               "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
             }
           },
           "required": [],
           "default": {
             "types": [],
-            "countBreakingAsBump": true,
+            "countBreakingAs": "bump",
             "commitsPerBump": 1
           },
-          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"types\": [],\n  \"count-breaking-as-bump\": true,\n  \"commits-per-bump\": 1\n}"
+          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"types\": [],\n  \"count-breaking-as\": \"bump\",\n  \"commits-per-bump\": 1\n}"
         },
         "minor": {
           "type": "object",
@@ -700,17 +880,16 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping."
+              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
             },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -723,10 +902,13 @@
                 },
                 {
                   "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
                 }
               ],
               "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
             }
           },
           "required": [],
@@ -747,17 +929,16 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping."
+              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
             },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -770,10 +951,13 @@
                 },
                 {
                   "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
                 }
               ],
               "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
             }
           },
           "required": [],
@@ -795,17 +979,16 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping."
+              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
             },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -818,10 +1001,13 @@
                 },
                 {
                   "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
                 }
               ],
               "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
             }
           },
           "required": [],
@@ -840,17 +1026,16 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping."
+              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
             },
-            "count-breaking-as-commit": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
-            },
-            "count-breaking-as-bump": {
-              "type": "boolean",
-              "default": false,
-              "description": "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\nDefault: `false`"
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -863,10 +1048,13 @@
                 },
                 {
                   "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
                 }
               ],
               "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: `1`."
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
             }
           },
           "required": [],
@@ -908,7 +1096,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run before the operation.\nDefault: `[]`"
+              "description": "Commands to run before the operation.\nDefault: []"
             },
             "post": {
               "type": "array",
@@ -916,7 +1104,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run after the operation.\nDefault: `[]`"
+              "description": "Commands to run after the operation.\nDefault: []"
             }
           },
           "required": [],
@@ -935,28 +1123,28 @@
         },
         "header-pattern": {
           "type": "string",
-          "default": "# Changelog\n\n",
-          "description": "Pattern for header of changelog file. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\\n\""
+          "default": "# Changelog\n",
+          "description": "Pattern for changelog file header. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\""
         },
         "header-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing header of changelog file. Overrides `headerPattern` when both are provided."
+          "description": "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided."
         },
         "footer-pattern": {
           "type": "string",
           "default": "",
-          "description": "Pattern for footer of changelog file. Placed below any changelog content section.\nDefault: \"\""
+          "description": "Pattern for changelog file footer. Placed below any changelog content section.\nDefault: \"\""
         },
         "footer-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing footer of changelog file. Overrides `footerPattern` when both are provided."
+          "description": "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided."
         },
         "heading-pattern": {
           "type": "string",
-          "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->",
-          "description": "Pattern for heading of a changelog content section.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${yyyy-mm-dd}) <!-- time-zone: ${timeZone} -->\""
+          "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
+          "description": "Pattern for heading of a changelog content section.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
         },
         "body-pattern": {
           "type": "string",
@@ -979,7 +1167,7 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: `true`."
+          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: true"
         },
         "commands": {
           "type": "object",
@@ -990,7 +1178,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run before the operation.\nDefault: `[]`"
+              "description": "Commands to run before the operation.\nDefault: []"
             },
             "post": {
               "type": "array",
@@ -998,7 +1186,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run after the operation.\nDefault: `[]`"
+              "description": "Commands to run after the operation.\nDefault: []"
             }
           },
           "required": [],
@@ -1009,7 +1197,7 @@
           "type": "string",
           "minLength": 1,
           "default": "release/zephyr-release",
-          "description": "Pattern for branch name that Zephyr Release is gonna use."
+          "description": "Pattern for branch name that Zephyr Release is gonna use.\nDefault: \"release/zephyr-release\""
         },
         "labels-on-create": {
           "anyOf": [
@@ -1017,7 +1205,8 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "description": {
                   "type": "string",
@@ -1027,7 +1216,7 @@
                   "type": "string",
                   "minLength": 1,
                   "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                 }
               },
               "required": [
@@ -1040,7 +1229,8 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "description": {
                     "type": "string",
@@ -1050,7 +1240,7 @@
                     "type": "string",
                     "minLength": 1,
                     "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                   }
                 },
                 "required": [
@@ -1060,11 +1250,11 @@
             }
           ],
           "default": {
-            "name": "zp-release: pending",
+            "name": "release: pending",
             "description": "Indicates that the pull request is pending release.",
             "color": "FBCA04"
           },
-          "description": "A label or an array of labels to add to the pull request when it is created"
+          "description": "A label or an array of labels to add to the pull request when it is created.\nDefault: {\n  \"name\": \"release: pending\",\n  \"description\": \"Indicates that the pull request is pending release.\",\n  \"color\": \"FBCA04\"\n}"
         },
         "labels-on-close": {
           "anyOf": [
@@ -1072,7 +1262,8 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "description": {
                   "type": "string",
@@ -1082,7 +1273,7 @@
                   "type": "string",
                   "minLength": 1,
                   "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                 }
               },
               "required": [
@@ -1095,7 +1286,8 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   "description": {
                     "type": "string",
@@ -1105,7 +1297,7 @@
                     "type": "string",
                     "minLength": 1,
                     "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: `ededed`"
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                   }
                 },
                 "required": [
@@ -1115,17 +1307,17 @@
             }
           ],
           "default": {
-            "name": "zp-release: released",
+            "name": "release: released",
             "description": "Indicates that the pull request is closed and the release has completed.",
             "color": "0E8A16"
           },
-          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed."
+          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.\nDefault: {\n  \"name\": \"release: released\",\n  \"description\": \"Indicates that the pull request is closed and the release has completed.\",\n  \"color\": \"0E8A16\"\n}"
         },
         "title-pattern": {
           "type": "string",
           "minLength": 1,
           "default": "chore: release v${version}",
-          "description": "Pattern for pull request title."
+          "description": "Pattern for pull request title.\nDefault: \"chore: release v${version}\""
         },
         "header-pattern": {
           "anyOf": [
@@ -1140,12 +1332,12 @@
             }
           ],
           "default": "🤖 New release created. Stand by for approval",
-          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it."
+          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it.\nDefault: \"🤖 New release created. Stand by for approval\""
         },
         "body-pattern": {
           "type": "string",
-          "default": "${changelog}",
-          "description": "Pattern for pull request body."
+          "default": "${changelogContent}",
+          "description": "Pattern for pull request body.\nDefault: \"${changelogContent}\""
         },
         "body-pattern-path": {
           "type": "string",
@@ -1155,7 +1347,7 @@
         "footer-pattern": {
           "type": "string",
           "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
-          "description": "Pattern for pull request footer."
+          "description": "Pattern for pull request footer.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
         }
       },
       "required": [],
@@ -1168,12 +1360,12 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable tag and release.\nDefault: `true`."
+          "description": "Enable/disable tag and release.\nDefault: true"
         },
         "skip-release": {
           "type": "boolean",
           "default": false,
-          "description": "If enabled, only the tag will be created, no release will be made.\nDefault: `false`."
+          "description": "If enabled, only the tag will be created, no release will be made.\nDefault: false"
         },
         "commands": {
           "type": "object",
@@ -1184,7 +1376,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run before the operation.\nDefault: `[]`"
+              "description": "Commands to run before the operation.\nDefault: []"
             },
             "post": {
               "type": "array",
@@ -1192,7 +1384,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commands to run after the operation.\nDefault: `[]`"
+              "description": "Commands to run after the operation.\nDefault: []"
             }
           },
           "required": [],
@@ -1202,28 +1394,28 @@
         "prerelease": {
           "type": "boolean",
           "default": false,
-          "description": "If enabled, the release will be marked as prerelease.\nDefault: `false`."
+          "description": "If enabled, the release will be marked as prerelease.\nDefault: false"
         },
         "draft": {
           "type": "boolean",
           "default": false,
-          "description": "If enabled, the release will be created as draft.\nDefault: `false`."
+          "description": "If enabled, the release will be created as draft.\nDefault: false"
         },
         "tag-name-pattern": {
           "type": "string",
           "minLength": 1,
           "default": "v${version}",
-          "description": "Pattern for tag name, available in string pattern as `${tagName}`."
+          "description": "Pattern for tag name, available in string pattern as ${tagName}.\nDefault: \"v${version}\""
         },
         "title-pattern": {
           "type": "string",
           "default": "${tagName}",
-          "description": "Pattern for release title."
+          "description": "Pattern for release title.\nDefault: \"${tagName}\""
         },
         "body-pattern": {
           "type": "string",
-          "default": "${changelog}",
-          "description": "Pattern for release body."
+          "default": "${changelogContent}",
+          "description": "Pattern for release body.\nDefault: \"${changelogContent}\""
         }
       },
       "required": [],
