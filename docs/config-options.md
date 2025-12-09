@@ -20,7 +20,7 @@ Some example config JSON files: `example links to be inserted later`
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
-    - [commit... \> changelog-hidden (Optional)](#commit--changelog-hidden-optional)
+    - [commit... \> hidden (Optional)](#commit--hidden-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
@@ -155,7 +155,7 @@ Files to include in the commit. Accepts `base`, `all` or an array of paths/globs
 Type: `array of objects`  
 Default: `{ type: "feat", section: "Features" }, { type: "fix", section: "Bug Fixes" }, { type: "perf", section: "Performance Improvements" }, { type: "revert", section: "Reverts" }`
 
-**Properties:** [`type`](#commit--type-required), [`section`](#commit--section-optional), [`changelog-hidden`](#commit--changelog-hidden-optional)
+**Properties:** [`type`](#commit--type-required), [`section`](#commit--section-optional), [`hidden`](#commit--hidden-optional)
 
 List of commit types that the application will track and record. Only commits with these types will be considered when calculating version bumps and generating release notes.
 
@@ -163,21 +163,21 @@ List of commit types that the application will track and record. Only commits wi
 
 Type: `string`
 
-Conventional commit type (e.g., "feat", "fix").
+Commit type name (e.g., "feat", "fix").
 
 #### commit... > section (Optional)
 
 Type: `string`  
 Default: `""`
 
-Changelog section heading for this commit type.
+Changelog section heading for this commit type. When empty, the `type` value is used.
 
-#### commit... > changelog-hidden (Optional)
+#### commit... > hidden (Optional)
 
 Type: `boolean`  
 Default: `false`
 
-Exclude this commit type from changelog generation.
+Exclude this commit type from changelog generation (does not affect version bump calculation).
 
 ### bump-strategy (Optional)
 
@@ -189,35 +189,35 @@ Configuration options that determine how version numbers are calculated.
 #### bump... > major (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], countBreakingAsBump: true, commitsPerBump: 1 }`
+Default: `{ types: [], count-breaking-as: "bump", commits-per-bump: 1 }`
 
 Strategy for major version bumps (x.0.0).
 
 #### bump... > minor (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: ["feat"], commitsPerBump: 1 }`
+Default: `{ types: ["feat"], commits-per-bump: 1 }`
 
 Strategy for minor version bumps (0.x.0).
 
 #### bump... > patch (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: ["fix", "perf"], commitsPerBump: 1 }`
+Default: `{ types: ["fix", "perf"], commits-per-bump: 1 }`
 
 Strategy for patch version bumps (0.0.x).
 
 #### bump... > prerelease (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], commitsPerBump: 1 }`
+Default: `{ types: [], commits-per-bump: 1 }`
 
 Strategy for prerelease version bumps (x.x.x-alpha.x).
 
 #### bump... > build (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], commitsPerBump: 1 }`
+Default: `{ types: [], commits-per-bump: 1 }`
 
 Strategy for build metadata bumps (x.x.x+meta).
 
@@ -226,12 +226,12 @@ Strategy for build metadata bumps (x.x.x+meta).
 Type: `object`  
 **Properties:**
 
-- `types` (Optional): Array of commit types that count toward version bumping. Default: `string[]`
-- `countBreakingAsCommit` (Optional): Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list. Default: `false`
-- `countBreakingAsBump` (Optional): Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list. Default: `false`
-- `commitsPerBump` (Optional): Number of commits required for additional version bump after the first. Use `Infinity` or `"Infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `1`
+- `types` (Optional): Array of commit types (from base [`commit-types`](#commit-types-optional)) that count toward version bumping. Default: `[]`
+- `count-breaking-as` (Optional): How to treat breaking changes regardless of `types`. Allowed: `none`, `commit`, `bump`. Default: `"none"`  
+  Usually this should only be set for a single semver level (major, minor, or patch) to avoid double counting.
+- `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `1`
 
-Note: In JSON/JSONC files use `"Infinity"` string, in JSON5 you can use `Infinity` directly.
+Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
 #### bump... > bump-minor-for-major-pre-stable (Optional)
 
@@ -252,7 +252,7 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 Type: `object`  
 **Properties:** [`enabled`](#changelog--enabled-optional), [`commands`](#changelog--commands-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
-Configuration specific to changelogs. All generated changelog content is available in string patterns as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
+Configuration specific to changelogs. All generated changelog content are available in string pattern as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
 #### changelog > enabled (Optional)
 
@@ -287,28 +287,28 @@ Path to the file where the generated changelog will be written to, relative to t
 Type: `string`  
 Default: `"# Changelog\n"`
 
-Pattern for header of changelog file. Placed above any changelog content sections.
+Pattern for changelog file header. Placed above any changelog content sections.
 
 #### changelog > header-pattern-path (Optional)
 
 Type: `string`  
 Default: `""`
 
-Path to text file containing header of changelog file. Overrides `header-pattern` when both are provided.
+Path to text file containing changelog file header. Overrides `header-pattern` when both are provided.
 
 #### changelog > footer-pattern (Optional)
 
 Type: `string`  
 Default: `""`
 
-Pattern for footer of changelog file. Placed below any changelog content section.
+Pattern for changelog file footer. Placed below any changelog content section.
 
 #### changelog > footer-pattern-path (Optional)
 
 Type: `string`  
 Default: `""`
 
-Path to text file containing footer of changelog file. Overrides `footer-pattern` when both are provided.
+Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided.
 
 #### changelog > heading-pattern (Optional)
 
@@ -413,7 +413,7 @@ Pattern for pull request footer.
 Type: `object`  
 **Properties:**
 
-- `name` (Required): Label name
+- `name` (Required): Label name.
 - `description` (Optional): Label description. Default: `""`
 - `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
 

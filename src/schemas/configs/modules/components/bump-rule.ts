@@ -1,26 +1,22 @@
 import * as v from "@valibot/valibot";
+import { countBreakingAsOptions } from "../../../../constants/bump-rule.ts";
 
 export const BumpRuleSchema = v.object({
   types: v.pipe(
     v.optional(v.array(v.string()), []),
     v.metadata({
-      description: "Commit types that count toward version bumping.",
+      description:
+        "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\n" +
+        "Default: []",
     }),
   ),
-  countBreakingAsCommit: v.pipe(
-    v.optional(v.boolean(), false),
+  countBreakingAs: v.pipe(
+    v.optional(v.enum(countBreakingAsOptions), "none"),
     v.metadata({
       description:
-        "Count a breaking change as one commit regardless of current chosen `types`, provided that the commit type exists in base commit types list.\n" +
-        "Default: `false`",
-    }),
-  ),
-  countBreakingAsBump: v.pipe(
-    v.optional(v.boolean(), false),
-    v.metadata({
-      description:
-        "Count a breaking change as one bump directly regardless of current chosen `types`, provided that the commit type exists in base commit types list.\n" +
-        "Default: `false`",
+        "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as " +
+        "the commit type exists in base `commitTypes` list.\n" +
+        'Default: "none"',
     }),
   ),
   commitsPerBump: v.pipe(
@@ -30,6 +26,7 @@ export const BumpRuleSchema = v.object({
           v.pipe(v.number(), v.minValue(0), v.integer()),
           v.literal(Infinity),
           v.literal("Infinity"),
+          v.literal("infinity"),
         ]),
         v.transform((value) => typeof value === "string" ? Infinity : value),
       ),
@@ -37,11 +34,12 @@ export const BumpRuleSchema = v.object({
     ),
     v.metadata({
       description:
-        "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\n" +
-        "Default: `1`.",
+        "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even " +
+        "if breaking changes are counted as bumps.\n" +
+        "Default: 1",
     }),
   ),
 });
 
-type _BumpRuleInput = v.InferInput<typeof BumpRuleSchema>;
+export type BumpRuleInput = v.InferInput<typeof BumpRuleSchema>;
 type _BumpRuleOutput = v.InferOutput<typeof BumpRuleSchema>;

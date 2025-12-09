@@ -4,13 +4,13 @@ export const CommandsSchema = v.object({
   pre: v.pipe(
     v.optional(v.array(v.string()), []),
     v.metadata({
-      description: "Commands to run before the operation.\n" + "Default: `[]`",
+      description: "Commands to run before the operation.\n" + "Default: []",
     }),
   ),
   post: v.pipe(
     v.optional(v.array(v.string()), []),
     v.metadata({
-      description: "Commands to run after the operation.\n" + "Default: `[]`",
+      description: "Commands to run after the operation.\n" + "Default: []",
     }),
   ),
 });

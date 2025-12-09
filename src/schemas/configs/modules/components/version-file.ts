@@ -14,8 +14,8 @@ export const VersionFileSchema = v.object({
     v.optional(v.enum(FileFormats), "auto"),
     v.metadata({
       description:
-        "Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`.\n" +
-        "Default: `auto`",
+        'Defines the file format. Allowed values: "auto", "json", "jsonc", "json5", "yaml", "toml", "txt".\n' +
+        'Default: "auto"',
     }),
   ),
   extractor: v.pipe(
@@ -23,7 +23,7 @@ export const VersionFileSchema = v.object({
     v.metadata({
       description:
         "Defines how to extract the version from the parsed file.\n" +
-        "Default: `auto`",
+        'Default: "auto"',
     }),
   ),
   selector: v.pipe(

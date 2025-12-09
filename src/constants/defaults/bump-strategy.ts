@@ -1,25 +1,27 @@
-export const DEFAULT_MAJOR_BUMP_STRATEGY = {
+import type { BumpRuleInput } from "../../schemas/configs/modules/components/bump-rule.ts";
+
+export const DEFAULT_MAJOR_BUMP_STRATEGY: BumpRuleInput = {
   types: [],
-  countBreakingAsBump: true,
+  countBreakingAs: "bump",
   commitsPerBump: 1,
 };
 
-export const DEFAULT_MINOR_BUMP_STRATEGY = {
+export const DEFAULT_MINOR_BUMP_STRATEGY: BumpRuleInput = {
   types: ["feat"],
   commitsPerBump: 1,
 };
 
-export const DEFAULT_PATCH_BUMP_STRATEGY = {
+export const DEFAULT_PATCH_BUMP_STRATEGY: BumpRuleInput = {
   types: ["fix", "perf"],
   commitsPerBump: 1,
 };
 
-export const DEFAULT_PRERELEASE_BUMP_STRATEGY = {
+export const DEFAULT_PRERELEASE_BUMP_STRATEGY: BumpRuleInput = {
   types: [],
   commitsPerBump: 1,
 };
 
-export const DEFAULT_BUILD_BUMP_STRATEGY = {
+export const DEFAULT_BUILD_BUMP_STRATEGY: BumpRuleInput = {
   types: [],
   commitsPerBump: 1,
 };

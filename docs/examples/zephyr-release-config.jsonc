@@ -48,18 +48,18 @@
     {
       "type": "feat",
       "section": "✨ Features",
-      "changelog-hidden": false
+      "hidden": false
     },
     {
       "type": "fix",
       "section": "🐛 Bug Fixes",
-      "changelog-hidden": false
+      "hidden": false
     },
     {
       // Ex: A custom commit type that won't appear in changelog
       "type": "custom",
       "section": "🛠 Custom",
-      "changelog-hidden": true
+      "hidden": true
     }
   ],
 
@@ -67,34 +67,26 @@
     // Ex: This strategy will trigger major bump only on breaking changes
     "major": {
       "types": [],
-      "count-breaking-as-commit": false,
-      "count-breaking-as-bump": true,
+      "count-breaking-as": "bump",
       "commits-per-bump": "Infinity"
     },
     // Ex: This strategy will bump minor version after every 10 feat commits
     "minor": {
       "types": ["feat"],
-      "count-breaking-as-commit": false,
-      "count-breaking-as-bump": false,
       "commits-per-bump": 10
     },
     // Ex: This strategy treats breaking changes as regular commits for patch
     "patch": {
       "types": ["fix", "perf"],
-      "count-breaking-as-commit": true,
-      "count-breaking-as-bump": false,
+      "count-breaking-as": "commit",
       "commits-per-bump": 10
     },
     "prerelease": {
       "types": [],
-      "count-breaking-as-commit": false,
-      "count-breaking-as-bump": false,
       "commits-per-bump": "Infinity"
     },
     "build": {
       "types": [],
-      "count-breaking-as-commit": false,
-      "count-breaking-as-bump": false,
       "commits-per-bump": 1
     },
 

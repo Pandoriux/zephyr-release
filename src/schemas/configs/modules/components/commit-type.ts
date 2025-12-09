@@ -4,18 +4,22 @@ export const CommitTypeSchema = v.object({
   type: v.pipe(
     v.string(),
     v.nonEmpty(),
-    v.metadata({ description: "Commit type." }),
+    v.metadata({ description: "Commit type name." }),
   ),
   section: v.pipe(
     v.optional(v.string(), ""),
     v.metadata({
-      description: "Changelog section heading for this commit type.",
+      description:
+        "Changelog section heading for this commit type. When empty, `type` value is used.\n" +
+        'Default: ""',
     }),
   ),
-  changelogHidden: v.pipe(
+  hidden: v.pipe(
     v.optional(v.boolean(), false),
     v.metadata({
-      description: "Exclude this commit type from changelog generation.",
+      description:
+        "Exclude this commit type from changelog generation (does not affect version bump calculation).\n" +
+        "Default: false",
     }),
   ),
 });

@@ -48,7 +48,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_CHANGELOG_HEADER_PATTERN),
       v.metadata({
         description:
-          "Pattern for header of changelog file. Placed above any changelog content sections.\n" +
+          "Pattern for changelog file header. Placed above any changelog content sections.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADER_PATTERN)}`,
       }),
     ),
@@ -56,14 +56,14 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "Path to text file containing header of changelog file. Overrides `headerPattern` when both are provided.",
+          "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided.",
       }),
     ),
     footerPattern: v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "Pattern for footer of changelog file. Placed below any changelog content section.\n" +
+          "Pattern for changelog file footer. Placed below any changelog content section.\n" +
           'Default: ""',
       }),
     ),
@@ -71,7 +71,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), ""),
       v.metadata({
         description:
-          "Path to text file containing footer of changelog file. Overrides `footerPattern` when both are provided.",
+          "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided.",
       }),
     ),
 
