@@ -832,7 +832,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
             },
             "count-breaking-as": {
               "enum": [
@@ -841,7 +841,7 @@
                 "bump"
               ],
               "default": "none",
-              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -880,7 +880,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
             },
             "count-breaking-as": {
               "enum": [
@@ -889,7 +889,7 @@
                 "bump"
               ],
               "default": "none",
-              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -929,7 +929,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
             },
             "count-breaking-as": {
               "enum": [
@@ -938,7 +938,7 @@
                 "bump"
               ],
               "default": "none",
-              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -979,7 +979,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
             },
             "count-breaking-as": {
               "enum": [
@@ -988,7 +988,7 @@
                 "bump"
               ],
               "default": "none",
-              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -1026,7 +1026,7 @@
                 "type": "string"
               },
               "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
             },
             "count-breaking-as": {
               "enum": [
@@ -1035,7 +1035,7 @@
                 "bump"
               ],
               "default": "none",
-              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commitTypes` list.\nDefault: \"none\""
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
             },
             "commits-per-bump": {
               "anyOf": [
@@ -1114,7 +1114,7 @@
         "content-body-override": {
           "type": "string",
           "default": "",
-          "description": "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically in workflow input, not in config."
+          "description": "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
         },
         "path": {
           "type": "string",
@@ -1129,7 +1129,7 @@
         "header-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided."
+          "description": "Path to text file containing changelog file header. Overrides `header-pattern` when both are provided."
         },
         "footer-pattern": {
           "type": "string",
@@ -1139,7 +1139,7 @@
         "footer-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided."
+          "description": "Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided."
         },
         "heading-pattern": {
           "type": "string",
@@ -1154,7 +1154,7 @@
         "body-pattern-path": {
           "type": "string",
           "default": "",
-          "description": "Path to text file containing body of a changelog content section. Overrides `bodyPattern` when both are provided."
+          "description": "Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided."
         }
       },
       "required": [],

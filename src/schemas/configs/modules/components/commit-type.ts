@@ -3,6 +3,7 @@ import * as v from "@valibot/valibot";
 export const CommitTypeSchema = v.object({
   type: v.pipe(
     v.string(),
+    v.trim(),
     v.nonEmpty(),
     v.metadata({ description: "Commit type name." }),
   ),

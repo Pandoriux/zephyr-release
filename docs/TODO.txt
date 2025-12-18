@@ -1,1 +1,23 @@
 9/12/25: Learn how semver prerelease and build metadata work to implement correct bump feature
+
+Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be used.
+About primary file: link-to-be-insert-later
+
+resetOn: v.pipe(
+      v.optional(
+        v.union([
+          v.enum({ none: "none", ...semverFormat }),
+          v.array(v.enum({ none: "none", ...semverFormat })),
+        ]),
+        "none",
+      ),
+      v.metadata({
+        description:
+          "Resets the incremental identifier when the specified version component(s) change, could be single or array. Allowed " +
+          'values: "major", "minor", "patch", "prerelease", "build", and "none".\n' +
+          'For "prerelease" and "build", only changes to fixed identifiers (e.g. "literal") are considered. More: ' +
+          "link insert here\n" +
+          'Default: "none"',
+      }),
+    ),
+  }),

@@ -30,8 +30,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely " +
-          "skips the built-in generation process and uses this value as the content. Should only be set dynamically " +
-          "in workflow input, not in config.",
+          "skips the built-in generation process and uses this value as the content. Should only be set dynamically, not " +
+          "in static config.",
       }),
     ),
 

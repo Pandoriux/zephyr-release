@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { countBreakingAsOptions } from "../../../../constants/bump-rule.ts";
+import { countBreakingAsOptions } from "../../../../constants/bump-rules.ts";
 
 export const BumpRuleSchema = v.object({
   types: v.pipe(

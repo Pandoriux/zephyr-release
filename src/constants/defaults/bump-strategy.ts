@@ -15,13 +15,3 @@ export const DEFAULT_PATCH_BUMP_STRATEGY: BumpRuleInput = {
   types: ["fix", "perf"],
   commitsPerBump: 1,
 };
-
-export const DEFAULT_PRERELEASE_BUMP_STRATEGY: BumpRuleInput = {
-  types: [],
-  commitsPerBump: 1,
-};
-
-export const DEFAULT_BUILD_BUMP_STRATEGY: BumpRuleInput = {
-  types: [],
-  commitsPerBump: 1,
-};

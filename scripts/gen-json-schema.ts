@@ -5,14 +5,16 @@ import traverse from "@json-schema-tools/traverse";
 import { ConfigSchema } from "../src/schemas/configs/config.ts";
 
 const OUTPUT_CONFIG_FILE = "config-v1.json";
+const propertyKeyMap = new Map<string, string>();
 
 // Config json schema based on valibot schema
 const schema = toJsonSchema(ConfigSchema, {
   typeMode: "input",
+  ignoreActions: ["trim"],
 });
 
-// Transform function (schema keys from camelCase to kebab-case)
-function transform(
+// Transform function (from camelCase to kebab-case)
+function transformKeys(
   schema: unknown,
   _isCycle: boolean,
   _path: string,
@@ -42,12 +44,16 @@ function transform(
 
     // properties
     if (
-      "properties" in schema
-      && schema.properties
-      && typeof schema.properties === "object"
+      "properties" in schema &&
+      schema.properties &&
+      typeof schema.properties === "object"
     ) {
       const props = Object.fromEntries(
-        Object.entries(schema.properties).map(([k, v]) => [toKebabCase(k), v]),
+        Object.entries(schema.properties).map(([k, v]) => {
+          const kebabKey = toKebabCase(k);
+          propertyKeyMap.set(k, kebabKey);
+          return [kebabKey, v];
+        }),
       );
 
       schema.properties = props;
@@ -55,9 +61,9 @@ function transform(
 
     // required
     if (
-      "required" in schema
-      && Array.isArray(schema.required)
-      && schema.required.every((item) => typeof item === "string")
+      "required" in schema &&
+      Array.isArray(schema.required) &&
+      schema.required.every((item) => typeof item === "string")
     ) {
       schema.required = schema.required.map((str) => toKebabCase(str));
     }
@@ -66,8 +72,35 @@ function transform(
   return schema;
 }
 
-// Traverse and transform schema keys
-traverse.default(schema, transform, { mutable: true });
+function transformDescription(
+  schema: unknown,
+  _isCycle: boolean,
+  _path: string,
+  _parent: unknown,
+) {
+  if (schema && typeof schema === "object") {
+    // description
+    if ("description" in schema && typeof schema.description === "string") {
+      schema.description = schema.description.replace(
+        /`([^`]+)`/g,
+        (match, content) => {
+          const replacement = propertyKeyMap.get(content);
+          if (!replacement) {
+            return match;
+          }
+
+          return "`" + replacement + "`";
+        },
+      );
+    }
+  }
+
+  return schema;
+}
+
+// Traverse and transform schema
+traverse.default(schema, transformKeys, { mutable: true });
+traverse.default(schema, transformDescription, { mutable: true });
 
 // Write schema file
 Deno.writeTextFileSync(

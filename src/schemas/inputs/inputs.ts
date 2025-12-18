@@ -1,5 +1,8 @@
 import * as v from "@valibot/valibot";
-import { FileFormatAliases, FileFormats } from "../../constants/file-format.ts";
+import {
+  FileFormatAliases,
+  FileFormats,
+} from "../../constants/file-formats.ts";
 
 export const InputsSchema = v.pipe(
   v.object({

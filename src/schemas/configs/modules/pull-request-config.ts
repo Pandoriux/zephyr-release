@@ -33,7 +33,10 @@ export const PullRequestConfigSchema = v.pipe(
     ),
 
     branchNamePattern: v.pipe(
-      v.optional(v.pipe(v.string(), v.nonEmpty()), "release/zephyr-release"),
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        "release/zephyr-release",
+      ),
       v.metadata({
         description:
           "Pattern for branch name that Zephyr Release is gonna use.\n" +
@@ -78,7 +81,7 @@ export const PullRequestConfigSchema = v.pipe(
 
     titlePattern: v.pipe(
       v.optional(
-        v.pipe(v.string(), v.nonEmpty()),
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_PULL_REQUEST_TITLE_PATTERN,
       ),
       v.metadata({

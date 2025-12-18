@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
 
 export const LabelSchema = v.object({
-  name: v.pipe(v.string(), v.nonEmpty()),
+  name: v.pipe(v.string(), v.trim(), v.nonEmpty()),
   description: v.optional(v.string(), ""),
   color: v.pipe(
-    v.optional(v.pipe(v.string(), v.nonEmpty()), "ededed"),
+    v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "ededed"),
     v.metadata({
       description:
         "The hexadecimal color code for the label, without the leading #.\n" +

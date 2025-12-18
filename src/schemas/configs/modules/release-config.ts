@@ -47,7 +47,10 @@ export const ReleaseConfigSchema = v.pipe(
     ),
 
     tagNamePattern: v.pipe(
-      v.optional(v.pipe(v.string(), v.nonEmpty()), DEFAULT_TAG_NAME_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        DEFAULT_TAG_NAME_PATTERN,
+      ),
       v.metadata({
         description:
           "Pattern for tag name, available in string pattern as ${tagName}.\n" +

@@ -25,9 +25,12 @@ Some example config JSON files: `example links to be inserted later`
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
     - [bump... \> patch (Optional)](#bump--patch-optional)
-    - [bump... \> prerelease (Optional)](#bump--prerelease-optional)
-    - [bump... \> build (Optional)](#bump--build-optional)
       - [BumpRule](#bumprule)
+    - [bump... \> prerelease (Optional)](#bump--prerelease-optional)
+      - [BumpRulePrerelease](#bumpruleprerelease)
+    - [bump... \> build (Optional)](#bump--build-optional)
+      - [BumpRuleBuild](#bumprulebuild)
+      - [SemverExtension](#semverextension)
     - [bump... \> bump-minor-for-major-pre-stable (Optional)](#bump--bump-minor-for-major-pre-stable-optional)
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
@@ -207,20 +210,6 @@ Default: `{ types: ["fix", "perf"], commits-per-bump: 1 }`
 
 Strategy for patch version bumps (0.0.x).
 
-#### bump... > prerelease (Optional)
-
-Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], commits-per-bump: 1 }`
-
-Strategy for prerelease version bumps (x.x.x-alpha.x).
-
-#### bump... > build (Optional)
-
-Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], commits-per-bump: 1 }`
-
-Strategy for build metadata bumps (x.x.x+meta).
-
 ##### BumpRule
 
 Type: `object`  
@@ -232,6 +221,72 @@ Type: `object`
 - `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `1`
 
 Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
+
+#### bump... > prerelease (Optional)
+
+Type: [`BumpRulePrerelease`](#bumpruleprerelease)  
+Default: `{}`
+
+Strategy for bumping prerelease version (1.2.3-x.x).
+
+##### BumpRulePrerelease
+
+Type: `object`  
+**Properties:**
+
+- `enabled` (Optional): Enable/disable handling of pre-release identifiers. Default: `false`
+- `override` (Optional): Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
+- `identifiers` (Optional): Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers. Type: [`SemverExtension[]`](#semverextension)
+
+#### bump... > build (Optional)
+
+Type: [`BumpRuleBuild`](#bumprulebuild)  
+Default: `{}`
+
+Strategy for bumping build metadata (1.2.3+x.x).
+
+##### BumpRuleBuild
+
+Type: `object`  
+**Properties:**
+
+- `enabled` (Optional): Enable/disable handling of build metadata. Default: `false`
+- `override` (Optional): Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
+- `metadata` (Optional): Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata. Type: [`SemverExtension[]`](#semverextension)
+
+##### SemverExtension
+
+A discriminated union based on the `type` field. Specifies the type of pre-release/build identifier/metadata.
+
+**Type: `"static"`** — A stable label that should not change often.
+
+- `type` (Required): `"static"`
+- `value` (Required): The static string value to use. Examples: `"pre"`, `"alpha"`, `"beta"`, `"rc"`.
+
+**Type: `"dynamic"`** — A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).
+
+- `type` (Required): `"dynamic"`
+- `value` (Optional): The string value to use, should be set dynamically.
+- `fallback-value` (Optional): The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array.
+
+**Type: `"incremental"`** — Integer value that changes over time.
+
+- `type` (Required): `"incremental"`
+- `initial-value` (Optional): Initial integer number value. Default: `0`
+- `expression-variables` (Optional): Defines custom variables for use in `next-value-expression`, `v` is reserved for current value. These variables are usually set dynamically.
+- `next-value-expression` (Optional): Expression for computing the next value, where `v` represents the current value. The expression must evaluate to an integer number. Evaluated with [`expr-eval`](https://www.npmjs.com/package/expr-eval). Default: `"v+1"`
+- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, or `"timestamp"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
+
+**Type: `"timestamp"`** — Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).
+
+- `type` (Required): `"timestamp"`
+- `unit` (Optional): The time unit. `"ms"` (13 digits) or `"s"` (10 digits). Default: `"ms"`
+
+**Type: `"date"`** — A date string that changes over time.
+
+- `type` (Required): `"date"`
+- `format` (Optional): The date format. `"YYYYMMDD"` or `"YYYY-MM-DD"`. Default: `"YYYYMMDD"`
+- `time-zone` (Optional): The timezone to use for the date. If not specified, falls back to base [`time-zone`](#time-zone-optional).
 
 #### bump... > bump-minor-for-major-pre-stable (Optional)
 
@@ -273,7 +328,7 @@ Pre/post command lists to run around the changelog operation. Each command runs 
 Type: `string`  
 Default: `""`
 
-User-provided changelog content body, available in string pattern as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically in workflow input, not in config.
+User-provided changelog content body, available in string pattern as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
 
 #### changelog > path (Optional)
 

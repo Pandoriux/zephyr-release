@@ -1,13 +1,13 @@
 import * as v from "@valibot/valibot";
 import { BumpRuleSchema } from "./components/bump-rule.ts";
 import {
-  DEFAULT_BUILD_BUMP_STRATEGY,
   DEFAULT_MAJOR_BUMP_STRATEGY,
   DEFAULT_MINOR_BUMP_STRATEGY,
   DEFAULT_PATCH_BUMP_STRATEGY,
-  DEFAULT_PRERELEASE_BUMP_STRATEGY,
 } from "../../../constants/defaults/bump-strategy.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
+import { BumpRulePrereleaseSchema } from "./components/bump-rule-prerelease.ts";
+import { BumpRuleBuildSchema } from "./components/bump-rule-build.ts";
 
 export const BumpStrategyConfigSchema = v.pipe(
   v.object({
@@ -50,31 +50,17 @@ export const BumpStrategyConfigSchema = v.pipe(
           }`,
       }),
     ),
+
     prerelease: v.pipe(
-      v.optional(BumpRuleSchema, DEFAULT_PRERELEASE_BUMP_STRATEGY),
+      v.optional(BumpRulePrereleaseSchema, {}),
       v.metadata({
-        description:
-          "Strategy for bumping prerelease version (1.2.3-alpha.x).\n" +
-          `Default:  ${
-            JSON.stringify(
-              transformObjKeyToKebabCase(DEFAULT_PRERELEASE_BUMP_STRATEGY),
-              null,
-              2,
-            )
-          }`,
+        description: "Strategy for bumping prerelease version (1.2.3-x.x).",
       }),
     ),
     build: v.pipe(
-      v.optional(BumpRuleSchema, DEFAULT_BUILD_BUMP_STRATEGY),
+      v.optional(BumpRuleBuildSchema, {}),
       v.metadata({
-        description: "Strategy for bumping build metadata (1.2.3+meta.x).\n" +
-          `Default: ${
-            JSON.stringify(
-              transformObjKeyToKebabCase(DEFAULT_BUILD_BUMP_STRATEGY),
-              null,
-              2,
-            )
-          }`,
+        description: "Strategy for bumping build metadata (1.2.3+x.x).",
       }),
     ),
 

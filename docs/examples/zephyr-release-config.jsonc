@@ -81,13 +81,24 @@
       "count-breaking-as": "commit",
       "commits-per-bump": 10
     },
+    // Ex: Prerelease strategy with static "alpha" label and incremental counter
     "prerelease": {
-      "types": [],
-      "commits-per-bump": "Infinity"
+      "enabled": true,
+      // This setting should only be used in workflow inputs, not in config file
+      "override": [],
+      "identifiers": [
+        { "type": "static", "value": "alpha" },
+        { "type": "incremental", "initial-value": 0, "next-value-expression": "v+1", "reset-on": "patch" }
+      ]
     },
+    // Ex: Build metadata strategy with timestamp
     "build": {
-      "types": [],
-      "commits-per-bump": 1
+      "enabled": false,
+      // This setting should only be used in workflow inputs, not in config file
+      "override": [],
+      "metadata": [
+        { "type": "timestamp", "unit": "s" }
+      ]
     },
 
     // This setting will convert major bumps to minor in 0.x.x versions
