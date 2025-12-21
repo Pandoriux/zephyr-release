@@ -51,3 +51,4 @@ const res = map(DEFAULT_COMMIT_TYPES, ({ val }) => {
 
 // console.log(JSON.stringify(transformObjKeyToKebabCase(DEFAULT_COMMIT_TYPES), null, 2))
 console.log(JSON.stringify(res, null, 2))
+

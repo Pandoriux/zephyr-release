@@ -1,25 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
-import { toCamelCase } from "@std/text";
 import { deepMerge } from "@std/collections";
 import * as core from "@actions/core";
 import * as v from "@valibot/valibot";
-import { type ConfigOutput, ConfigSchema } from "./schemas/configs/config.ts";
-
-function reviveKeysToCamelCase(_key: string, value: unknown) {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [toCamelCase(k), v]),
-    );
-  }
-
-  return value;
-}
+import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
+import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
+import { parseConfig } from "../parsers/config-parsers.ts";
 
 export function resolveConfig(
   workspace: string,
   configPath: string,
+  configFormat: ConfigFileFormatWithAuto,
   configOverrideStr: string,
+  configOverrideFormat: ConfigFileFormatWithAuto,
 ): ConfigOutput {
   let configFile: unknown;
   let configOverride: unknown;
@@ -31,7 +24,7 @@ export function resolveConfig(
       encoding: "utf8",
     });
 
-    configFile = JSON.parse(configJson, reviveKeysToCamelCase);
+    configFile = parseConfig(configJson, configFormat, configPath);
 
     core.info("Config file parsed successfully.");
     if (core.isDebug()) {
@@ -45,7 +38,7 @@ export function resolveConfig(
 
   core.info("Reading config override from action input...");
   if (configOverrideStr) {
-    configOverride = JSON.parse(configOverrideStr, reviveKeysToCamelCase);
+    configOverride = parseConfig(configOverrideStr, configOverrideFormat);
 
     core.info("Config override parsed successfully.");
     if (core.isDebug()) {

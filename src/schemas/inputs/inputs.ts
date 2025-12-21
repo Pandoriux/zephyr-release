@@ -1,8 +1,5 @@
 import * as v from "@valibot/valibot";
-import {
-  FileFormatAliases,
-  FileFormats,
-} from "../../constants/file-formats.ts";
+import { ConfigFileFormatsWithAuto } from "../../constants/file-formats.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
@@ -10,10 +7,10 @@ export const InputsSchema = v.pipe(
     token: v.pipe(v.string(), v.nonEmpty("Token is missing.")),
 
     configPath: v.string(),
-    configFormat: v.union([v.enum(FileFormats), v.enum(FileFormatAliases)]),
+    configFormat: v.enum(ConfigFileFormatsWithAuto),
 
     configOverride: v.string(),
-    configOverrideFormat: v.enum(FileFormats),
+    configOverrideFormat: v.enum(ConfigFileFormatsWithAuto),
   }),
   // custom checks
   v.forward(

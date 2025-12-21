@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { FileFormats } from "../../../../constants/file-formats.ts";
+import { FileFormatsWithAuto } from "../../../../constants/file-formats.ts";
 import { VersionFileExtractors } from "../../../../constants/version-file-options.ts";
 
 export const VersionFileSchema = v.object({
@@ -12,7 +12,7 @@ export const VersionFileSchema = v.object({
     }),
   ),
   format: v.pipe(
-    v.optional(v.enum(FileFormats), "auto"),
+    v.optional(v.enum(FileFormatsWithAuto), "auto"),
     v.metadata({
       description:
         'Defines the file format. Allowed values: "auto", "json", "jsonc", "json5", "yaml", "toml", "txt".\n' +
