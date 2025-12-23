@@ -3,6 +3,7 @@ import { join } from "@std/path";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import traverse from "@json-schema-tools/traverse";
 import { ConfigSchema } from "../src/schemas/configs/config.ts";
+import { TimeZoneSchema } from "../src/schemas/configs/modules/components/timezone.ts";
 
 const OUTPUT_CONFIG_FILE = "config-v1.json";
 const propertyKeyMap = new Map<string, string>();
@@ -10,47 +11,7 @@ const propertyKeyMap = new Map<string, string>();
 // Config json schema based on valibot schema
 const schema = toJsonSchema(ConfigSchema, {
   typeMode: "input",
-  overrideSchema: (context) => {
-    const schema = context.valibotSchema;
-
-    if (schema && typeof schema === "object" && "key" in schema) {
-      const schemaKey = schema.key;
-
-      if (
-        schemaKey &&
-        typeof schemaKey === "object" &&
-        "pipe" in schemaKey &&
-        Array.isArray(schemaKey.pipe)
-      ) {
-        const isBaseSchemaString = schemaKey.pipe[0]?.type === "string";
-
-        const hasTrim = schemaKey.pipe.some((action) =>
-          action &&
-          typeof action === "object" &&
-          "type" in action &&
-          action.type === "trim"
-        );
-
-        const hasNonEmpty = schemaKey.pipe.some((action) =>
-          action &&
-          typeof action === "object" &&
-          "type" in action &&
-          action.type === "non_empty"
-        );
-
-        if (isBaseSchemaString && hasTrim && hasNonEmpty) {
-          return {
-            type: "object",
-            propertyNames: {
-              type: "string",
-              minLength: 1,
-            },
-            additionalProperties: {},
-          };
-        }
-      }
-    }
-  },
+  definitions: { timeZone: TimeZoneSchema },
   ignoreActions: ["trim", "safe_integer"],
 });
 
