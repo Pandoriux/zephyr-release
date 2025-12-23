@@ -12,6 +12,7 @@ import {
 } from "../constants/file-formats.ts";
 import { exitFailure } from "../lifecycle.ts";
 import { transformObjKeyToCamelCase } from "../utils/transformers/object.ts";
+import { logger } from "../utils/logger.ts";
 
 function parseOrThrow(
   configStr: string,
@@ -74,7 +75,11 @@ function parseConfigAuto(
     triedFormats.push(detectedFormat);
     try {
       return parseOrThrow(configStr, detectedFormat);
-    } catch { /* ignore */ }
+    } catch (error) {
+      logger.startGroup(`Parser error (${detectedFormat})`);
+      logger.info(String(error));
+      logger.endGroup();
+    }
   }
 
   for (let i = 0; i < supportedFormats.length; i++) {
@@ -83,7 +88,11 @@ function parseConfigAuto(
     try {
       triedFormats.push(supportedFormats[i]);
       return parseOrThrow(configStr, supportedFormats[i]);
-    } catch { /* ignore */ }
+    } catch (error) {
+      logger.startGroup(`Parser error (${supportedFormats[i]})`);
+      logger.info(String(error));
+      logger.endGroup();
+    }
   }
 
   // The end, none matched
