@@ -1,6 +1,6 @@
-import * as core from "@actions/core";
 import { markScriptEnd, markScriptStart } from "./lifecycle.ts";
 import { run } from "./run.ts";
+import { logger } from "./utils/logger.ts";
 
 async function main() {
   markScriptStart();
@@ -8,11 +8,11 @@ async function main() {
   try {
     await run();
   } catch (error) {
-    core.setFailed("❌ An unexpected error occurred: " + error);
+    logger.setFailed("❌ An unexpected error occurred: " + error);
     if (error instanceof Error && error.stack) {
-      core.startGroup("Stack trace:");
-      core.info(error.stack);
-      core.endGroup();
+      logger.startGroup("Stack trace:");
+      logger.info(error.stack);
+      logger.endGroup();
     }
 
     markScriptEnd("Failed");

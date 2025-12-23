@@ -4,6 +4,7 @@ import * as core from "@actions/core";
 import { InputsSchema } from "../schemas/inputs/inputs.ts";
 import { exitFailure } from "../lifecycle.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
+import { logger } from "../utils/logger.ts";
 
 export function GetActionInputs() {
   const rawInputs = {
@@ -20,9 +21,9 @@ export function GetActionInputs() {
     exitFailure(formatValibotIssues(parsedInputsResult.issues));
   }
 
-  core.startGroup("Parsed inputs:");
-  core.info(JSON.stringify(parsedInputsResult.output, null, 2));
-  core.endGroup();
+  logger.startGroup("Parsed inputs:");
+  logger.info(JSON.stringify(parsedInputsResult.output, null, 2));
+  logger.endGroup();
 
   return parsedInputsResult.output;
 }

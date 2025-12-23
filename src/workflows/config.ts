@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { deepMerge } from "@std/collections";
-import * as core from "@actions/core";
 import * as v from "@valibot/valibot";
 import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
 import { parseConfig } from "../parsers/config-parsers.ts";
+import { logger } from "../utils/logger.ts";
 
 export function resolveConfig(
   workspace: string,
@@ -18,7 +18,7 @@ export function resolveConfig(
   let configOverride: unknown;
   let finalConfig: unknown;
 
-  core.info("Reading config file from config path...");
+  logger.info("Reading config file from config path...");
   if (configPath) {
     const configJson = fs.readFileSync(path.join(workspace, configPath), {
       encoding: "utf8",
@@ -26,39 +26,39 @@ export function resolveConfig(
 
     configFile = parseConfig(configJson, configFormat, configPath);
 
-    core.info("Config file parsed successfully.");
-    if (core.isDebug()) {
-      core.startGroup("[DEBUG] Parsed config file:");
-      core.debug(JSON.stringify(configFile, null, 2));
-      core.endGroup();
-    }
+    logger.info("Config file parsed successfully.");
+    logger.debugWrap(() => {
+      logger.startGroup("[DEBUG] Parsed config file:");
+      logger.debug(JSON.stringify(configFile, null, 2));
+      logger.endGroup();
+    });
   } else {
-    core.info("Config path not provided. Skipping...");
+    logger.info("Config path not provided. Skipping...");
   }
 
-  core.info("Reading config override from action input...");
+  logger.info("Reading config override from action input...");
   if (configOverrideStr) {
     configOverride = parseConfig(configOverrideStr, configOverrideFormat);
 
-    core.info("Config override parsed successfully.");
-    if (core.isDebug()) {
-      core.startGroup("[DEBUG] Parsed config override:");
-      core.debug(JSON.stringify(configOverride, null, 2));
-      core.endGroup();
-    }
+    logger.info("Config override parsed successfully.");
+    logger.debugWrap(() => {
+      logger.startGroup("[DEBUG] Parsed config override:");
+      logger.debug(JSON.stringify(configOverride, null, 2));
+      logger.endGroup();
+    });
   } else {
-    core.info("Config override not provided. Skipping...");
+    logger.info("Config override not provided. Skipping...");
   }
 
-  core.info("Resolving final config...");
+  logger.info("Resolving final config...");
   if (configFile && configOverride) {
-    core.info("Both config file and config override exist, merging...");
+    logger.info("Both config file and config override exist, merging...");
     finalConfig = deepMerge(configFile, configOverride, { arrays: "replace" });
   } else if (configFile) {
-    core.info("Only config file exist, use config file as final config.");
+    logger.info("Only config file exist, use config file as final config.");
     finalConfig = configFile;
   } else if (configOverride) {
-    core.info(
+    logger.info(
       "Only config override exist, use config override as final config.",
     );
     finalConfig = configOverride;
@@ -67,9 +67,9 @@ export function resolveConfig(
   }
 
   const resolvedConfig = v.parse(ConfigSchema, finalConfig);
-  core.startGroup("Resolved config:");
-  core.info(JSON.stringify(resolvedConfig, null, 2));
-  core.endGroup();
+  logger.startGroup("Resolved config:");
+  logger.info(JSON.stringify(resolvedConfig, null, 2));
+  logger.endGroup();
 
   return resolvedConfig;
 }
