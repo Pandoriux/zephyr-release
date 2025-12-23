@@ -11,11 +11,7 @@
     "gen:version": "deno run --allow-write scripts/gen-version.ts",
     "prebuild": "deno run --allow-run --allow-read --allow-write scripts/prebuild.ts",
     "build": {
-      "command": "tsdown",
-      "dependencies": ["gen:json-schema", "gen:version", "prebuild"]
-    },
-    "build:deno": {
-      "command": "deno bundle src/main.ts -o dist/deno.mjs",
+      "command": "deno bundle src/main.ts -o dist/main.mjs",
       "dependencies": ["gen:json-schema", "gen:version", "prebuild"]
     }
   },
@@ -38,8 +34,7 @@
     "@js-joda/timezone": "npm:@js-joda/timezone@^2.22.0",
 
     "@valibot/to-json-schema": "jsr:@valibot/to-json-schema@^1.5.0",
-    "@json-schema-tools/traverse": "npm:@json-schema-tools/traverse@^1.11.0",
-    "tsdown": "npm:tsdown@^0.18.2"
+    "@json-schema-tools/traverse": "npm:@json-schema-tools/traverse@^1.11.0"
   },
 
   "exclude": [
