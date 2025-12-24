@@ -4,7 +4,7 @@ import { deepMerge } from "@std/collections";
 import * as v from "@valibot/valibot";
 import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
-import { parseConfig } from "../parsers/config-parsers.ts";
+import { parseConfigOrExit } from "../parsers/config-parsers.ts";
 import { logger } from "../utils/logger.ts";
 
 export function resolveConfig(
@@ -24,9 +24,10 @@ export function resolveConfig(
       encoding: "utf8",
     });
 
-    configFile = parseConfig(configJson, configFormat, configPath);
+    const parsedResult = parseConfigOrExit(configJson, configFormat, configPath);
+    configFile = parsedResult.parsedConfig;
 
-    logger.info("Config file parsed successfully.");
+    logger.info(`Config file parsed successfully (${parsedResult.resolvedFormat}).`);
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config file:");
       logger.debug(JSON.stringify(configFile, null, 2));
@@ -38,9 +39,10 @@ export function resolveConfig(
 
   logger.info("Reading config override from action input...");
   if (configOverrideStr) {
-    configOverride = parseConfig(configOverrideStr, configOverrideFormat);
+    const parsedResult = parseConfigOrExit(configOverrideStr, configOverrideFormat);
+    configOverride = parsedResult.parsedConfig;
 
-    logger.info("Config override parsed successfully.");
+    logger.info(`Config override parsed successfully (${parsedResult.resolvedFormat}).`);
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config override:");
       logger.debug(JSON.stringify(configOverride, null, 2));
