@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 import { LabelSchema } from "./components/label.ts";
-import { CommandsSchema } from "./components/commands.ts";
+import { CommandHookSchema } from "./components/command-hook.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_PATTERN,
   DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
@@ -24,8 +24,8 @@ export const PullRequestConfigSchema = v.pipe(
           "Default: true",
       }),
     ),
-    commands: v.pipe(
-      v.optional(CommandsSchema, {}),
+    commandHook: v.pipe(
+      v.optional(CommandHookSchema),
       v.metadata({
         description:
           "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
@@ -91,31 +91,40 @@ export const PullRequestConfigSchema = v.pipe(
     ),
     headerPattern: v.pipe(
       v.optional(
-        v.union([v.string(), v.array(v.string())]),
+        v.union([
+          v.pipe(v.string(), v.trim()),
+          v.array(v.pipe(v.string(), v.trim())),
+        ]),
         DEFAULT_PULL_REQUEST_HEADER_PATTERN,
       ),
       v.metadata({
         description:
-          "Pattern for pull request header. If an array is provided, it will randomly choose one from it.\n" +
+          "Pattern for pull request header. If an array is provided, one will be randomly chosen.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_PATTERN)}`,
       }),
     ),
     bodyPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_PULL_REQUEST_BODY_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim()),
+        DEFAULT_PULL_REQUEST_BODY_PATTERN,
+      ),
       v.metadata({
         description: "Pattern for pull request body.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_PATTERN)}`,
       }),
     ),
     bodyPatternPath: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
           "Path to text file containing pull request body pattern. Overrides body pattern if both are provided.",
       }),
     ),
     footerPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_PULL_REQUEST_FOOTER_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim()),
+        DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
+      ),
       v.metadata({
         description: "Pattern for pull request footer.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_PATTERN)}`,

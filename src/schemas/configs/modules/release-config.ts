@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { CommandsSchema } from "./components/commands.ts";
+import { CommandHookSchema } from "./components/command-hook.ts";
 import {
   DEFAULT_RELEASE_BODY_PATTERN,
   DEFAULT_RELEASE_TITLE_PATTERN,
@@ -23,8 +23,8 @@ export const ReleaseConfigSchema = v.pipe(
           "Default: false",
       }),
     ),
-    commands: v.pipe(
-      v.optional(CommandsSchema, {}),
+    commandHook: v.pipe(
+      v.optional(CommandHookSchema),
       v.metadata({
         description:
           "Pre/post command lists to run around the release operation. Each command runs from the repository root.",
@@ -59,14 +59,14 @@ export const ReleaseConfigSchema = v.pipe(
     ),
 
     titlePattern: v.pipe(
-      v.optional(v.string(), DEFAULT_RELEASE_TITLE_PATTERN),
+      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_TITLE_PATTERN),
       v.metadata({
         description: "Pattern for release title.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_PATTERN)}`,
       }),
     ),
     bodyPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_RELEASE_BODY_PATTERN),
+      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_PATTERN),
       v.metadata({
         description: "Pattern for release body.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_PATTERN)}`,

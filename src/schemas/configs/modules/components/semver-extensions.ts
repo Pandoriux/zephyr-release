@@ -2,10 +2,10 @@ import * as v from "@valibot/valibot";
 import { TimeZoneSchema } from "./timezone.ts";
 import {
   SemverExtensionDateFormatTypes,
+  SemverExtensionResetOnOptions,
   SemverExtensionTimestampUnitTypes,
   type SemverExtensionType,
-} from "../../../../constants/semver-extension-types.ts";
-import { semverComponents } from "../../../../constants/semver-component.ts";
+} from "../../../../constants/semver-extension-options.ts";
 
 function SemverExtensionTypeSchema(type: SemverExtensionType) {
   return v.pipe(
@@ -85,8 +85,8 @@ export const SemverExtensionsSchema = v.variant("type", [
     resetOn: v.pipe(
       v.optional(
         v.union([
-          v.enum({ none: "none", ...semverComponents }),
-          v.array(v.enum({ none: "none", ...semverComponents })),
+          v.enum(SemverExtensionResetOnOptions),
+          v.array(v.enum(SemverExtensionResetOnOptions)),
         ]),
         "none",
       ),
