@@ -10,7 +10,7 @@ export const BumpRulePrereleaseSchema = v.object({
     }),
   ),
   override: v.pipe(
-    v.optional(v.array(v.union([v.string(), v.number()]))),
+    v.optional(v.array(v.union([v.pipe(v.string(), v.trim()), v.number()]))),
     v.metadata({
       description:
         "Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over " +

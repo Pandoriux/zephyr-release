@@ -1,3 +1,11 @@
+import { semverComponents } from "./semver-component.ts";
+
+export const SemverExtensionResetOnOptions = {
+  ...semverComponents,
+
+  none: "none",
+} as const;
+
 const SemverExtensionTypes = {
   static: "static",
   dynamic: "dynamic",

@@ -2,7 +2,7 @@ import * as v from "@valibot/valibot";
 import { TimeZoneSchema } from "./components/timezone.ts";
 import { CommitTypeSchema } from "./components/commit-type.ts";
 import { VersionFileSchema } from "./components/version-file.ts";
-import { CommandsSchema } from "./components/commands.ts";
+import { CommandHookSchema } from "./components/command-hook.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
@@ -10,10 +10,9 @@ import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.t
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
-    v.optional(v.string(), ""),
+    v.optional(v.pipe(v.string(), v.trim())),
     v.metadata({
-      description: "Project name, available in string pattern as ${name}.\n" +
-        'Default: ""',
+      description: "Project name, available in string pattern as ${name}.",
     }),
   ),
   timeZone: v.pipe(
@@ -24,8 +23,8 @@ export const BaseConfigSchema = v.object({
         'Default: "UTC"',
     }),
   ),
-  commands: v.pipe(
-    v.optional(CommandsSchema, {}),
+  commandHook: v.pipe(
+    v.optional(CommandHookSchema),
     v.metadata({
       description:
         "Pre/post command lists to run around the main operation. Each command runs from the repository root.",

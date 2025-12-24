@@ -1,5 +1,5 @@
 // Changelog
-export const DEFAULT_CHANGELOG_HEADER_PATTERN = "# Changelog\n";
+export const DEFAULT_CHANGELOG_HEADER_PATTERN = "# Changelog\n\n<br/>\n";
 
 export const DEFAULT_CHANGELOG_HEADING_PATTERN =
   "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->";

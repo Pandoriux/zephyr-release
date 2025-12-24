@@ -3,11 +3,10 @@ import { countBreakingAsOptions } from "../../../../constants/bump-rules.ts";
 
 export const BumpRuleSchema = v.object({
   types: v.pipe(
-    v.optional(v.array(v.string()), []),
+    v.optional(v.array(v.pipe(v.string(), v.trim()))),
     v.metadata({
       description:
-        "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.\n" +
-        "Default: []",
+        "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.",
     }),
   ),
   countBreakingAs: v.pipe(
@@ -23,20 +22,20 @@ export const BumpRuleSchema = v.object({
     v.optional(
       v.pipe(
         v.union([
-          v.pipe(v.number(), v.minValue(0), v.integer()),
+          v.pipe(v.number(), v.minValue(1), v.safeInteger()),
           v.literal(Infinity),
           v.literal("Infinity"),
           v.literal("infinity"),
         ]),
         v.transform((value) => typeof value === "string" ? Infinity : value),
       ),
-      1,
+      Infinity,
     ),
     v.metadata({
       description:
         "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even " +
         "if breaking changes are counted as bumps.\n" +
-        "Default: 1",
+        "Default: Infinity",
     }),
   ),
 });

@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { CommandsSchema } from "./components/commands.ts";
+import { CommandHookSchema } from "./components/command-hook.ts";
 import {
   DEFAULT_CHANGELOG_BODY_PATTERN,
   DEFAULT_CHANGELOG_HEADER_PATTERN,
@@ -17,8 +17,8 @@ export const ChangelogConfigSchema = v.pipe(
           "Default: true",
       }),
     ),
-    commands: v.pipe(
-      v.optional(CommandsSchema, {}),
+    commandHook: v.pipe(
+      v.optional(CommandHookSchema),
       v.metadata({
         description:
           "Pre/post command lists to run around the changelog operation. Each command runs from the repository root.",
@@ -26,7 +26,7 @@ export const ChangelogConfigSchema = v.pipe(
     ),
 
     contentBodyOverride: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
           "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely " +
@@ -53,22 +53,21 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     headerPatternPath: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
           "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided.",
       }),
     ),
     footerPattern: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
-          "Pattern for changelog file footer. Placed below any changelog content section.\n" +
-          'Default: ""',
+          "Pattern for changelog file footer. Placed below any changelog content section.",
       }),
     ),
     footerPatternPath: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
           "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided.",
@@ -90,7 +89,7 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     bodyPatternPath: v.pipe(
-      v.optional(v.string(), ""),
+      v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
           "Path to text file containing body of a changelog content section. Overrides `bodyPattern` when both are provided.",

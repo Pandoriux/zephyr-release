@@ -5,8 +5,13 @@
   "time-zone": "UTC",
 
   // Ex: Run commands before and after the main operation
-  "commands": {
-    "pre": ["npm run build", "npm test"],
+  // Commands can be strings or objects with cmd and optional timeout
+  "command-hook": {
+    "pre": [
+      "npm run build",
+      "npm test",
+      { "cmd": "npm run lint", "timeout": 120000 }
+    ],
     "post": ["npm run deploy"]
   },
 
@@ -112,7 +117,7 @@
     "enabled": true,
 
     // Ex: Run commands before and after changelog generation
-    "commands": {
+    "command-hook": {
       "pre": ["npm run format:changelog"],
       "post": []
     },
@@ -122,22 +127,22 @@
 
     "path": "CHANGELOG.md",
 
-    "header-pattern": "# Changelog\\n",
-    "header-pattern-path": "",
+    "header-pattern": "# Changelog\\n\\n<br/>\\n",
+    // "header-pattern-path": "",
 
-    "footer-pattern": "",
-    "footer-pattern-path": "",
+    // "footer-pattern": "",
+    // "footer-pattern-path": "",
 
     "heading-pattern": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
     "body-pattern": "${changelogContentBody}",
-    "body-pattern-path": ""
+    // "body-pattern-path": ""
   },
 
   "pull-request": {
     "enabled": true,
 
     // Ex: Run commands before and after pull request creation
-    "commands": {
+    "command-hook": {
       "pre": [],
       "post": ["npm run notify:pr"]
     },
@@ -157,8 +162,8 @@
 
     "title-pattern": "chore: release v${version}",
     "header-pattern": "🤖 New release created. Stand by for approval",
-    "body-pattern": "${changelog}",
-    "body-pattern-path": "",
+    "body-pattern": "${changelogContent}",
+    // "body-pattern-path": "",
     "footer-pattern": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"
   },
 
@@ -167,9 +172,12 @@
     "skip-release": false,
 
     // Ex: Run commands before and after release creation
-    "commands": {
+    "command-hook": {
       "pre": ["npm run pre-release"],
-      "post": ["npm run post-release", "npm run publish"]
+      "post": [
+        "npm run post-release",
+        { "cmd": "npm run publish", "timeout": 300000 }
+      ]
     },
 
     "draft": false,
@@ -179,6 +187,6 @@
     "tag-name-pattern": "v${version}",
 
     "title-pattern": "${tagName}",
-    "body-pattern": "${changelog}"
+    "body-pattern": "${changelogContent}"
   }
 }
