@@ -11,8 +11,9 @@ Some example config JSON files: `example links to be inserted later`
 - [Options](#options)
   - [name (Optional)](#name-optional)
   - [time-zone (Optional)](#time-zone-optional)
-  - [commands (Optional)](#commands-optional)
-    - [Commands](#commands)
+  - [command-hook (Optional)](#command-hook-optional)
+    - [CommandHook](#commandhook)
+      - [Command Object](#command-object)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
     - [VersionFile](#versionfile)
@@ -35,7 +36,7 @@ Some example config JSON files: `example links to be inserted later`
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> enabled (Optional)](#changelog--enabled-optional)
-    - [changelog \> commands (Optional)](#changelog--commands-optional)
+    - [changelog \> command-hook (Optional)](#changelog--command-hook-optional)
     - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> header-pattern (Optional)](#changelog--header-pattern-optional)
@@ -47,7 +48,7 @@ Some example config JSON files: `example links to be inserted later`
     - [changelog \> body-pattern-path (Optional)](#changelog--body-pattern-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> enabled (Optional)](#pull--enabled-optional)
-    - [pull... \> commands (Optional)](#pull--commands-optional)
+    - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> branch-name-pattern (Optional)](#pull--branch-name-pattern-optional)
     - [pull... \> labels-on-create (Optional)](#pull--labels-on-create-optional)
     - [pull... \> labels-on-close (Optional)](#pull--labels-on-close-optional)
@@ -60,7 +61,7 @@ Some example config JSON files: `example links to be inserted later`
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> skip-release (Optional)](#release--skip-release-optional)
-    - [release \> commands (Optional)](#release--commands-optional)
+    - [release \> command-hook (Optional)](#release--command-hook-optional)
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> tag-name-pattern (Optional)](#release--tag-name-pattern-optional)
@@ -87,20 +88,29 @@ Default: `"UTC"`
 IANA time zone used to format and display times.  
 This value is also available for use in naming patterns as `${timeZone}`.
 
-### commands (Optional)
+### command-hook (Optional)
 
-Type: [`Commands`](#commands)  
-Default: `{}`
+Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the main operation. Each command runs from the repository root.
 
-#### Commands
+#### CommandHook
 
 Type: `object`  
 **Properties:**
 
-- `pre` (Optional): Commands to run before the operation. Default: `[]`
-- `post` (Optional): Commands to run after the operation. Default: `[]`
+- `pre` (Optional): Commands to run before the operation.  
+  Each command can be either a `string` or a [`Command`](#command-object) object.
+- `post` (Optional): Commands to run after the operation.  
+  Each command can be either a `string` or a [`Command`](#command-object) object.
+
+##### Command Object
+
+Type: `object`  
+**Properties:**
+
+- `cmd` (Required): The command string to execute.
+- `timeout` (Optional): Timeout in milliseconds. Default: `60000` (1 minute)
 
 ### initial-version (Optional)
 
@@ -146,10 +156,10 @@ Files to include in the commit. Accepts `base`, `all` or an array of paths/globs
   - Version files (defined in [`version-files`](#version-files-required))
   
 - **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
-  - Base [`commands`](#commands-optional)
-  - [`changelog > commands`](#changelog--commands-optional)
-  - [`pull-request > commands`](#pull--commands-optional)
-  - [`release > commands`](#release--commands-optional)
+  - Base [`command-hook`](#command-hook-optional)
+  - [`changelog > command-hook`](#changelog--command-hook-optional)
+  - [`pull-request > command-hook`](#pull--command-hook-optional)
+  - [`release > command-hook`](#release--command-hook-optional)
 
 - **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
 
@@ -305,7 +315,7 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#changelog--enabled-optional), [`commands`](#changelog--commands-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
+**Properties:** [`enabled`](#changelog--enabled-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in string pattern as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
@@ -316,10 +326,9 @@ Default: `true`
 
 Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.
 
-#### changelog > commands (Optional)
+#### changelog > command-hook (Optional)
 
-Type: [`Commands`](#commands)  
-Default: `{}`
+Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the changelog operation. Each command runs from the repository root.
 
@@ -340,28 +349,25 @@ Path to the file where the generated changelog will be written to, relative to t
 #### changelog > header-pattern (Optional)
 
 Type: `string`  
-Default: `"# Changelog\n"`
+Default: `"# Changelog\n\n<br/>\n"`
 
 Pattern for changelog file header. Placed above any changelog content sections.
 
 #### changelog > header-pattern-path (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Path to text file containing changelog file header. Overrides `header-pattern` when both are provided.
 
 #### changelog > footer-pattern (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Pattern for changelog file footer. Placed below any changelog content section.
 
 #### changelog > footer-pattern-path (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided.
 
@@ -381,15 +387,14 @@ Pattern for body of a changelog content section.
 
 #### changelog > body-pattern-path (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided.
 
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#pull--enabled-optional), [`commands`](#pull--commands-optional), [`branch-name-pattern`](#pull--branch-name-pattern-optional), [`labels-on-create`](#pull--labels-on-create-optional), [`labels-on-close`](#pull--labels-on-close-optional), [`title-pattern`](#pull--title-pattern-optional), [`header-pattern`](#pull--header-pattern-optional), [`body-pattern`](#pull--body-pattern-optional), [`body-pattern-path`](#pull--body-pattern-path-optional), [`footer-pattern`](#pull--footer-pattern-optional)
+**Properties:** [`enabled`](#pull--enabled-optional), [`command-hook`](#pull--command-hook-optional), [`branch-name-pattern`](#pull--branch-name-pattern-optional), [`labels-on-create`](#pull--labels-on-create-optional), [`labels-on-close`](#pull--labels-on-close-optional), [`title-pattern`](#pull--title-pattern-optional), [`header-pattern`](#pull--header-pattern-optional), [`body-pattern`](#pull--body-pattern-optional), [`body-pattern-path`](#pull--body-pattern-path-optional), [`footer-pattern`](#pull--footer-pattern-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
 
@@ -400,10 +405,9 @@ Default: `true`
 
 Enable/disable pull request creation. If disabled, version changes, changelog, tags, and releases will be committed and created directly.
 
-#### pull... > commands (Optional)
+#### pull... > command-hook (Optional)
 
-Type: [`Commands`](#commands)  
-Default: `{}`
+Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
@@ -445,14 +449,13 @@ Pattern for pull request header. If an array is provided, it will randomly choos
 #### pull... > body-pattern (Optional)
 
 Type: `string`  
-Default: `"${changelog}"`
+Default: `"${changelogContent}"`
 
 Pattern for pull request body.
 
 #### pull... > body-pattern-path (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Path to text file containing pull request body pattern. Overrides body pattern if both are provided.
 
@@ -475,7 +478,7 @@ Type: `object`
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`commands`](#release--commands-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-pattern`](#release--tag-name-pattern-optional), [`title-pattern`](#release--title-pattern-optional), [`body-pattern`](#release--body-pattern-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`command-hook`](#release--command-hook-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-pattern`](#release--tag-name-pattern-optional), [`title-pattern`](#release--title-pattern-optional), [`body-pattern`](#release--body-pattern-optional)
 
 Configuration specific to tags and releases.
 
@@ -493,10 +496,9 @@ Default: `false`
 
 If enabled, only the tag will be created, no release will be made.
 
-#### release > commands (Optional)
+#### release > command-hook (Optional)
 
-Type: [`Commands`](#commands)  
-Default: `{}`
+Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the release operation. Each command runs from the repository root.
 
@@ -517,21 +519,21 @@ If enabled, the release will be marked as prerelease.
 #### release > tag-name-pattern (Optional)
 
 Type: `string`  
-Default: `""`
+Default: `"v${version}"`
 
 Pattern for tag name, available in string pattern as `${tagName}`.
 
 #### release > title-pattern (Optional)
 
 Type: `string`  
-Default: `""`
+Default: `"${tagName}"`
 
 Pattern for release title.
 
 #### release > body-pattern (Optional)
 
 Type: `string`  
-Default: `""`
+Default: `"${changelogContent}"`
 
 Pattern for release body.
 
