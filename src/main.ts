@@ -1,16 +1,24 @@
-import core from "@actions/core";
+import { markScriptEnd, markScriptStart } from "./lifecycle.ts";
+import { run } from "./run.ts";
+import { logger } from "./utils/logger.ts";
 
-function main() {
+async function main() {
+  markScriptStart();
+
   try {
-    const name = core.getInput("name", { required: true });
-
-    core.info("We are special because we were born into this world.");
-    core.info(`Don't you agree, ${name}?`);
-    core.info("=======================================================");
-    core.notice("Zephyr Release run successfully!");
+    await run();
   } catch (error) {
-    core.setFailed("❌ An unexpected error occurred:\n" + error);
+    logger.setFailed("❌ An unexpected error occurred: " + error);
+    if (error instanceof Error && error.stack) {
+      logger.startGroup("Stack trace:");
+      logger.info(error.stack);
+      logger.endGroup();
+    }
+
+    markScriptEnd("Failed");
   }
+
+  markScriptEnd("Finished");
 }
 
 main();

@@ -1,0 +1,1703 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "default": "",
+      "description": "Project name, available in string pattern as ${name}.\nDefault: \"\""
+    },
+    "time-zone": {
+      "$ref": "#/$defs/time-zone",
+      "default": "UTC",
+      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: \"UTC\""
+    },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "pre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Commands to run before the operation.\nDefault: []"
+        },
+        "post": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Commands to run after the operation.\nDefault: []"
+        }
+      },
+      "required": [],
+      "default": {},
+      "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root."
+    },
+    "initial-version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "default": "0.1.0",
+      "description": "Initial SemVer version applied when no existing version is found.\nDefault: \"0.1.0\""
+    },
+    "version-files": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path to the version file, relative to the project root."
+            },
+            "format": {
+              "enum": [
+                "json",
+                "jsonc",
+                "json5",
+                "yaml",
+                "toml",
+                "txt",
+                "auto"
+              ],
+              "default": "auto",
+              "description": "Defines the file format. Allowed values: \"auto\", \"json\", \"jsonc\", \"json5\", \"yaml\", \"toml\", \"txt\".\nDefault: \"auto\""
+            },
+            "extractor": {
+              "enum": [
+                "auto",
+                "json-path",
+                "regex"
+              ],
+              "default": "auto",
+              "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
+            },
+            "selector": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Defines how to locate the version field, depends on `extractor`."
+            },
+            "primary": {
+              "type": "boolean",
+              "default": false,
+              "description": "Marks this file as the primary source of truth for the current version."
+            }
+          },
+          "required": [
+            "path",
+            "selector"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Path to the version file, relative to the project root."
+              },
+              "format": {
+                "enum": [
+                  "json",
+                  "jsonc",
+                  "json5",
+                  "yaml",
+                  "toml",
+                  "txt",
+                  "auto"
+                ],
+                "default": "auto",
+                "description": "Defines the file format. Allowed values: \"auto\", \"json\", \"jsonc\", \"json5\", \"yaml\", \"toml\", \"txt\".\nDefault: \"auto\""
+              },
+              "extractor": {
+                "enum": [
+                  "auto",
+                  "json-path",
+                  "regex"
+                ],
+                "default": "auto",
+                "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
+              },
+              "selector": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Defines how to locate the version field, depends on `extractor`."
+              },
+              "primary": {
+                "type": "boolean",
+                "default": false,
+                "description": "Marks this file as the primary source of truth for the current version."
+              }
+            },
+            "required": [
+              "path",
+              "selector"
+            ]
+          }
+        }
+      ],
+      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be used.\nAbout primary file: link-to-be-insert-later"
+    },
+    "files-to-commit": {
+      "anyOf": [
+        {
+          "enum": [
+            "base",
+            "all"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "enum": [
+                  "base",
+                  "all"
+                ]
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        }
+      ],
+      "default": "base",
+      "description": "Files to include in the commit. Accepts \"base\", \"all\" options or an array of options and paths/globs. Paths are relative to the repo root.\nDefault: \"base\"",
+      "examples": [
+        [],
+        [
+          "base",
+          "src/release-artifacts/*"
+        ]
+      ]
+    },
+    "commit-types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Commit type name."
+          },
+          "section": {
+            "type": "string",
+            "default": "",
+            "description": "Changelog section heading for this commit type. When empty, `type` value is used.\nDefault: \"\""
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false,
+            "description": "Exclude this commit type from changelog generation (does not affect version bump calculation).\nDefault: false"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "default": [
+        {
+          "type": "feat",
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "perf",
+          "section": "Performance Improvements"
+        },
+        {
+          "type": "revert",
+          "section": "Reverts"
+        }
+      ],
+      "description": "List of commit types used for version calculation and changelog generation.\nDefault: [\n  {\n    \"type\": \"feat\",\n    \"section\": \"Features\"\n  },\n  {\n    \"type\": \"fix\",\n    \"section\": \"Bug Fixes\"\n  },\n  {\n    \"type\": \"perf\",\n    \"section\": \"Performance Improvements\"\n  },\n  {\n    \"type\": \"revert\",\n    \"section\": \"Reverts\"\n  }\n]"
+    },
+    "bump-strategy": {
+      "type": "object",
+      "properties": {
+        "major": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+            },
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [],
+            "countBreakingAs": "bump",
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"types\": [],\n  \"count-breaking-as\": \"bump\",\n  \"commits-per-bump\": 1\n}"
+        },
+        "minor": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+            },
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "feat"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping minor version (1.x.3).\nDefault: {\n  \"types\": [\n    \"feat\"\n  ],\n  \"commits-per-bump\": 1\n}"
+        },
+        "patch": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+            },
+            "count-breaking-as": {
+              "enum": [
+                "none",
+                "commit",
+                "bump"
+              ],
+              "default": "none",
+              "description": "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as the commit type exists in base `commit-types` list.\nDefault: \"none\""
+            },
+            "commits-per-bump": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 1,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+            }
+          },
+          "required": [],
+          "default": {
+            "types": [
+              "fix",
+              "perf"
+            ],
+            "commitsPerBump": 1
+          },
+          "description": "Strategy for bumping patch version (1.2.x).\nDefault: {\n  \"types\": [\n    \"fix\",\n    \"perf\"\n  ],\n  \"commits-per-bump\": 1\n}"
+        },
+        "prerelease": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable/disable handling of pre-release identifiers.\nDefault: false"
+            },
+            "override": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "description": "Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config."
+            },
+            "identifiers": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "static",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The static string value to use.",
+                        "examples": [
+                          "pre",
+                          "alpha",
+                          "beta",
+                          "rc"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "value"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "dynamic",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "The string value to use, should be set dynamically."
+                      },
+                      "fallback-value": {
+                        "type": "string",
+                        "description": "The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array."
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "incremental",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "initial-value": {
+                        "type": "number",
+                        "default": 0,
+                        "description": "Initial integer number value.\nDefault: 0"
+                      },
+                      "expression-variables": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {},
+                        "description": "Defines custom variables for use in `next-value-expression`, \"v\" is reserved for current value. These variables are usually set dynamically."
+                      },
+                      "next-value-expression": {
+                        "type": "string",
+                        "minLength": 1,
+                        "default": "v+1",
+                        "description": "Expression for computing the next value, where \"v\" represents the current value. The expression must evaluate to an integer number.\nEvaluated with `expr-eval`: https://www.npmjs.com/package/expr-eval \nDefault: \"v+1\""
+                      },
+                      "reset-on": {
+                        "anyOf": [
+                          {
+                            "enum": [
+                              "none",
+                              "major",
+                              "minor",
+                              "patch",
+                              "prerelease",
+                              "build"
+                            ]
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "enum": [
+                                "none",
+                                "major",
+                                "minor",
+                                "patch",
+                                "prerelease",
+                                "build"
+                              ]
+                            }
+                          }
+                        ],
+                        "default": "none",
+                        "description": "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: \"major\", \"minor\", \"patch\", \"prerelease\", \"build\", and \"none\".\nFor \"prerelease\" and \"build\", a reset is triggered only when \"static\" values change, or when \"static\", \"incremental\", or \"timestamp\" values are added or removed. Any changes to \"dynamic\" values, including their addition or removal, do not trigger a reset.\nlink insert here\nDefault: \"none\""
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "timestamp",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "unit": {
+                        "enum": [
+                          "s",
+                          "ms"
+                        ],
+                        "default": "ms",
+                        "description": "The time unit. \"ms\" (13 digits) or \"s\" (10 digits).\nDefault: \"ms\""
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "date",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "format": {
+                        "enum": [
+                          "YYYYMMDD",
+                          "YYYY-MM-DD"
+                        ],
+                        "default": "YYYYMMDD",
+                        "description": "The date format. \"YYYYMMDD\" or \"YYYY-MM-DD\".\nDefault: \"YYYYMMDD\""
+                      },
+                      "time-zone": {
+                        "$ref": "#/$defs/time-zone",
+                        "description": "The timezone to use for the date. If not specified, falls back to base `time-zone`."
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                ]
+              },
+              "description": "Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers."
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Strategy for bumping prerelease version (1.2.3-x.x)."
+        },
+        "build": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable/disable handling of build metadata.\nDefault: false"
+            },
+            "override": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config."
+            },
+            "metadata": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "static",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "value": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The static string value to use.",
+                        "examples": [
+                          "pre",
+                          "alpha",
+                          "beta",
+                          "rc"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "value"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "dynamic",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "The string value to use, should be set dynamically."
+                      },
+                      "fallback-value": {
+                        "type": "string",
+                        "description": "The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array."
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "incremental",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "initial-value": {
+                        "type": "number",
+                        "default": 0,
+                        "description": "Initial integer number value.\nDefault: 0"
+                      },
+                      "expression-variables": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {},
+                        "description": "Defines custom variables for use in `next-value-expression`, \"v\" is reserved for current value. These variables are usually set dynamically."
+                      },
+                      "next-value-expression": {
+                        "type": "string",
+                        "minLength": 1,
+                        "default": "v+1",
+                        "description": "Expression for computing the next value, where \"v\" represents the current value. The expression must evaluate to an integer number.\nEvaluated with `expr-eval`: https://www.npmjs.com/package/expr-eval \nDefault: \"v+1\""
+                      },
+                      "reset-on": {
+                        "anyOf": [
+                          {
+                            "enum": [
+                              "none",
+                              "major",
+                              "minor",
+                              "patch",
+                              "prerelease",
+                              "build"
+                            ]
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "enum": [
+                                "none",
+                                "major",
+                                "minor",
+                                "patch",
+                                "prerelease",
+                                "build"
+                              ]
+                            }
+                          }
+                        ],
+                        "default": "none",
+                        "description": "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: \"major\", \"minor\", \"patch\", \"prerelease\", \"build\", and \"none\".\nFor \"prerelease\" and \"build\", a reset is triggered only when \"static\" values change, or when \"static\", \"incremental\", or \"timestamp\" values are added or removed. Any changes to \"dynamic\" values, including their addition or removal, do not trigger a reset.\nlink insert here\nDefault: \"none\""
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "timestamp",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "unit": {
+                        "enum": [
+                          "s",
+                          "ms"
+                        ],
+                        "default": "ms",
+                        "description": "The time unit. \"ms\" (13 digits) or \"s\" (10 digits).\nDefault: \"ms\""
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "date",
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                      },
+                      "format": {
+                        "enum": [
+                          "YYYYMMDD",
+                          "YYYY-MM-DD"
+                        ],
+                        "default": "YYYYMMDD",
+                        "description": "The date format. \"YYYYMMDD\" or \"YYYY-MM-DD\".\nDefault: \"YYYYMMDD\""
+                      },
+                      "time-zone": {
+                        "$ref": "#/$defs/time-zone",
+                        "description": "The timezone to use for the date. If not specified, falls back to base `time-zone`."
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                ]
+              },
+              "description": "Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata."
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Strategy for bumping build metadata (1.2.3+x.x)."
+        },
+        "bump-minor-for-major-pre-stable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Redirects major version bumps to minor in pre-1.0 (0.x.3).\nDefault: true"
+        },
+        "bump-patch-for-minor-pre-stable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Redirects minor version bumps to patch in pre-1.0 (0.2.x).\nDefault: false"
+        }
+      },
+      "required": [],
+      "description": "Configuration options to calculate the next version number.",
+      "default": {}
+    },
+    "changelog": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: true"
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: []"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: []"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the changelog operation. Each command runs from the repository root."
+        },
+        "content-body-override": {
+          "type": "string",
+          "default": "",
+          "description": "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
+        },
+        "path": {
+          "type": "string",
+          "default": "CHANGELOG.md",
+          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
+        },
+        "header-pattern": {
+          "type": "string",
+          "default": "# Changelog\n",
+          "description": "Pattern for changelog file header. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\""
+        },
+        "header-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing changelog file header. Overrides `header-pattern` when both are provided."
+        },
+        "footer-pattern": {
+          "type": "string",
+          "default": "",
+          "description": "Pattern for changelog file footer. Placed below any changelog content section.\nDefault: \"\""
+        },
+        "footer-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided."
+        },
+        "heading-pattern": {
+          "type": "string",
+          "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
+          "description": "Pattern for heading of a changelog content section.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelogContentBody}",
+          "description": "Pattern for body of a changelog content section.\nDefault: \"${changelogContentBody}\""
+        },
+        "body-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided."
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to changelogs. All generated changelog content are available in string pattern as ${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
+      "default": {}
+    },
+    "pull-request": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: true"
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: []"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: []"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root."
+        },
+        "branch-name-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "release/zephyr-release",
+          "description": "Pattern for branch name that Zephyr Release is gonna use.\nDefault: \"release/zephyr-release\""
+        },
+        "labels-on-create": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string",
+                  "default": ""
+                },
+                "color": {
+                  "type": "string",
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          ],
+          "default": {
+            "name": "release: pending",
+            "description": "Indicates that the pull request is pending release.",
+            "color": "FBCA04"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is created.\nDefault: {\n  \"name\": \"release: pending\",\n  \"description\": \"Indicates that the pull request is pending release.\",\n  \"color\": \"FBCA04\"\n}"
+        },
+        "labels-on-close": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string",
+                  "default": ""
+                },
+                "color": {
+                  "type": "string",
+                  "minLength": 1,
+                  "default": "ededed",
+                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "minLength": 1,
+                    "default": "ededed",
+                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          ],
+          "default": {
+            "name": "release: released",
+            "description": "Indicates that the pull request is closed and the release has completed.",
+            "color": "0E8A16"
+          },
+          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.\nDefault: {\n  \"name\": \"release: released\",\n  \"description\": \"Indicates that the pull request is closed and the release has completed.\",\n  \"color\": \"0E8A16\"\n}"
+        },
+        "title-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "chore: release v${version}",
+          "description": "Pattern for pull request title.\nDefault: \"chore: release v${version}\""
+        },
+        "header-pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "default": "🤖 New release created. Stand by for approval",
+          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it.\nDefault: \"🤖 New release created. Stand by for approval\""
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelogContent}",
+          "description": "Pattern for pull request body.\nDefault: \"${changelogContent}\""
+        },
+        "body-pattern-path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to text file containing pull request body pattern. Overrides body pattern if both are provided."
+        },
+        "footer-pattern": {
+          "type": "string",
+          "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
+          "description": "Pattern for pull request footer.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to pull requests.",
+      "default": {}
+    },
+    "release": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable tag and release.\nDefault: true"
+        },
+        "skip-release": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, only the tag will be created, no release will be made.\nDefault: false"
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run before the operation.\nDefault: []"
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Commands to run after the operation.\nDefault: []"
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post command lists to run around the release operation. Each command runs from the repository root."
+        },
+        "prerelease": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, the release will be marked as prerelease.\nDefault: false"
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, the release will be created as draft.\nDefault: false"
+        },
+        "tag-name-pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "v${version}",
+          "description": "Pattern for tag name, available in string pattern as ${tagName}.\nDefault: \"v${version}\""
+        },
+        "title-pattern": {
+          "type": "string",
+          "default": "${tagName}",
+          "description": "Pattern for release title.\nDefault: \"${tagName}\""
+        },
+        "body-pattern": {
+          "type": "string",
+          "default": "${changelogContent}",
+          "description": "Pattern for release body.\nDefault: \"${changelogContent}\""
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to tags and releases.",
+      "default": {}
+    }
+  },
+  "required": [
+    "version-files"
+  ],
+  "title": "Zephyr Release configuration file",
+  "description": "A JSON representation of a Zephyr Release configuration file.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "time-zone": {
+      "enum": [
+        "Africa/Abidjan",
+        "Africa/Nairobi",
+        "Africa/Algiers",
+        "Africa/Lagos",
+        "Africa/Bissau",
+        "Africa/Maputo",
+        "Africa/Cairo",
+        "Africa/Casablanca",
+        "Africa/Ceuta",
+        "Africa/El_Aaiun",
+        "Africa/Johannesburg",
+        "Africa/Juba",
+        "Africa/Khartoum",
+        "Africa/Monrovia",
+        "Africa/Ndjamena",
+        "Africa/Sao_Tome",
+        "Africa/Tripoli",
+        "Africa/Tunis",
+        "Africa/Windhoek",
+        "America/Adak",
+        "America/Anchorage",
+        "America/Puerto_Rico",
+        "America/Araguaina",
+        "America/Argentina/Buenos_Aires",
+        "America/Argentina/Catamarca",
+        "America/Argentina/Cordoba",
+        "America/Argentina/Jujuy",
+        "America/Argentina/La_Rioja",
+        "America/Argentina/Mendoza",
+        "America/Argentina/Rio_Gallegos",
+        "America/Argentina/Salta",
+        "America/Argentina/San_Juan",
+        "America/Argentina/San_Luis",
+        "America/Argentina/Tucuman",
+        "America/Argentina/Ushuaia",
+        "America/Asuncion",
+        "America/Panama",
+        "America/Bahia_Banderas",
+        "America/Bahia",
+        "America/Barbados",
+        "America/Belem",
+        "America/Belize",
+        "America/Boa_Vista",
+        "America/Bogota",
+        "America/Boise",
+        "America/Cambridge_Bay",
+        "America/Campo_Grande",
+        "America/Cancun",
+        "America/Caracas",
+        "America/Cayenne",
+        "America/Chicago",
+        "America/Chihuahua",
+        "America/Ciudad_Juarez",
+        "America/Costa_Rica",
+        "America/Coyhaique",
+        "America/Phoenix",
+        "America/Cuiaba",
+        "America/Danmarkshavn",
+        "America/Dawson_Creek",
+        "America/Dawson",
+        "America/Denver",
+        "America/Detroit",
+        "America/Edmonton",
+        "America/Eirunepe",
+        "America/El_Salvador",
+        "America/Tijuana",
+        "America/Fort_Nelson",
+        "America/Fort_Wayne",
+        "America/Fortaleza",
+        "America/Glace_Bay",
+        "America/Godthab",
+        "America/Goose_Bay",
+        "America/Grand_Turk",
+        "America/Guatemala",
+        "America/Guayaquil",
+        "America/Guyana",
+        "America/Halifax",
+        "America/Havana",
+        "America/Hermosillo",
+        "America/Indiana/Knox",
+        "America/Indiana/Marengo",
+        "America/Indiana/Petersburg",
+        "America/Indiana/Tell_City",
+        "America/Indiana/Vevay",
+        "America/Indiana/Vincennes",
+        "America/Indiana/Winamac",
+        "America/Inuvik",
+        "America/Iqaluit",
+        "America/Jamaica",
+        "America/Juneau",
+        "America/Kentucky/Louisville",
+        "America/Kentucky/Monticello",
+        "America/La_Paz",
+        "America/Lima",
+        "America/Los_Angeles",
+        "America/Maceio",
+        "America/Managua",
+        "America/Manaus",
+        "America/Martinique",
+        "America/Matamoros",
+        "America/Mazatlan",
+        "America/Menominee",
+        "America/Merida",
+        "America/Metlakatla",
+        "America/Mexico_City",
+        "America/Miquelon",
+        "America/Moncton",
+        "America/Monterrey",
+        "America/Montevideo",
+        "America/Toronto",
+        "America/New_York",
+        "America/Nome",
+        "America/Noronha",
+        "America/North_Dakota/Beulah",
+        "America/North_Dakota/Center",
+        "America/North_Dakota/New_Salem",
+        "America/Ojinaga",
+        "America/Paramaribo",
+        "America/Port-au-Prince",
+        "America/Rio_Branco",
+        "America/Porto_Velho",
+        "America/Punta_Arenas",
+        "America/Winnipeg",
+        "America/Rankin_Inlet",
+        "America/Recife",
+        "America/Regina",
+        "America/Resolute",
+        "America/Santarem",
+        "America/Santiago",
+        "America/Santo_Domingo",
+        "America/Sao_Paulo",
+        "America/Scoresbysund",
+        "America/Sitka",
+        "America/St_Johns",
+        "America/Swift_Current",
+        "America/Tegucigalpa",
+        "America/Thule",
+        "America/Vancouver",
+        "America/Whitehorse",
+        "America/Yakutat",
+        "Antarctica/Casey",
+        "Antarctica/Davis",
+        "Pacific/Port_Moresby",
+        "Antarctica/Macquarie",
+        "Antarctica/Mawson",
+        "Pacific/Auckland",
+        "Antarctica/Palmer",
+        "Antarctica/Rothera",
+        "Asia/Riyadh",
+        "Antarctica/Troll",
+        "Antarctica/Vostok",
+        "Europe/Berlin",
+        "Asia/Almaty",
+        "Asia/Amman",
+        "Asia/Anadyr",
+        "Asia/Aqtau",
+        "Asia/Aqtobe",
+        "Asia/Ashgabat",
+        "Asia/Atyrau",
+        "Asia/Baghdad",
+        "Asia/Qatar",
+        "Asia/Baku",
+        "Asia/Bangkok",
+        "Asia/Barnaul",
+        "Asia/Beirut",
+        "Asia/Bishkek",
+        "Asia/Brunei",
+        "Asia/Kolkata",
+        "Asia/Chita",
+        "Asia/Ulaanbaatar",
+        "Asia/Shanghai",
+        "Asia/Colombo",
+        "Asia/Dhaka",
+        "Asia/Damascus",
+        "Asia/Dili",
+        "Asia/Dubai",
+        "Asia/Dushanbe",
+        "Asia/Famagusta",
+        "Asia/Gaza",
+        "Asia/Hebron",
+        "Asia/Ho_Chi_Minh",
+        "Asia/Hong_Kong",
+        "Asia/Hovd",
+        "Asia/Irkutsk",
+        "Europe/Istanbul",
+        "Asia/Jakarta",
+        "Asia/Jayapura",
+        "Asia/Jerusalem",
+        "Asia/Kabul",
+        "Asia/Kamchatka",
+        "Asia/Karachi",
+        "Asia/Urumqi",
+        "Asia/Kathmandu",
+        "Asia/Khandyga",
+        "Asia/Krasnoyarsk",
+        "Asia/Kuala_Lumpur",
+        "Asia/Macau",
+        "Asia/Magadan",
+        "Asia/Makassar",
+        "Asia/Manila",
+        "Asia/Nicosia",
+        "Asia/Novokuznetsk",
+        "Asia/Novosibirsk",
+        "Asia/Omsk",
+        "Asia/Oral",
+        "Asia/Pontianak",
+        "Asia/Pyongyang",
+        "Asia/Qostanay",
+        "Asia/Qyzylorda",
+        "Asia/Rangoon",
+        "Asia/Sakhalin",
+        "Asia/Samarkand",
+        "Asia/Seoul",
+        "Asia/Srednekolymsk",
+        "Asia/Taipei",
+        "Asia/Tashkent",
+        "Asia/Tbilisi",
+        "Asia/Tehran",
+        "Asia/Thimphu",
+        "Asia/Tokyo",
+        "Asia/Tomsk",
+        "Asia/Ust-Nera",
+        "Asia/Vladivostok",
+        "Asia/Yakutsk",
+        "Asia/Yekaterinburg",
+        "Asia/Yerevan",
+        "Atlantic/Azores",
+        "Atlantic/Bermuda",
+        "Atlantic/Canary",
+        "Atlantic/Cape_Verde",
+        "Atlantic/Faroe",
+        "Atlantic/Madeira",
+        "Atlantic/South_Georgia",
+        "Atlantic/Stanley",
+        "Australia/Sydney",
+        "Australia/Adelaide",
+        "Australia/Brisbane",
+        "Australia/Broken_Hill",
+        "Australia/Hobart",
+        "Australia/Darwin",
+        "Australia/Eucla",
+        "Australia/Lord_Howe",
+        "Australia/Lindeman",
+        "Australia/Melbourne",
+        "Australia/Perth",
+        "Europe/Brussels",
+        "Pacific/Easter",
+        "Europe/Athens",
+        "Europe/Dublin",
+        "Etc/GMT-0",
+        "Etc/GMT-1",
+        "Etc/GMT-10",
+        "Etc/GMT-11",
+        "Etc/GMT-12",
+        "Etc/GMT-13",
+        "Etc/GMT-14",
+        "Etc/GMT-2",
+        "Etc/GMT-3",
+        "Etc/GMT-4",
+        "Etc/GMT-5",
+        "Etc/GMT-6",
+        "Etc/GMT-7",
+        "Etc/GMT-8",
+        "Etc/GMT-9",
+        "Etc/GMT+1",
+        "Etc/GMT+10",
+        "Etc/GMT+11",
+        "Etc/GMT+12",
+        "Etc/GMT+2",
+        "Etc/GMT+3",
+        "Etc/GMT+4",
+        "Etc/GMT+5",
+        "Etc/GMT+6",
+        "Etc/GMT+7",
+        "Etc/GMT+8",
+        "Etc/GMT+9",
+        "Etc/UCT",
+        "Europe/Andorra",
+        "Europe/Astrakhan",
+        "Europe/London",
+        "Europe/Belgrade",
+        "Europe/Prague",
+        "Europe/Bucharest",
+        "Europe/Budapest",
+        "Europe/Zurich",
+        "Europe/Chisinau",
+        "Europe/Gibraltar",
+        "Europe/Helsinki",
+        "Europe/Kaliningrad",
+        "Europe/Kiev",
+        "Europe/Kirov",
+        "Europe/Lisbon",
+        "Europe/Madrid",
+        "Europe/Malta",
+        "Europe/Minsk",
+        "Europe/Paris",
+        "Europe/Moscow",
+        "Europe/Riga",
+        "Europe/Rome",
+        "Europe/Samara",
+        "Europe/Saratov",
+        "Europe/Simferopol",
+        "Europe/Sofia",
+        "Europe/Tallinn",
+        "Europe/Tirane",
+        "Europe/Ulyanovsk",
+        "Europe/Vienna",
+        "Europe/Vilnius",
+        "Europe/Volgograd",
+        "Europe/Warsaw",
+        "Pacific/Honolulu",
+        "Indian/Chagos",
+        "Indian/Maldives",
+        "Indian/Mauritius",
+        "Pacific/Kwajalein",
+        "Pacific/Chatham",
+        "Pacific/Apia",
+        "Pacific/Bougainville",
+        "Pacific/Efate",
+        "Pacific/Enderbury",
+        "Pacific/Fakaofo",
+        "Pacific/Fiji",
+        "Pacific/Tarawa",
+        "Pacific/Galapagos",
+        "Pacific/Gambier",
+        "Pacific/Guadalcanal",
+        "Pacific/Guam",
+        "Pacific/Kiritimati",
+        "Pacific/Kosrae",
+        "Pacific/Marquesas",
+        "Pacific/Pago_Pago",
+        "Pacific/Nauru",
+        "Pacific/Niue",
+        "Pacific/Norfolk",
+        "Pacific/Noumea",
+        "Pacific/Palau",
+        "Pacific/Pitcairn",
+        "Pacific/Rarotonga",
+        "Pacific/Tahiti",
+        "Pacific/Tongatapu",
+        "Africa/Accra",
+        "Africa/Bamako",
+        "Africa/Banjul",
+        "Africa/Conakry",
+        "Africa/Dakar",
+        "Africa/Freetown",
+        "Africa/Lome",
+        "Africa/Nouakchott",
+        "Africa/Ouagadougou",
+        "Africa/Timbuktu",
+        "Atlantic/Reykjavik",
+        "Atlantic/St_Helena",
+        "Iceland",
+        "Egypt",
+        "Africa/Maseru",
+        "Africa/Mbabane",
+        "Africa/Bangui",
+        "Africa/Brazzaville",
+        "Africa/Douala",
+        "Africa/Kinshasa",
+        "Africa/Libreville",
+        "Africa/Luanda",
+        "Africa/Malabo",
+        "Africa/Niamey",
+        "Africa/Porto-Novo",
+        "Africa/Blantyre",
+        "Africa/Bujumbura",
+        "Africa/Gaborone",
+        "Africa/Harare",
+        "Africa/Kigali",
+        "Africa/Lubumbashi",
+        "Africa/Lusaka",
+        "Africa/Addis_Ababa",
+        "Africa/Asmara",
+        "Africa/Asmera",
+        "Africa/Dar_es_Salaam",
+        "Africa/Djibouti",
+        "Africa/Kampala",
+        "Africa/Mogadishu",
+        "Indian/Antananarivo",
+        "Indian/Comoro",
+        "Indian/Mayotte",
+        "Libya",
+        "America/Atka",
+        "US/Aleutian",
+        "US/Alaska",
+        "America/Buenos_Aires",
+        "America/Argentina/ComodRivadavia",
+        "America/Catamarca",
+        "America/Cordoba",
+        "America/Rosario",
+        "America/Jujuy",
+        "America/Mendoza",
+        "CST6CDT",
+        "US/Central",
+        "America/Shiprock",
+        "MST7MDT",
+        "Navajo",
+        "US/Mountain",
+        "US/Michigan",
+        "America/Yellowknife",
+        "Canada/Mountain",
+        "America/Indiana/Indianapolis",
+        "America/Indianapolis",
+        "US/East-Indiana",
+        "America/Nuuk",
+        "Canada/Atlantic",
+        "Cuba",
+        "America/Knox_IN",
+        "US/Indiana-Starke",
+        "America/Pangnirtung",
+        "Jamaica",
+        "America/Louisville",
+        "PST8PDT",
+        "US/Pacific",
+        "Brazil/West",
+        "Mexico/BajaSur",
+        "Mexico/General",
+        "EST5EDT",
+        "US/Eastern",
+        "Brazil/DeNoronha",
+        "America/Atikokan",
+        "America/Cayman",
+        "America/Coral_Harbour",
+        "EST",
+        "America/Creston",
+        "MST",
+        "US/Arizona",
+        "America/Anguilla",
+        "America/Antigua",
+        "America/Aruba",
+        "America/Blanc-Sablon",
+        "America/Curacao",
+        "America/Dominica",
+        "America/Grenada",
+        "America/Guadeloupe",
+        "America/Kralendijk",
+        "America/Lower_Princes",
+        "America/Marigot",
+        "America/Montserrat",
+        "America/Port_of_Spain",
+        "America/St_Barthelemy",
+        "America/St_Kitts",
+        "America/St_Lucia",
+        "America/St_Thomas",
+        "America/St_Vincent",
+        "America/Tortola",
+        "America/Virgin",
+        "Canada/Saskatchewan",
+        "America/Porto_Acre",
+        "Brazil/Acre",
+        "Chile/Continental",
+        "Brazil/East",
+        "Canada/Newfoundland",
+        "America/Ensenada",
+        "America/Santa_Isabel",
+        "Mexico/BajaNorte",
+        "America/Montreal",
+        "America/Nassau",
+        "America/Nipigon",
+        "America/Thunder_Bay",
+        "Canada/Eastern",
+        "Canada/Pacific",
+        "Canada/Yukon",
+        "America/Rainy_River",
+        "Canada/Central",
+        "Asia/Ashkhabad",
+        "Asia/Phnom_Penh",
+        "Asia/Vientiane",
+        "Indian/Christmas",
+        "Asia/Kuching",
+        "Asia/Dacca",
+        "Asia/Muscat",
+        "Indian/Mahe",
+        "Indian/Reunion",
+        "Asia/Saigon",
+        "Hongkong",
+        "Asia/Tel_Aviv",
+        "Israel",
+        "Asia/Katmandu",
+        "Asia/Calcutta",
+        "Asia/Singapore",
+        "Singapore",
+        "Asia/Macao",
+        "Asia/Ujung_Pandang",
+        "Europe/Nicosia",
+        "Asia/Bahrain",
+        "Asia/Yangon",
+        "Indian/Cocos",
+        "Antarctica/Syowa",
+        "Asia/Aden",
+        "Asia/Kuwait",
+        "ROK",
+        "Asia/Chongqing",
+        "Asia/Chungking",
+        "Asia/Harbin",
+        "PRC",
+        "ROC",
+        "Iran",
+        "Asia/Thimbu",
+        "Japan",
+        "Asia/Choibalsan",
+        "Asia/Ulan_Bator",
+        "Asia/Kashgar",
+        "Atlantic/Faeroe",
+        "Australia/South",
+        "Australia/Queensland",
+        "Australia/Yancowinna",
+        "Australia/North",
+        "Australia/Currie",
+        "Australia/Tasmania",
+        "Australia/LHI",
+        "Australia/Victoria",
+        "Australia/West",
+        "Australia/ACT",
+        "Australia/Canberra",
+        "Australia/NSW",
+        "Etc/GMT",
+        "Etc/GMT+0",
+        "Etc/GMT0",
+        "Etc/Greenwich",
+        "GMT",
+        "GMT+0",
+        "GMT-0",
+        "GMT0",
+        "Greenwich",
+        "Etc/UTC",
+        "Etc/Universal",
+        "Etc/Zulu",
+        "UCT",
+        "UTC",
+        "Universal",
+        "Zulu",
+        "EET",
+        "Europe/Ljubljana",
+        "Europe/Podgorica",
+        "Europe/Sarajevo",
+        "Europe/Skopje",
+        "Europe/Zagreb",
+        "Arctic/Longyearbyen",
+        "Atlantic/Jan_Mayen",
+        "Europe/Copenhagen",
+        "Europe/Oslo",
+        "Europe/Stockholm",
+        "CET",
+        "Europe/Amsterdam",
+        "Europe/Luxembourg",
+        "MET",
+        "Europe/Tiraspol",
+        "Eire",
+        "Europe/Mariehamn",
+        "Asia/Istanbul",
+        "Turkey",
+        "Europe/Kyiv",
+        "Europe/Uzhgorod",
+        "Europe/Zaporozhye",
+        "Portugal",
+        "WET",
+        "Europe/Belfast",
+        "Europe/Guernsey",
+        "Europe/Isle_of_Man",
+        "Europe/Jersey",
+        "GB",
+        "GB-Eire",
+        "W-SU",
+        "Europe/Monaco",
+        "Europe/Bratislava",
+        "Europe/San_Marino",
+        "Europe/Vatican",
+        "Poland",
+        "Europe/Busingen",
+        "Europe/Vaduz",
+        "Indian/Kerguelen",
+        "Antarctica/McMurdo",
+        "Antarctica/South_Pole",
+        "NZ",
+        "NZ-CHAT",
+        "Chile/EasterIsland",
+        "Pacific/Kanton",
+        "Pacific/Pohnpei",
+        "Pacific/Ponape",
+        "Pacific/Saipan",
+        "HST",
+        "Pacific/Johnston",
+        "US/Hawaii",
+        "Kwajalein",
+        "Pacific/Midway",
+        "Pacific/Samoa",
+        "US/Samoa",
+        "Antarctica/DumontDUrville",
+        "Pacific/Chuuk",
+        "Pacific/Truk",
+        "Pacific/Yap",
+        "Pacific/Funafuti",
+        "Pacific/Majuro",
+        "Pacific/Wake",
+        "Pacific/Wallis"
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "../../schemas/config-v1.json",
+
+  "name": "",
+
+  "pullRequest": {
+    "name": "pr"
+  },
+
+  "tag": {
+    "name": "tag"
+  },
+
+  "release": {
+    "name": "release"
+  }
+}

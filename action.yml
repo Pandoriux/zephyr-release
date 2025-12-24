@@ -7,11 +7,27 @@ branding:
   color: blue
 
 inputs:
-  name:
-    description: Your name.
+  token:
+    description: Token for Zephyr Release. Defaults to GITHUB_TOKEN.
+    required: false
+    default: ${{ github.token }}
+  config-path:
+    description: Path to config file, relative to project root.
     required: false
     default: ""
+  config-format:
+    description: The format of config file. Allowed formats are `auto`, `json/jsonc/json5`, `yaml`, `toml`.
+    required: false
+    default: "auto"
+  config-override:
+    description: Config written in literal block scalar ( | ), will merge with config file and override duplicate keys.
+    required: false
+    default: ""
+  config-override-format:
+    description: The format of config override. Allowed values are `auto`, `json/jsonc/json5`, `yaml/yml`, `toml`.
+    required: false
+    default: "auto"
 
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/main.mjs"
