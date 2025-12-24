@@ -231,7 +231,7 @@ var require_file_command = __commonJS({
     exports.issueFileCommand = issueFileCommand;
     exports.prepareKeyValueMessage = prepareKeyValueMessage;
     var crypto = __importStar(__require("node:crypto"));
-    var fs4 = __importStar(__require("node:fs"));
+    var fs3 = __importStar(__require("node:fs"));
     var os = __importStar(__require("node:os"));
     var utils_1 = require_utils();
     function issueFileCommand(command, message) {
@@ -239,10 +239,10 @@ var require_file_command = __commonJS({
       if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
       }
-      if (!fs4.existsSync(filePath)) {
+      if (!fs3.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
       }
-      fs4.appendFileSync(filePath, `${(0, utils_1.toCommandValue)(message)}${os.EOL}`, {
+      fs3.appendFileSync(filePath, `${(0, utils_1.toCommandValue)(message)}${os.EOL}`, {
         encoding: "utf8"
       });
     }
@@ -987,7 +987,7 @@ var require_util = __commonJS({
     var { InvalidArgumentError } = require_errors();
     var { Blob: Blob2 } = __require("node:buffer");
     var nodeUtil = __require("node:util");
-    var { stringify: stringify5 } = __require("node:querystring");
+    var { stringify: stringify4 } = __require("node:querystring");
     var { headerNameLowerCasedRecord } = require_constants();
     var [nodeMajor, nodeMinor] = process.versions.node.split(".").map((v) => Number(v));
     function nop() {
@@ -1002,7 +1002,7 @@ var require_util = __commonJS({
       if (url.includes("?") || url.includes("#")) {
         throw new Error('Query params cannot be passed when url already contains "?" or "#".');
       }
-      const stringified = stringify5(queryParams);
+      const stringified = stringify4(queryParams);
       if (stringified) {
         url += "?" + stringified;
       }
@@ -15874,7 +15874,7 @@ var require_util6 = __commonJS({
         throw new Error("Invalid cookie max-age");
       }
     }
-    function stringify5(cookie) {
+    function stringify4(cookie) {
       if (cookie.name.length === 0) {
         return null;
       }
@@ -15930,7 +15930,7 @@ var require_util6 = __commonJS({
       validateCookiePath,
       validateCookieValue,
       toIMFDate,
-      stringify: stringify5
+      stringify: stringify4
     };
   }
 });
@@ -16076,7 +16076,7 @@ var require_cookies = __commonJS({
   "node_modules/.deno/undici@5.29.0/node_modules/undici/lib/cookies/index.js"(exports, module) {
     "use strict";
     var { parseSetCookie } = require_parse();
-    var { stringify: stringify5 } = require_util6();
+    var { stringify: stringify4 } = require_util6();
     var { webidl } = require_webidl();
     var { Headers } = require_headers();
     function getCookies(headers) {
@@ -16134,9 +16134,9 @@ var require_cookies = __commonJS({
         strict: false
       });
       cookie = webidl.converters.Cookie(cookie);
-      const str = stringify5(cookie);
+      const str = stringify4(cookie);
       if (str) {
-        headers.append("Set-Cookie", stringify5(cookie));
+        headers.append("Set-Cookie", stringify4(cookie));
       }
     }
     webidl.converters.DeleteCookieAttributes = webidl.dictionaryConverter([
@@ -18989,13 +18989,13 @@ var require_io_util = __commonJS({
     exports.isRooted = isRooted;
     exports.tryGetExecutablePath = tryGetExecutablePath;
     exports.getCmdPath = getCmdPath;
-    var fs4 = __importStar(__require("node:fs"));
+    var fs3 = __importStar(__require("node:fs"));
     var path3 = __importStar(__require("node:path"));
-    _a = fs4.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+    _a = fs3.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function readlink(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
-        const result = yield fs4.promises.readlink(fsPath);
+        const result = yield fs3.promises.readlink(fsPath);
         if (exports.IS_WINDOWS && !result.endsWith("\\")) {
           return `${result}\\`;
         }
@@ -19003,7 +19003,7 @@ var require_io_util = __commonJS({
       });
     }
     exports.UV_FS_O_EXLOCK = 268435456;
-    exports.READONLY = fs4.constants.O_RDONLY;
+    exports.READONLY = fs3.constants.O_RDONLY;
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -20456,13 +20456,13 @@ var require_ms = __commonJS({
       options = options || {};
       var type = typeof val;
       if (type === "string" && val.length > 0) {
-        return parse7(val);
+        return parse6(val);
       } else if (type === "number" && isFinite(val)) {
         return options.long ? fmtLong(val) : fmtShort(val);
       }
       throw new Error("val is not a non-empty string or a valid number. val=" + JSON.stringify(val));
     };
-    function parse7(str) {
+    function parse6(str) {
       str = String(str);
       if (str.length > 100) {
         return;
@@ -28409,7 +28409,7 @@ var require_lodash_min = __commonJS({
           return de2(n2, qc, Rs);
         }
         function bi(n2) {
-          for (var t2 = n2.name + "", r2 = fs4[t2], e2 = bl.call(fs4, t2) ? r2.length : 0; e2--; ) {
+          for (var t2 = n2.name + "", r2 = fs3[t2], e2 = bl.call(fs3, t2) ? r2.length : 0; e2--; ) {
             var u2 = r2[e2], i2 = u2.func;
             if (null == i2 || i2 == n2) return u2.name;
           }
@@ -29689,7 +29689,7 @@ var require_lodash_min = __commonJS({
             return n2({}, "", {}), n2;
           } catch (n3) {
           }
-        }(), $l = x2.clearTimeout !== re.clearTimeout && x2.clearTimeout, Dl = ol && ol.now !== re.Date.now && ol.now, Ml = x2.setTimeout !== re.setTimeout && x2.setTimeout, Fl = al.ceil, Nl = al.floor, Pl = ll.getOwnPropertySymbols, ql = Ol ? Ol.isBuffer : X, Zl = x2.isFinite, Kl = _l.join, Vl = F(ll.keys, ll), Gl = al.max, Hl = al.min, Jl = ol.now, Yl = x2.parseInt, Ql = al.random, Xl = _l.reverse, ns = Ai(x2, "DataView"), ts = Ai(x2, "Map"), rs = Ai(x2, "Promise"), es = Ai(x2, "Set"), us = Ai(x2, "WeakMap"), is = Ai(ll, "create"), os = us && new us(), fs4 = {}, cs = to(ns), as = to(ts), ls = to(rs), ss = to(es), hs = to(us), ps = Il ? Il.prototype : X, _s = ps ? ps.valueOf : X, vs = ps ? ps.toString : X, gs = /* @__PURE__ */ function() {
+        }(), $l = x2.clearTimeout !== re.clearTimeout && x2.clearTimeout, Dl = ol && ol.now !== re.Date.now && ol.now, Ml = x2.setTimeout !== re.setTimeout && x2.setTimeout, Fl = al.ceil, Nl = al.floor, Pl = ll.getOwnPropertySymbols, ql = Ol ? Ol.isBuffer : X, Zl = x2.isFinite, Kl = _l.join, Vl = F(ll.keys, ll), Gl = al.max, Hl = al.min, Jl = ol.now, Yl = x2.parseInt, Ql = al.random, Xl = _l.reverse, ns = Ai(x2, "DataView"), ts = Ai(x2, "Map"), rs = Ai(x2, "Promise"), es = Ai(x2, "Set"), us = Ai(x2, "WeakMap"), is = Ai(ll, "create"), os = us && new us(), fs3 = {}, cs = to(ns), as = to(ts), ls = to(rs), ss = to(es), hs = to(us), ps = Il ? Il.prototype : X, _s = ps ? ps.valueOf : X, vs = ps ? ps.toString : X, gs = /* @__PURE__ */ function() {
           function n2() {
           }
           return function(t2) {
@@ -30090,12 +30090,12 @@ var require_lodash_min = __commonJS({
           var r2 = Z2[t2];
           if (r2) {
             var e2 = r2.name + "";
-            bl.call(fs4, e2) || (fs4[e2] = []), fs4[e2].push({
+            bl.call(fs3, e2) || (fs3[e2] = []), fs3[e2].push({
               name: t2,
               func: r2
             });
           }
-        }), fs4[Qu(X, vn).name] = [
+        }), fs3[Qu(X, vn).name] = [
           {
             name: "wrapper",
             func: X
@@ -35260,7 +35260,7 @@ function GetActionInputs() {
 }
 
 // src/workflows/config.ts
-import fs3 from "node:fs";
+import fs2 from "node:fs";
 import path2 from "node:path";
 
 // deno:https://jsr.io/@std/collections/1.1.3/_utils.ts
@@ -35767,7 +35767,7 @@ var Duration = function(_TemporalAmount) {
     }
     return this.ofSeconds(secs, nanos);
   };
-  Duration2.parse = function parse7(text) {
+  Duration2.parse = function parse6(text) {
     requireNonNull(text, "text");
     var PATTERN2 = new RegExp("([-+]?)P(?:([-+]?[0-9]+)D)?(T(?:([-+]?[0-9]+)H)?(?:([-+]?[0-9]+)M)?(?:([-+]?[0-9]+)(?:[.,]([0-9]{0,9}))?S)?)?", "i");
     var matches = PATTERN2.exec(text);
@@ -36975,7 +36975,7 @@ var Period = function(_TemporalAmount) {
     requireInstance(endDate, LocalDate, "endDate");
     return startDate.until(endDate);
   };
-  Period2.parse = function parse7(text) {
+  Period2.parse = function parse6(text) {
     requireNonNull(text, "text");
     try {
       return Period2._parse(text);
@@ -38870,7 +38870,7 @@ var SignStyle = function(_Enum) {
     return _Enum.apply(this, arguments) || this;
   }
   var _proto = SignStyle2.prototype;
-  _proto.parse = function parse7(positive, strict, fixedWidth) {
+  _proto.parse = function parse6(positive, strict, fixedWidth) {
     switch (this) {
       case SignStyle2.NORMAL:
         return !positive || !strict;
@@ -38948,7 +38948,7 @@ var CharLiteralPrinterParser = function() {
     buf.append(this._literal);
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var length = text.length;
     if (position === length) {
       return ~position;
@@ -38999,7 +38999,7 @@ var CompositePrinterParser = function() {
     }
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     if (this._optional) {
       context.startOptional();
       var pos = position;
@@ -39092,7 +39092,7 @@ var FractionPrinterParser = function() {
     }
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var effectiveMin = context.isStrict() ? this.minWidth : 0;
     var effectiveMax = context.isStrict() ? this.maxWidth : 9;
     var length = text.length;
@@ -39244,7 +39244,7 @@ var NumberPrinterParser = function() {
     buf.append(str);
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var length = text.length;
     if (position === length) {
       return ~position;
@@ -39482,7 +39482,7 @@ var OffsetIdPrinterParser = function() {
     }
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var length = text.length;
     var noOffsetLen = this.noOffsetText.length;
     if (noOffsetLen === 0) {
@@ -39573,7 +39573,7 @@ var PadPrinterParserDecorator = function() {
     }
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var strict = context.isStrict();
     var caseSensitive = context.isCaseSensitive();
     assert(!(position > text.length));
@@ -39613,7 +39613,7 @@ var SettingsParser = function(_Enum) {
   _proto.print = function print() {
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     switch (this) {
       case SettingsParser2.SENSITIVE:
         context.setCaseSensitive(true);
@@ -39657,7 +39657,7 @@ var StringLiteralPrinterParser = function() {
     buf.append(this._literal);
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var length = text.length;
     assert(!(position > length || position < 0));
     if (context.subSequenceEquals(text, position, this._literal, 0, this._literal.length) === false) {
@@ -39718,7 +39718,7 @@ var ZoneIdPrinterParser = function() {
     buf.append(zone.id());
     return true;
   };
-  _proto.parse = function parse7(context, text, position) {
+  _proto.parse = function parse6(context, text, position) {
     var length = text.length;
     if (position > length) {
       return ~position;
@@ -40488,7 +40488,7 @@ var InstantPrinterParser = function() {
     buf.append("Z");
     return true;
   };
-  _proto2.parse = function parse7(context, text, position) {
+  _proto2.parse = function parse6(context, text, position) {
     var newContext = context.copy();
     var minDigits = this.fractionalDigits < 0 ? 0 : this.fractionalDigits;
     var maxDigits = this.fractionalDigits < 0 ? 9 : this.fractionalDigits;
@@ -40541,7 +40541,7 @@ var DefaultingParser = function() {
   _proto3.print = function print() {
     return true;
   };
-  _proto3.parse = function parse7(context, text, position) {
+  _proto3.parse = function parse6(context, text, position) {
     if (context.getParsed(this._field) == null) {
       context.setParsedField(this._field, this._value, position, position);
     }
@@ -40658,7 +40658,7 @@ var DateTimeFormatter = function() {
     var context = new DateTimePrintContext(temporal, this);
     this._printerParser.print(context, appendable);
   };
-  _proto.parse = function parse7(text, type) {
+  _proto.parse = function parse6(text, type) {
     if (arguments.length === 1) {
       return this.parse1(text);
     } else {
@@ -40828,7 +40828,7 @@ var MonthDay = function(_TemporalAccessor) {
       throw new DateTimeException("Unable to obtain MonthDay from TemporalAccessor: " + temporal + ", type " + (temporal && temporal.constructor != null ? temporal.constructor.name : ""));
     }
   };
-  MonthDay2.parse = function parse7(text, formatter) {
+  MonthDay2.parse = function parse6(text, formatter) {
     if (arguments.length === 1) {
       return MonthDay2.parseString(text);
     } else {
@@ -41027,7 +41027,7 @@ var YearMonth = function(_Temporal) {
       throw new DateTimeException("Unable to obtain YearMonth from TemporalAccessor: " + temporal + ", type " + (temporal && temporal.constructor != null ? temporal.constructor.name : ""));
     }
   };
-  YearMonth2.parse = function parse7(text, formatter) {
+  YearMonth2.parse = function parse6(text, formatter) {
     if (arguments.length === 1) {
       return YearMonth2.parseString(text);
     } else {
@@ -41354,7 +41354,7 @@ var Year = function(_Temporal) {
       throw new DateTimeException("Unable to obtain Year from TemporalAccessor: " + temporal + ", type " + (temporal && temporal.constructor != null ? temporal.constructor.name : ""));
     }
   };
-  Year2.parse = function parse7(text, formatter) {
+  Year2.parse = function parse6(text, formatter) {
     if (arguments.length <= 1) {
       return Year2.parseText(text);
     } else {
@@ -41920,7 +41920,7 @@ var OffsetTime = function(_Temporal) {
     var time = LocalTime.ofSecondOfDay(secsOfDay, instant.nano());
     return new OffsetTime2(time, offset);
   };
-  OffsetTime2.parse = function parse7(text, formatter) {
+  OffsetTime2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_OFFSET_TIME;
     }
@@ -42400,7 +42400,7 @@ var ZonedDateTime = function(_ChronoZonedDateTime) {
     var nanoOfSecond = temporal.get(ChronoField.NANO_OF_SECOND);
     return ZonedDateTime2._create(epochSecond, nanoOfSecond, zone);
   };
-  ZonedDateTime2.parse = function parse7(text, formatter) {
+  ZonedDateTime2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     }
@@ -42790,7 +42790,7 @@ var OffsetDateTime = function(_Temporal) {
     var ldt = LocalDateTime.ofEpochSecond(instant.epochSecond(), instant.nano(), offset);
     return new OffsetDateTime2(ldt, offset);
   };
-  OffsetDateTime2.parse = function parse7(text, formatter) {
+  OffsetDateTime2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
     }
@@ -43218,7 +43218,7 @@ var LocalDate = function(_ChronoLocalDate) {
     }
     return date;
   };
-  LocalDate2.parse = function parse7(text, formatter) {
+  LocalDate2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_LOCAL_DATE;
     }
@@ -43886,7 +43886,7 @@ var LocalDateTime = function(_ChronoLocalDateTime) {
       throw new DateTimeException("Unable to obtain LocalDateTime TemporalAccessor: " + temporal + ", type " + (temporal.constructor != null ? temporal.constructor.name : ""));
     }
   };
-  LocalDateTime2.parse = function parse7(text, formatter) {
+  LocalDateTime2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     }
@@ -44307,7 +44307,7 @@ var LocalTime = function(_Temporal) {
     }
     return time;
   };
-  LocalTime2.parse = function parse7(text, formatter) {
+  LocalTime2.parse = function parse6(text, formatter) {
     if (formatter === void 0) {
       formatter = DateTimeFormatter.ISO_LOCAL_TIME;
     }
@@ -44806,7 +44806,7 @@ var Instant = function(_Temporal) {
       throw new DateTimeException("Unable to obtain Instant from TemporalAccessor: " + temporal + ", type " + typeof temporal, ex);
     }
   };
-  Instant2.parse = function parse7(text) {
+  Instant2.parse = function parse6(text) {
     return DateTimeFormatter.ISO_INSTANT.parse(text, Instant2.FROM);
   };
   Instant2._create = function _create(seconds, nanoOfSecond) {
@@ -49129,8 +49129,8 @@ var Pair = class _Pair {
 // deno:https://jsr.io/@eemeli/yaml/2.8.2/src/stringify/stringifyCollection.ts
 function stringifyCollection(collection, ctx, options) {
   const flow = ctx.inFlow ?? collection.flow;
-  const stringify5 = flow ? stringifyFlowCollection : stringifyBlockCollection;
-  return stringify5(collection, ctx, options);
+  const stringify4 = flow ? stringifyFlowCollection : stringifyBlockCollection;
+  return stringify4(collection, ctx, options);
 }
 function stringifyBlockCollection({ comment, items }, ctx, { blockItemPrefix, flowChars, itemIndent, onChompKeep, onComment }) {
   const { indent, options: { commentString } } = ctx;
@@ -53408,19 +53408,19 @@ var Parser = class {
         case "scalar":
         case "single-quoted-scalar":
         case "double-quoted-scalar": {
-          const fs4 = this.flowScalar(this.type);
+          const fs3 = this.flowScalar(this.type);
           if (atNextItem || it.value) {
             map3.items.push({
               start,
-              key: fs4,
+              key: fs3,
               sep: []
             });
             this.onKeyLine = true;
           } else if (it.sep) {
-            this.stack.push(fs4);
+            this.stack.push(fs3);
           } else {
             Object.assign(it, {
-              key: fs4,
+              key: fs3,
               sep: []
             });
             this.onKeyLine = true;
@@ -53567,15 +53567,15 @@ var Parser = class {
         case "scalar":
         case "single-quoted-scalar":
         case "double-quoted-scalar": {
-          const fs4 = this.flowScalar(this.type);
+          const fs3 = this.flowScalar(this.type);
           if (!it || it.value) fc.items.push({
             start: [],
-            key: fs4,
+            key: fs3,
             sep: []
           });
-          else if (it.sep) this.stack.push(fs4);
+          else if (it.sep) this.stack.push(fs3);
           else Object.assign(it, {
-            key: fs4,
+            key: fs3,
             sep: []
           });
           return;
@@ -54231,71 +54231,22 @@ async function __wbg_init(module_or_path) {
   return __wbg_finalize_init(instance, module);
 }
 
-// node_modules/.deno/@rainbowatcher+toml-edit-js@0.6.4/node_modules/@rainbowatcher/toml-edit-js/shims.js
-var wasmUrl = new URL("index_bg.wasm", import.meta.url);
-var wasmBuffer;
-var fs2;
-var isDeno = !!globalThis.Deno;
-var isNode2 = globalThis.process?.release?.name === "node";
-var isBrowser = !!globalThis.window;
-switch (wasmUrl.protocol) {
-  case "file:": {
-    if (isNode2) {
-      fs2 = await import("node:fs");
-    }
-    break;
-  }
-  case "https:":
-  case "http:": {
-    break;
-  }
-  default:
-    throw new Error(`Unsupported protocol: ${wasmUrl.protocol}`);
-}
-function checkInit() {
-  if (wasmBuffer === void 0) {
-    throw new Error("WASM module not initialized");
-  }
-}
-function parse6(input) {
-  checkInit();
-  if (typeof input !== "string") {
-    throw new Error("Invalid parameter: input must be a string");
-  }
-  ;
-  return parse5(input);
-}
-
 // src/parsers/config-parsers.ts
-function parseOrThrow(configStr, configFormat) {
-  let parsedConfig;
-  switch (configFormat) {
-    case "json":
-    case "jsonc":
-    case "json5":
-      parsedConfig = import_json5_parser.JsonParser.parse(configStr, import_json5_parser.JsonObjectNode).toJSON();
-      break;
-    case "yaml":
-      parsedConfig = parse4(configStr);
-      break;
-    case "toml":
-      parsedConfig = parse6(configStr);
-      break;
-  }
-  return transformObjKeyToCamelCase(parsedConfig);
-}
-function parseConfig(configStr, configFormat, configPath) {
+function parseConfigOrExit(configStr, configFormat, configPath) {
   try {
     if (configFormat === "auto") {
-      return parseConfigAuto(configStr, configPath);
+      return parseConfigAutoOrThrow(configStr, configPath);
     } else {
-      return parseOrThrow(configStr, configFormat);
+      return {
+        parsedConfig: parseOrThrow(configStr, configFormat),
+        resolvedFormat: configFormat
+      };
     }
   } catch (error) {
     exitFailure(`Failed to parse configuration (${configFormat}): ${error}`);
   }
 }
-function parseConfigAuto(configStr, configPath) {
+function parseConfigAutoOrThrow(configStr, configPath) {
   const supportedFormats = Object.values(ConfigFileFormats);
   const triedFormats = [];
   let detectedFormat = void 0;
@@ -54308,19 +54259,48 @@ function parseConfigAuto(configStr, configPath) {
   if (detectedFormat) {
     triedFormats.push(detectedFormat);
     try {
-      return parseOrThrow(configStr, detectedFormat);
-    } catch {
+      return {
+        parsedConfig: parseOrThrow(configStr, detectedFormat),
+        resolvedFormat: `auto -> ${detectedFormat}`
+      };
+    } catch (error) {
+      logger.startGroup(`Parser error (${detectedFormat})`);
+      logger.info(String(error));
+      logger.endGroup();
     }
   }
   for (let i = 0; i < supportedFormats.length; i++) {
     if (supportedFormats[i] === detectedFormat) continue;
     try {
       triedFormats.push(supportedFormats[i]);
-      return parseOrThrow(configStr, supportedFormats[i]);
-    } catch {
+      return {
+        parsedConfig: parseOrThrow(configStr, supportedFormats[i]),
+        resolvedFormat: `auto -> ${triedFormats.join(" -> ")}`
+      };
+    } catch (error) {
+      logger.startGroup(`Parser error (${supportedFormats[i]})`);
+      logger.info(String(error));
+      logger.endGroup();
     }
   }
   throw new Error(`None formats matched. Tried order: ${triedFormats.join(" -> ")}`);
+}
+function parseOrThrow(configStr, configFormat) {
+  let parsedConfig;
+  switch (configFormat) {
+    case "json":
+    case "jsonc":
+    case "json5":
+      parsedConfig = import_json5_parser.JsonParser.parse(configStr, import_json5_parser.JsonObjectNode).toJSON();
+      break;
+    case "yaml":
+      parsedConfig = parse4(configStr);
+      break;
+    case "toml":
+      parsedConfig = parse5(configStr);
+      break;
+  }
+  return transformObjKeyToCamelCase(parsedConfig);
 }
 
 // src/workflows/config.ts
@@ -54330,11 +54310,12 @@ function resolveConfig(workspace, configPath, configFormat, configOverrideStr, c
   let finalConfig;
   logger.info("Reading config file from config path...");
   if (configPath) {
-    const configJson = fs3.readFileSync(path2.join(workspace, configPath), {
+    const configJson = fs2.readFileSync(path2.join(workspace, configPath), {
       encoding: "utf8"
     });
-    configFile = parseConfig(configJson, configFormat, configPath);
-    logger.info("Config file parsed successfully.");
+    const parsedResult = parseConfigOrExit(configJson, configFormat, configPath);
+    configFile = parsedResult.parsedConfig;
+    logger.info(`Config file parsed successfully (${parsedResult.resolvedFormat}).`);
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config file:");
       logger.debug(JSON.stringify(configFile, null, 2));
@@ -54345,8 +54326,9 @@ function resolveConfig(workspace, configPath, configFormat, configOverrideStr, c
   }
   logger.info("Reading config override from action input...");
   if (configOverrideStr) {
-    configOverride = parseConfig(configOverrideStr, configOverrideFormat);
-    logger.info("Config override parsed successfully.");
+    const parsedResult = parseConfigOrExit(configOverrideStr, configOverrideFormat);
+    configOverride = parsedResult.parsedConfig;
+    logger.info(`Config override parsed successfully (${parsedResult.resolvedFormat}).`);
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config override:");
       logger.debug(JSON.stringify(configOverride, null, 2));
