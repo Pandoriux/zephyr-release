@@ -5,7 +5,7 @@ export const CommandHookSchema = v.object({
   pre: v.pipe(
     v.optional(
       v.array(
-        v.union([CommandSchema, v.pipe(v.string(), v.trim(), v.nonEmpty())]),
+        v.union([CommandSchema, v.pipe(v.string(), v.trim())]),
       ),
     ),
     v.metadata({
@@ -15,7 +15,7 @@ export const CommandHookSchema = v.object({
   post: v.pipe(
     v.optional(
       v.array(
-        v.union([CommandSchema, v.pipe(v.string(), v.trim(), v.nonEmpty())]),
+        v.union([CommandSchema, v.pipe(v.string(), v.trim())]),
       ),
     ),
     v.metadata({

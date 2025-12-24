@@ -180,8 +180,7 @@ Commit type name (e.g., "feat", "fix").
 
 #### commit... > section (Optional)
 
-Type: `string`  
-Default: `""`
+Type: `string`
 
 Changelog section heading for this commit type. When empty, the `type` value is used.
 
@@ -202,21 +201,21 @@ Configuration options that determine how version numbers are calculated.
 #### bump... > major (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: [], count-breaking-as: "bump", commits-per-bump: 1 }`
+Default: `{ count-breaking-as: "bump" }`
 
 Strategy for major version bumps (x.0.0).
 
 #### bump... > minor (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: ["feat"], commits-per-bump: 1 }`
+Default: `{ types: ["feat"] }`
 
 Strategy for minor version bumps (0.x.0).
 
 #### bump... > patch (Optional)
 
 Type: [`BumpRule`](#bumprule)  
-Default: `{ types: ["fix", "perf"], commits-per-bump: 1 }`
+Default: `{ types: ["fix", "perf"] }`
 
 Strategy for patch version bumps (0.0.x).
 
@@ -225,10 +224,10 @@ Strategy for patch version bumps (0.0.x).
 Type: `object`  
 **Properties:**
 
-- `types` (Optional): Array of commit types (from base [`commit-types`](#commit-types-optional)) that count toward version bumping. Default: `[]`
+- `types` (Optional): Array of commit types (from base [`commit-types`](#commit-types-optional)) that count toward version bumping.
 - `count-breaking-as` (Optional): How to treat breaking changes regardless of `types`. Allowed: `none`, `commit`, `bump`. Default: `"none"`  
   Usually this should only be set for a single semver level (major, minor, or patch) to avoid double counting.
-- `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `1`
+- `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `Infinity`
 
 Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
@@ -472,7 +471,7 @@ Type: `object`
 **Properties:**
 
 - `name` (Required): Label name.
-- `description` (Optional): Label description. Default: `""`
+- `description` (Optional): Label description.
 - `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
 
 ### release (Optional)

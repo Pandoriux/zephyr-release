@@ -10,7 +10,7 @@ export const BumpRuleBuildSchema = v.object({
     }),
   ),
   override: v.pipe(
-    v.optional(v.array(v.string())),
+    v.optional(v.array(v.pipe(v.string(), v.trim()))),
     v.metadata({
       description:
         "Overrides build metadata to use for the next version. When provided, these values take precedence over " +
