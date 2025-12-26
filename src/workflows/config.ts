@@ -6,8 +6,10 @@ import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
 import { parseConfigOrExit } from "../parsers/config-parsers.ts";
 import { logger } from "../utils/logger.ts";
+import { exitFailure } from "../lifecycle.ts";
+import { formatValibotIssues } from "../utils/formatters/valibot.ts";
 
-export function resolveConfig(
+export function resolveConfigOrExit(
   workspace: string,
   configPath: string,
   configFormat: ConfigFileFormatWithAuto,
@@ -24,10 +26,16 @@ export function resolveConfig(
       encoding: "utf8",
     });
 
-    const parsedResult = parseConfigOrExit(configJson, configFormat, configPath);
+    const parsedResult = parseConfigOrExit(
+      configJson,
+      configFormat,
+      configPath,
+    );
     configFile = parsedResult.parsedConfig;
 
-    logger.info(`Config file parsed successfully (${parsedResult.resolvedFormat}).`);
+    logger.info(
+      `Config file parsed successfully (${parsedResult.resolvedFormat}).`,
+    );
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config file:");
       logger.debug(JSON.stringify(configFile, null, 2));
@@ -39,10 +47,15 @@ export function resolveConfig(
 
   logger.info("Reading config override from action input...");
   if (configOverrideStr) {
-    const parsedResult = parseConfigOrExit(configOverrideStr, configOverrideFormat);
+    const parsedResult = parseConfigOrExit(
+      configOverrideStr,
+      configOverrideFormat,
+    );
     configOverride = parsedResult.parsedConfig;
 
-    logger.info(`Config override parsed successfully (${parsedResult.resolvedFormat}).`);
+    logger.info(
+      `Config override parsed successfully (${parsedResult.resolvedFormat}).`,
+    );
     logger.debugWrap(() => {
       logger.startGroup("[DEBUG] Parsed config override:");
       logger.debug(JSON.stringify(configOverride, null, 2));
@@ -65,13 +78,17 @@ export function resolveConfig(
     );
     finalConfig = configOverride;
   } else {
-    throw new Error("Both config file and config override are missing.");
+    exitFailure("Both config file and config override are missing.");
   }
 
-  const resolvedConfig = v.parse(ConfigSchema, finalConfig);
+  const parsedFinalConfigResult = v.safeParse(ConfigSchema, finalConfig);
+  if (!parsedFinalConfigResult.success) {
+    exitFailure(formatValibotIssues(parsedFinalConfigResult.issues));
+  }
+
   logger.startGroup("Resolved config:");
-  logger.info(JSON.stringify(resolvedConfig, null, 2));
+  logger.info(JSON.stringify(parsedFinalConfigResult.output, null, 2));
   logger.endGroup();
 
-  return resolvedConfig;
+  return parsedFinalConfigResult.output;
 }

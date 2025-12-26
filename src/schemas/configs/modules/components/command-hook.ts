@@ -51,7 +51,3 @@ export const CommandHookSchema = v.object({
 
 type _CommandHookInput = v.InferInput<typeof CommandHookSchema>;
 type _CommandHookOutput = v.InferOutput<typeof CommandHookSchema>;
-
-export const BASE_DEFAULT_CMD_TIMEOUT = v.getDefault(
-  CommandHookSchema.entries.timeout,
-);
