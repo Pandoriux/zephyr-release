@@ -12,11 +12,8 @@ Some example config JSON files: `example links to be inserted later`
   - [name (Optional)](#name-optional)
   - [time-zone (Optional)](#time-zone-optional)
   - [command-hook (Optional)](#command-hook-optional)
-    - [CommandHook](#commandhook)
-      - [Command](#command)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
-    - [VersionFile](#versionfile)
   - [files-to-commit (Optional)](#files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
@@ -26,12 +23,8 @@ Some example config JSON files: `example links to be inserted later`
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
     - [bump... \> patch (Optional)](#bump--patch-optional)
-      - [BumpRule](#bumprule)
     - [bump... \> prerelease (Optional)](#bump--prerelease-optional)
-      - [BumpRulePrerelease](#bumpruleprerelease)
     - [bump... \> build (Optional)](#bump--build-optional)
-      - [BumpRuleBuild](#bumprulebuild)
-      - [SemverExtension](#semverextension)
     - [bump... \> bump-minor-for-major-pre-stable (Optional)](#bump--bump-minor-for-major-pre-stable-optional)
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
@@ -57,7 +50,6 @@ Some example config JSON files: `example links to be inserted later`
     - [pull... \> body-pattern (Optional)](#pull--body-pattern-optional)
     - [pull... \> body-pattern-path (Optional)](#pull--body-pattern-path-optional)
     - [pull... \> footer-pattern (Optional)](#pull--footer-pattern-optional)
-      - [Label Object](#label-object)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> skip-release (Optional)](#release--skip-release-optional)
@@ -67,10 +59,20 @@ Some example config JSON files: `example links to be inserted later`
     - [release \> tag-name-pattern (Optional)](#release--tag-name-pattern-optional)
     - [release \> title-pattern (Optional)](#release--title-pattern-optional)
     - [release \> body-pattern (Optional)](#release--body-pattern-optional)
-- [String Patterns](#string-patterns)
-  - [User-defined](#user-defined)
-  - [App-defined](#app-defined)
-
+- [Type Definitions](#type-definitions)
+  - [CommandHook](#commandhook)
+  - [Command](#command)
+  - [VersionFile](#versionfile)
+  - [BumpRule](#bumprule)
+  - [BumpRulePrerelease](#bumpruleprerelease)
+  - [BumpRuleBuild](#bumprulebuild)
+  - [SemverExtension](#semverextension)
+  - [Label](#label)
+- [Exposed env variables](#exposed-env-variables)
+  - [All](#all)
+  - [placeholder 1](#placeholder-1)
+  - [placeholder 2](#placeholder-2)
+  
 ## Options
 
 ### name (Optional)
@@ -78,7 +80,7 @@ Some example config JSON files: `example links to be inserted later`
 Type: `string`  
 Default: `""`
 
-The project name used in naming patterns (available as `${name}`).
+The project name used in [naming patterns](./string-patterns.md) (available as `${name}`).
 
 ### time-zone (Optional)
 
@@ -86,7 +88,7 @@ Type: `string`
 Default: `"UTC"`
 
 IANA time zone used to format and display times.  
-This value is also available for use in naming patterns as `${timeZone}`.
+This value is also available for use in [naming patterns](./string-patterns.md) as `${timeZone}`.
 
 ### command-hook (Optional)
 
@@ -94,29 +96,9 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the main operation. Each command runs from the repository root.
 
-#### CommandHook
+List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
 
-Type: `object`  
-**Properties:**
-
-- `timeout` (Optional): Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended). Default: `60000` (1 min)
-- `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
-- `pre` (Optional): Commands to run before the operation.  
-  Each command can be either a `string` or a [`Command`](#command) object.
-- `post` (Optional): Commands to run after the operation.  
-  Each command can be either a `string` or a [`Command`](#command) object.
-
-##### Command
-
-Type: `string | object`
-
-A command can be specified as either a string or an object.
-
-**When specified as an object, properties:**
-
-- `cmd` (Required): The command string to execute.
-- `timeout` (Optional): Timeout in milliseconds, use Infinity to never timeout (not recommended). Defaults to `commandHook` base `timeout` value.
-- `continueOnError` (Optional): Continue or stop the process on commands error. Defaults to `commandHook` base `continueOnError` value.
+See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
 
 ### initial-version (Optional)
 
@@ -139,16 +121,7 @@ The **primary file** serves as the main source of truth for the project's versio
 When reading or bumping versions, the action uses the primary file's version to determine the current and next version.  
 Other version files (if any) are then synchronized to match the primary version.
 
-#### VersionFile
-
-Type: `object`  
-**Properties:**
-
-- `path` (Required): Path to the version file, relative to the project root.
-- `format` (Optional): Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`. Default: `"auto"`
-- `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
-- `selector` (Required): The lookup used by the chosen extractor. For `json-path`, this is the JSON path string; for `regex`, supply the pattern.
-- `primary` (Optional): Marks this file as the primary source of truth for the current version. Default: `false`
+See [`VersionFile`](#versionfile) for the type definition.
 
 ### files-to-commit (Optional)
 
@@ -225,17 +198,7 @@ Default: `{ types: ["fix", "perf"] }`
 
 Strategy for patch version bumps (0.0.x).
 
-##### BumpRule
-
-Type: `object`  
-**Properties:**
-
-- `types` (Optional): Array of commit types (from base [`commit-types`](#commit-types-optional)) that count toward version bumping.
-- `count-breaking-as` (Optional): How to treat breaking changes regardless of `types`. Allowed: `none`, `commit`, `bump`. Default: `"none"`  
-  Usually this should only be set for a single semver level (major, minor, or patch) to avoid double counting.
-- `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `Infinity`
-
-Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
+See [`BumpRule`](#bumprule) for the type definition.
 
 #### bump... > prerelease (Optional)
 
@@ -244,14 +207,7 @@ Default: `{}`
 
 Strategy for bumping prerelease version (1.2.3-x.x).
 
-##### BumpRulePrerelease
-
-Type: `object`  
-**Properties:**
-
-- `enabled` (Optional): Enable/disable handling of pre-release identifiers. Default: `false`
-- `override` (Optional): Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `identifiers` (Optional): Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers. Type: [`SemverExtension[]`](#semverextension)
+See [`BumpRulePrerelease`](#bumpruleprerelease) for the type definition.
 
 #### bump... > build (Optional)
 
@@ -260,48 +216,7 @@ Default: `{}`
 
 Strategy for bumping build metadata (1.2.3+x.x).
 
-##### BumpRuleBuild
-
-Type: `object`  
-**Properties:**
-
-- `enabled` (Optional): Enable/disable handling of build metadata. Default: `false`
-- `override` (Optional): Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `metadata` (Optional): Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata. Type: [`SemverExtension[]`](#semverextension)
-
-##### SemverExtension
-
-A discriminated union based on the `type` field. Specifies the type of pre-release/build identifier/metadata.
-
-**Type: `"static"`** — A stable label that should not change often.
-
-- `type` (Required): `"static"`
-- `value` (Required): The static string value to use. Examples: `"pre"`, `"alpha"`, `"beta"`, `"rc"`.
-
-**Type: `"dynamic"`** — A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).
-
-- `type` (Required): `"dynamic"`
-- `value` (Optional): The string value to use, should be set dynamically.
-- `fallback-value` (Optional): The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array.
-
-**Type: `"incremental"`** — Integer value that changes over time.
-
-- `type` (Required): `"incremental"`
-- `initial-value` (Optional): Initial integer number value. Default: `0`
-- `expression-variables` (Optional): Defines custom variables for use in `next-value-expression`, `v` is reserved for current value. These variables are usually set dynamically.
-- `next-value-expression` (Optional): Expression for computing the next value, where `v` represents the current value. The expression must evaluate to an integer number. Evaluated with [`expr-eval`](https://www.npmjs.com/package/expr-eval). Default: `"v+1"`
-- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, or `"timestamp"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
-
-**Type: `"timestamp"`** — Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).
-
-- `type` (Required): `"timestamp"`
-- `unit` (Optional): The time unit. `"ms"` (13 digits) or `"s"` (10 digits). Default: `"ms"`
-
-**Type: `"date"`** — A date string that changes over time.
-
-- `type` (Required): `"date"`
-- `format` (Optional): The date format. `"YYYYMMDD"` or `"YYYY-MM-DD"`. Default: `"YYYYMMDD"`
-- `time-zone` (Optional): The timezone to use for the date. If not specified, falls back to base [`time-zone`](#time-zone-optional).
+See [`BumpRuleBuild`](#bumprulebuild) and [`SemverExtension`](#semverextension) for the type definitions.
 
 #### bump... > bump-minor-for-major-pre-stable (Optional)
 
@@ -322,14 +237,14 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 Type: `object`  
 **Properties:** [`enabled`](#changelog--enabled-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
-Configuration specific to changelogs. All generated changelog content are available in string pattern as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
+Configuration specific to changelogs. All generated changelog content are available in [string patterns](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
 #### changelog > enabled (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.
+Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and [string patterns](./string-patterns.md) but they won't be written to file.
 
 #### changelog > command-hook (Optional)
 
@@ -342,7 +257,7 @@ Pre/post command lists to run around the changelog operation. Each command runs 
 Type: `string`  
 Default: `""`
 
-User-provided changelog content body, available in string pattern as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
+User-provided changelog content body, available in [string patterns](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
 
 #### changelog > path (Optional)
 
@@ -425,17 +340,21 @@ Pattern for branch name that Zephyr Release is gonna use.
 
 #### pull... > labels-on-create (Optional)
 
-Type: [`Label`](#label-object) | [`Label[]`](#label-object)  
+Type: [`Label`](#label) | [`Label[]`](#label)  
 Default: `{ name: "zp-release: pending",...}`
 
 A label or an array of labels to add to the pull request when it is created.
 
+See [`Label`](#label) for the type definition.
+
 #### pull... > labels-on-close (Optional)
 
-Type: [`Label`](#label-object) | [`Label[]`](#label-object)  
+Type: [`Label`](#label) | [`Label[]`](#label)  
 Default: `{ name: "zp-release: released",...}`
 
 A label or an array of labels to add to the pull request when it is closed and the release operation has completed.
+
+See [`Label`](#label) for the type definition.
 
 #### pull... > title-pattern (Optional)
 
@@ -471,14 +390,7 @@ Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-r
 
 Pattern for pull request footer.
 
-##### Label Object
-
-Type: `object`  
-**Properties:**
-
-- `name` (Required): Label name.
-- `description` (Optional): Label description.
-- `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
+See [`Label`](#label) for the type definition.
 
 ### release (Optional)
 
@@ -526,7 +438,7 @@ If enabled, the release will be marked as prerelease.
 Type: `string`  
 Default: `"v${version}"`
 
-Pattern for tag name, available in string pattern as `${tagName}`.
+Pattern for tag name, available in [string patterns](./string-patterns.md) as `${tagName}`.
 
 #### release > title-pattern (Optional)
 
@@ -542,62 +454,127 @@ Default: `"${changelogContent}"`
 
 Pattern for release body.
 
-## String Patterns
+## Type Definitions
 
-Available string patterns that can be used in various configuration fields.
+### CommandHook
 
-### User-defined
+Type: `object`  
+**Properties:**
 
-These patterns are resolved based on user configuration.
+- `timeout` (Optional): Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended). Default: `60000` (1 min)
+- `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
+- `pre` (Optional): Commands to run before the operation.  
+  Each command can be either a `string` or a [`Command`](#command) object.  
+  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+- `post` (Optional): Commands to run after the operation.  
+  Each command can be either a `string` or a [`Command`](#command) object.  
+  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
 
-- `${name}`: Project name [[→ name](#name-optional)].
-- `${timeZone}`: IANA time zone [[→ time-zone](#time-zone-optional)].
+### Command
 
-<br/>
+Type: `string | object`
 
-- `${tagName}`: Tag name [[→ tag-name-pattern](#release--tag-name-pattern-optional)].
+A command can be specified as either a string or an object.
 
-### App-defined
+**When specified as an object, properties:**
 
-These patterns are resolved based on the app code.
+- `cmd` (Required): The command string to execute.
+- `timeout` (Optional): Timeout in milliseconds, use Infinity to never timeout (not recommended). Defaults to `commandHook` base `timeout` value.
+- `continueOnError` (Optional): Continue or stop the process on commands error. Defaults to `commandHook` base `continueOnError` value.
 
-- `${repoOwner}`: GitHub repository owner (organization or user).
-- `${repoName}`: GitHub repository name.
+### VersionFile
 
-<br/>
+Type: `object`  
+**Properties:**
 
-- `${YYYY-MM-DD}`: Full date in ISO format (e.g., `2025-10-21`).
-- `${DD-MM-YYYY}`: Full date in day-first format (e.g., `21-10-2025`).
-- `${YYYY}`: Four-digit year (e.g., `2025`).
-- `${MM}`: Two-digit month (01–12).
-- `${DD}`: Two-digit day of the month (01–31).
-- `${hh:mm:ss}`: Full time in 24-hour format (e.g., `14:37:05`).
-- `${hh}`: Two-digit hour in 24-hour format (00–23).
-- `${mm}`: Two-digit minute (00–59).
-- `${ss}`: Two-digit second (00–59).
+- `path` (Required): Path to the version file, relative to the project root.
+- `format` (Optional): Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`. Default: `"auto"`
+- `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
+- `selector` (Required): The lookup used by the chosen extractor. For `json-path`, this is the JSON path string; for `regex`, supply the pattern.
+- `primary` (Optional): Marks this file as the primary source of truth for the current version. Default: `false`
 
-<br/>
+### BumpRule
 
-- `${version}`: The full semantic version (SemVer) number.
-- `${versionPri}`: The primary part of the semantic version (major.minor.patch).
-- `${versionPre}`: The prerelease identifier of the semantic version.
-- `${versionBld}`: The build metadata of the semantic version.
+Type: `object`  
+**Properties:**
 
-<br/>
+- `types` (Optional): Array of commit types (from base [`commit-types`](#commit-types-optional)) that count toward version bumping.
+- `count-breaking-as` (Optional): How to treat breaking changes regardless of `types`. Allowed: `none`, `commit`, `bump`. Default: `"none"`  
+  Usually this should only be set for a single semver level (major, minor, or patch) to avoid double counting.
+- `commits-per-bump` (Optional): Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps. Default: `Infinity`
 
-- `${changelogContent}`: The generated changelog content section (→ [heading](#changelog--heading-pattern-optional) + [body](#changelog--body-pattern-optional)).
-- `${changelogContentBody}`: The generated changelog body. You can override it with your own computed content [[→ content-body-override](#changelog--content-body-override-optional)].
+Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
-<br/>
+### BumpRulePrerelease
 
-- `${<key>:mdLink(compare=tagPrev,prev=<N>)}`: Wraps the resolved `${key}` as a markdown-formatted GitHub compare link from the previous tag to the current tag.  
-\- `<key>` must be either a pattern name (e.g. `tagName`) or a quoted literal label (`"Release v1.0"`).  
-\- `<N>` is a positive integer, default `1`.
+Type: `object`  
+**Properties:**
 
-  - **Quoted literal:** `${"Release v1.0":mdLink(compare=tagPrev,prev=1)}` uses the literal text as the link label.  
-    Resolved to `[Release v1.0](https://github.com/<owner>/<repo>/compare/<previous-1-tag>...<current-tag>)`.  
-  - **Unquoted (pattern):** `${tagName:mdLink(compare=tagPrev,prev=1)}` resolves `tagName` from context.  
-    Resolved to `[v2.0.0](https://github.com/<owner>/<repo>/compare/<previous-1-tag>...v2.0.0)`.  
-  - If a compare URL cannot be constructed:  
-    \- If the pattern cannot be resolved → returns an empty string.  
-    \- If the tag or repository data cannot be found → returns plain text (without Markdown link formatting) instead of a broken link.
+- `enabled` (Optional): Enable/disable handling of pre-release identifiers. Default: `false`
+- `override` (Optional): Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
+- `identifiers` (Optional): Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers. Type: [`SemverExtension[]`](#semverextension)
+
+### BumpRuleBuild
+
+Type: `object`  
+**Properties:**
+
+- `enabled` (Optional): Enable/disable handling of build metadata. Default: `false`
+- `override` (Optional): Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
+- `metadata` (Optional): Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata. Type: [`SemverExtension[]`](#semverextension)
+
+### SemverExtension
+
+A discriminated union based on the `type` field. Specifies the type of pre-release/build identifier/metadata.
+
+**Type: `"static"`** — A stable label that should not change often.
+
+- `type` (Required): `"static"`
+- `value` (Required): The static string value to use. Examples: `"pre"`, `"alpha"`, `"beta"`, `"rc"`.
+
+**Type: `"dynamic"`** — A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).
+
+- `type` (Required): `"dynamic"`
+- `value` (Optional): The string value to use, should be set dynamically.
+- `fallback-value` (Optional): The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array.
+
+**Type: `"incremental"`** — Integer value that changes over time.
+
+- `type` (Required): `"incremental"`
+- `initial-value` (Optional): Initial integer number value. Default: `0`
+- `expression-variables` (Optional): Defines custom variables for use in `next-value-expression`, `v` is reserved for current value. These variables are usually set dynamically.
+- `next-value-expression` (Optional): Expression for computing the next value, where `v` represents the current value. The expression must evaluate to an integer number. Evaluated with [`expr-eval`](https://www.npmjs.com/package/expr-eval). Default: `"v+1"`
+- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, or `"timestamp"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
+
+**Type: `"timestamp"`** — Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).
+
+- `type` (Required): `"timestamp"`
+- `unit` (Optional): The time unit. `"ms"` (13 digits) or `"s"` (10 digits). Default: `"ms"`
+
+**Type: `"date"`** — A date string that changes over time.
+
+- `type` (Required): `"date"`
+- `format` (Optional): The date format. `"YYYYMMDD"` or `"YYYY-MM-DD"`. Default: `"YYYYMMDD"`
+- `time-zone` (Optional): The timezone to use for the date. If not specified, falls back to base [`time-zone`](#time-zone-optional).
+
+### Label
+
+Type: `object`  
+**Properties:**
+
+- `name` (Required): Label name.
+- `description` (Optional): Label description.
+- `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
+
+## Exposed env variables
+
+### All
+
+These environment variables can be used in all commands.
+
+- `...process.env.*`: all env currently exposed by the system
+- Placeholder item 2
+
+### placeholder 1
+
+### placeholder 2

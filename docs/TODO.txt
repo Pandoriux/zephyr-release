@@ -21,3 +21,23 @@ resetOn: v.pipe(
       }),
     ),
   }),
+
+  pre: v.pipe(
+    v.optional(
+      v.union([CommandSchema, v.array(CommandSchema)]),
+    ),
+    v.metadata({
+      description: "Commands to run before the operation.\n" +
+        "List of exposed env variables: to-do-insert-later",
+    }),
+  ),
+  post: v.pipe(
+    v.optional(
+      v.union([CommandSchema, v.array(CommandSchema)]),
+    ),
+    v.metadata({
+      description: "Commands to run after the operation.\n" +
+        "List of exposed env variables: to-do-insert-later",
+    }),
+  ),
+});
