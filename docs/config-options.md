@@ -13,7 +13,7 @@ Some example config JSON files: `example links to be inserted later`
   - [time-zone (Optional)](#time-zone-optional)
   - [command-hook (Optional)](#command-hook-optional)
     - [CommandHook](#commandhook)
-      - [Command Object](#command-object)
+      - [Command](#command)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
     - [VersionFile](#versionfile)
@@ -99,18 +99,24 @@ Pre/post command lists to run around the main operation. Each command runs from 
 Type: `object`  
 **Properties:**
 
+- `timeout` (Optional): Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended). Default: `60000` (1 min)
+- `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
 - `pre` (Optional): Commands to run before the operation.  
-  Each command can be either a `string` or a [`Command`](#command-object) object.
+  Each command can be either a `string` or a [`Command`](#command) object.
 - `post` (Optional): Commands to run after the operation.  
-  Each command can be either a `string` or a [`Command`](#command-object) object.
+  Each command can be either a `string` or a [`Command`](#command) object.
 
-##### Command Object
+##### Command
 
-Type: `object`  
-**Properties:**
+Type: `string | object`
+
+A command can be specified as either a string or an object.
+
+**When specified as an object, properties:**
 
 - `cmd` (Required): The command string to execute.
-- `timeout` (Optional): Timeout in milliseconds. Default: `60000` (1 minute)
+- `timeout` (Optional): Timeout in milliseconds, use Infinity to never timeout (not recommended). Defaults to `commandHook` base `timeout` value.
+- `continueOnError` (Optional): Continue or stop the process on commands error. Defaults to `commandHook` base `continueOnError` value.
 
 ### initial-version (Optional)
 
