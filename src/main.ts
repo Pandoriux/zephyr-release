@@ -1,9 +1,9 @@
-import { markScriptEnd, markScriptStart } from "./lifecycle.ts";
+import { markProcessEnd, markProcessStart } from "./lifecycle.ts";
 import { run } from "./run.ts";
 import { logger } from "./utils/logger.ts";
 
 async function main() {
-  markScriptStart();
+  markProcessStart();
 
   try {
     await run();
@@ -15,10 +15,10 @@ async function main() {
       logger.endGroup();
     }
 
-    markScriptEnd("Failed");
+    markProcessEnd("Failed");
   }
 
-  markScriptEnd("Finished");
+  markProcessEnd("Finished");
 }
 
 main();

@@ -4,13 +4,13 @@ import { logger } from "./utils/logger.ts";
 
 const startTime = new Date();
 
-export function markScriptStart() {
+export function markProcessStart() {
   logger.info(
     `🔹 Starting Zephyr Release 🍃 • version: ${VERSION} • at: ${startTime.toISOString()}`,
   );
 }
 
-export function markScriptEnd(reason: "Finished" | "Failed"): never {
+export function markProcessEnd(reason: "Finished" | "Failed"): never {
   const endTime = new Date();
 
   logger.info(
@@ -25,7 +25,7 @@ export function markScriptEnd(reason: "Finished" | "Failed"): never {
 export function exitFailure(message: string): never {
   const endTime = new Date();
 
-  logger.setFailed("❌ Proccess Failed.\n" + message);
+  logger.setFailed("❌ Process Failed.\n" + message);
   logger.info(
     `🔹 Stopped Zephyr Release 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${
       endTime.getTime() - startTime.getTime()
