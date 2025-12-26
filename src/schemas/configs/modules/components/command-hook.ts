@@ -36,7 +36,8 @@ export const CommandHookSchema = v.object({
       v.union([CommandSchema, v.array(CommandSchema)]),
     ),
     v.metadata({
-      description: "Commands to run before the operation.",
+      description: "Commands to run before the operation.\n" +
+        "List of exposed env variables: to-do-insert-later",
     }),
   ),
   post: v.pipe(
@@ -44,7 +45,8 @@ export const CommandHookSchema = v.object({
       v.union([CommandSchema, v.array(CommandSchema)]),
     ),
     v.metadata({
-      description: "Commands to run after the operation.",
+      description: "Commands to run after the operation.\n" +
+        "List of exposed env variables: to-do-insert-later",
     }),
   ),
 });
