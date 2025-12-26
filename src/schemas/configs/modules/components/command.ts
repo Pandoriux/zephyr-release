@@ -26,7 +26,7 @@ export const CommandSchema = v.union([
     continueOnError: v.pipe(
       v.optional(v.boolean()),
       v.metadata({
-        description: "Continue or stop the proccess on commands error.\n" +
+        description: "Continue or stop the process on commands error.\n" +
           "Defaults to `commandHook` base `continueOnError` value",
       }),
     ),

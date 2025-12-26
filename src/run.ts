@@ -32,7 +32,7 @@ export async function run(provider: PlatformProvider) {
       config.commandHook.pre,
       config.commandHook.timeout,
       config.commandHook.continueOnError,
-      "Pre base proccess",
+      "Pre base process",
     );
     logger.info(result);
     logger.info("Pre commands executed successfully.");
