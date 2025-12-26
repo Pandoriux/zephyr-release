@@ -438,7 +438,7 @@ If enabled, the release will be marked as prerelease.
 Type: `string`  
 Default: `"v${version}"`
 
-Pattern for tag name, available in [string patterns](./string-patterns.md) as `${tagName}`.
+Pattern for tag name, must always include `${version}`. Available in [string patterns](./string-patterns.md) as `${tagName}`.
 
 #### release > title-pattern (Optional)
 
