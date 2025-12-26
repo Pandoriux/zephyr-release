@@ -48,12 +48,12 @@ export const ReleaseConfigSchema = v.pipe(
 
     tagNamePattern: v.pipe(
       v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.pipe(v.string(), v.trim(), v.nonEmpty(), v.includes("${version}")),
         DEFAULT_TAG_NAME_PATTERN,
       ),
       v.metadata({
         description:
-          "Pattern for tag name, available in string pattern as ${tagName}.\n" +
+          "Pattern for tag name, must always include `${version}`. Available in string pattern as ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
       }),
     ),
