@@ -5,12 +5,15 @@
   "time-zone": "UTC",
 
   // Ex: Run commands before and after the main operation
-  // Commands can be strings or objects with cmd and optional timeout
+  // Commands can be strings or objects with cmd, optional timeout, and optional continueOnError
   "command-hook": {
+    "timeout": 60000,
+    "continueOnError": false,
     "pre": [
       "npm run build",
       "npm test",
-      { "cmd": "npm run lint", "timeout": 120000 }
+      { "cmd": "npm run lint", "timeout": 120000 },
+      { "cmd": "npm run optional-check", "continueOnError": true }
     ],
     "post": ["npm run deploy"]
   },
@@ -118,6 +121,8 @@
 
     // Ex: Run commands before and after changelog generation
     "command-hook": {
+      "timeout": 60000,
+      "continueOnError": false,
       "pre": ["npm run format:changelog"],
       "post": []
     },
@@ -143,6 +148,8 @@
 
     // Ex: Run commands before and after pull request creation
     "command-hook": {
+      "timeout": 60000,
+      "continueOnError": false,
       "pre": [],
       "post": ["npm run notify:pr"]
     },
@@ -173,6 +180,8 @@
 
     // Ex: Run commands before and after release creation
     "command-hook": {
+      "timeout": 60000,
+      "continueOnError": false,
       "pre": ["npm run pre-release"],
       "post": [
         "npm run post-release",

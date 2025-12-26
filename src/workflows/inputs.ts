@@ -6,7 +6,7 @@ import { exitFailure } from "../lifecycle.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
 import { logger } from "../utils/logger.ts";
 
-export function GetActionInputs() {
+export function GetActionInputsOrExit() {
   const rawInputs = {
     workspace: process.env.GITHUB_WORKSPACE,
     token: core.getInput("token", { required: true }),

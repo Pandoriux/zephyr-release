@@ -25,7 +25,7 @@ export function markScriptEnd(reason: "Finished" | "Failed"): never {
 export function exitFailure(message: string): never {
   const endTime = new Date();
 
-  logger.setFailed(`❌ ${message}`);
+  logger.setFailed("❌ Proccess Failed.\n" + message);
   logger.info(
     `🔹 Stopped Zephyr Release 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${
       endTime.getTime() - startTime.getTime()
