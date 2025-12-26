@@ -156,15 +156,22 @@
 
     "branch-name-pattern": "release/zephyr-release",
 
-    "labels-on-create": {
-      "name": "zp-release: pending",
-      "description": "Indicates that the pull request is pending release",
-      "color": "FBCA04"
+    "label": {
+      "onCreate": {
+        "name": "zp-release: pending",
+        "description": "Indicates that the pull request is pending release",
+        "color": "FBCA04"
+      },
+      "onClose": {
+        "name": "zp-release: released",
+        "description": "Indicates that the pull request is closed and released",
+        "color": "0E8A16"
+      }
     },
-    "labels-on-close": {
-      "name": "zp-release: released",
-      "description": "Indicates that the pull request is closed and released",
-      "color": "0E8A16"
+    "additional-label": {
+      "onCreateAdd": ["documentation", "ready-for-review"],
+      "onCloseAdd": "released",
+      "onCloseRemove": "allOnCreate"
     },
 
     "title-pattern": "chore: release v${version}",

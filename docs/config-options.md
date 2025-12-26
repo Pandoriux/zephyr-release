@@ -43,8 +43,8 @@ Some example config JSON files: `example links to be inserted later`
     - [pull... \> enabled (Optional)](#pull--enabled-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> branch-name-pattern (Optional)](#pull--branch-name-pattern-optional)
-    - [pull... \> labels-on-create (Optional)](#pull--labels-on-create-optional)
-    - [pull... \> labels-on-close (Optional)](#pull--labels-on-close-optional)
+    - [pull... \> label (Optional)](#pull--label-optional)
+    - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
     - [pull... \> title-pattern (Optional)](#pull--title-pattern-optional)
     - [pull... \> header-pattern (Optional)](#pull--header-pattern-optional)
     - [pull... \> body-pattern (Optional)](#pull--body-pattern-optional)
@@ -314,7 +314,7 @@ Path to text file containing body of a changelog content section. Overrides `bod
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#pull--enabled-optional), [`command-hook`](#pull--command-hook-optional), [`branch-name-pattern`](#pull--branch-name-pattern-optional), [`labels-on-create`](#pull--labels-on-create-optional), [`labels-on-close`](#pull--labels-on-close-optional), [`title-pattern`](#pull--title-pattern-optional), [`header-pattern`](#pull--header-pattern-optional), [`body-pattern`](#pull--body-pattern-optional), [`body-pattern-path`](#pull--body-pattern-path-optional), [`footer-pattern`](#pull--footer-pattern-optional)
+**Properties:** [`enabled`](#pull--enabled-optional), [`command-hook`](#pull--command-hook-optional), [`branch-name-pattern`](#pull--branch-name-pattern-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-pattern`](#pull--title-pattern-optional), [`header-pattern`](#pull--header-pattern-optional), [`body-pattern`](#pull--body-pattern-optional), [`body-pattern-path`](#pull--body-pattern-path-optional), [`footer-pattern`](#pull--footer-pattern-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
 
@@ -331,30 +331,39 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
+List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+
 #### pull... > branch-name-pattern (Optional)
 
 Type: `string`  
 Default: `"release/zephyr-release"`
 
-Pattern for branch name that Zephyr Release is gonna use.
+Pattern for branch name that Zephyr Release uses.
 
-#### pull... > labels-on-create (Optional)
+#### pull... > label (Optional)
 
-Type: [`Label`](#label) | [`Label[]`](#label)  
-Default: `{ name: "zp-release: pending",...}`
+Type: `object`  
+Default: `{}`
 
-A label or an array of labels to add to the pull request when it is created.
+Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These labels should not be manually added or removed.
 
-See [`Label`](#label) for the type definition.
+**Properties:**
 
-#### pull... > labels-on-close (Optional)
+- `onCreate` (Optional): Label to add when pull request is created. Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "zp-release: pending",...}`
+- `onClose` (Optional): Label to add when pull request is closed and release operation has completed (replaces `onCreate` label). Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "zp-release: released",...}`
 
-Type: [`Label`](#label) | [`Label[]`](#label)  
-Default: `{ name: "zp-release: released",...}`
+#### pull... > additional-label (Optional)
 
-A label or an array of labels to add to the pull request when it is closed and the release operation has completed.
+Type: `object`  
+Default: `{}`
 
-See [`Label`](#label) for the type definition.
+Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
+
+**Properties:**
+
+- `onCreateAdd` (Optional): Additional labels to add when pull request is created. Can be a `string` (label name) or an array of `string` (label names).
+- `onCloseAdd` (Optional): Additional labels to add when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names).
+- `onCloseRemove` (Optional): Additional labels to remove when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names). Use `"allOnCreate"` to remove all labels added in `onCreateAdd`.
 
 #### pull... > title-pattern (Optional)
 
@@ -389,8 +398,6 @@ Type: `string`
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
 Pattern for pull request footer.
-
-See [`Label`](#label) for the type definition.
 
 ### release (Optional)
 
