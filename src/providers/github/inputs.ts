@@ -1,14 +1,17 @@
 import process from "node:process";
 import * as v from "@valibot/valibot";
 import * as core from "@actions/core";
-import { InputsSchema } from "../schemas/inputs/inputs.ts";
-import { exitFailure } from "../lifecycle.ts";
-import { formatValibotIssues } from "../utils/formatters/valibot.ts";
-import { logger } from "../utils/logger.ts";
+import {
+  type InputsOutput,
+  InputsSchema,
+} from "../../schemas/inputs/inputs.ts";
+import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
+import { logger } from "../../tasks/logger.ts";
+import { ZephyrReleaseError } from "../../errors/zephyr-release-error.ts";
 
-export function GetActionInputsOrExit() {
+export function githubGetInputsOrThrow(): InputsOutput {
   const rawInputs = {
-    workspace: process.env.GITHUB_WORKSPACE,
+    workspacePath: process.env.GITHUB_WORKSPACE,
     token: core.getInput("token", { required: true }),
     configPath: core.getInput("config-path"),
     configFormat: core.getInput("config-format"),
@@ -18,7 +21,11 @@ export function GetActionInputsOrExit() {
 
   const parsedInputsResult = v.safeParse(InputsSchema, rawInputs);
   if (!parsedInputsResult.success) {
-    exitFailure(formatValibotIssues(parsedInputsResult.issues));
+    throw new ZephyrReleaseError(
+      `\`${githubGetInputsOrThrow.name}\`: ${
+        formatValibotIssues(parsedInputsResult.issues)
+      }`,
+    );
   }
 
   logger.startGroup("Parsed inputs:");

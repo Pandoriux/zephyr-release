@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
+import { logger } from "./logger.ts";
 import type { CommandOutput } from "../schemas/configs/modules/components/command.ts";
-import { logger } from "../utils/logger.ts";
-import { exitFailure } from "../lifecycle.ts";
+import { ZephyrReleaseError } from "../errors/zephyr-release-error.ts";
 
 export function isCommandHookValid(
   commands: CommandOutput | CommandOutput[],
@@ -26,7 +26,7 @@ function isCommandValid(command: CommandOutput): boolean {
   return Boolean(command.cmd);
 }
 
-export async function runCommands(
+export async function runCommandsOrThrow(
   commands: CommandOutput | CommandOutput[],
   baseTimeout: number,
   baseContinueOnError: boolean,
@@ -60,26 +60,22 @@ export async function runCommands(
       await runChildProcessOrThrow(cmdStr, timeout);
       succeedCount++;
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : String(error);
+      const message = error instanceof Error ? error.message : String(error);
 
-      logger.info(errorMessage);
+      logger.info(message);
       failedCommands.push(cmdStr);
 
       if (!continueOnError) {
         logger.endGroup();
-        exitFailure(
-          `Command failed: ${cmdStr}. ${errorMessage}`,
+        throw new ZephyrReleaseError(
+          `\`${runCommandsOrThrow.name}\`: Command failed: ${cmdStr}. ${message}`,
         );
       }
     }
   }
   logger.endGroup();
 
-  return `${succeedCount} cmd succeed, ${skippedCount} cmd skipped, ${
-    failedCommands.length
-  } cmd failed${
+  return `${succeedCount} cmd succeed, ${skippedCount} cmd skipped, ${failedCommands.length} cmd failed${
     failedCommands.length > 0 ? ` (${failedCommands.join(", ")})` : ""
   }`;
 }
@@ -108,7 +104,9 @@ async function runChildProcessOrThrow(
         }
       }, 1000);
 
-      reject(new Error(`Command timed out after ${timeout}ms: ${cmd}`));
+      reject(
+        new Error(`Command timed out after ${timeout}ms: ${cmd}`),
+      );
     }, timeout);
 
     child.on("error", (error) => {

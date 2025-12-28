@@ -1,26 +1,24 @@
-import { exitIfRepoNotCheckedOut } from "./workflows/checkout.ts";
-import { GetActionInputsOrExit } from "./workflows/inputs.ts";
-import { resolveConfigOrExit } from "./workflows/config.ts";
-import { prepareEnvironment } from "./workflows/prepare-environment.ts";
-import { logger } from "./utils/logger.ts";
-import { isCommandHookValid, runCommands } from "./workflows/command.ts";
+import { prepareTools } from "./tasks/prepare-tools.ts";
+import { isCommandHookValid, runCommandsOrThrow } from "./tasks/command.ts";
+import type { PlatformProvider } from "./types/platform-provider.ts";
+import { logger } from "./tasks/logger.ts";
 
-export async function run() {
-  logger.info("Preparing environment...");
-  prepareEnvironment();
-  logger.info("Environment prepared successfully.");
+export async function run(provider: PlatformProvider) {
+  logger.info("Preparing tools...");
+  prepareTools();
+  logger.info("Tools prepared successfully.");
 
   logger.info("Reading inputs...");
-  const inputs = GetActionInputsOrExit();
+  const inputs = provider.getInputsOrThrow();
   logger.info("Inputs parsed successfully.");
 
-  exitIfRepoNotCheckedOut(inputs.workspace);
+  // isRepoCheckedOut(inputs.workspacePath);
 
   logger.info(
     "Resolving configuration from config file and config override...",
   );
-  const config = resolveConfigOrExit(
-    inputs.workspace,
+  const config = provider.resolveConfigOrThrow(
+    inputs.workspacePath,
     inputs.configPath,
     inputs.configFormat,
     inputs.configOverride,
@@ -30,7 +28,7 @@ export async function run() {
 
   if (config.commandHook?.pre && isCommandHookValid(config.commandHook.pre)) {
     logger.info("Pre commands executing...");
-    const result = await runCommands(
+    const result = await runCommandsOrThrow(
       config.commandHook.pre,
       config.commandHook.timeout,
       config.commandHook.continueOnError,
