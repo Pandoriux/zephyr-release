@@ -355,7 +355,6 @@ Core label used by Zephyr Release to track pull requests, managed exclusively by
 #### pull... > additional-label (Optional)
 
 Type: `object`  
-Default: `{}`
 
 Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
 

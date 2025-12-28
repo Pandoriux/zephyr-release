@@ -7,7 +7,6 @@ import {
 } from "../../schemas/inputs/inputs.ts";
 import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
 import { logger } from "../../tasks/logger.ts";
-import { ZephyrReleaseError } from "../../errors/zephyr-release-error.ts";
 
 export function githubGetInputsOrThrow(): InputsOutput {
   const rawInputs = {
@@ -21,7 +20,7 @@ export function githubGetInputsOrThrow(): InputsOutput {
 
   const parsedInputsResult = v.safeParse(InputsSchema, rawInputs);
   if (!parsedInputsResult.success) {
-    throw new ZephyrReleaseError(
+    throw new Error(
       `\`${githubGetInputsOrThrow.name}\`: ${
         formatValibotIssues(parsedInputsResult.issues)
       }`,

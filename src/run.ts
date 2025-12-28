@@ -6,11 +6,11 @@ import { logger } from "./tasks/logger.ts";
 export async function run(provider: PlatformProvider) {
   logger.info("Preparing tools...");
   prepareTools();
-  logger.info("Tools prepared successfully.");
+  logger.info("Tools prepared successfully");
 
   logger.info("Reading inputs...");
   const inputs = provider.getInputsOrThrow();
-  logger.info("Inputs parsed successfully.");
+  logger.info("Inputs parsed successfully");
 
   // isRepoCheckedOut(inputs.workspacePath);
 
@@ -24,7 +24,7 @@ export async function run(provider: PlatformProvider) {
     inputs.configOverride,
     inputs.configOverrideFormat,
   );
-  logger.info("Configuration resolved successfully.");
+  logger.info("Configuration resolved successfully");
 
   if (config.commandHook?.pre && isCommandHookValid(config.commandHook.pre)) {
     logger.info("Pre commands executing...");
@@ -35,6 +35,6 @@ export async function run(provider: PlatformProvider) {
       "Pre base process",
     );
     logger.info(result);
-    logger.info("Pre commands executed successfully.");
+    logger.info("Pre commands executed successfully");
   }
 }

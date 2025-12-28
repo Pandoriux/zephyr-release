@@ -35,7 +35,7 @@ export function parseConfigOrExit(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Failed to parse configuration (${configFormat}): ${message}`,
+      `Failed to parse configuration (${configFormat}) - ${message}`,
     );
   }
 }
@@ -88,7 +88,7 @@ function parseConfigAutoOrThrow(
 
   // The end, none matched
   throw new Error(
-    `None formats matched. Tried order: ${triedFormats.join(" -> ")}`,
+    `None formats matched - Tried order: ${triedFormats.join(" -> ")}`,
   );
 }
 

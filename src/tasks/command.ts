@@ -2,7 +2,6 @@ import { spawn } from "node:child_process";
 import process from "node:process";
 import { logger } from "./logger.ts";
 import type { CommandOutput } from "../schemas/configs/modules/components/command.ts";
-import { ZephyrReleaseError } from "../errors/zephyr-release-error.ts";
 
 export function isCommandHookValid(
   commands: CommandOutput | CommandOutput[],
@@ -67,8 +66,8 @@ export async function runCommandsOrThrow(
 
       if (!continueOnError) {
         logger.endGroup();
-        throw new ZephyrReleaseError(
-          `\`${runCommandsOrThrow.name}\`: Command failed: ${cmdStr}. ${message}`,
+        throw new Error(
+          `\`${runCommandsOrThrow.name}\` - ${message}`,
         );
       }
     }
@@ -105,7 +104,7 @@ async function runChildProcessOrThrow(
       }, 1000);
 
       reject(
-        new Error(`Command timed out after ${timeout}ms: ${cmd}`),
+        new Error(`Command timed out after ${timeout}ms - ${cmd}`),
       );
     }, timeout);
 
@@ -123,7 +122,7 @@ async function runChildProcessOrThrow(
           new Error(
             `Command failed with code ${code ?? "unknown"}${
               signal ? ` (signal: ${signal})` : ""
-            }: ${cmd}`,
+            } - ${cmd}`,
           ),
         );
       }
