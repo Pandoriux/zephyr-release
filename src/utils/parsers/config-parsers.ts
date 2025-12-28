@@ -5,14 +5,13 @@ import { parse as parseToml } from "@rainbowatcher/toml-edit-js/index";
 import type {
   ConfigFileFormat,
   ConfigFileFormatWithAuto,
-} from "../constants/file-formats.ts";
+} from "../../constants/file-formats.ts";
 import {
   ConfigFileFormatAliasMap,
   ConfigFileFormats,
-} from "../constants/file-formats.ts";
-import { exitFailure } from "../lifecycle.ts";
-import { transformObjKeyToCamelCase } from "../utils/transformers/object.ts";
-import { logger } from "../utils/logger.ts";
+} from "../../constants/file-formats.ts";
+import { transformObjKeyToCamelCase } from "../transformers/object.ts";
+import { logger } from "../../tasks/logger.ts";
 
 interface ParseConfigResult {
   parsedConfig: unknown;
@@ -34,7 +33,10 @@ export function parseConfigOrExit(
       };
     }
   } catch (error) {
-    exitFailure(`Failed to parse configuration (${configFormat}): ${error}`);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to parse configuration (${configFormat}): ${message}`,
+    );
   }
 }
 

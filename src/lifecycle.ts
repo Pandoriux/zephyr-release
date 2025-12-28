@@ -1,36 +1,20 @@
-import process from "node:process";
-import { VERSION } from "./script-version.ts";
-import { logger } from "./utils/logger.ts";
+import { VERSION } from "./version.generated.ts";
+import { logger } from "./tasks/logger.ts";
 
 const startTime = new Date();
 
-export function markScriptStart() {
+export function markProcessStart() {
   logger.info(
-    `🔹 Starting Zephyr Release 🍃 • version: ${VERSION} • at: ${startTime.toISOString()}`,
+    `🔹 Zephyr Release Started 🍃 • version: ${VERSION} • at: ${startTime.toISOString()}`,
   );
 }
 
-export function markScriptEnd(reason: "Finished" | "Failed"): never {
+export function markProcessEnd(reason: "Finished" | "Failed") {
   const endTime = new Date();
 
   logger.info(
-    `🔹 ${reason} Zephyr Release 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${
+    `🔹 Zephyr Release ${reason} 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${
       endTime.getTime() - startTime.getTime()
     }ms)`,
   );
-
-  process.exit();
-}
-
-export function exitFailure(message: string): never {
-  const endTime = new Date();
-
-  logger.setFailed("❌ Proccess Failed.\n" + message);
-  logger.info(
-    `🔹 Stopped Zephyr Release 🍃 • version: ${VERSION} • at: ${endTime.toISOString()} (took ${
-      endTime.getTime() - startTime.getTime()
-    }ms)`,
-  );
-
-  process.exit();
 }

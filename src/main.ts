@@ -1,24 +1,35 @@
-import { markScriptEnd, markScriptStart } from "./lifecycle.ts";
+import { markProcessEnd, markProcessStart } from "./lifecycle.ts";
 import { run } from "./run.ts";
-import { logger } from "./utils/logger.ts";
+import { getProviderOrThrow } from "./providers/provider.ts";
+import { logger, setLogger } from "./tasks/logger.ts";
+import { ZephyrReleaseError } from "./errors/zephyr-release-error.ts";
 
 async function main() {
-  markScriptStart();
-
   try {
-    await run();
+    const provider = await getProviderOrThrow();
+    setLogger(provider.logger);
+
+    markProcessStart();
+
+    await run(provider);
+
+    markProcessEnd("Finished");
   } catch (error) {
-    logger.setFailed("❌ An unexpected error occurred: " + error);
-    if (error instanceof Error && error.stack) {
-      logger.startGroup("Stack trace:");
-      logger.info(error.stack);
-      logger.endGroup();
+    if (error instanceof ZephyrReleaseError) {
+      logger.setFailed("❌ Operation Failed: " + error.message);
+    } else {
+      const message = error instanceof Error ? error.message : String(error);
+
+      logger.setFailed("❌ An unexpected error occurred: " + message);
+      if (error instanceof Error && error.stack) {
+        logger.startGroup("Stack trace:");
+        logger.info(error.stack);
+        logger.endGroup();
+      }
     }
 
-    markScriptEnd("Failed");
+    markProcessEnd("Failed");
   }
-
-  markScriptEnd("Finished");
 }
 
 main();

@@ -3,7 +3,7 @@ import { ConfigFileFormatsWithAuto } from "../../constants/file-formats.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
-    workspace: v.pipe(v.string(), v.nonEmpty("Workspace not found.")),
+    workspacePath: v.pipe(v.string(), v.nonEmpty("Workspace not found.")),
     token: v.pipe(v.string(), v.nonEmpty("Token is missing.")),
 
     configPath: v.string(),
@@ -36,4 +36,4 @@ export const InputsSchema = v.pipe(
 );
 
 type _InputsInput = v.InferInput<typeof InputsSchema>;
-type _InputsOutput = v.InferOutput<typeof InputsSchema>;
+export type InputsOutput = v.InferOutput<typeof InputsSchema>;

@@ -13,7 +13,9 @@
     "build": {
       "command": "deno bundle src/main.ts -o dist/main.mjs",
       "dependencies": ["gen:json-schema", "gen:version", "prebuild"]
-    }
+    },
+
+    "check": "deno check src/**/*.ts"
   },
 
   "nodeModulesDir": "auto",
