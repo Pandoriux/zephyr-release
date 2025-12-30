@@ -1,21 +1,16 @@
 import type { Logger } from "./logger.ts";
-import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import type { ConfigOutput } from "../schemas/configs/config.ts";
-import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
+import type { RawInputs } from "./raw-inputs.ts";
 
 export interface PlatformProvider {
-  platform: "github";
+  platform: "github" | ""; // gitlab? local?
 
   logger: Logger;
 
-  getInputsOrThrow: () => InputsOutput;
-  resolveConfigOrThrow: (
+  getRawInputs: () => RawInputs;
+  getTextFileOrThrow: (
     workspacePath: string,
-    configPath: string,
-    configFormat: ConfigFileFormatWithAuto,
-    configOverrideStr: string,
-    configOverrideFormat: ConfigFileFormatWithAuto,
-  ) => ConfigOutput;
+    filePath: string,
+  ) => Promise<string>;
 
   // more
 }

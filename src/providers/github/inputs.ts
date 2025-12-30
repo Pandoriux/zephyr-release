@@ -1,15 +1,9 @@
 import process from "node:process";
-import * as v from "@valibot/valibot";
 import * as core from "@actions/core";
-import {
-  type InputsOutput,
-  InputsSchema,
-} from "../../schemas/inputs/inputs.ts";
-import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
-import { logger } from "../../tasks/logger.ts";
+import type { RawInputs } from "../../types/raw-inputs.ts";
 
-export function githubGetInputsOrThrow(): InputsOutput {
-  const rawInputs = {
+export function githubGetRawInputs(): RawInputs {
+  return {
     workspacePath: process.env.GITHUB_WORKSPACE,
     token: core.getInput("token", { required: true }),
     configPath: core.getInput("config-path"),
@@ -17,19 +11,4 @@ export function githubGetInputsOrThrow(): InputsOutput {
     configOverride: core.getInput("config-override"),
     configOverrideFormat: core.getInput("config-override-format"),
   };
-
-  const parsedInputsResult = v.safeParse(InputsSchema, rawInputs);
-  if (!parsedInputsResult.success) {
-    throw new Error(
-      `\`${githubGetInputsOrThrow.name}\`: ${
-        formatValibotIssues(parsedInputsResult.issues)
-      }`,
-    );
-  }
-
-  logger.startGroup("Parsed inputs:");
-  logger.info(JSON.stringify(parsedInputsResult.output, null, 2));
-  logger.endGroup();
-
-  return parsedInputsResult.output;
 }

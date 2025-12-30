@@ -16,7 +16,7 @@ async function main() {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    logger.setFailed("❌ Operation Failed! - An error occurred: " + message);
+    logger.setFailed("❌ Operation Failed! • An error occurred: " + message);
     if (error instanceof Error && error.stack) {
       logger.startGroup("Stack trace:");
       logger.info(error.stack);

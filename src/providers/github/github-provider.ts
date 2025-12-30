@@ -1,13 +1,13 @@
 import type { PlatformProvider } from "../../types/platform-provider.ts";
-import { githubResolveConfigOrThrow } from "./config.ts";
-import { githubGetInputsOrThrow } from "./inputs.ts";
 import { githubLogger } from "./logger.ts";
+import { githubGetRawInputs } from "./inputs.ts";
+import { githubGetTextFileOrThrow } from "./file.ts";
 
-export const githubProvider: PlatformProvider = {
+export const githubProvider = {
   platform: "github",
 
   logger: githubLogger,
 
-  getInputsOrThrow: githubGetInputsOrThrow,
-  resolveConfigOrThrow: githubResolveConfigOrThrow,
-};
+  getRawInputs: githubGetRawInputs,
+  getTextFileOrThrow: githubGetTextFileOrThrow,
+} satisfies PlatformProvider;

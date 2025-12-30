@@ -12,7 +12,9 @@ export async function getProviderOrThrow(): Promise<PlatformProvider> {
   //   return "gitlab";
   // }
 
+  // TODO(local): support local execution for development (e.g. fallback provider)
+
   throw new Error(
-    "Unsupported execution environment (no supported platform detected)",
+    "Unsupported execution environment - no supported platform detected",
   );
 }

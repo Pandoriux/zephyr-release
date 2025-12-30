@@ -1,40 +1,31 @@
-import { prepareTools } from "./tasks/prepare-tools.ts";
-import { isCommandHookValid, runCommandsOrThrow } from "./tasks/command.ts";
 import type { PlatformProvider } from "./types/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
+import { getInputsOrThrow } from "./tasks/inputs.ts";
+import { prepareTools } from "./tasks/prepare-tools.ts";
+import { resolveConfigOrThrow } from "./tasks/config.ts";
+import { runCommandsOrThrow } from "./tasks/command.ts";
 
 export async function run(provider: PlatformProvider) {
-  logger.info("Preparing tools...");
+  logger.info("Starting: Prepare tools");
   prepareTools();
-  logger.info("Tools prepared successfully");
+  logger.info("Finished: Prepare tools");
 
-  logger.info("Reading inputs...");
-  const inputs = provider.getInputsOrThrow();
-  logger.info("Inputs parsed successfully");
+  logger.info("Starting: Get inputs");
+  const inputs = getInputsOrThrow(provider);
+  logger.info("Finished: Get inputs");
 
+  // keep for now
   // isRepoCheckedOut(inputs.workspacePath);
 
-  logger.info(
-    "Resolving configuration from config file and config override...",
-  );
-  const config = provider.resolveConfigOrThrow(
-    inputs.workspacePath,
-    inputs.configPath,
-    inputs.configFormat,
-    inputs.configOverride,
-    inputs.configOverrideFormat,
-  );
-  logger.info("Configuration resolved successfully");
+  logger.info("Starting: Resolve config from file and override");
+  const config = await resolveConfigOrThrow(provider, inputs);
+  logger.info("Finished: Resolve config from file and override");
 
-  if (config.commandHook?.pre && isCommandHookValid(config.commandHook.pre)) {
-    logger.info("Pre commands executing...");
-    const result = await runCommandsOrThrow(
-      config.commandHook.pre,
-      config.commandHook.timeout,
-      config.commandHook.continueOnError,
-      "Pre base process",
-    );
-    logger.info(result);
-    logger.info("Pre commands executed successfully");
+  logger.info("Starting: Execute base pre commands");
+  const result = await runCommandsOrThrow(config.commandHook, "pre");
+  if (result) {
+    logger.info(`Finished: Execute base pre commands. ${result}`);
+  } else {
+    logger.info("Skipped: Execute base pre commands (empty)");
   }
 }

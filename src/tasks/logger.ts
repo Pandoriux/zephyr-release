@@ -1,7 +1,7 @@
 import process from "node:process";
 import type { Logger } from "../types/logger.ts";
 
-let activeLogger: Logger = {
+const defaultLogger = {
   info: (message: string) => console.log(message),
 
   startGroup: (name: string) => console.group(name),
@@ -18,6 +18,8 @@ let activeLogger: Logger = {
     process.exitCode = 1;
   },
 };
+
+let activeLogger: Logger = defaultLogger;
 
 export const logger: Logger = {
   info: (message: string) => activeLogger.info(message),
