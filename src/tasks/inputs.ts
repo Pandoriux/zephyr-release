@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { logger } from "./logger.ts";
+import { taskLogger } from "./logger.ts";
 import { type InputsOutput, InputsSchema } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/platform-provider.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
@@ -16,9 +16,9 @@ export function getInputsOrThrow(provider: PlatformProvider): InputsOutput {
     );
   }
 
-  logger.startGroup("Parsed inputs:");
-  logger.info(JSON.stringify(parsedInputsResult.output, null, 2));
-  logger.endGroup();
+  taskLogger.startGroup("Parsed inputs:");
+  taskLogger.info(JSON.stringify(parsedInputsResult.output, null, 2));
+  taskLogger.endGroup();
 
   return parsedInputsResult.output;
 }

@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
-import { logger } from "./logger.ts";
+import { taskLogger } from "./logger.ts";
 import {
   isCommandHookValid,
   isCommandValid,
@@ -26,7 +26,7 @@ export async function runCommandsOrThrow(
   let skippedCount = 0;
   const failedCommands: string[] = [];
 
-  logger.startGroup("Commands log:");
+  taskLogger.startGroup("Commands log:");
   for (const cmd of cmdList) {
     // Check if command is empty/invalid (skipped)
     if (!isCommandValid(cmd)) {
@@ -48,18 +48,18 @@ export async function runCommandsOrThrow(
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      logger.info(message);
+      taskLogger.info(message);
       failedCommands.push(cmdStr);
 
       if (!continueOnError) {
-        logger.endGroup();
+        taskLogger.endGroup();
         throw new Error(
           `\`${runCommandsOrThrow.name}\` - ${message}`,
         );
       }
     }
   }
-  logger.endGroup();
+  taskLogger.endGroup();
 
   return `${succeedCount} cmd succeed, ${skippedCount} cmd skipped, ${failedCommands.length} cmd failed${
     failedCommands.length > 0 ? ` (${failedCommands.join(", ")})` : ""

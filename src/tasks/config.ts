@@ -1,5 +1,6 @@
 import { deepMerge } from "@std/collections";
 import * as v from "@valibot/valibot";
+import { taskLogger } from "./logger.ts";
 import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/platform-provider.ts";
@@ -10,7 +11,6 @@ import {
   getConfigFormatTrialOrder,
   parseConfigStringOrThrow,
 } from "../utils/parsers/config.ts";
-import { logger } from "./logger.ts";
 
 interface ParseConfigResult {
   parsedConfig: unknown;
@@ -25,7 +25,7 @@ export async function resolveConfigOrThrow(
   let configOverride: unknown;
   let finalConfig: unknown;
 
-  logger.info("Reading config file from path...");
+  taskLogger.info("Reading config file from path...");
   if (inputs.configPath) {
     const configText = await provider.getTextFileOrThrow(
       inputs.workspacePath,
@@ -39,19 +39,19 @@ export async function resolveConfigOrThrow(
     );
     configFile = parsedResult.parsedConfig;
 
-    logger.info(
+    taskLogger.info(
       `Config file parsed successfully (${parsedResult.resolvedFormat})`,
     );
-    logger.debugWrap(() => {
-      logger.startGroup("Parsed config file:");
-      logger.debug(JSON.stringify(configFile, null, 2));
-      logger.endGroup();
+    taskLogger.debugWrap((dLogger) => {
+      dLogger.startGroup("Parsed config file:");
+      dLogger.info(JSON.stringify(configFile, null, 2));
+      dLogger.endGroup();
     });
   } else {
-    logger.info("Config path not provided. Skipping...");
+    taskLogger.info("Config path not provided. Skipping...");
   }
 
-  logger.info("Reading config override from inputs...");
+  taskLogger.info("Reading config override from inputs...");
   if (inputs.configOverride) {
     const parsedResult = parseConfigOrThrow(
       inputs.configOverride,
@@ -59,29 +59,29 @@ export async function resolveConfigOrThrow(
     );
     configOverride = parsedResult.parsedConfig;
 
-    logger.info(
+    taskLogger.info(
       `Config override parsed successfully (${parsedResult.resolvedFormat})`,
     );
-    logger.debugWrap(() => {
-      logger.startGroup("Parsed config override:");
-      logger.debug(JSON.stringify(configOverride, null, 2));
-      logger.endGroup();
+    taskLogger.debugWrap((dLogger) => {
+      dLogger.startGroup("Parsed config override:");
+      dLogger.info(JSON.stringify(configOverride, null, 2));
+      dLogger.endGroup();
     });
   } else {
-    logger.info("Config override not provided. Skipping...");
+    taskLogger.info("Config override not provided. Skipping...");
   }
 
-  logger.info("Resolving final config...");
+  taskLogger.info("Resolving final config...");
   if (configFile && configOverride) {
-    logger.info("Both config file and config override exist, merging...");
+    taskLogger.info("Both config file and config override exist, merging...");
     finalConfig = deepMerge(configFile, configOverride, {
       arrays: "replace",
     });
   } else if (configFile) {
-    logger.info("Only config file exist, use config file as final config");
+    taskLogger.info("Only config file exist, use config file as final config");
     finalConfig = configFile;
   } else if (configOverride) {
-    logger.info(
+    taskLogger.info(
       "Only config override exist, use config override as final config",
     );
     finalConfig = configOverride;
@@ -96,9 +96,9 @@ export async function resolveConfigOrThrow(
     );
   }
 
-  logger.startGroup("Resolved config:");
-  logger.info(JSON.stringify(parsedFinalConfigResult.output, null, 2));
-  logger.endGroup();
+  taskLogger.startGroup("Resolved config:");
+  taskLogger.info(JSON.stringify(parsedFinalConfigResult.output, null, 2));
+  taskLogger.endGroup();
 
   return parsedFinalConfigResult.output;
 }
@@ -129,9 +129,9 @@ function parseConfigOrThrow(
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
 
-        logger.startGroup(`Parser error (${fmt})`);
-        logger.info(message);
-        logger.endGroup();
+        taskLogger.startGroup(`Parser error (${fmt})`);
+        taskLogger.info(message);
+        taskLogger.endGroup();
       }
     }
 

@@ -54,4 +54,7 @@ export const CommandHookSchema = v.object({
 type _CommandHookInput = v.InferInput<typeof CommandHookSchema>;
 export type CommandHookOutput = v.InferOutput<typeof CommandHookSchema>;
 
-export type CommandHookKind = "pre" | "post";
+export type CommandHookKind = Exclude<
+  keyof CommandHookOutput,
+  "timeout" | "continueOnError"
+>;

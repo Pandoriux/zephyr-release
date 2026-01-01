@@ -1,16 +1,14 @@
 import * as core from "@actions/core";
-import type { Logger } from "../../types/logger.ts";
+import type { CoreLogger } from "../../types/logger.ts";
 
-export const githubLogger: Logger = Object.freeze({
+export const githubLogger: CoreLogger = Object.freeze({
   info: (message: string) => core.info(message),
 
   startGroup: (name: string) => core.startGroup(name),
   endGroup: () => core.endGroup(),
 
   debug: (message: string) => core.debug(message),
-  debugWrap: (fn: () => void) => {
-    if (core.isDebug()) fn();
-  },
+  isDebugEnabled: () => core.isDebug(),
 
   setFailed: (message: string | Error) => core.setFailed(message),
 });

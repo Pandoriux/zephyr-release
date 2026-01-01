@@ -1,10 +1,10 @@
-import type { Logger } from "./logger.ts";
+import type { CoreLogger } from "./logger.ts";
 import type { RawInputs } from "./raw-inputs.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
 
-  logger: Logger;
+  logger: CoreLogger;
 
   getRawInputs: () => RawInputs;
   getTextFileOrThrow: (
