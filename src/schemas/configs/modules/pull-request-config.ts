@@ -97,7 +97,7 @@ export const PullRequestConfigSchema = v.pipe(
       }),
     ),
     bodyPatternPath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
           "Path to text file containing pull request body pattern. Overrides body pattern if both are provided.",

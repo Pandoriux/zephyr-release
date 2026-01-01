@@ -59,7 +59,10 @@ export const ReleaseConfigSchema = v.pipe(
     ),
 
     titlePattern: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_TITLE_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        DEFAULT_RELEASE_TITLE_PATTERN,
+      ),
       v.metadata({
         description: "Pattern for release title.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_PATTERN)}`,

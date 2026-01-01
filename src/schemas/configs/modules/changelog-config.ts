@@ -26,7 +26,7 @@ export const ChangelogConfigSchema = v.pipe(
     ),
 
     contentBodyOverride: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
           "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely " +
@@ -36,7 +36,7 @@ export const ChangelogConfigSchema = v.pipe(
     ),
 
     path: v.pipe(
-      v.optional(v.string(), "CHANGELOG.md"),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "CHANGELOG.md"),
       v.metadata({
         description:
           "Path to the file where the generated changelog will be written to, relative to the project root.\n" +
@@ -45,7 +45,10 @@ export const ChangelogConfigSchema = v.pipe(
     ),
 
     headerPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_CHANGELOG_HEADER_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim()),
+        DEFAULT_CHANGELOG_HEADER_PATTERN,
+      ),
       v.metadata({
         description:
           "Pattern for changelog file header. Placed above any changelog content sections.\n" +
@@ -53,7 +56,7 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     headerPatternPath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
           "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided.",
@@ -67,7 +70,7 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     footerPatternPath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
           "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided.",
@@ -75,21 +78,27 @@ export const ChangelogConfigSchema = v.pipe(
     ),
 
     headingPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_CHANGELOG_HEADING_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        DEFAULT_CHANGELOG_HEADING_PATTERN,
+      ),
       v.metadata({
         description: "Pattern for heading of a changelog content section.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADING_PATTERN)}`,
       }),
     ),
     bodyPattern: v.pipe(
-      v.optional(v.string(), DEFAULT_CHANGELOG_BODY_PATTERN),
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        DEFAULT_CHANGELOG_BODY_PATTERN,
+      ),
       v.metadata({
         description: "Pattern for body of a changelog content section.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_BODY_PATTERN)}`,
       }),
     ),
     bodyPatternPath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
           "Path to text file containing body of a changelog content section. Overrides `bodyPattern` when both are provided.",

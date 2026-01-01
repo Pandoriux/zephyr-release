@@ -55,7 +55,10 @@ export const BaseConfigSchema = v.object({
       v.union([
         v.enum(filesToCommitOptions),
         v.array(
-          v.union([v.enum(filesToCommitOptions), v.pipe(v.string(), v.trim())]),
+          v.union([
+            v.enum(filesToCommitOptions),
+            v.pipe(v.string(), v.trim(), v.nonEmpty()),
+          ]),
         ),
       ]),
       "base",

@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
 
 export const CommandSchema = v.union([
-  v.pipe(v.string(), v.trim()),
+  v.pipe(v.string(), v.trim(), v.nonEmpty()),
 
   v.object({
-    cmd: v.pipe(v.string(), v.trim()),
+    cmd: v.pipe(v.string(), v.trim(), v.nonEmpty()),
     timeout: v.pipe(
       v.optional(
         v.pipe(

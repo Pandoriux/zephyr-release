@@ -5,8 +5,8 @@ export const AdditionalLabelSchema = v.object({
   onCreateAdd: v.pipe(
     v.optional(
       v.union([
-        v.pipe(v.string(), v.trim()),
-        v.array(v.pipe(v.string(), v.trim())),
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       ]),
     ),
     v.metadata({
@@ -16,8 +16,8 @@ export const AdditionalLabelSchema = v.object({
   onCloseAdd: v.pipe(
     v.optional(
       v.union([
-        v.pipe(v.string(), v.trim()),
-        v.array(v.pipe(v.string(), v.trim())),
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       ]),
     ),
     v.metadata({
@@ -28,10 +28,8 @@ export const AdditionalLabelSchema = v.object({
   onCloseRemove: v.pipe(
     v.optional(
       v.union([
-        v.pipe(v.string(), v.trim()),
-        v.array(
-          v.union([v.pipe(v.string(), v.trim())]),
-        ),
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       ]),
     ),
     v.metadata({

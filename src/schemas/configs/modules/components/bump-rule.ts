@@ -3,7 +3,7 @@ import { countBreakingAsOptions } from "../../../../constants/bump-rules.ts";
 
 export const BumpRuleSchema = v.object({
   types: v.pipe(
-    v.optional(v.array(v.pipe(v.string(), v.trim()))),
+    v.optional(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty()))),
     v.metadata({
       description:
         "Commit types that count toward version bumping, must be picked from the base `commitTypes` list.",
