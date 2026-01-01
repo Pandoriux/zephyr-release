@@ -68,10 +68,6 @@ Some example config JSON files: `example links to be inserted later`
   - [BumpRuleBuild](#bumprulebuild)
   - [SemverExtension](#semverextension)
   - [Label](#label)
-- [Exposed env variables](#exposed-env-variables)
-  - [All](#all)
-  - [placeholder 1](#placeholder-1)
-  - [placeholder 2](#placeholder-2)
   
 ## Options
 
@@ -96,7 +92,7 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the main operation. Each command runs from the repository root.
 
-List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
 
@@ -331,7 +327,7 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
-List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 #### pull... > branch-name-pattern (Optional)
 
@@ -471,10 +467,10 @@ Type: `object`
 - `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
 - `pre` (Optional): Commands to run before the operation.  
   Each command can be either a `string` or a [`Command`](#command) object.  
-  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+  List of exposed env variables: see [Export operation variables](./export-variables.md).
 - `post` (Optional): Commands to run after the operation.  
   Each command can be either a `string` or a [`Command`](#command) object.  
-  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+  List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 ### Command
 
@@ -572,15 +568,4 @@ Type: `object`
 - `description` (Optional): Label description.
 - `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
 
-## Exposed env variables
 
-### All
-
-These environment variables can be used in all commands.
-
-- `...process.env.*`: all env currently exposed by the system
-- Placeholder item 2
-
-### placeholder 1
-
-### placeholder 2

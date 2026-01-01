@@ -30,6 +30,7 @@
     "@eemeli/yaml": "jsr:@eemeli/yaml@^2.8.2",
 
     "@actions/core": "npm:@actions/core@^2.0.1",
+    "@actions/github": "npm:@actions/github@^6.0.1",
     "@croct/json5-parser": "npm:@croct/json5-parser@^0.2.2",
     "@rainbowatcher/toml-edit-js": "npm:@rainbowatcher/toml-edit-js@^0.6.4",
     "obj-walker": "npm:obj-walker@^2.5.0",
@@ -47,7 +48,7 @@
   "compilerOptions": {
     "lib": ["dom", "deno.ns"]
   },
-  
+
   "unstable": ["raw-imports"],
 
   "lint": {

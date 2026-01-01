@@ -4,6 +4,7 @@ import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { prepareTools } from "./tasks/tools.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
+import { getBaseOpVariables } from "./tasks/operation-variables.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Prepare tools");
@@ -20,6 +21,8 @@ export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Resolve config from file and override");
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
+
+  const baseOpVar = getBaseOpVariables(provider);
 
   logger.stepStart("Starting: Execute base pre commands");
   const result = await runCommandsOrThrow(config.commandHook, "pre");

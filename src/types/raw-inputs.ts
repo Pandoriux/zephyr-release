@@ -1,4 +1,5 @@
 export interface RawInputs {
+  currentCommitHash?: string;
   workspacePath?: string;
   token?: string;
   configPath?: string;

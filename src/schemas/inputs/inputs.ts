@@ -3,8 +3,17 @@ import { ConfigFileFormatsWithAuto } from "../../constants/file-formats.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
-    workspacePath: v.pipe(v.string(), v.nonEmpty("Workspace not found.")),
-    token: v.pipe(v.string(), v.nonEmpty("Token is missing.")),
+    currentCommitHash: v.pipe(
+      v.string(),
+      v.trim(),
+      v.nonEmpty("Commit hash not found"),
+    ),
+    workspacePath: v.pipe(
+      v.string(),
+      v.trim(),
+      v.nonEmpty("Workspace not found"),
+    ),
+    token: v.pipe(v.string(), v.trim(), v.nonEmpty("Token is missing")),
 
     configPath: v.string(),
     configFormat: v.enum(ConfigFileFormatsWithAuto),
@@ -19,7 +28,7 @@ export const InputsSchema = v.pipe(
       (input) =>
         Boolean(input.configPath.trim()) ||
         Boolean(input.configOverride.trim()),
-      "At least one of `config-path` or `config-override` is required.",
+      "At least one of `config-path` or `config-override` is required",
     ),
     ["configPath"],
   ),
@@ -29,7 +38,7 @@ export const InputsSchema = v.pipe(
       (input) =>
         Boolean(input.configPath.trim()) ||
         Boolean(input.configOverride.trim()),
-      "At least one of `config-path` or `config-override` is required.",
+      "At least one of `config-path` or `config-override` is required",
     ),
     ["configOverride"],
   ),
