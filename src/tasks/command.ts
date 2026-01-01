@@ -1,46 +1,32 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
-import { logger } from "./logger.ts";
-import type { CommandOutput } from "../schemas/configs/modules/components/command.ts";
-import { ZephyrReleaseError } from "../errors/zephyr-release-error.ts";
-
-export function isCommandHookValid(
-  commands: CommandOutput | CommandOutput[],
-): boolean {
-  // Single command (not array)
-  if (!Array.isArray(commands)) {
-    return isCommandValid(commands);
-  }
-
-  // Array: must have at least one valid command
-  if (commands.length === 0) return false;
-
-  // For arrays with multiple elements, find at least one valid command
-  return commands.some((cmd) => isCommandValid(cmd));
-}
-
-function isCommandValid(command: CommandOutput): boolean {
-  if (typeof command === "string") {
-    return Boolean(command);
-  }
-  return Boolean(command.cmd);
-}
+import { taskLogger } from "./logger.ts";
+import {
+  isCommandHookValid,
+  isCommandValid,
+} from "../utils/validations/command.ts";
+import type {
+  CommandHookKind,
+  CommandHookOutput,
+} from "../schemas/configs/modules/components/command-hook.ts";
 
 export async function runCommandsOrThrow(
-  commands: CommandOutput | CommandOutput[],
-  baseTimeout: number,
-  baseContinueOnError: boolean,
-  commandTitle?: string,
-): Promise<string> {
+  commandHook: CommandHookOutput | undefined,
+  kind: CommandHookKind,
+): Promise<string | undefined> {
+  if (!isCommandHookValid(commandHook, kind)) return undefined;
+
+  const commands = commandHook[kind];
+  const baseTimeout = commandHook.timeout;
+  const baseContinueOnError = commandHook.continueOnError;
+
   const cmdList = Array.isArray(commands) ? commands : [commands];
 
   let succeedCount = 0;
   let skippedCount = 0;
   const failedCommands: string[] = [];
 
-  logger.startGroup(
-    (commandTitle ? `${commandTitle} commands ` : "Commands ") + "logs",
-  );
+  taskLogger.startGroup("Commands log:");
   for (const cmd of cmdList) {
     // Check if command is empty/invalid (skipped)
     if (!isCommandValid(cmd)) {
@@ -62,18 +48,18 @@ export async function runCommandsOrThrow(
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      logger.info(message);
+      taskLogger.info(message);
       failedCommands.push(cmdStr);
 
       if (!continueOnError) {
-        logger.endGroup();
-        throw new ZephyrReleaseError(
-          `\`${runCommandsOrThrow.name}\`: Command failed: ${cmdStr}. ${message}`,
+        taskLogger.endGroup();
+        throw new Error(
+          `\`${runCommandsOrThrow.name}\` - ${message}`,
         );
       }
     }
   }
-  logger.endGroup();
+  taskLogger.endGroup();
 
   return `${succeedCount} cmd succeed, ${skippedCount} cmd skipped, ${failedCommands.length} cmd failed${
     failedCommands.length > 0 ? ` (${failedCommands.join(", ")})` : ""
@@ -105,7 +91,7 @@ async function runChildProcessOrThrow(
       }, 1000);
 
       reject(
-        new Error(`Command timed out after ${timeout}ms: ${cmd}`),
+        new Error(`Command timed out after ${timeout}ms - ${cmd}`),
       );
     }, timeout);
 
@@ -123,7 +109,7 @@ async function runChildProcessOrThrow(
           new Error(
             `Command failed with code ${code ?? "unknown"}${
               signal ? ` (signal: ${signal})` : ""
-            }: ${cmd}`,
+            } - ${cmd}`,
           ),
         );
       }

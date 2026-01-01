@@ -1,6 +1,8 @@
 import * as v from "@valibot/valibot";
 import { LabelSchema } from "./components/label.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
+import { CoreLabelSchema } from "./components/core-label.ts";
+import { AdditionalLabelSchema } from "./components/additional-label.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_PATTERN,
   DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
@@ -38,44 +40,25 @@ export const PullRequestConfigSchema = v.pipe(
         "release/zephyr-release",
       ),
       v.metadata({
-        description:
-          "Pattern for branch name that Zephyr Release is gonna use.\n" +
+        description: "Pattern for branch name that Zephyr Release uses.\n" +
           'Default: "release/zephyr-release"',
       }),
     ),
 
-    labelsOnCreate: v.pipe(
-      v.optional(
-        v.union([LabelSchema, v.array(LabelSchema)]),
-        DEFAULT_LABEL_ON_CREATE,
-      ),
+    label: v.pipe(
+      v.optional(CoreLabelSchema, {}),
       v.metadata({
         description:
-          "A label or an array of labels to add to the pull request when it is created.\n" +
-          `Default: ${
-            JSON.stringify(
-              transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CREATE),
-              null,
-              2,
-            )
-          }`,
+          "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. " +
+          "These label should not be manually added or removed.",
       }),
     ),
-    labelsOnClose: v.pipe(
-      v.optional(
-        v.union([LabelSchema, v.array(LabelSchema)]),
-        DEFAULT_LABEL_ON_CLOSE,
-      ),
+    additionalLabel: v.pipe(
+      v.optional(AdditionalLabelSchema, {}),
       v.metadata({
         description:
-          "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.\n" +
-          `Default: ${
-            JSON.stringify(
-              transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CLOSE),
-              null,
-              2,
-            )
-          }`,
+          "Additional labels to attach to pull requests, managed and supplied by you. " +
+          "Unlike the core label, these labels are not automatically created if missing.",
       }),
     ),
 

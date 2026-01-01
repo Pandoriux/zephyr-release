@@ -1,16 +1,26 @@
 import process from "node:process";
-import type { Logger } from "../types/logger.ts";
+import type {
+  CoreLogger,
+  DebugLogger,
+  IndentLogger,
+  Logger,
+} from "../types/logger.ts";
+import {
+  formatDebugMessage,
+  formatIndentedMessage,
+  formatStepMessage,
+} from "../utils/formatters/log.ts";
 
-let activeLogger: Logger = {
+let activeCoreLogger: CoreLogger;
+
+const defaultCoreLogger: CoreLogger = {
   info: (message: string) => console.log(message),
 
   startGroup: (name: string) => console.group(name),
   endGroup: () => console.groupEnd(),
 
   debug: (message: string) => console.debug(message),
-  debugWrap: (fn: () => void) => {
-    if (process.env.DEBUG?.toLowerCase() === "true") fn();
-  },
+  isDebugEnabled: () => process.env.DEBUG?.toLowerCase() === "true",
 
   setFailed: (message: string | Error) => {
     const msg = message instanceof Error ? message.message : message;
@@ -19,18 +29,88 @@ let activeLogger: Logger = {
   },
 };
 
-export const logger: Logger = {
-  info: (message: string) => activeLogger.info(message),
+const debugLogger: DebugLogger = {
+  info: (message: string) => {
+    activeCoreLogger.info(formatDebugMessage(message));
+  },
 
-  startGroup: (name: string) => activeLogger.startGroup(name),
-  endGroup: () => activeLogger.endGroup(),
-
-  debug: (message: string) => activeLogger.debug(message),
-  debugWrap: (fn: () => void) => activeLogger.debugWrap(fn),
-
-  setFailed: (message: string | Error) => activeLogger.setFailed(message),
+  startGroup: (name: string) => {
+    activeCoreLogger.startGroup(formatDebugMessage(name));
+  },
+  endGroup: () => activeCoreLogger.endGroup(),
 };
 
-export function setLogger(providedLogger: Logger) {
-  activeLogger = providedLogger;
+const indentDebugLogger: DebugLogger = {
+  info: (message: string) => {
+    activeCoreLogger.info(
+      formatDebugMessage(formatIndentedMessage(message)),
+    );
+  },
+
+  startGroup: (name: string) => {
+    activeCoreLogger.startGroup(
+      formatDebugMessage(formatIndentedMessage(name)),
+    );
+  },
+  endGroup: () => activeCoreLogger.endGroup(),
+};
+
+const indentLogger: IndentLogger = {
+  info: (message: string) =>
+    activeCoreLogger.info(formatIndentedMessage(message)),
+
+  startGroup: (name: string) =>
+    activeCoreLogger.startGroup(formatIndentedMessage(name)),
+  endGroup: () => activeCoreLogger.endGroup(),
+
+  debug: (message: string) =>
+    activeCoreLogger.debug(
+      formatDebugMessage(formatIndentedMessage(message)),
+    ),
+  debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
+    if (isDebugEnabled()) fn(indentDebugLogger);
+  },
+};
+
+activeCoreLogger = defaultCoreLogger;
+
+export const logger: Logger = {
+  info: (message: string) => activeCoreLogger.info(message),
+
+  step: (message: string) => activeCoreLogger.info(formatStepMessage(message)),
+  stepStart: (message: string) =>
+    activeCoreLogger.info(formatStepMessage(message, "start")),
+  stepFinish: (message: string) =>
+    activeCoreLogger.info(formatStepMessage(message, "finish")),
+  stepSkip: (message: string) =>
+    activeCoreLogger.info(formatStepMessage(message, "skip")),
+
+  startGroup: (name: string) => activeCoreLogger.startGroup(name),
+  endGroup: () => activeCoreLogger.endGroup(),
+
+  debug: (message: string) =>
+    activeCoreLogger.debug(formatDebugMessage(message)),
+  debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
+    if (isDebugEnabled()) fn(debugLogger);
+  },
+
+  setFailed: (message: string | Error) => activeCoreLogger.setFailed(message),
+
+  indent: indentLogger,
+};
+
+/**
+ * Shorthand for `logger.indent`. Use for logging in task processes.
+ */
+export const taskLogger = logger.indent;
+
+export function setLogger(providedLogger: CoreLogger) {
+  activeCoreLogger = providedLogger;
+}
+
+function isDebugEnabled(): boolean {
+  return (
+    activeCoreLogger.isDebugEnabled?.() ??
+      process.env.DEBUG?.toLowerCase() === "true"
+  );
 }

@@ -21,7 +21,7 @@ const ConfigFileFormatAliases = {
   yml: "yml",
 } as const;
 
-export const ConfigFileFormatAliasMap: Record<
+export const ConfigFileFormatMap: Record<
   string,
   ConfigFileFormat | undefined
 > = {
