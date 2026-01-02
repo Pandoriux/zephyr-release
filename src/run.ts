@@ -1,4 +1,4 @@
-import type { PlatformProvider } from "./types/platform-provider.ts";
+import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { prepareTools } from "./tasks/tools.ts";
@@ -22,7 +22,7 @@ export async function run(provider: PlatformProvider) {
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  const baseOpVar = getBaseOpVariables(provider);
+  const baseOpVar = getBaseOpVariables(provider, inputs.currentCommitHash);
 
   logger.stepStart("Starting: Execute base pre commands");
   const result = await runCommandsOrThrow(config.commandHook, "pre");

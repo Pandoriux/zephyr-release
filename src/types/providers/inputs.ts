@@ -1,4 +1,4 @@
-export interface RawInputs {
+export interface ProviderInputs {
   currentCommitHash?: string;
   workspacePath?: string;
   token?: string;

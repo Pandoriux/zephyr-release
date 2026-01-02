@@ -3,7 +3,7 @@ import * as v from "@valibot/valibot";
 import { taskLogger } from "./logger.ts";
 import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import type { PlatformProvider } from "../types/platform-provider.ts";
+import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
 import type { ConfigFileFormatWithAuto } from "../constants/file-formats.ts";
 import {
@@ -12,6 +12,15 @@ import {
   parseConfigStringOrThrow,
 } from "../utils/parsers/config.ts";
 
+type ResolveConfigInputs = Pick<
+  InputsOutput,
+  | "workspacePath"
+  | "configPath"
+  | "configFormat"
+  | "configOverride"
+  | "configOverrideFormat"
+>;
+
 interface ParseConfigResult {
   parsedConfig: unknown;
   resolvedFormat: string;
@@ -19,32 +28,38 @@ interface ParseConfigResult {
 
 export async function resolveConfigOrThrow(
   provider: PlatformProvider,
-  inputs: InputsOutput,
+  {
+    workspacePath,
+    configPath,
+    configFormat,
+    configOverride,
+    configOverrideFormat,
+  }: ResolveConfigInputs,
 ): Promise<ConfigOutput> {
-  let configFile: unknown;
-  let configOverride: unknown;
+  let parsedConfigFile: unknown;
+  let parsedConfigOverride: unknown;
   let finalConfig: unknown;
 
   taskLogger.info("Reading config file from path...");
-  if (inputs.configPath) {
+  if (configPath) {
     const configText = await provider.getTextFileOrThrow(
-      inputs.workspacePath,
-      inputs.configPath,
+      workspacePath,
+      configPath,
     );
 
     const parsedResult = parseConfigOrThrow(
       configText,
-      inputs.configFormat,
-      inputs.configPath,
+      configFormat,
+      configPath,
     );
-    configFile = parsedResult.parsedConfig;
+    parsedConfigFile = parsedResult.parsedConfig;
 
     taskLogger.info(
       `Config file parsed successfully (${parsedResult.resolvedFormat})`,
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config file:");
-      dLogger.info(JSON.stringify(configFile, null, 2));
+      dLogger.info(JSON.stringify(parsedConfigFile, null, 2));
       dLogger.endGroup();
     });
   } else {
@@ -52,19 +67,19 @@ export async function resolveConfigOrThrow(
   }
 
   taskLogger.info("Reading config override from inputs...");
-  if (inputs.configOverride) {
+  if (configOverride) {
     const parsedResult = parseConfigOrThrow(
-      inputs.configOverride,
-      inputs.configOverrideFormat,
+      configOverride,
+      configOverrideFormat,
     );
-    configOverride = parsedResult.parsedConfig;
+    parsedConfigOverride = parsedResult.parsedConfig;
 
     taskLogger.info(
       `Config override parsed successfully (${parsedResult.resolvedFormat})`,
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config override:");
-      dLogger.info(JSON.stringify(configOverride, null, 2));
+      dLogger.info(JSON.stringify(parsedConfigOverride, null, 2));
       dLogger.endGroup();
     });
   } else {
@@ -72,27 +87,31 @@ export async function resolveConfigOrThrow(
   }
 
   taskLogger.info("Resolving final config...");
-  if (configFile && configOverride) {
+  if (parsedConfigFile && parsedConfigOverride) {
     taskLogger.info("Both config file and config override exist, merging...");
-    finalConfig = deepMerge(configFile, configOverride, {
+    finalConfig = deepMerge(parsedConfigFile, parsedConfigOverride, {
       arrays: "replace",
     });
-  } else if (configFile) {
+  } else if (parsedConfigFile) {
     taskLogger.info("Only config file exist, use config file as final config");
-    finalConfig = configFile;
-  } else if (configOverride) {
+    finalConfig = parsedConfigFile;
+  } else if (parsedConfigOverride) {
     taskLogger.info(
       "Only config override exist, use config override as final config",
     );
-    finalConfig = configOverride;
+    finalConfig = parsedConfigOverride;
   } else {
-    throw new Error("Both config file and config override are missing");
+    throw new Error(
+      `\`${resolveConfigOrThrow.name}\` failed!` +
+        "Both config file and config override are missing",
+    );
   }
 
   const parsedFinalConfigResult = v.safeParse(ConfigSchema, finalConfig);
   if (!parsedFinalConfigResult.success) {
     throw new Error(
-      formatValibotIssues(parsedFinalConfigResult.issues),
+      `\`${resolveConfigOrThrow.name}\` failed!` +
+        formatValibotIssues(parsedFinalConfigResult.issues),
     );
   }
 
@@ -137,12 +156,12 @@ function parseConfigOrThrow(
 
     // None matched
     throw new Error(
-      `None formats matched - Tried order: ${triedFormats.join(" -> ")}`,
+      `None formats matched. Tried order: ${triedFormats.join(" -> ")}`,
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Failed to parse configuration (${configFormat}). ${message}`,
+      `Failed to parse configuration (${configFormat})`,
+      { cause: error },
     );
   }
 }

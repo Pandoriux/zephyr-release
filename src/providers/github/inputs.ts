@@ -1,9 +1,9 @@
 import process from "node:process";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import type { RawInputs } from "../../types/raw-inputs.ts";
+import type { ProviderInputs } from "../../types/providers/inputs.ts";
 
-export function githubGetRawInputs(): RawInputs {
+export function githubGetRawInputs(): ProviderInputs {
   return {
     currentCommitHash: github.context.sha,
     workspacePath: process.env.GITHUB_WORKSPACE,
