@@ -46,32 +46,32 @@ export const ReleaseConfigSchema = v.pipe(
       }),
     ),
 
-    tagNamePattern: v.pipe(
+    tagNameTemplate: v.pipe(
       v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty(), v.includes("${version}")),
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_TAG_NAME_PATTERN,
       ),
       v.metadata({
         description:
-          "Pattern for tag name, must always include `${version}`. Available in string pattern as ${tagName}.\n" +
+          "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
       }),
     ),
 
-    titlePattern: v.pipe(
+    titleTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_RELEASE_TITLE_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for release title.\n" +
+        description: "String template for release title, using with string patterns like ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_PATTERN)}`,
       }),
     ),
-    bodyPattern: v.pipe(
+    bodyTemplate: v.pipe(
       v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_PATTERN),
       v.metadata({
-        description: "Pattern for release body.\n" +
+        description: "String template for release body, using with string patterns like ${changelogContent}.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_PATTERN)}`,
       }),
     ),

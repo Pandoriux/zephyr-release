@@ -5,7 +5,7 @@ import { isHttpRequestError } from "../../utils/validations/http-request-error.t
 export async function githubGetPullRequestsForCommit(
   commitHash: string,
   token: string,
-): Promise<ProviderPullRequest[]> {
+): Promise<ProviderPullRequest> {
   try {
     const res = await github.getOctokit(token).rest.repos
       .listPullRequestsAssociatedWithCommit({
@@ -15,10 +15,16 @@ export async function githubGetPullRequestsForCommit(
         per_page: 100,
       });
 
-    return res.data.map(); /*todo */
+    return {
+      hasNextPage: res.headers.link?.includes('rel="next"') ?? false,
+      data: res.data.map((pr) => ({
+        sourceBranch: pr.head.ref,
+        targetBranch: pr.base.ref,
+      })),
+    };
   } catch (error) {
     if (isHttpRequestError(error)) {
-      if (error.status === 404) return [];
+      if (error.status === 404) return { hasNextPage: false, data: [] };
 
       throw new Error(`GitHub API failed (${error.status}): ${error.message}`);
     }

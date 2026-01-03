@@ -30,3 +30,20 @@ export function formatStepMessage(
 export function formatIndentedMessage(message: string): string {
   return prefixLines(message, "  │ ");
 }
+
+export function formatDebugStepMessage(
+  message: string,
+  kind?: StepMessageKind,
+): string {
+  const arrow = yellow("❯ ");
+  const icon = kind === "start"
+    ? "⏳"
+    : kind === "finish"
+    ? "✔"
+    : kind === "skip"
+    ? "↷"
+    : undefined;
+
+  const prefix = icon ? `${arrow}${yellow(icon)} ` : arrow;
+  return yellow(prefixLines(message, prefix));
+}

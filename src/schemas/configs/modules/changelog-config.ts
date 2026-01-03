@@ -13,7 +13,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string " +
-          "pattern but they won't be written to file.\n" +
+          "templates but they won't be written to file.\n" +
           "Default: true",
       }),
     ),
@@ -29,7 +29,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
-          "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely " +
+          "User-provided changelog content body, available in string templates as ${changelogContentBody}. If set, completely " +
           "skips the built-in generation process and uses this value as the content. Should only be set dynamically, not " +
           "in static config.",
       }),
@@ -44,70 +44,70 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
 
-    headerPattern: v.pipe(
+    headerTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
         DEFAULT_CHANGELOG_HEADER_PATTERN,
       ),
       v.metadata({
         description:
-          "Pattern for changelog file header. Placed above any changelog content sections.\n" +
+          "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content sections.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADER_PATTERN)}`,
       }),
     ),
-    headerPatternPath: v.pipe(
+    headerTemplatePath: v.pipe(
       v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
-          "Path to text file containing changelog file header. Overrides `headerPattern` when both are provided.",
+          "Path to text file containing changelog file header. Overrides `headerTemplate` when both are provided.",
       }),
     ),
-    footerPattern: v.pipe(
+    footerTemplate: v.pipe(
       v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
         description:
-          "Pattern for changelog file footer. Placed below any changelog content section.",
+          "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content section.",
       }),
     ),
-    footerPatternPath: v.pipe(
+    footerTemplatePath: v.pipe(
       v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
-          "Path to text file containing changelog file footer. Overrides `footerPattern` when both are provided.",
+          "Path to text file containing changelog file footer. Overrides `footerTemplate` when both are provided.",
       }),
     ),
 
-    headingPattern: v.pipe(
+    headingTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_CHANGELOG_HEADING_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for heading of a changelog content section.\n" +
+        description: "String template for heading of a changelog content section, using with string patterns like ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADING_PATTERN)}`,
       }),
     ),
-    bodyPattern: v.pipe(
+    bodyTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_CHANGELOG_BODY_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for body of a changelog content section.\n" +
+        description: "String template for body of a changelog content section, using with string patterns like ${changelogContentBody}.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_BODY_PATTERN)}`,
       }),
     ),
-    bodyPatternPath: v.pipe(
+    bodyTemplatePath: v.pipe(
       v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
-          "Path to text file containing body of a changelog content section. Overrides `bodyPattern` when both are provided.",
+          "Path to text file containing body of a changelog content section. Overrides `bodyTemplate` when both are provided.",
       }),
     ),
   }),
   v.metadata({
     description:
-      "Configuration specific to changelogs. All generated changelog content are available in string pattern as " +
+      "Configuration specific to changelogs. All generated changelog content are available in string templates as " +
       "${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
   }),
 );

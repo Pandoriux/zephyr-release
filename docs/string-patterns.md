@@ -1,26 +1,30 @@
 # String Patterns
 
-Available string patterns that can be used in various configuration fields.
+Available string patterns (like `${version}`) that can be used in string templates (like `"version-${version}"`) within various configuration fields.
+
+**Terminology:**
+- **String pattern**: A placeholder like `${version}` or `${name}` that gets replaced with a value.
+- **String template**: A complete string like `"version-${version}"` or `"Release ${tagName}"` that contains one or more string patterns.
 
 For more information about configuration options, see [Configuration Options](./config-options.md).
 
 ## User-defined
 
-These patterns are resolved based on user configuration.
+These string patterns are resolved based on user configuration.
 
 - `${name}`: Project name [[→ name](./config-options.md#name-optional)].
 - `${timeZone}`: IANA time zone [[→ time-zone](./config-options.md#time-zone-optional)].
 
 <br/>
 
-- `${tagName}`: Tag name [[→ tag-name-pattern](./config-options.md#release--tag-name-pattern-optional)].
+- `${tagName}`: Tag name [[→ tag-name-template](./config-options.md#release--tag-name-template-optional)].
 
-## App-defined
+## Operation-defined
 
-These patterns are resolved based on the app code.
+These string patterns are resolved based on where or how the operation is run.
 
-- `${repoOwner}`: GitHub repository owner (organization or user).
-- `${repoName}`: GitHub repository name.
+- `${namespace}`: Repository namespace (organization or user).
+- `${repository}`: Repository name.
 
 <br/>
 
@@ -29,8 +33,8 @@ These patterns are resolved based on the app code.
 - `${YYYY}`: Four-digit year (e.g., `2025`).
 - `${MM}`: Two-digit month (01–12).
 - `${DD}`: Two-digit day of the month (01–31).
-- `${hh:mm:ss}`: Full time in 24-hour format (e.g., `14:37:05`).
-- `${hh}`: Two-digit hour in 24-hour format (00–23).
+- `${HH:mm:ss}`: Full time in 24-hour format (e.g., `14:37:05`).
+- `${HH}`: Two-digit hour in 24-hour format (00–23).
 - `${mm}`: Two-digit minute (00–59).
 - `${ss}`: Two-digit second (00–59).
 
@@ -43,20 +47,20 @@ These patterns are resolved based on the app code.
 
 <br/>
 
-- `${changelogContent}`: The generated changelog content section (→ [heading](./config-options.md#changelog--heading-pattern-optional) + [body](./config-options.md#changelog--body-pattern-optional)).
+- `${changelogContent}`: The generated changelog content section (→ [heading](./config-options.md#changelog--heading-template-optional) + [body](./config-options.md#changelog--body-template-optional)).
 - `${changelogContentBody}`: The generated changelog body. You can override it with your own computed content [[→ content-body-override](./config-options.md#changelog--content-body-override-optional)].
 
 <br/>
 
 - `${<key>:mdLink(compare=tagPrev,prev=<N>)}`: Wraps the resolved `${key}` as a markdown-formatted GitHub compare link from the previous tag to the current tag.  
-\- `<key>` must be either a pattern name (e.g. `tagName`) or a quoted literal label (`"Release v1.0"`).  
+\- `<key>` must be either a string pattern name (e.g. `tagName`) or a quoted literal label (`"Release v1.0"`).  
 \- `<N>` is a positive integer, default `1`.
 
   - **Quoted literal:** `${"Release v1.0":mdLink(compare=tagPrev,prev=1)}` uses the literal text as the link label.  
-    Resolved to `[Release v1.0](https://github.com/<owner>/<repo>/compare/<previous-1-tag>...<current-tag>)`.  
-  - **Unquoted (pattern):** `${tagName:mdLink(compare=tagPrev,prev=1)}` resolves `tagName` from context.  
-    Resolved to `[v2.0.0](https://github.com/<owner>/<repo>/compare/<previous-1-tag>...v2.0.0)`.  
+    Resolved to `[Release v1.0](https://github.com/<namespace>/<repository>/compare/<previous-1-tag>...<current-tag>)`.  
+  - **Unquoted (string pattern):** `${tagName:mdLink(compare=tagPrev,prev=1)}` resolves the `tagName` string pattern from context.  
+    Resolved to `[v2.0.0](https://github.com/<namespace>/<repository>/compare/<previous-1-tag>...v2.0.0)`.  
   - If a compare URL cannot be constructed:  
-    \- If the pattern cannot be resolved → returns an empty string.  
+    \- If the string pattern cannot be resolved → returns an empty string.  
     \- If the tag or repository data cannot be found → returns plain text (without Markdown link formatting) instead of a broken link.
 

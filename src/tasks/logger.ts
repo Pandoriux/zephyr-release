@@ -7,6 +7,7 @@ import type {
 } from "../types/logger.ts";
 import {
   formatDebugMessage,
+  formatDebugStepMessage,
   formatIndentedMessage,
   formatStepMessage,
 } from "../utils/formatters/log.ts";
@@ -90,6 +91,12 @@ export const logger: Logger = {
 
   debug: (message: string) =>
     activeCoreLogger.debug(formatDebugMessage(message)),
+  debugStepStart: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "start")),
+  debugStepFinish: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "finish")),
+  debugStepSkip: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "skip")),
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
     if (isDebugEnabled()) fn(debugLogger);
   },

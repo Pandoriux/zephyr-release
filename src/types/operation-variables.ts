@@ -1,7 +1,11 @@
+import type {
+  OperationJob,
+  OperationTarget,
+} from "../constants/operation-variables.ts";
+
 export interface BaseOpVariables {
-  // All
-  target: "prepare" | "release";
-  jobs: "create-pr" | "update-pr" | "create-release";
+  target: OperationTarget;
+  jobs: OperationJob[];
 }
 
 export interface Stage2 {

@@ -1,4 +1,20 @@
-import { getSpaceCache } from "../caches/space.ts";
+const SPACE_CACHE: string[] = [
+  "",
+  " ",
+  "  ",
+  "   ",
+  "    ",
+  "     ",
+  "      ",
+  "       ",
+  "        ",
+];
+
+function getSpaceCache(n: number): string {
+  if (n <= 0) return "";
+  if (SPACE_CACHE[n] !== undefined) return SPACE_CACHE[n];
+  return (SPACE_CACHE[n] = " ".repeat(n));
+}
 
 export function formatErrorHierarchy(
   error: unknown,

@@ -22,6 +22,9 @@ export interface Logger {
   endGroup: () => void;
 
   debug: (message: string) => void;
+  debugStepStart: (message: string) => void;
+  debugStepFinish: (message: string) => void;
+  debugStepSkip: (message: string) => void;
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => void;
 
   setFailed: (message: string | Error) => void;

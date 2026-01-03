@@ -12,7 +12,7 @@ import {
   parseConfigStringOrThrow,
 } from "../utils/parsers/config.ts";
 
-type ResolveConfigInputs = Pick<
+type ResolveConfigInputsParams = Pick<
   InputsOutput,
   | "workspacePath"
   | "configPath"
@@ -34,7 +34,7 @@ export async function resolveConfigOrThrow(
     configFormat,
     configOverride,
     configOverrideFormat,
-  }: ResolveConfigInputs,
+  }: ResolveConfigInputsParams,
 ): Promise<ConfigOutput> {
   let parsedConfigFile: unknown;
   let parsedConfigOverride: unknown;

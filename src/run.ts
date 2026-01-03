@@ -1,15 +1,16 @@
 import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
-import { prepareTools } from "./tasks/tools.ts";
+import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
-import { getBaseOpVariables } from "./tasks/operation-variables.ts";
+import { getBaseOpVariables } from "./tasks/get-variables.ts";
+import { getBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
 
-export async function run(provider: PlatformProvider) {
-  logger.stepStart("Starting: Prepare tools");
-  prepareTools();
-  logger.stepFinish("Finished: Prepare tools");
+export async function run(provider: PlatformProvider, startTime: Date) {
+  logger.stepStart("Starting: Setup operation");
+  setupOperation();
+  logger.stepFinish("Finished: Setup operation");
 
   logger.stepStart("Starting: Get inputs");
   const inputs = getInputsOrThrow(provider);
@@ -22,7 +23,15 @@ export async function run(provider: PlatformProvider) {
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  const baseOpVar = getBaseOpVariables(provider, inputs.currentCommitHash);
+  logger.debugStepStart("Starting: Get base string pattern context");
+  const baseStringPatternCtx = getBaseStringPatternContext(
+    provider,
+    startTime,
+    config,
+  );
+  logger.debugStepFinish("Finished: Get base string pattern context");
+
+  const baseOpVar = await getBaseOpVariables(provider, inputs);
 
   logger.stepStart("Starting: Execute base pre commands");
   const result = await runCommandsOrThrow(config.commandHook, "pre");

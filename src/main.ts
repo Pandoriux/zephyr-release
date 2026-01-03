@@ -1,3 +1,4 @@
+import "@js-joda/timezone";
 import { markProcessEnd, markProcessStart } from "./lifecycle.ts";
 import { run } from "./run.ts";
 import { getProviderOrThrow } from "./providers/provider.ts";
@@ -5,15 +6,17 @@ import { logger, setLogger } from "./tasks/logger.ts";
 import { formatErrorHierarchy } from "./utils/formatters/error.ts";
 
 async function main() {
+  const startTime = new Date();
+
   try {
     const provider = await getProviderOrThrow();
     setLogger(provider.logger);
 
-    markProcessStart();
+    markProcessStart(startTime);
 
-    await run(provider);
+    await run(provider, startTime);
 
-    markProcessEnd("Finished");
+    markProcessEnd("Finished", startTime);
   } catch (error) {
     logger.setFailed(
       "❌ Operation Failed! • An error occurred:\n" +
@@ -26,7 +29,7 @@ async function main() {
       logger.endGroup();
     }
 
-    markProcessEnd("Failed");
+    markProcessEnd("Failed", startTime);
   }
 }
 

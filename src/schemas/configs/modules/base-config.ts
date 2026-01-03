@@ -12,14 +12,14 @@ export const BaseConfigSchema = v.object({
   name: v.pipe(
     v.optional(v.pipe(v.string(), v.trim())),
     v.metadata({
-      description: "Project name, available in string pattern as ${name}.",
+      description: "Project name, available in string templates as ${name}.",
     }),
   ),
   timeZone: v.pipe(
     v.optional(TimeZoneSchema, "UTC"),
     v.metadata({
       description:
-        "IANA timezone used to display times, available in string pattern as ${timeZone}.\n" +
+        "IANA timezone used to display times, available in string templates as ${timeZone}.\n" +
         'Default: "UTC"',
     }),
   ),
