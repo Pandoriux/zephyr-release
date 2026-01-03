@@ -11,7 +11,7 @@ export async function getBaseOpVariables(
   provider: PlatformProvider,
   { currentCommitHash, token }: GetBaseOpVariablesInputs,
 ): BaseOpVariables {
-  const opTarget = await provider.getPullRequestsForCommit(
+  const opTarget = await provider.getPullRequestsForCommitOrThrow(
     currentCommitHash,
     token,
   );

@@ -10,7 +10,7 @@ export async function getCurrentPullReuqest(
   provider: PlatformProvider,
   { currentCommitHash, token }: GetBaseOpVariablesInputs,
 ) {
-  const foundPrs = await provider.getPullRequestsForCommit(
+  const foundPrs = await provider.getPullRequestsForCommitOrThrow(
     currentCommitHash,
     token,
   );

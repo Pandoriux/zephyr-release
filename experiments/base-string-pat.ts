@@ -15,7 +15,7 @@ const mockProvider: PlatformProvider = {
   getNamespace: () => "test-org",
   getRepositoryName: () => "test-repo",
   getInputs: () => ({} as any),
-  getPullRequestsForCommit: async () => [],
+  getPullRequestsForCommitOrThrow: async () => [],
   getTextFileOrThrow: async () => "",
 };
 
@@ -128,11 +128,31 @@ for (const testCase of testCases) {
   }
 
   // Check other fields
-  console.log(`  name: ${result.name} ${result.name === testCase.name ? "✓" : "✗"} (expected: ${testCase.name})`);
-  console.log(`  timeZone: ${result.timeZone} ${result.timeZone === testCase.timeZone ? "✓" : "✗"} (expected: ${testCase.timeZone})`);
-  console.log(`  namespace: ${result.namespace} ${result.namespace === "test-org" ? "✓" : "✗"} (expected: test-org)`);
-  console.log(`  repository: ${result.repository} ${result.repository === "test-repo" ? "✓" : "✗"} (expected: test-repo)`);
+  console.log(
+    `  name: ${result.name} ${
+      result.name === testCase.name ? "✓" : "✗"
+    } (expected: ${testCase.name})`,
+  );
+  console.log(
+    `  timeZone: ${result.timeZone} ${
+      result.timeZone === testCase.timeZone ? "✓" : "✗"
+    } (expected: ${testCase.timeZone})`,
+  );
+  console.log(
+    `  namespace: ${result.namespace} ${
+      result.namespace === "test-org" ? "✓" : "✗"
+    } (expected: test-org)`,
+  );
+  console.log(
+    `  repository: ${result.repository} ${
+      result.repository === "test-repo" ? "✓" : "✗"
+    } (expected: test-repo)`,
+  );
 
-  console.log(`\n${allMatch ? "✓ All date/time fields match!" : "✗ Some fields don't match!"}\n`);
+  console.log(
+    `\n${
+      allMatch ? "✓ All date/time fields match!" : "✗ Some fields don't match!"
+    }\n`,
+  );
   console.log("---\n");
 }

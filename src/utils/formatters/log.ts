@@ -1,10 +1,14 @@
-import { blue, yellow } from "@std/fmt/colors";
+import { blue, gray, yellow } from "@std/fmt/colors";
 
 function prefixLines(message: string, prefix: string): string {
   return message.split(/\r?\n/).map((line) => `${prefix}${line}`).join("\n");
 }
 
 export function formatDebugMessage(message: string): string {
+  return gray(message);
+}
+
+export function formatWarnMessage(message: string): string {
   return yellow(message);
 }
 
@@ -35,7 +39,7 @@ export function formatDebugStepMessage(
   message: string,
   kind?: StepMessageKind,
 ): string {
-  const arrow = yellow("❯ ");
+  const arrow = gray("❯ ");
   const icon = kind === "start"
     ? "⏳"
     : kind === "finish"
@@ -44,6 +48,6 @@ export function formatDebugStepMessage(
     ? "↷"
     : undefined;
 
-  const prefix = icon ? `${arrow}${yellow(icon)} ` : arrow;
-  return yellow(prefixLines(message, prefix));
+  const prefix = icon ? `${arrow}${gray(icon)} ` : arrow;
+  return gray(prefixLines(message, prefix));
 }

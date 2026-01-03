@@ -1,9 +1,9 @@
-import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
 import { githubGetTextFileOrThrow } from "./file.ts";
-import { githubGetPullRequestsForCommit } from "./pull-request.ts";
+import { githubGetPullRequestsForCommitOrThrow } from "./pull-request.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
+import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 
 export const githubProvider = {
   platform: "github",
@@ -15,7 +15,7 @@ export const githubProvider = {
 
   getInputs: githubGetRawInputs,
 
-  getPullRequestsForCommit: githubGetPullRequestsForCommit,
+  getPullRequestsForCommitOrThrow: githubGetPullRequestsForCommitOrThrow,
 
   getTextFileOrThrow: githubGetTextFileOrThrow,
 } satisfies PlatformProvider;

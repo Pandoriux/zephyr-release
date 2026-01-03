@@ -1,9 +1,9 @@
-import * as github from "@actions/github";
+import process from "node:process";
 
 export function githubGetNamespace(): string {
-  return github.context.repo.owner;
+  return process.env.GITHUB_REPOSITORY?.split("/")[0] ?? "";
 }
 
 export function githubGetRepositoryName(): string {
-  return github.context.repo.repo;
+  return process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "";
 }

@@ -1,11 +1,10 @@
 import process from "node:process";
 import * as core from "@actions/core";
-import * as github from "@actions/github";
 import type { ProviderInputs } from "../../types/providers/inputs.ts";
 
 export function githubGetRawInputs(): ProviderInputs {
   return {
-    currentCommitHash: github.context.sha,
+    currentCommitHash: process.env.GITHUB_SHA,
     workspacePath: process.env.GITHUB_WORKSPACE,
     token: core.getInput("token", { required: true }),
     configPath: core.getInput("config-path"),

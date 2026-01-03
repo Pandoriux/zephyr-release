@@ -1,7 +1,17 @@
-import core from "@actions/core";
-import github from "@actions/github";
-import { logger } from "../src/tasks/logger.ts";
+import { black, brightBlack, dim, gray } from "@std/fmt/colors";
 
-logger.debugStepStart("dsds");
-logger.debugStepFinish("dsds");
-logger.debugStepSkip("dsds");
+console.log("normal normal");
+console.log("normal normal");
+console.log("normal normal");
+
+console.log(gray("gray gray"));
+console.log(gray("gray gray"));
+console.log(gray("gray gray"));
+
+console.log(black("black black"));
+console.log(black("black black"));
+console.log(black("black black"));
+
+console.log(brightBlack("brightBlack brightBlack"));
+console.log(brightBlack("brightBlack brightBlack"));
+console.log(brightBlack("brightBlack brightBlack"));

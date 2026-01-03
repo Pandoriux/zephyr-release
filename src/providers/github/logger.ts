@@ -10,5 +10,7 @@ export const githubLogger: CoreLogger = Object.freeze({
   debug: (message: string) => core.debug(message),
   isDebugEnabled: () => core.isDebug(),
 
+  warn: (message: string) => core.warning(message),
+
   setFailed: (message: string | Error) => core.setFailed(message),
 });

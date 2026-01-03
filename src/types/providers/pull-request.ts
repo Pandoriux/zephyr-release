@@ -1,4 +1,9 @@
-export interface ProviderPullRequest {
+export interface ProviderPaginatedPullRequest {
   hasNextPage: boolean;
-  data: { sourceBranch: string; targetBranch: string }[];
+  data: ProviderPullRequest[];
+}
+
+export interface ProviderPullRequest {
+  sourceBranch: string;
+  targetBranch: string;
 }

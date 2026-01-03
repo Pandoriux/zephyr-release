@@ -31,6 +31,11 @@
 
     "@actions/core": "npm:@actions/core@^2.0.1",
     "@actions/github": "npm:@actions/github@^6.0.1",
+    "@octokit/action": "npm:@octokit/action@^8.0.4",
+    "@octokit/plugin-paginate-rest": "npm:@octokit/plugin-paginate-rest@^14.0.0",
+    "@octokit/plugin-rest-endpoint-methods": "npm:@octokit/plugin-rest-endpoint-methods@^17.0.0",
+    "@octokit/plugin-retry": "npm:@octokit/plugin-retry@^8.0.3",
+    "@octokit/plugin-throttling": "npm:@octokit/plugin-throttling@^11.0.3",
     "@croct/json5-parser": "npm:@croct/json5-parser@^0.2.2",
     "@rainbowatcher/toml-edit-js": "npm:@rainbowatcher/toml-edit-js@^0.6.4",
     "obj-walker": "npm:obj-walker@^2.5.0",
@@ -46,7 +51,9 @@
   ],
 
   "compilerOptions": {
-    "lib": ["dom", "deno.ns"]
+    "lib": ["dom", "deno.ns"],
+
+    "moduleResolution": "nodenext"
   },
 
   "unstable": ["raw-imports"],

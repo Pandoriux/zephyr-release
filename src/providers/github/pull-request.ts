@@ -1,19 +1,21 @@
-import * as github from "@actions/github";
-import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
+import { getOctokitClient } from "./octokit.ts";
+import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
+import type { ProviderPaginatedPullRequest } from "../../types/providers/pull-request.ts";
 import { isHttpRequestError } from "../../utils/validations/http-request-error.ts";
 
-export async function githubGetPullRequestsForCommit(
+export async function githubGetPullRequestsForCommitOrThrow(
   commitHash: string,
   token: string,
-): Promise<ProviderPullRequest> {
+): Promise<ProviderPaginatedPullRequest> {
+  const octokit = getOctokitClient(token);
+
   try {
-    const res = await github.getOctokit(token).rest.repos
-      .listPullRequestsAssociatedWithCommit({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        commit_sha: commitHash,
-        per_page: 100,
-      });
+    const res = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+      owner: githubGetNamespace(),
+      repo: githubGetRepositoryName(),
+      commit_sha: commitHash,
+      per_page: 100,
+    });
 
     return {
       hasNextPage: res.headers.link?.includes('rel="next"') ?? false,
