@@ -9,8 +9,10 @@ type GetBaseStrPatCtxConfigParams = Pick<ConfigOutput, "name" | "timeZone">;
 export function getBaseStringPatternContext(
   provider: PlatformProvider,
   startTime: Date,
-  { name, timeZone }: GetBaseStrPatCtxConfigParams,
+  config: GetBaseStrPatCtxConfigParams,
 ): BaseStringPatternContext {
+  const { name, timeZone } = config;
+  
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
 

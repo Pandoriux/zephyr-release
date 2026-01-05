@@ -1,36 +1,61 @@
 import { getOctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import type { ProviderPaginatedPullRequest } from "../../types/providers/pull-request.ts";
-import { isHttpRequestError } from "../../utils/validations/http-request-error.ts";
+import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
+import { taskLogger } from "../../tasks/logger.ts";
 
 export async function githubGetPullRequestsForCommitOrThrow(
-  commitHash: string,
   token: string,
-): Promise<ProviderPaginatedPullRequest> {
-  const octokit = getOctokitClient(token);
+  commitHash: string,
+  sourceBranch: string,
+  requiredLabel: string,
+): Promise<ProviderPullRequest | undefined> {
+  let foundPr: ProviderPullRequest | undefined = undefined;
+  const orphanPrs: number[] = [];
 
-  try {
-    const res = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+  const octokit = getOctokitClient(token);
+  const paginatedIterator = octokit.paginate.iterator(
+    octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+    {
       owner: githubGetNamespace(),
       repo: githubGetRepositoryName(),
       commit_sha: commitHash,
       per_page: 100,
-    });
+    },
+  );
 
-    return {
-      hasNextPage: res.headers.link?.includes('rel="next"') ?? false,
-      data: res.data.map((pr) => ({
-        sourceBranch: pr.head.ref,
-        targetBranch: pr.base.ref,
-      })),
-    };
-  } catch (error) {
-    if (isHttpRequestError(error)) {
-      if (error.status === 404) return { hasNextPage: false, data: [] };
+  for await (const res of paginatedIterator) {
+    for (const pr of res.data) {
+      if (pr.head.ref !== sourceBranch) continue;
 
-      throw new Error(`GitHub API failed (${error.status}): ${error.message}`);
+      const hasLabel = pr.labels.some((l) => l.name === requiredLabel);
+      if (hasLabel) {
+        if (foundPr) {
+          throw new Error(
+            `Multiple PRs with label '${requiredLabel}' found for branch '${sourceBranch}' on commit ${
+              commitHash.substring(0, 7)
+            }.`,
+          );
+        }
+
+        foundPr = {
+          sourceBranch: pr.head.ref,
+          targetBranch: pr.base.ref,
+          label: { name: requiredLabel },
+        };
+      } else {
+        // ORPHAN PRs
+        orphanPrs.push(pr.number);
+      }
     }
-
-    throw error;
   }
+
+  if (orphanPrs.length > 0) {
+    taskLogger.warn(
+      `Detected ${orphanPrs.length} "orphan" PRs (#${
+        orphanPrs.join(", #")
+      }) on branch '${sourceBranch}' without the '${requiredLabel}' label. These were ignored.`,
+    );
+  }
+
+  return foundPr;
 }

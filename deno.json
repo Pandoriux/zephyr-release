@@ -30,7 +30,6 @@
     "@eemeli/yaml": "jsr:@eemeli/yaml@^2.8.2",
 
     "@actions/core": "npm:@actions/core@^2.0.1",
-    "@actions/github": "npm:@actions/github@^6.0.1",
     "@octokit/action": "npm:@octokit/action@^8.0.4",
     "@octokit/plugin-paginate-rest": "npm:@octokit/plugin-paginate-rest@^14.0.0",
     "@octokit/plugin-rest-endpoint-methods": "npm:@octokit/plugin-rest-endpoint-methods@^17.0.0",
@@ -51,9 +50,7 @@
   ],
 
   "compilerOptions": {
-    "lib": ["dom", "deno.ns"],
-
-    "moduleResolution": "nodenext"
+    "lib": ["dom", "deno.ns"]
   },
 
   "unstable": ["raw-imports"],

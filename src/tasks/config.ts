@@ -28,14 +28,16 @@ interface ParseConfigResult {
 
 export async function resolveConfigOrThrow(
   provider: PlatformProvider,
-  {
+  inputs: ResolveConfigInputsParams,
+): Promise<ConfigOutput> {
+  const {
     workspacePath,
     configPath,
     configFormat,
     configOverride,
     configOverrideFormat,
-  }: ResolveConfigInputsParams,
-): Promise<ConfigOutput> {
+  } = inputs;
+  
   let parsedConfigFile: unknown;
   let parsedConfigOverride: unknown;
   let finalConfig: unknown;

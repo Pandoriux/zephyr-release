@@ -13,8 +13,10 @@ export interface PlatformProvider {
   getInputs: () => ProviderInputs;
 
   getPullRequestsForCommitOrThrow: (
-    commitHash: string,
     token: string,
+    commitHash: string,
+    sourceBranch: string,
+    label: string,
   ) => Promise<ProviderPullRequest>;
 
   getTextFileOrThrow: (

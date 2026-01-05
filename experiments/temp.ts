@@ -1,17 +1,3 @@
-import { black, brightBlack, dim, gray } from "@std/fmt/colors";
+import { ConfigOutput } from "../src/schemas/configs/config.ts";
 
-console.log("normal normal");
-console.log("normal normal");
-console.log("normal normal");
-
-console.log(gray("gray gray"));
-console.log(gray("gray gray"));
-console.log(gray("gray gray"));
-
-console.log(black("black black"));
-console.log(black("black black"));
-console.log(black("black black"));
-
-console.log(brightBlack("brightBlack brightBlack"));
-console.log(brightBlack("brightBlack brightBlack"));
-console.log(brightBlack("brightBlack brightBlack"));
+export type DEBUG_YourComplexType = ConfigOutput;

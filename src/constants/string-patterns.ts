@@ -22,7 +22,8 @@ export const BaseStringPatterns = {
 export type BaseStringPattern =
   typeof BaseStringPatterns[keyof typeof BaseStringPatterns];
 
-export const AfterVersionStringPatterns = {
+  // not used yet
+const _AfterVersionStringPatterns = {
   // Version components
   version: "version", // ${version}
   versionPrimary: "versionPri", // ${versionPri}

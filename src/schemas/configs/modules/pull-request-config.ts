@@ -70,7 +70,8 @@ export const PullRequestConfigSchema = v.pipe(
         DEFAULT_PULL_REQUEST_TITLE_PATTERN,
       ),
       v.metadata({
-        description: "String template for pull request title, using with string patterns like ${version}.\n" +
+        description:
+          "String template for pull request title, using with string patterns like ${version}.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_PATTERN)}`,
       }),
     ),
@@ -94,7 +95,8 @@ export const PullRequestConfigSchema = v.pipe(
         DEFAULT_PULL_REQUEST_BODY_PATTERN,
       ),
       v.metadata({
-        description: "String template for pull request body, using with string patterns like ${changelogContent}.\n" +
+        description:
+          "String template for pull request body, using with string patterns like ${changelogContent}.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_PATTERN)}`,
       }),
     ),
@@ -111,7 +113,8 @@ export const PullRequestConfigSchema = v.pipe(
         DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
       ),
       v.metadata({
-        description: "String template for pull request footer, using with string patterns.\n" +
+        description:
+          "String template for pull request footer, using with string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_PATTERN)}`,
       }),
     ),
@@ -122,4 +125,6 @@ export const PullRequestConfigSchema = v.pipe(
 );
 
 type _PullRequestConfigInput = v.InferInput<typeof PullRequestConfigSchema>;
-type _PullRequestConfigOutput = v.InferOutput<typeof PullRequestConfigSchema>;
+export type PullRequestConfigOutput = v.InferOutput<
+  typeof PullRequestConfigSchema
+>;
