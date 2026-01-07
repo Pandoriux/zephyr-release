@@ -1,17 +1,13 @@
-import type {
-  OperationJob,
-  OperationTarget,
-} from "../constants/operation-variables.ts";
+import type { ConfigOutput } from "../schemas/configs/config.ts";
+import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
-export interface BaseOpVariables {
-  target: OperationTarget;
-  jobs: OperationJob[];
-}
+export interface BaseOperationVariables {
+  inputs: unknown;
+  config: unknown;
 
-export interface Stage2 {
-  // After calculate version and generate in-memory changelog
-  nextVersion: string;
-  changelog: string;
+  inputsCamelCase: InputsOutput;
+  configCamelCase: ConfigOutput;
 
-  // ...
+  target: "prepare" | "release";
+  job: "create-pr" | "update-pr" | "create-release";
 }

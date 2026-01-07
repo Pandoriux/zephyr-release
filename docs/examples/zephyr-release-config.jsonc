@@ -43,15 +43,6 @@
     }
   ],
 
-  // Ex: Include base files plus additional docs/artifacts
-  "files-to-commit": [
-    "base",
-    "docs/**/*.md",
-    "dist/**"
-  ],
-  // Ex: Only custom paths (no keywords)
-  // "files-to-commit": ["CHANGELOG.md", "package.json"],
-
   "commit-types": [
     {
       "type": "feat",
@@ -117,7 +108,8 @@
   },
 
   "changelog": {
-    "enabled": true,
+    "writeToFile": true,
+    "path": "CHANGELOG.md",
 
     // Ex: Run commands before and after changelog generation
     "command-hook": {
@@ -129,8 +121,6 @@
 
     // This setting should only be used in workflow inputs, not in config file
     "content-body-override": "",
-
-    "path": "CHANGELOG.md",
 
     "header-pattern": "# Changelog\\n\\n<br/>\\n",
     // "header-pattern-path": "",
@@ -144,8 +134,6 @@
   },
 
   "pull-request": {
-    "enabled": true,
-
     // Ex: Run commands before and after pull request creation
     "command-hook": {
       "timeout": 60000,
@@ -153,6 +141,15 @@
       "pre": [],
       "post": ["npm run notify:pr"]
     },
+
+    // Ex: Include base files plus additional docs/artifacts
+    "files-to-commit": [
+      "base",
+      "docs/**/*.md",
+      "dist/**"
+    ],
+    // Ex: Only custom paths (no keywords)
+    // "files-to-commit": ["CHANGELOG.md", "package.json"],
 
     "branch-name-pattern": "release/zephyr-release",
 

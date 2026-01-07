@@ -8,15 +8,24 @@ import {
 
 export const ChangelogConfigSchema = v.pipe(
   v.object({
-    enabled: v.pipe(
+    writeToFile: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string " +
-          "templates but they won't be written to file.\n" +
+          "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and string " +
+          "templates.\n" +
           "Default: true",
       }),
     ),
+    path: v.pipe(
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "CHANGELOG.md"),
+      v.metadata({
+        description:
+          "Path to the file where the generated changelog will be written to, relative to the project root.\n" +
+          'Default: "CHANGELOG.md"',
+      }),
+    ),
+
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
@@ -32,15 +41,6 @@ export const ChangelogConfigSchema = v.pipe(
           "User-provided changelog content body, available in string templates as ${changelogContentBody}. If set, completely " +
           "skips the built-in generation process and uses this value as the content. Should only be set dynamically, not " +
           "in static config.",
-      }),
-    ),
-
-    path: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "CHANGELOG.md"),
-      v.metadata({
-        description:
-          "Path to the file where the generated changelog will be written to, relative to the project root.\n" +
-          'Default: "CHANGELOG.md"',
       }),
     ),
 

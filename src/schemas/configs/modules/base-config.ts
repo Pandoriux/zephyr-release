@@ -5,7 +5,6 @@ import { VersionFileSchema } from "./components/version-file.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import { SEMVER_REGEX } from "../../../constants/regex.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
-import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const BaseConfigSchema = v.object({
@@ -47,28 +46,6 @@ export const BaseConfigSchema = v.object({
         "primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, " +
         "the first file in the array will be used.\n" +
         "About primary file: link-to-be-insert-later",
-    }),
-  ),
-
-  filesToCommit: v.pipe(
-    v.optional(
-      v.union([
-        v.enum(filesToCommitOptions),
-        v.array(
-          v.union([
-            v.enum(filesToCommitOptions),
-            v.pipe(v.string(), v.trim(), v.nonEmpty()),
-          ]),
-        ),
-      ]),
-      "base",
-    ),
-    v.metadata({
-      description:
-        'Files to include in the commit. Accepts "base", "all" options or an array of options and paths/globs. ' +
-        "Paths are relative to the repo root.\n" +
-        'Default: "base"',
-      examples: [[], ["base", "src/release-artifacts/*"]],
     }),
   ),
 

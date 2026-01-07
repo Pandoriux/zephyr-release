@@ -5,7 +5,13 @@ import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
 import { getBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
-import { getCurrentAssociatedPullReuqest } from "./tasks/pull-request.ts";
+import {
+  findPullRequestForCommitOrThrow,
+  findPullRequestFromBranchOrThrow,
+} from "./tasks/pull-request.ts";
+import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
+import { prepareWorkflow } from "./workflows/prepare.ts";
+import { releaseWorkflow } from "./workflows/release.ts";
 
 export async function run(provider: PlatformProvider, startTime: Date) {
   logger.stepStart("Starting: Setup operation");
@@ -31,12 +37,32 @@ export async function run(provider: PlatformProvider, startTime: Date) {
   );
   logger.debugStepFinish("Finished: Get base string patterns");
 
-  const t = await getCurrentAssociatedPullReuqest(
+  logger.stepStart("Starting: Get associated pull requests");
+  const associatedPrForCommit = await findPullRequestForCommitOrThrow(
     provider,
     baseStringPatternCtx,
     inputs,
-    {sourceBranchTemplate: },
+    config,
   );
+  const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
+    provider,
+    baseStringPatternCtx,
+    inputs.token,
+    config,
+  );
+  logger.stepFinish(
+    "Finished: Get associated pull requests",
+  );
+
+  logger.debugStepStart("Starting: Export base operation variables");
+  exportBaseOperationVariables(
+    provider,
+    inputs,
+    config,
+    Boolean(associatedPrForCommit),
+    Boolean(associatedPrFromBranch),
+  );
+  logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
   const result = await runCommandsOrThrow(config.commandHook, "pre");
@@ -44,5 +70,13 @@ export async function run(provider: PlatformProvider, startTime: Date) {
     logger.stepFinish(`Finished: Execute base pre commands. ${result}`);
   } else {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
+  }
+
+  if (!associatedPrForCommit) {
+    logger.stepStart("Workflow: Prepare release with pull request");
+    await prepareWorkflow(provider);
+  } else {
+    logger.stepStart("Workflow: Release finalize");
+    await releaseWorkflow(provider);
   }
 }

@@ -1,36 +1,43 @@
 import * as v from "@valibot/valibot";
-import { LabelSchema } from "./components/label.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import { CoreLabelSchema } from "./components/core-label.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
+import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_PATTERN,
   DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
   DEFAULT_PULL_REQUEST_HEADER_PATTERN,
   DEFAULT_PULL_REQUEST_TITLE_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
-import {
-  DEFAULT_LABEL_ON_CLOSE,
-  DEFAULT_LABEL_ON_CREATE,
-} from "../../../constants/defaults/label.ts";
-import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
-    enabled: v.pipe(
-      v.optional(v.boolean(), true),
-      v.metadata({
-        description:
-          "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases " +
-          "will be committed and created directly.\n" +
-          "Default: true",
-      }),
-    ),
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
         description:
           "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
+      }),
+    ),
+    filesToCommit: v.pipe(
+      v.optional(
+        v.union([
+          v.enum(filesToCommitOptions),
+          v.array(
+            v.union([
+              v.enum(filesToCommitOptions),
+              v.pipe(v.string(), v.trim(), v.nonEmpty()),
+            ]),
+          ),
+        ]),
+        "base",
+      ),
+      v.metadata({
+        description:
+          'Files to include in the commit when creating a pull request. Accepts "base", "all" options or an array of options and paths/globs. ' +
+          "Paths are relative to the repo root.\n" +
+          'Default: "base"',
+        examples: [[], ["base", "src/release-artifacts/*"]],
       }),
     ),
 

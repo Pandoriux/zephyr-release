@@ -7,16 +7,14 @@ In GitHub: using [`@actions/core`](https://github.com/actions/toolkit/tree/main/
 ## Table of Content <!-- omit from toc -->
 
 - [Summary](#summary)
-- [Variables available to internal commands and external system](#variables-available-to-internal-commands-and-external-system)
   - [System environment (internal commands only)](#system-environment-internal-commands-only)
   - [Zephyr Release operation variables](#zephyr-release-operation-variables)
-    - [Base (available at all time)](#base-available-at-all-time)
+- [Variable availability stages](#variable-availability-stages)
+  - [Base (available at all time)](#base-available-at-all-time)
+
+
 
 ## Summary
-
-... DONT WRITE ANYTHING HERE FOR NOW
-
-## Variables available to internal commands and external system
 
 ### System environment (internal commands only)
 
@@ -26,16 +24,30 @@ By default, all environment variables available on your system are automatically
 
 ### Zephyr Release operation variables
 
-Zephyr Release additional operation-scoped variables. These variables are not immediately available, they become available as the operation progresses through each stage.
+Zephyr Release additional operation-scoped variables. These variables are not immediately available, they become available as the operation progresses through each stage. See [Variable availability stages](#variable-availability-stages) for details on when each variable becomes available.
 
-#### Base (available at all time)
+- **inputs:** Inputs object with original kebab-case keys (JSON stringified)  
+Export: `zr-inputs`; Env: `ZR_INPUTS`
+- **config:** Config object with original kebab-case keys (JSON stringified)  
+Export: `zr-config`; Env: `ZR_CONFIG`
+- **inputsCamelCase:** Inputs object with keys transformed to camelCase (JSON stringified)  
+Export: `zr-inputs-camel-case`; Env: `ZR_INPUTS_CAMEL_CASE`
+- **configCamelCase:** Config object with keys transformed to camelCase (JSON stringified)  
+Export: `zr-config-camel-case`; Env: `ZR_CONFIG_CAMEL_CASE`
+- **target:** "prepare" or "release"  
+Export: `zr-target`; Env: `ZR_TARGET`
+- **job:** "create-pr" or "update-pr" when **target** is "prepare", "create-release" when **target** is "release"  
+Export: `zr-job`; Env: `ZR_JOB`
 
-These variables are available before the first [`command-hook > pre`](./config-options.md#commandhook) command runs.
+## Variable availability stages
 
-- **target:** `"prepare"` or `"release"`  
-Export: `zr_target`, Env: `ZR_TARGET`
-- **jobs:** `"create-pr"` or `"update-pr"` when **target** is `"prepare"`, `"create-release"` when **target** is `"release"`  
-**Export:** zr_jobs  
-**Env:** ZR_JOBS
-- `nextVersion`: next semantic version string
-- `changelog`: generated changelog content (string)
+### Base (available at all time)
+
+These variables are available before the first [`command-hook > pre`](./config-options.md#commandhook) command runs. See [Zephyr Release operation variables](#zephyr-release-operation-variables) for the complete list.
+
+- **target**
+- **job**
+- **inputs**
+- **config**
+- **inputsCamelCase**
+- **configCamelCase**

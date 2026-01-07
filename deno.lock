@@ -25,7 +25,8 @@
     "npm:@rainbowatcher/toml-edit-js@~0.6.4": "0.6.4",
     "npm:@types/node@*": "24.2.0",
     "npm:obj-walker@^2.5.0": "2.5.0",
-    "npm:valibot@^1.2.0": "1.2.0"
+    "npm:valibot@^1.2.0": "1.2.0",
+    "npm:valibot@latest": "1.2.0"
   },
   "jsr": {
     "@eemeli/yaml@2.8.2": {
@@ -61,7 +62,7 @@
     "@valibot/to-json-schema@1.5.0": {
       "integrity": "5032147bd2976f9251282b51bf71af25fbd43ded2bb139575e200d337a246d69",
       "dependencies": [
-        "npm:valibot"
+        "npm:valibot@^1.2.0"
       ]
     },
     "@valibot/valibot@1.2.0": {

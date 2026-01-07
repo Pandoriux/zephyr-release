@@ -28,9 +28,11 @@ inputs:
     required: false
     default: "auto"
   source-mode:
-    description: 
+    description: > 
+      Execution strategy (`remote` or `local`). Accepts a string or a JSON object for granular control over which operations 
+      use the local filesystem vs remote API. See: [link-to-docs]
     required: false
-    default: ""
+    default: "remote"
 
 runs:
   using: "node24"

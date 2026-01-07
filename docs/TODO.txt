@@ -41,3 +41,10 @@ resetOn: v.pipe(
     }),
   ),
 });
+
+source-mode:
+    description: > 
+      Execution strategy (`remote` or `local`). Accepts a string or a JSON object for granular control over which operations 
+      use the local filesystem vs remote API. See: [link-to-docs]
+    required: false
+    default: "remote"

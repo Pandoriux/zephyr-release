@@ -1,9 +1,13 @@
 import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
 import { githubGetTextFileOrThrow } from "./file.ts";
-import { githubGetPullRequestsForCommitOrThrow } from "./pull-request.ts";
+import {
+  githubFindUniquePullRequestForCommitOrThrow,
+  githubFindUniquePullRequestFromBranchOrThrow,
+} from "./pull-request.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
+import { githubExportVariables } from "./export.ts";
 
 export const githubProvider = {
   platform: "github",
@@ -15,7 +19,13 @@ export const githubProvider = {
 
   getInputs: githubGetRawInputs,
 
-  getPullRequestsForCommitOrThrow: githubGetPullRequestsForCommitOrThrow,
+  findUniquePullRequestForCommitOrThrow:
+    githubFindUniquePullRequestForCommitOrThrow,
+
+  findUniquePullRequestFromBranchOrThrow:
+    githubFindUniquePullRequestFromBranchOrThrow,
 
   getTextFileOrThrow: githubGetTextFileOrThrow,
+
+  exportVariables: githubExportVariables,
 } satisfies PlatformProvider;

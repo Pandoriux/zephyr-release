@@ -15,7 +15,7 @@ const mockProvider: PlatformProvider = {
   getNamespace: () => "test-org",
   getRepositoryName: () => "test-repo",
   getInputs: () => ({} as any),
-  getPullRequestsForCommitOrThrow: async () => [],
+  findUniquePullRequestForCommitOrThrow: async () => [],
   getTextFileOrThrow: async () => "",
 };
 

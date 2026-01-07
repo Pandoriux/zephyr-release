@@ -12,17 +12,25 @@ export interface PlatformProvider {
 
   getInputs: () => ProviderInputs;
 
-  getPullRequestsForCommitOrThrow: (
+  findUniquePullRequestForCommitOrThrow: (
     token: string,
     commitHash: string,
     sourceBranch: string,
     label: string,
-  ) => Promise<ProviderPullRequest>;
+  ) => Promise<ProviderPullRequest | undefined>;
+
+  findUniquePullRequestFromBranchOrThrow: (
+    token: string,
+    branchName: string,
+    requiredLabel: string,
+  ) => Promise<ProviderPullRequest | undefined>;
 
   getTextFileOrThrow: (
     workspacePath: string,
     filePath: string,
   ) => Promise<string>;
+
+  exportVariables: (exportObj: Record<string, unknown>) => void;
 
   // more
 }

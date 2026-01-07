@@ -15,10 +15,10 @@ export const InputsSchema = v.pipe(
     ),
     token: v.pipe(v.string(), v.trim(), v.nonEmpty("Token is missing")),
 
-    configPath: v.string(),
+    configPath: v.pipe(v.string(), v.trim()),
     configFormat: v.enum(ConfigFileFormatsWithAuto),
 
-    configOverride: v.string(),
+    configOverride: v.pipe(v.string(), v.trim()),
     configOverrideFormat: v.enum(ConfigFileFormatsWithAuto),
   }),
   // custom checks
@@ -26,8 +26,8 @@ export const InputsSchema = v.pipe(
     v.partialCheck(
       [["configPath"], ["configOverride"]],
       (input) =>
-        Boolean(input.configPath.trim()) ||
-        Boolean(input.configOverride.trim()),
+        Boolean(input.configPath) ||
+        Boolean(input.configOverride),
       "At least one of `config-path` or `config-override` is required",
     ),
     ["configPath"],
@@ -36,8 +36,8 @@ export const InputsSchema = v.pipe(
     v.partialCheck(
       [["configPath"], ["configOverride"]],
       (input) =>
-        Boolean(input.configPath.trim()) ||
-        Boolean(input.configOverride.trim()),
+        Boolean(input.configPath) ||
+        Boolean(input.configOverride),
       "At least one of `config-path` or `config-override` is required",
     ),
     ["configOverride"],

@@ -16,7 +16,6 @@ String interpolation in templates (like `"version-${version}"`) using string pat
   - [command-hook (Optional)](#command-hook-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
-  - [files-to-commit (Optional)](#files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
@@ -30,10 +29,10 @@ String interpolation in templates (like `"version-${version}"`) using string pat
     - [bump... \> bump-minor-for-major-pre-stable (Optional)](#bump--bump-minor-for-major-pre-stable-optional)
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
-    - [changelog \> enabled (Optional)](#changelog--enabled-optional)
+    - [changelog \> writeToFile (Optional)](#changelog--writetofile-optional)
+    - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> command-hook (Optional)](#changelog--command-hook-optional)
     - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
-    - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> header-template (Optional)](#changelog--header-template-optional)
     - [changelog \> header-template-path (Optional)](#changelog--header-template-path-optional)
     - [changelog \> footer-template (Optional)](#changelog--footer-template-optional)
@@ -42,8 +41,8 @@ String interpolation in templates (like `"version-${version}"`) using string pat
     - [changelog \> body-template (Optional)](#changelog--body-template-optional)
     - [changelog \> body-template-path (Optional)](#changelog--body-template-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
-    - [pull... \> enabled (Optional)](#pull--enabled-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
+    - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
     - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
     - [pull... \> label (Optional)](#pull--label-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
@@ -120,25 +119,6 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 See [`VersionFile`](#versionfile) for the type definition.
-
-### files-to-commit (Optional)
-
-Type: `"base" | "all" | string[]`  
-Default: `"base"`
-
-Files to include in the commit. Accepts `base`, `all` or an array of paths/globs. Paths are relative to the repo root.
-
-- **`base`**: Includes files affected by the script, such as:
-  - Changelog file (defined in [`changelog > file-path`](#changelog--file-path-optional))
-  - Version files (defined in [`version-files`](#version-files-required))
-  
-- **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
-  - Base [`command-hook`](#command-hook-optional)
-  - [`changelog > command-hook`](#changelog--command-hook-optional)
-  - [`pull-request > command-hook`](#pull--command-hook-optional)
-  - [`release > command-hook`](#release--command-hook-optional)
-
-- **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
 
 ### commit-types (Optional)
 
@@ -233,16 +213,23 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#changelog--enabled-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
-#### changelog > enabled (Optional)
+#### changelog > writeToFile (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-patterns.md) but they won't be written to file.
+Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-patterns.md) but they won't be written to file.
+
+#### changelog > path (Optional)
+
+Type: `string`  
+Default: `"CHANGELOG.md"`
+
+Path to the file where the generated changelog will be written to, relative to the project root.
 
 #### changelog > command-hook (Optional)
 
@@ -256,13 +243,6 @@ Type: `string`
 Default: `""`
 
 User-provided changelog content body, available in [string templates](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
-
-#### changelog > path (Optional)
-
-Type: `string`  
-Default: `"CHANGELOG.md"`
-
-Path to the file where the generated changelog will be written to, relative to the project root.
 
 #### changelog > header-template (Optional)
 
@@ -312,16 +292,9 @@ Path to text file containing body of a changelog content section. Overrides `bod
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#pull--enabled-optional), [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
+**Properties:** [`command-hook`](#pull--command-hook-optional), [`files-to-commit`](#pull--files-to-commit-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
-
-#### pull... > enabled (Optional)
-
-Type: `boolean`  
-Default: `true`
-
-Enable/disable pull request creation. If disabled, version changes, changelog, tags, and releases will be committed and created directly.
 
 #### pull... > command-hook (Optional)
 
@@ -330,6 +303,25 @@ Type: [`CommandHook`](#commandhook)
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+#### pull... > files-to-commit (Optional)
+
+Type: `"base" | "all" | string[]`  
+Default: `"base"`
+
+Files to include in the commit when creating a pull request. Accepts `base`, `all` or an array of paths/globs. Paths are relative to the repo root.
+
+- **`base`**: Includes files affected by the script, such as:
+  - Changelog file (defined in [`changelog > file-path`](#changelog--file-path-optional))
+  - Version files (defined in [`version-files`](#version-files-required))
+  
+- **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
+  - Base [`command-hook`](#command-hook-optional)
+  - [`changelog > command-hook`](#changelog--command-hook-optional)
+  - [`pull-request > command-hook`](#pull--command-hook-optional)
+  - [`release > command-hook`](#release--command-hook-optional)
+
+- **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
 
 #### pull... > branch-name-template (Optional)
 

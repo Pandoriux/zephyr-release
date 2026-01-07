@@ -1,5 +1,6 @@
 import { deepMerge } from "@std/collections";
 import * as v from "@valibot/valibot";
+import { jsonValueNormalizer } from "../utils/transformers/json.ts";
 import { taskLogger } from "./logger.ts";
 import { type ConfigOutput, ConfigSchema } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
@@ -37,7 +38,7 @@ export async function resolveConfigOrThrow(
     configOverride,
     configOverrideFormat,
   } = inputs;
-  
+
   let parsedConfigFile: unknown;
   let parsedConfigOverride: unknown;
   let finalConfig: unknown;
@@ -61,7 +62,7 @@ export async function resolveConfigOrThrow(
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config file:");
-      dLogger.info(JSON.stringify(parsedConfigFile, null, 2));
+      dLogger.info(JSON.stringify(parsedConfigFile, jsonValueNormalizer, 2));
       dLogger.endGroup();
     });
   } else {
@@ -81,7 +82,9 @@ export async function resolveConfigOrThrow(
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config override:");
-      dLogger.info(JSON.stringify(parsedConfigOverride, null, 2));
+      dLogger.info(
+        JSON.stringify(parsedConfigOverride, jsonValueNormalizer, 2),
+      );
       dLogger.endGroup();
     });
   } else {
@@ -102,11 +105,6 @@ export async function resolveConfigOrThrow(
       "Only config override exist, use config override as final config",
     );
     finalConfig = parsedConfigOverride;
-  } else {
-    throw new Error(
-      `\`${resolveConfigOrThrow.name}\` failed!` +
-        "Both config file and config override are missing",
-    );
   }
 
   const parsedFinalConfigResult = v.safeParse(ConfigSchema, finalConfig);
@@ -118,7 +116,9 @@ export async function resolveConfigOrThrow(
   }
 
   taskLogger.startGroup("Resolved config:");
-  taskLogger.info(JSON.stringify(parsedFinalConfigResult.output, null, 2));
+  taskLogger.info(
+    JSON.stringify(parsedFinalConfigResult.output, jsonValueNormalizer, 2),
+  );
   taskLogger.endGroup();
 
   return parsedFinalConfigResult.output;
