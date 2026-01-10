@@ -1,13 +1,15 @@
 import { Octokit } from "@octokit/action";
-import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
+import { paginateRest } from "@octokit/plugin-paginate-rest";
+import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 import { taskLogger } from "../../tasks/logger.ts";
 
 const OctokitInstance = Octokit.plugin(
-  paginateRest,
   restEndpointMethods,
+  paginateRest,
+  paginateGraphQL,
   retry,
   throttling,
 );

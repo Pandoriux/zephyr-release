@@ -61,15 +61,14 @@ Defines the data execution strategy and source of truth for the operation.
 - **`object`**: A JSON object allowing for granular control over which specific parts of the operation use the local filesystem versus the remote API.
 
 **Granular Configuration:**
-When providing a JSON object, you can specify the mode for individual lifecycle stages. Operations not explicitly defined in the object will inherit the global default.
+When providing a JSON object, you can specify the mode for individual operations. Operations not explicitly defined in the object will inherit the global default, which is `remote`. To make `local` the default instead, include `{"source-mode": "local", ...}` and override specific keys as needed.
 
-Example: `{"source-mode": "remote", "versionFiles": "local", "changelog": "remote"}`
+Example: `{"source-mode": "local", "version-files": "local", "changelog": "remote"}`
 
 **Supported Keys:**
-- `versionFiles`: [Placeholder for description]
-- `changelog`: [Placeholder for description]
-- `command-hook`: [Placeholder for description]
-- `pull-request`: [Placeholder for description]
-- `release`: [Placeholder for description]
+- `version-files`: Either `"local"` or `"remote"`, or an object with keys as version file path strings and values as `"local"` or `"remote"`. Any file paths not listed fall back to the default `source-mode` value.  
+More about version file config in [config-options.md](./config-options.md#version-files-required)
+- placeholder 2
+- placeholder 3
 
 > **Important:** If `source-mode` is set to `local` (globally or for a specific operation), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.

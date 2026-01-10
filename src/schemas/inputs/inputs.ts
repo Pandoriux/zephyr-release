@@ -1,5 +1,7 @@
 import * as v from "@valibot/valibot";
+import { SourceModeSchema } from "./source-mode.ts";
 import { ConfigFileFormatsWithAuto } from "../../constants/file-formats.ts";
+import { SourceModeOptions } from "../../constants/source-mode-options.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
@@ -20,6 +22,8 @@ export const InputsSchema = v.pipe(
 
     configOverride: v.pipe(v.string(), v.trim()),
     configOverrideFormat: v.enum(ConfigFileFormatsWithAuto),
+
+    sourceMode: v.union([v.enum(SourceModeOptions), SourceModeSchema]),
   }),
   // custom checks
   v.forward(

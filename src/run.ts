@@ -22,9 +22,6 @@ export async function run(provider: PlatformProvider, startTime: Date) {
   const inputs = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get inputs");
 
-  // keep for now
-  // isRepoCheckedOut(inputs.workspacePath);
-
   logger.stepStart("Starting: Resolve config from file and override");
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
@@ -74,9 +71,19 @@ export async function run(provider: PlatformProvider, startTime: Date) {
 
   if (!associatedPrForCommit) {
     logger.stepStart("Workflow: Prepare release with pull request");
-    await prepareWorkflow(provider);
+    await prepareWorkflow(
+      provider,
+      {
+        inputs,
+        config,
+        baseStringPatternCtx,
+      },
+    );
   } else {
     logger.stepStart("Workflow: Release finalize");
     await releaseWorkflow(provider);
   }
+
+  logger.stepStart("Starting: Execute base post commands");
+  // post cmds.... todo
 }

@@ -6,4 +6,5 @@ export interface ProviderInputs {
   configFormat?: string;
   configOverride?: string;
   configOverrideFormat?: string;
+  sourceMode?: string;
 }

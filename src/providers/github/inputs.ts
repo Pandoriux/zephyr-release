@@ -11,5 +11,6 @@ export function githubGetRawInputs(): ProviderInputs {
     configFormat: core.getInput("config-format"),
     configOverride: core.getInput("config-override"),
     configOverrideFormat: core.getInput("config-override-format"),
+    sourceMode: core.getInput("source-mode"),
   };
 }
