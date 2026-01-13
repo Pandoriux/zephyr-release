@@ -1,5 +1,5 @@
 export interface ProviderInputs {
-  currentCommitHash?: string;
+  triggerCommitHash?: string;
   workspacePath?: string;
   token?: string;
   configPath?: string;

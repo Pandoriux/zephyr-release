@@ -9,13 +9,10 @@ import { ProviderCommit } from "../types/providers/commit.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
-  "currentCommitHash" | "token"
+  "triggerCommitHash" | "token"
 >;
 
-type ResolveCommitsConfigParams = Pick<
-  ConfigOutput,
-  "commitTypes" | "releaseAsIgnoreTypes"
->;
+type ResolveCommitsConfigParams = Pick<ConfigOutput, "commitTypes">;
 
 type ResolvedCommit = CommitBase & {
   hash: string;
@@ -29,27 +26,27 @@ type ResolvedCommit = CommitBase & {
 interface WorkingCommitEntry {
   hash: string;
   message: string;
-  isNested: boolean;
+  isVirtual: boolean;
   isIgnored: boolean;
 }
 
 export interface ResolvedCommitsResult {
-  parsedCurrentCommit: CommitBase | undefined;
-  commits: ResolvedCommit[];
+  resolvedTriggerCommit: CommitBase;
+  entries: ResolvedCommit[];
 }
 
-export async function resolveCommitsFromCurrentToLastRelease(
+export async function resolveCommitsFromTriggerToLastRelease(
   provider: PlatformProvider,
   inputs: ResolveCommitsInputsParams,
   config: ResolveCommitsConfigParams,
 ): Promise<ResolvedCommitsResult> {
-  const { token, currentCommitHash } = inputs;
+  const { token, triggerCommitHash } = inputs;
   const { commitTypes } = config;
 
   const rawCommits = await provider
     .findCommitsFromGivenToPreviousTaggedOrThrow(
       token,
-      currentCommitHash,
+      triggerCommitHash,
     );
 
   taskLogger.debugWrap((dLogger) => {
@@ -61,7 +58,7 @@ export async function resolveCommitsFromCurrentToLastRelease(
   taskLogger.info("Pre processing raw commits into working entries...");
   const workingEntries = processRawCommits(rawCommits);
 
-  taskLogger.info("Parsing and filtering processed working entries...");
+  taskLogger.info("Parsing and filtering processed working commit entries...");
   // Options is shallow merged with the library defaults
   const commitParser = new CommitParser(
     provider.getConventionalCommitParserOptions(),
@@ -69,7 +66,7 @@ export async function resolveCommitsFromCurrentToLastRelease(
 
   const allowedTypes = new Set(commitTypes.map((c) => c.type));
 
-  let parsedCurrentCommit: CommitBase | undefined;
+  let resolvedTriggerCommit: CommitBase | undefined;
   const parsedFilteredCommits: ResolvedCommit[] = [];
 
   for (const entry of workingEntries) {
@@ -79,10 +76,8 @@ export async function resolveCommitsFromCurrentToLastRelease(
     const subject = commit.subject;
     const isTypeAllowed = !!(type && allowedTypes.has(type));
 
-    if (entry.hash === currentCommitHash && !entry.isNested) {
-      if (config.releaseAsIgnoreTypes || isTypeAllowed) {
-        parsedCurrentCommit = commit;
-      }
+    if (entry.hash === triggerCommitHash && !entry.isVirtual) {
+      resolvedTriggerCommit = commit;
     }
 
     if (entry.isIgnored || !isTypeAllowed || !subject) continue;
@@ -105,6 +100,12 @@ export async function resolveCommitsFromCurrentToLastRelease(
     });
   }
 
+  if (!resolvedTriggerCommit) {
+    throw new Error(
+      `Critical Error: Trigger commit ${triggerCommitHash} not found after resolved commit entries`,
+    );
+  }
+
   const resolvedCommits = Array.from(
     filterRevertedCommitsSync(parsedFilteredCommits),
   );
@@ -116,8 +117,8 @@ export async function resolveCommitsFromCurrentToLastRelease(
   });
 
   return {
-    parsedCurrentCommit,
-    commits: resolvedCommits,
+    resolvedTriggerCommit,
+    entries: resolvedCommits,
   };
 }
 
@@ -132,7 +133,7 @@ function processRawCommits(rawCommits: ProviderCommit[]): WorkingCommitEntry[] {
     workingEntries.push({
       hash: raw.hash,
       message: cleanedOriginalMessage,
-      isNested: false,
+      isVirtual: false,
       isIgnored: overrides.length > 0, // Ignore if user provided an override
     });
 
@@ -141,7 +142,7 @@ function processRawCommits(rawCommits: ProviderCommit[]): WorkingCommitEntry[] {
       workingEntries.push({
         hash: raw.hash,
         message: msg,
-        isNested: true,
+        isVirtual: true,
         isIgnored: false,
       });
     }

@@ -7,18 +7,21 @@ export async function calculateNextVersion(
   resolvedCommitsResult: ResolvedCommitsResult,
   config: CalculateNextVersionConfigParams,
 ): Promise<string> {
-  const { parsedCurrentCommit, commits } = resolvedCommitsResult;
+  const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
 
-  if (parsedCurrentCommit) {
-    parsedCurrentCommit.footer;
+  if (resolvedTriggerCommit) {
+    resolvedTriggerCommit.footer;
   }
 
   let majorCount = 0;
   let minorCount = 0;
   let patchCount = 0;
 
-  for (const commit of commits) {
+  for (const entry of entries) {
   }
   // Placeholder implementation
   return "0.0.1";
+}
+
+function findReleaseAsVersionFooter(footer: string): string | undefined {
 }

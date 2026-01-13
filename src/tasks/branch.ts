@@ -8,7 +8,7 @@ import type { BaseStringPatternContext } from "../types/string-patterns.ts";
 
 type SetupWorkingBranchInputsParams = Pick<
   InputsOutput,
-  "currentCommitHash" | "token"
+  "triggerCommitHash" | "token"
 >;
 
 interface SetupWorkingBranchConfigParams {
@@ -23,7 +23,7 @@ export async function setupWorkingBranchOrThrow(
   inputs: SetupWorkingBranchInputsParams,
   config: SetupWorkingBranchConfigParams,
 ): Promise<ProviderBranch> {
-  const { currentCommitHash, token } = inputs;
+  const { triggerCommitHash, token } = inputs;
   const branchName = resolveStringTemplate(
     config.pullRequest.branchNameTemplate,
     strPatCtx,
@@ -32,11 +32,11 @@ export async function setupWorkingBranchOrThrow(
   const workBranch = await provider.ensureBranchAtCommitOrThrow(
     token,
     branchName,
-    currentCommitHash,
+    triggerCommitHash,
   );
 
   taskLogger.debug(
-    `Ensured working branch '${branchName}' at commit ${currentCommitHash}:\n` +
+    `Ensured working branch '${branchName}' at commit ${triggerCommitHash}:\n` +
       JSON.stringify(workBranch, null, 2),
   );
 

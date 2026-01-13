@@ -9,7 +9,7 @@ import type { BaseStringPatternContext } from "../types/string-patterns.ts";
 
 type FindPrForCommitInputsParams = Pick<
   InputsOutput,
-  "currentCommitHash" | "token"
+  "triggerCommitHash" | "token"
 >;
 
 interface PullRequestBranchAndLabelConfigParams {
@@ -25,7 +25,7 @@ export async function findPullRequestForCommitOrThrow(
   inputs: FindPrForCommitInputsParams,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
-  const { currentCommitHash, token } = inputs;
+  const { triggerCommitHash, token } = inputs;
   const sourceBranch = resolveStringTemplate(
     config.pullRequest.branchNameTemplate,
     strPatCtx,
@@ -36,13 +36,13 @@ export async function findPullRequestForCommitOrThrow(
 
   const foundPr = await provider.findUniquePullRequestForCommitOrThrow(
     token,
-    currentCommitHash,
+    triggerCommitHash,
     sourceBranch,
     label,
   );
 
   taskLogger.debug(
-    `Found associated pull request for current commit (${currentCommitHash}):\n` +
+    `Found associated pull request for trigger commit (${triggerCommitHash}):\n` +
       JSON.stringify(foundPr, null, 2),
   );
 

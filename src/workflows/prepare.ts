@@ -2,7 +2,7 @@ import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { setupWorkingBranchOrThrow } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
-import { resolveCommitsFromCurrentToLastRelease } from "../tasks/commit.ts";
+import { resolveCommitsFromTriggerToLastRelease } from "../tasks/commit.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { BaseStringPatternContext } from "../types/string-patterns.ts";
 import { calculateNextVersion } from "../tasks/next-version.ts";
@@ -32,13 +32,13 @@ export async function prepareWorkflow(
   );
   logger.stepFinish("Finished: Ensure working branch is prepared");
 
-  logger.stepStart("Starting: Resolve commits from current to last release");
-  const resolvedCommitsResult = await resolveCommitsFromCurrentToLastRelease(
+  logger.stepStart("Starting: Resolve commits from trigger to last release");
+  const resolvedCommitsResult = await resolveCommitsFromTriggerToLastRelease(
     provider,
     inputs,
     config,
   );
-  logger.stepFinish("Finished: Resolve commits from current to last release");
+  logger.stepFinish("Finished: Resolve commits from trigger to last release");
 
   logger.stepStart("Starting: Calculate next version");
   const nextVersion = await calculateNextVersion(resolvedCommitsResult, config);

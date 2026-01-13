@@ -5,7 +5,7 @@ import { SourceModeOptions } from "../../constants/source-mode-options.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
-    currentCommitHash: v.pipe(
+    triggerCommitHash: v.pipe(
       v.string(),
       v.trim(),
       v.nonEmpty("Commit hash not found"),
