@@ -8,3 +8,18 @@ export function isPlainObject(
   const proto = Object.getPrototypeOf(input);
   return proto === Object.prototype || proto === null;
 }
+
+export function isPlainObjectOrArray(
+  input: unknown,
+): input is Record<string, unknown> | unknown[] {
+  if (input === null || typeof input !== "object") {
+    return false;
+  }
+
+  if (Array.isArray(input)) {
+    return true;
+  }
+
+  const proto = Object.getPrototypeOf(input);
+  return proto === Object.prototype || proto === null;
+}

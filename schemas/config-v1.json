@@ -3,36 +3,226 @@
   "properties": {
     "name": {
       "type": "string",
-      "default": "",
-      "description": "Project name, available in string pattern as ${name}.\nDefault: \"\""
+      "description": "Project name, available in string templates as ${name}."
     },
     "time-zone": {
       "$ref": "#/$defs/time-zone",
       "default": "UTC",
-      "description": "IANA timezone used to display times, available in string pattern as ${timeZone}.\nDefault: \"UTC\""
+      "description": "IANA timezone used to display times, available in string templates as ${timeZone}.\nDefault: \"UTC\""
     },
-    "commands": {
+    "command-hook": {
       "type": "object",
       "properties": {
+        "timeout": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 1
+            },
+            {
+              "const": null
+            },
+            {
+              "const": "Infinity"
+            },
+            {
+              "const": "infinity"
+            }
+          ],
+          "default": 60000,
+          "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+        },
+        "continue-on-error": {
+          "type": "boolean",
+          "default": false,
+          "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+        },
         "pre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "description": "Commands to run before the operation.\nDefault: []"
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "cmd": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "timeout": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 1
+                        },
+                        {
+                          "const": null
+                        },
+                        {
+                          "const": "Infinity"
+                        },
+                        {
+                          "const": "infinity"
+                        }
+                      ],
+                      "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                    },
+                    "continue-on-error": {
+                      "type": "boolean",
+                      "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                    }
+                  },
+                  "required": [
+                    "cmd"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "cmd": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "timeout": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 1
+                          },
+                          {
+                            "const": null
+                          },
+                          {
+                            "const": "Infinity"
+                          },
+                          {
+                            "const": "infinity"
+                          }
+                        ],
+                        "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                      },
+                      "continue-on-error": {
+                        "type": "boolean",
+                        "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                      }
+                    },
+                    "required": [
+                      "cmd"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
         },
         "post": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "description": "Commands to run after the operation.\nDefault: []"
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "cmd": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "timeout": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 1
+                        },
+                        {
+                          "const": null
+                        },
+                        {
+                          "const": "Infinity"
+                        },
+                        {
+                          "const": "infinity"
+                        }
+                      ],
+                      "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                    },
+                    "continue-on-error": {
+                      "type": "boolean",
+                      "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                    }
+                  },
+                  "required": [
+                    "cmd"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "cmd": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "timeout": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 1
+                          },
+                          {
+                            "const": null
+                          },
+                          {
+                            "const": "Infinity"
+                          },
+                          {
+                            "const": "infinity"
+                          }
+                        ],
+                        "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                      },
+                      "continue-on-error": {
+                        "type": "boolean",
+                        "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                      }
+                    },
+                    "required": [
+                      "cmd"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
         }
       },
       "required": [],
-      "default": {},
       "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root."
     },
     "initial-version": {
@@ -141,41 +331,6 @@
       ],
       "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be used.\nAbout primary file: link-to-be-insert-later"
     },
-    "files-to-commit": {
-      "anyOf": [
-        {
-          "enum": [
-            "base",
-            "all"
-          ]
-        },
-        {
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "enum": [
-                  "base",
-                  "all"
-                ]
-              },
-              {
-                "type": "string"
-              }
-            ]
-          }
-        }
-      ],
-      "default": "base",
-      "description": "Files to include in the commit. Accepts \"base\", \"all\" options or an array of options and paths/globs. Paths are relative to the repo root.\nDefault: \"base\"",
-      "examples": [
-        [],
-        [
-          "base",
-          "src/release-artifacts/*"
-        ]
-      ]
-    },
     "commit-types": {
       "type": "array",
       "items": {
@@ -188,8 +343,8 @@
           },
           "section": {
             "type": "string",
-            "default": "",
-            "description": "Changelog section heading for this commit type. When empty, `type` value is used.\nDefault: \"\""
+            "minLength": 1,
+            "description": "Changelog section heading for this commit type. When not provided, `type` value is used.\n"
           },
           "hidden": {
             "type": "boolean",
@@ -230,10 +385,10 @@
             "types": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
-              "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
               "enum": [
@@ -247,8 +402,8 @@
             "commits-per-bump": {
               "anyOf": [
                 {
-                  "type": "integer",
-                  "minimum": 0
+                  "type": "number",
+                  "minimum": 1
                 },
                 {
                   "const": null
@@ -260,17 +415,15 @@
                   "const": "infinity"
                 }
               ],
-              "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+              "default": null,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: Infinity"
             }
           },
           "required": [],
           "default": {
-            "types": [],
-            "countBreakingAs": "bump",
-            "commitsPerBump": 1
+            "countBreakingAs": "bump"
           },
-          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"types\": [],\n  \"count-breaking-as\": \"bump\",\n  \"commits-per-bump\": 1\n}"
+          "description": "Strategy for bumping major version (x.2.3).\nDefault: {\n  \"count-breaking-as\": \"bump\"\n}"
         },
         "minor": {
           "type": "object",
@@ -278,10 +431,10 @@
             "types": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
-              "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
               "enum": [
@@ -295,8 +448,8 @@
             "commits-per-bump": {
               "anyOf": [
                 {
-                  "type": "integer",
-                  "minimum": 0
+                  "type": "number",
+                  "minimum": 1
                 },
                 {
                   "const": null
@@ -308,18 +461,17 @@
                   "const": "infinity"
                 }
               ],
-              "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+              "default": null,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: Infinity"
             }
           },
           "required": [],
           "default": {
             "types": [
               "feat"
-            ],
-            "commitsPerBump": 1
+            ]
           },
-          "description": "Strategy for bumping minor version (1.x.3).\nDefault: {\n  \"types\": [\n    \"feat\"\n  ],\n  \"commits-per-bump\": 1\n}"
+          "description": "Strategy for bumping minor version (1.x.3).\nDefault: {\n  \"types\": [\n    \"feat\"\n  ]\n}"
         },
         "patch": {
           "type": "object",
@@ -327,10 +479,10 @@
             "types": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
-              "default": [],
-              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list.\nDefault: []"
+              "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
               "enum": [
@@ -344,8 +496,8 @@
             "commits-per-bump": {
               "anyOf": [
                 {
-                  "type": "integer",
-                  "minimum": 0
+                  "type": "number",
+                  "minimum": 1
                 },
                 {
                   "const": null
@@ -357,8 +509,8 @@
                   "const": "infinity"
                 }
               ],
-              "default": 1,
-              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: 1"
+              "default": null,
+              "description": "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even if breaking changes are counted as bumps.\nDefault: Infinity"
             }
           },
           "required": [],
@@ -366,10 +518,9 @@
             "types": [
               "fix",
               "perf"
-            ],
-            "commitsPerBump": 1
+            ]
           },
-          "description": "Strategy for bumping patch version (1.2.x).\nDefault: {\n  \"types\": [\n    \"fix\",\n    \"perf\"\n  ],\n  \"commits-per-bump\": 1\n}"
+          "description": "Strategy for bumping patch version (1.2.x).\nDefault: {\n  \"types\": [\n    \"fix\",\n    \"perf\"\n  ]\n}"
         },
         "prerelease": {
           "type": "object",
@@ -384,7 +535,8 @@
               "items": {
                 "anyOf": [
                   {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   },
                   {
                     "type": "number"
@@ -472,24 +624,24 @@
                         "anyOf": [
                           {
                             "enum": [
-                              "none",
                               "major",
                               "minor",
                               "patch",
                               "prerelease",
-                              "build"
+                              "build",
+                              "none"
                             ]
                           },
                           {
                             "type": "array",
                             "items": {
                               "enum": [
-                                "none",
                                 "major",
                                 "minor",
                                 "patch",
                                 "prerelease",
-                                "build"
+                                "build",
+                                "none"
                               ]
                             }
                           }
@@ -566,7 +718,8 @@
             "override": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
               "description": "Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config."
             },
@@ -649,24 +802,24 @@
                         "anyOf": [
                           {
                             "enum": [
-                              "none",
                               "major",
                               "minor",
                               "patch",
                               "prerelease",
-                              "build"
+                              "build",
+                              "none"
                             ]
                           },
                           {
                             "type": "array",
                             "items": {
                               "enum": [
-                                "none",
                                 "major",
                                 "minor",
                                 "patch",
                                 "prerelease",
-                                "build"
+                                "build",
+                                "none"
                               ]
                             }
                           }
@@ -750,244 +903,679 @@
     "changelog": {
       "type": "object",
       "properties": {
-        "enabled": {
+        "write-to-file": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and string pattern but they won't be written to file.\nDefault: true"
+          "description": "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and string templates.\nDefault: true"
         },
-        "commands": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "default": "CHANGELOG.md",
+          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
+        },
+        "command-hook": {
           "type": "object",
           "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continue-on-error": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
             "pre": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commands to run before the operation.\nDefault: []"
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
             },
             "post": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commands to run after the operation.\nDefault: []"
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
             }
           },
           "required": [],
-          "default": {},
           "description": "Pre/post command lists to run around the changelog operation. Each command runs from the repository root."
         },
         "content-body-override": {
           "type": "string",
-          "default": "",
-          "description": "User-provided changelog content body, available in string pattern as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
+          "minLength": 1,
+          "description": "User-provided changelog content body, available in string templates as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
         },
-        "path": {
+        "header-template": {
           "type": "string",
-          "default": "CHANGELOG.md",
-          "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
+          "default": "# Changelog\n\n<br/>\n",
+          "description": "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
         },
-        "header-pattern": {
+        "header-template-path": {
           "type": "string",
-          "default": "# Changelog\n",
-          "description": "Pattern for changelog file header. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\""
+          "minLength": 1,
+          "description": "Path to text file containing changelog file header. Overrides `header-template` when both are provided."
         },
-        "header-pattern-path": {
+        "footer-template": {
           "type": "string",
-          "default": "",
-          "description": "Path to text file containing changelog file header. Overrides `header-pattern` when both are provided."
+          "description": "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content section."
         },
-        "footer-pattern": {
+        "footer-template-path": {
           "type": "string",
-          "default": "",
-          "description": "Pattern for changelog file footer. Placed below any changelog content section.\nDefault: \"\""
+          "minLength": 1,
+          "description": "Path to text file containing changelog file footer. Overrides `footer-template` when both are provided."
         },
-        "footer-pattern-path": {
+        "heading-template": {
           "type": "string",
-          "default": "",
-          "description": "Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided."
-        },
-        "heading-pattern": {
-          "type": "string",
+          "minLength": 1,
           "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
-          "description": "Pattern for heading of a changelog content section.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
+          "description": "String template for heading of a changelog content section, using with string patterns like ${tagName}.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
         },
-        "body-pattern": {
+        "body-template": {
           "type": "string",
+          "minLength": 1,
           "default": "${changelogContentBody}",
-          "description": "Pattern for body of a changelog content section.\nDefault: \"${changelogContentBody}\""
+          "description": "String template for body of a changelog content section, using with string patterns like ${changelogContentBody}.\nDefault: \"${changelogContentBody}\""
         },
-        "body-pattern-path": {
+        "body-template-path": {
           "type": "string",
-          "default": "",
-          "description": "Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided."
+          "minLength": 1,
+          "description": "Path to text file containing body of a changelog content section. Overrides `body-template` when both are provided."
         }
       },
       "required": [],
-      "description": "Configuration specific to changelogs. All generated changelog content are available in string pattern as ${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
+      "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as ${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
       "default": {}
     },
     "pull-request": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases will be committed and created directly.\nDefault: true"
-        },
-        "commands": {
+        "command-hook": {
           "type": "object",
           "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continue-on-error": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
             "pre": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commands to run before the operation.\nDefault: []"
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
             },
             "post": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
+            }
+          },
+          "required": [],
+          "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root."
+        },
+        "files-to-commit": {
+          "anyOf": [
+            {
+              "enum": [
+                "base",
+                "all"
+              ]
+            },
+            {
               "type": "array",
               "items": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "enum": [
+                      "base",
+                      "all"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ]
+              }
+            }
+          ],
+          "default": "base",
+          "description": "Files to include in the commit when creating a pull request. Accepts \"base\", \"all\" options or an array of options and paths/globs. Paths are relative to the repo root.\nDefault: \"base\"",
+          "examples": [
+            [],
+            [
+              "base",
+              "src/release-artifacts/*"
+            ]
+          ]
+        },
+        "branch-name-template": {
+          "type": "string",
+          "minLength": 1,
+          "default": "release/zephyr-release",
+          "description": "String template for branch name that Zephyr Release uses. Allowed patterns to use are: \"${name}\", \"${namespace}\", \"${repository}\"\nDefault: \"release/zephyr-release\""
+        },
+        "label": {
+          "type": "object",
+          "properties": {
+            "on-create": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string",
+                      "minLength": 1,
+                      "default": "ededed",
+                      "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ],
+              "default": {
+                "name": "release: pending",
+                "description": "Indicates that the pull request is pending release.",
+                "color": "FBCA04"
               },
-              "default": [],
-              "description": "Commands to run after the operation.\nDefault: []"
+              "description": "Label to add when pull request is created.\nDefault: {\n  \"name\": \"release: pending\",\n  \"description\": \"Indicates that the pull request is pending release.\",\n  \"color\": \"FBCA04\"\n}"
+            },
+            "on-close": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string",
+                      "minLength": 1,
+                      "default": "ededed",
+                      "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ],
+              "default": {
+                "name": "release: released",
+                "description": "Indicates that the pull request is closed and the release has completed.",
+                "color": "0E8A16"
+              },
+              "description": "Label to add when pull request is closed and release operation has completed (replaces `on-create` label).\nDefault: {\n  \"name\": \"release: released\",\n  \"description\": \"Indicates that the pull request is closed and the release has completed.\",\n  \"color\": \"0E8A16\"\n}"
             }
           },
           "required": [],
           "default": {},
-          "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root."
+          "description": "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These label should not be manually added or removed."
         },
-        "branch-name-pattern": {
-          "type": "string",
-          "minLength": 1,
-          "default": "release/zephyr-release",
-          "description": "Pattern for branch name that Zephyr Release is gonna use.\nDefault: \"release/zephyr-release\""
-        },
-        "labels-on-create": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
+        "additional-label": {
+          "type": "object",
+          "properties": {
+            "on-create-add": {
+              "anyOf": [
+                {
                   "type": "string",
                   "minLength": 1
                 },
-                "description": {
-                  "type": "string",
-                  "default": ""
-                },
-                "color": {
-                  "type": "string",
-                  "minLength": 1,
-                  "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
-                }
-              },
-              "required": [
-                "name"
-              ]
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
+                {
+                  "type": "array",
+                  "items": {
                     "type": "string",
                     "minLength": 1
-                  },
-                  "description": {
-                    "type": "string",
-                    "default": ""
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 1,
-                    "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                   }
-                },
-                "required": [
-                  "name"
-                ]
-              }
-            }
-          ],
-          "default": {
-            "name": "release: pending",
-            "description": "Indicates that the pull request is pending release.",
-            "color": "FBCA04"
-          },
-          "description": "A label or an array of labels to add to the pull request when it is created.\nDefault: {\n  \"name\": \"release: pending\",\n  \"description\": \"Indicates that the pull request is pending release.\",\n  \"color\": \"FBCA04\"\n}"
-        },
-        "labels-on-close": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
+                }
+              ],
+              "description": "Additional labels to add when pull request is created."
+            },
+            "on-close-add": {
+              "anyOf": [
+                {
                   "type": "string",
                   "minLength": 1
                 },
-                "description": {
-                  "type": "string",
-                  "default": ""
-                },
-                "color": {
-                  "type": "string",
-                  "minLength": 1,
-                  "default": "ededed",
-                  "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
-                }
-              },
-              "required": [
-                "name"
-              ]
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
+                {
+                  "type": "array",
+                  "items": {
                     "type": "string",
                     "minLength": 1
-                  },
-                  "description": {
-                    "type": "string",
-                    "default": ""
-                  },
-                  "color": {
-                    "type": "string",
-                    "minLength": 1,
-                    "default": "ededed",
-                    "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
                   }
+                }
+              ],
+              "description": "Additional labels to add when pull request is closed and release operation has completed."
+            },
+            "on-close-remove": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
                 },
-                "required": [
-                  "name"
-                ]
-              }
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              ],
+              "description": "Additional labels to remove when pull request is closed and release operation has completed. Use \"allOnCreate\" to remove all labels added in `on-create-add`."
             }
-          ],
-          "default": {
-            "name": "release: released",
-            "description": "Indicates that the pull request is closed and the release has completed.",
-            "color": "0E8A16"
           },
-          "description": "A label or an array of labels to add to the pull request when it is closed and the release operation has completed.\nDefault: {\n  \"name\": \"release: released\",\n  \"description\": \"Indicates that the pull request is closed and the release has completed.\",\n  \"color\": \"0E8A16\"\n}"
+          "required": [],
+          "default": {},
+          "description": "Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing."
         },
-        "title-pattern": {
+        "title-template": {
           "type": "string",
           "minLength": 1,
           "default": "chore: release v${version}",
-          "description": "Pattern for pull request title.\nDefault: \"chore: release v${version}\""
+          "description": "String template for pull request title, using with string patterns like ${version}.\nDefault: \"chore: release v${version}\""
         },
-        "header-pattern": {
+        "header-template": {
           "anyOf": [
             {
               "type": "string"
@@ -1000,22 +1588,22 @@
             }
           ],
           "default": "🤖 New release created. Stand by for approval",
-          "description": "Pattern for pull request header. If an array is provided, it will randomly choose one from it.\nDefault: \"🤖 New release created. Stand by for approval\""
+          "description": "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\nDefault: \"🤖 New release created. Stand by for approval\""
         },
-        "body-pattern": {
+        "body-template": {
           "type": "string",
           "default": "${changelogContent}",
-          "description": "Pattern for pull request body.\nDefault: \"${changelogContent}\""
+          "description": "String template for pull request body, using with string patterns like ${changelogContent}.\nDefault: \"${changelogContent}\""
         },
-        "body-pattern-path": {
+        "body-template-path": {
           "type": "string",
-          "default": "",
-          "description": "Path to text file containing pull request body pattern. Overrides body pattern if both are provided."
+          "minLength": 1,
+          "description": "Path to text file containing pull request body template. Overrides body template if both are provided."
         },
-        "footer-pattern": {
+        "footer-template": {
           "type": "string",
           "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
-          "description": "Pattern for pull request footer.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
+          "description": "String template for pull request footer, using with string patterns.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
         }
       },
       "required": [],
@@ -1035,28 +1623,219 @@
           "default": false,
           "description": "If enabled, only the tag will be created, no release will be made.\nDefault: false"
         },
-        "commands": {
+        "command-hook": {
           "type": "object",
           "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continue-on-error": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
             "pre": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commands to run before the operation.\nDefault: []"
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
             },
             "post": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "default": [],
-              "description": "Commands to run after the operation.\nDefault: []"
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                        },
+                        "continue-on-error": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
+                          },
+                          "continue-on-error": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
             }
           },
           "required": [],
-          "default": {},
           "description": "Pre/post command lists to run around the release operation. Each command runs from the repository root."
         },
         "prerelease": {
@@ -1069,21 +1848,22 @@
           "default": false,
           "description": "If enabled, the release will be created as draft.\nDefault: false"
         },
-        "tag-name-pattern": {
+        "tag-name-template": {
           "type": "string",
           "minLength": 1,
           "default": "v${version}",
-          "description": "Pattern for tag name, available in string pattern as ${tagName}.\nDefault: \"v${version}\""
+          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nDefault: \"v${version}\""
         },
-        "title-pattern": {
+        "title-template": {
           "type": "string",
+          "minLength": 1,
           "default": "${tagName}",
-          "description": "Pattern for release title.\nDefault: \"${tagName}\""
+          "description": "String template for release title, using with string patterns like ${tagName}.\nDefault: \"${tagName}\""
         },
-        "body-pattern": {
+        "body-template": {
           "type": "string",
           "default": "${changelogContent}",
-          "description": "Pattern for release body.\nDefault: \"${changelogContent}\""
+          "description": "String template for release body, using with string patterns like ${changelogContent}.\nDefault: \"${changelogContent}\""
         }
       },
       "required": [],

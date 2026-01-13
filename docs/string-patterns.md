@@ -3,6 +3,7 @@
 Available string patterns (like `${version}`) that can be used in string templates (like `"version-${version}"`) within various configuration fields.
 
 **Terminology:**
+
 - **String pattern**: A placeholder like `${version}` or `${name}` that gets replaced with a value.
 - **String template**: A complete string like `"version-${version}"` or `"Release ${tagName}"` that contains one or more string patterns.
 
@@ -61,6 +62,5 @@ These string patterns are resolved based on where or how the operation is run.
   - **Unquoted (string pattern):** `${tagName:mdLink(compare=tagPrev,prev=1)}` resolves the `tagName` string pattern from context.  
     Resolved to `[v2.0.0](https://github.com/<namespace>/<repository>/compare/<previous-1-tag>...v2.0.0)`.  
   - If a compare URL cannot be constructed:  
-    \- If the string pattern cannot be resolved → returns an empty string.  
+    \- If the string pattern cannot be resolved → returns ... NOT DECIDED YET  
     \- If the tag or repository data cannot be found → returns plain text (without Markdown link formatting) instead of a broken link.
-

@@ -1,5 +1,10 @@
 export interface ProviderCommit {
   hash: string;
-  subject: string;
+  header: string;
   body: string;
+
+  /**
+   * Full commit message (header + body)
+   */
+  message: string;
 }

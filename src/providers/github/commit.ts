@@ -7,6 +7,7 @@ const RawCommitNodeSchema = v.object({
   oid: v.string(),
   messageHeadline: v.string(),
   messageBody: v.string(),
+  message: v.string(),
   refs: v.object({
     nodes: v.array(
       v.object({
@@ -34,6 +35,7 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
                 oid
                 messageHeadline
                 messageBody
+                message
                 refs(refPrefix: "refs/tags/", first: 1) {
                   nodes { name }
                 }
@@ -79,8 +81,9 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
 
       collectedCommits.push({
         hash: commit.oid,
-        subject: commit.messageHeadline,
+        header: commit.messageHeadline,
         body: commit.messageBody,
+        message: commit.message,
       });
     }
   }

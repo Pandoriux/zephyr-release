@@ -48,3 +48,26 @@ source-mode:
       use the local filesystem vs remote API. See: [link-to-docs]
     required: false
     default: "remote"
+
+```json
+{
+  "$schema": "../../schemas/config-v1.json",
+
+  "version-files": {
+    "path": "deno.json",
+    "selector": "$.version"
+  }
+}
+```
+
+for full list of options, see inputs-options.md
+
+ releaseAsIgnoreTypes: v.pipe(
+    v.optional(v.boolean(), true),
+    v.metadata({
+      description:
+        "If true, 'release-as' works on all commits. Otherwise, only commits with types listed in `commitTypes` work.\n" +
+        "See: [lnk]\n" +
+        "Default: true",
+    }),
+  ),

@@ -10,6 +10,7 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import { githubExportVariables } from "./export.ts";
 import { githubEnsureBranchAtCommitOrThrow } from "./branch.ts";
 import { githubFindCommitsFromGivenToPreviousTaggedOrThrow } from "./commit.ts";
+import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 
 export const githubProvider = {
   platform: "github",
@@ -35,4 +36,6 @@ export const githubProvider = {
     githubFindUniquePullRequestFromBranchOrThrow,
 
   exportVariables: githubExportVariables,
+
+  getConventionalCommitParserOptions: githubGetConventionalCommitParserOptions,
 } satisfies PlatformProvider;

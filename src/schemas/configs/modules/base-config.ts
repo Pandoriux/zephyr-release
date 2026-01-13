@@ -63,6 +63,16 @@ export const BaseConfigSchema = v.object({
         }`,
     }),
   ),
+
+  releaseAsIgnoreTypes: v.pipe(
+    v.optional(v.boolean(), true),
+    v.metadata({
+      description:
+        "If true, 'release-as' works on all commits. Otherwise, only commits with types listed in `commitTypes` work.\n" +
+        "See: [lnk]\n" +
+        "Default: true",
+    }),
+  ),
 });
 
 type _BaseConfigInput = v.InferInput<typeof BaseConfigSchema>;

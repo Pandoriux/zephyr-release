@@ -62,6 +62,9 @@
     }
   ],
 
+  // Ex: If true, 'release-as' works on all commits. Otherwise, only commits with types listed in commit-types work
+  "release-as-ignore-types": true,
+
   "bump-strategy": {
     // Ex: This strategy will trigger major bump only on breaking changes
     "major": {

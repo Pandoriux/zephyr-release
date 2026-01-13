@@ -5,6 +5,7 @@ export const CommitTypeSchema = v.object({
     v.string(),
     v.trim(),
     v.nonEmpty(),
+    v.toLowerCase(),
     v.metadata({ description: "Commit type name." }),
   ),
   section: v.pipe(

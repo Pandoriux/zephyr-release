@@ -20,6 +20,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
     - [commit... \> hidden (Optional)](#commit--hidden-optional)
+  - [release-as-ignore-types (Optional)](#release-as-ignore-types-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
@@ -147,6 +148,15 @@ Type: `boolean`
 Default: `false`
 
 Exclude this commit type from changelog generation (does not affect version bump calculation).
+
+### release-as-ignore-types (Optional)
+
+Type: `boolean`  
+Default: `true`
+
+If `true`, `release-as` works on all commits. Otherwise, only commits with types listed in [`commit-types`](#commit-types-optional) work.
+
+`release-as`: [links]
 
 ### bump-strategy (Optional)
 

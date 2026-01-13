@@ -1,3 +1,4 @@
+import type { ParserOptions } from "conventional-commits-parser";
 import type { CoreLogger } from "../logger.ts";
 import type { ProviderBranch } from "./branch.ts";
 import type { ProviderCommit } from "./commit.ts";
@@ -45,5 +46,6 @@ export interface PlatformProvider {
 
   exportVariables: (exportObj: Record<string, unknown>) => void;
 
+  getConventionalCommitParserOptions: () => ParserOptions;
   // more
 }

@@ -1,13 +1,15 @@
 import { toCamelCase, toKebabCase } from "@std/text";
 import { map } from "obj-walker";
-import { isPlainObject } from "../validations/object.ts";
+import { isPlainObject, isPlainObjectOrArray } from "../validations/object.ts";
 
 export function transformObjKeyToKebabCase(
   obj: unknown,
   mutate: boolean = false,
 ): unknown {
-  if (!isPlainObject(obj)) {
-    throw new Error(`'${transformObjKeyToKebabCase.name}' error: expected a plain object input`);
+  if (!isPlainObjectOrArray(obj)) {
+    throw new Error(
+      `'${transformObjKeyToKebabCase.name}' error: expected a plain object or array input`,
+    );
   }
 
   return map(obj, ({ val }) => {
@@ -28,8 +30,10 @@ export function transformObjKeyToCamelCase(
   obj: unknown,
   mutate: boolean = false,
 ): unknown {
-  if (!isPlainObject(obj)) {
-    throw new Error(`'${transformObjKeyToCamelCase.name}' error: expected a plain object input`);
+  if (!isPlainObjectOrArray(obj)) {
+    throw new Error(
+      `'${transformObjKeyToCamelCase.name}' error: expected a plain object or array input`,
+    );
   }
 
   return map(obj, ({ val }) => {
