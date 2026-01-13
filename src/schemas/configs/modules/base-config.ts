@@ -3,7 +3,7 @@ import { TimeZoneSchema } from "./components/timezone.ts";
 import { CommitTypeSchema } from "./components/commit-type.ts";
 import { VersionFileSchema } from "./components/version-file.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
-import { SEMVER_REGEX } from "../../../constants/regex.ts";
+import { SEMVER_REGEX } from "../../../constants/semver.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
