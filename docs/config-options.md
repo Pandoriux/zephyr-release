@@ -20,7 +20,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
     - [commit... \> hidden (Optional)](#commit--hidden-optional)
-  - [release-as-ignore-types (Optional)](#release-as-ignore-types-optional)
+  - [allow-release-as (Optional)](#allow-release-as-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
@@ -149,12 +149,19 @@ Default: `false`
 
 Exclude this commit type from changelog generation (does not affect version bump calculation).
 
-### release-as-ignore-types (Optional)
+### allow-release-as (Optional)
 
-Type: `boolean`  
-Default: `true`
+Type: `string | string[]`  
+Default: `"ALL"`
 
-If `true`, `release-as` works on all commits. Otherwise, only commits with types listed in [`commit-types`](#commit-types-optional) work.
+List of commit type(s) allowed to trigger `release-as`. Accepts a single string or an array of strings.
+
+**Special values:**
+
+- `"ALL"`: Accepts any commit type (default behavior)
+- `"BASE"`: Uses the list of commit types defined in [`commit-types`](#commit-types-optional)
+
+You can combine `"BASE"` with other commit types. For example: `["BASE", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
 
 `release-as`: [links]
 
@@ -316,22 +323,9 @@ List of exposed env variables: see [Export operation variables](./export-variabl
 
 #### pull... > files-to-commit (Optional)
 
-Type: `"base" | "all" | string[]`  
-Default: `"base"`
+Type: `string | string[]`
 
-Files to include in the commit when creating a pull request. Accepts `base`, `all` or an array of paths/globs. Paths are relative to the repo root.
-
-- **`base`**: Includes files affected by the script, such as:
-  - Changelog file (defined in [`changelog > file-path`](#changelog--file-path-optional))
-  - Version files (defined in [`version-files`](#version-files-required))
-  
-- **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
-  - Base [`command-hook`](#command-hook-optional)
-  - [`changelog > command-hook`](#changelog--command-hook-optional)
-  - [`pull-request > command-hook`](#pull--command-hook-optional)
-  - [`release > command-hook`](#release--command-hook-optional)
-
-- **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
+Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
 
 #### pull... > branch-name-template (Optional)
 

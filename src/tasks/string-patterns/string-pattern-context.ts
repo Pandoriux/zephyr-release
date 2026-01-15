@@ -3,16 +3,16 @@ import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import type { BaseStringPatternContext } from "../../types/string-patterns.ts";
 import { taskLogger } from "../logger.ts";
+import { startTime } from "../../main.ts";
 
 type GetBaseStrPatCtxConfigParams = Pick<ConfigOutput, "name" | "timeZone">;
 
 export function getBaseStringPatternContext(
   provider: PlatformProvider,
-  startTime: Date,
   config: GetBaseStrPatCtxConfigParams,
 ): BaseStringPatternContext {
   const { name, timeZone } = config;
-  
+
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
 

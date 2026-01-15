@@ -37,6 +37,24 @@ export const baseConventionalCommitParserOptions = {
 
   // =======================================================================
 
+  // --- Modern Header Support ---
+  // This pattern supports the "!" for breaking changes: feat(api)!: subject
+  headerPattern: /^(\w*)(?:\(([\w$@.\-*/ ]*)\))?(!?): (.*)$/,
+  headerCorrespondence: ["type", "scope", "breaking", "subject"],
+
+  // --- Flexible Revert Support ---
+  // Matches the standard Git format used by most CLI and web tools, with or without a colon
+  revertPattern:
+    /^(?:Revert|revert:?)\s+"?([\s\S]*?)"?\s*This reverts commit (\w+)/,
+  revertCorrespondence: ["header", "hash"],
+
+  noteKeywords: [
+    "BREAKING CHANGE",
+    "BREAKING-CHANGE",
+    "release as",
+    "release-as",
+  ],
+
   issuePrefixes: ["#"],
   referenceActions: [
     "close",
@@ -49,15 +67,4 @@ export const baseConventionalCommitParserOptions = {
     "resolves",
     "resolved",
   ],
-
-  // --- Modern Header Support ---
-  // This pattern supports the "!" for breaking changes: feat(api)!: subject
-  headerPattern: /^(\w*)(?:\(([\w$@.\-*/ ]*)\))?(!?): (.*)$/,
-  headerCorrespondence: ["type", "scope", "breaking", "subject"],
-
-  // --- Flexible Revert Support ---
-  // Matches the standard Git format used by most CLI and web tools, with or without a colon
-  revertPattern:
-    /^(?:Revert|revert:?)\s+"?([\s\S]*?)"?\s*This reverts commit (\w+)/,
-  revertCorrespondence: ["header", "hash"],
 } satisfies ParserOptions;

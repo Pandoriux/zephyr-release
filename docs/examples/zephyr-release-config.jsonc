@@ -62,8 +62,11 @@
     }
   ],
 
-  // Ex: If true, 'release-as' works on all commits. Otherwise, only commits with types listed in commit-types work
-  "release-as-ignore-types": true,
+  // Ex: List of commit type(s) allowed to trigger 'release-as'. Use "ALL" for any commit type, "BASE" for types in commit-types, or combine them
+  "allow-release-as": "ALL",
+  // Other examples:
+  // "allow-release-as": ["BASE", "chore", "ci", "cd"],
+  // "allow-release-as": "BASE",
 
   "bump-strategy": {
     // Ex: This strategy will trigger major bump only on breaking changes
@@ -145,14 +148,12 @@
       "post": ["npm run notify:pr"]
     },
 
-    // Ex: Include base files plus additional docs/artifacts
-    "files-to-commit": [
-      "base",
-      "docs/**/*.md",
-      "dist/**"
-    ],
-    // Ex: Only custom paths (no keywords)
-    // "files-to-commit": ["CHANGELOG.md", "package.json"],
+    // Ex: Include additional files using "ALL" option
+    "files-to-commit": "ALL",
+    // Ex: Include specific paths/globs
+    // "files-to-commit": ["docs/**/*.md", "dist/**"],
+    // Ex: Single path
+    // "files-to-commit": ["CHANGELOG.md"],
 
     "branch-name-pattern": "release/zephyr-release",
 

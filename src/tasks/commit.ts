@@ -1,11 +1,15 @@
-import { type CommitBase, CommitParser } from "conventional-commits-parser";
+import {
+  type Commit,
+  type CommitBase,
+  CommitParser,
+} from "conventional-commits-parser";
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
 import { taskLogger } from "./logger.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
-import { ProviderCommit } from "../types/providers/commit.ts";
+import type { ProviderCommit } from "../types/providers/commit.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -14,7 +18,7 @@ type ResolveCommitsInputsParams = Pick<
 
 type ResolveCommitsConfigParams = Pick<ConfigOutput, "commitTypes">;
 
-type ResolvedCommit = CommitBase & {
+export type ResolvedCommit = CommitBase & {
   hash: string;
   type: string;
   scope?: string;
@@ -31,7 +35,7 @@ interface WorkingCommitEntry {
 }
 
 export interface ResolvedCommitsResult {
-  resolvedTriggerCommit: CommitBase;
+  resolvedTriggerCommit: Commit;
   entries: ResolvedCommit[];
 }
 
@@ -66,7 +70,7 @@ export async function resolveCommitsFromTriggerToLastRelease(
 
   const allowedTypes = new Set(commitTypes.map((c) => c.type));
 
-  let resolvedTriggerCommit: CommitBase | undefined;
+  let resolvedTriggerCommit: Commit | undefined;
   const parsedFilteredCommits: ResolvedCommit[] = [];
 
   for (const entry of workingEntries) {

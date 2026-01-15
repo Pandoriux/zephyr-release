@@ -33,7 +33,7 @@ export const CommandHookSchema = v.object({
 
   pre: v.pipe(
     v.optional(
-      v.union([CommandSchema, v.array(CommandSchema)]),
+      v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
     v.metadata({
       description: "Commands to run before the operation.\n" +
@@ -42,7 +42,7 @@ export const CommandHookSchema = v.object({
   ),
   post: v.pipe(
     v.optional(
-      v.union([CommandSchema, v.array(CommandSchema)]),
+      v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
     v.metadata({
       description: "Commands to run after the operation.\n" +

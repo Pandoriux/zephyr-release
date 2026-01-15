@@ -6,7 +6,7 @@ export const AdditionalLabelSchema = v.object({
     v.optional(
       v.union([
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
     v.metadata({
@@ -17,7 +17,7 @@ export const AdditionalLabelSchema = v.object({
     v.optional(
       v.union([
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
     v.metadata({
@@ -29,7 +29,7 @@ export const AdditionalLabelSchema = v.object({
     v.optional(
       v.union([
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
     v.metadata({

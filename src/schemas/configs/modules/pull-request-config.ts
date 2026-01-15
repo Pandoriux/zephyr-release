@@ -22,22 +22,18 @@ export const PullRequestConfigSchema = v.pipe(
     filesToCommit: v.pipe(
       v.optional(
         v.union([
-          v.enum(filesToCommitOptions),
-          v.array(
-            v.union([
-              v.enum(filesToCommitOptions),
-              v.pipe(v.string(), v.trim(), v.nonEmpty()),
-            ]),
+          v.pipe(v.string(), v.trim(), v.nonEmpty()),
+          v.pipe(
+            v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+            v.nonEmpty(),
           ),
         ]),
-        "base",
       ),
       v.metadata({
         description:
-          'Files to include in the commit when creating a pull request. Accepts "base", "all" options or an array of options and paths/globs. ' +
-          "Paths are relative to the repo root.\n" +
-          'Default: "base"',
-        examples: [[], ["base", "src/release-artifacts/*"]],
+          'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
+          "Paths are relative to the repo root.",
+        examples: ["ALL", ["some/path"], ["src/release-artifacts/*"]],
       }),
     ),
 
@@ -86,7 +82,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(
         v.union([
           v.pipe(v.string(), v.trim()),
-          v.array(v.pipe(v.string(), v.trim())),
+          v.pipe(v.array(v.pipe(v.string(), v.trim())), v.nonEmpty()),
         ]),
         DEFAULT_PULL_REQUEST_HEADER_PATTERN,
       ),

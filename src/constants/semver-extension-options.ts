@@ -6,7 +6,7 @@ export const SemverExtensionResetOnOptions = {
   none: "none",
 } as const;
 
-const SemverExtensionTypes = {
+export const SemverExtensionTypes = {
   static: "static",
   dynamic: "dynamic",
   incremental: "incremental",

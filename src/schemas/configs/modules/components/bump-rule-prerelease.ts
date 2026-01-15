@@ -11,8 +11,11 @@ export const BumpRulePrereleaseSchema = v.object({
   ),
   override: v.pipe(
     v.optional(
-      v.array(
-        v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), v.number()]),
+      v.pipe(
+        v.array(
+          v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), v.number()]),
+        ),
+        v.nonEmpty(),
       ),
     ),
     v.metadata({
@@ -23,7 +26,7 @@ export const BumpRulePrereleaseSchema = v.object({
   ),
 
   identifiers: v.pipe(
-    v.optional(v.array(SemverExtensionsSchema)),
+    v.optional(v.pipe(v.array(SemverExtensionsSchema), v.nonEmpty())),
     v.metadata({
       description:
         "Specifies the pre-release identifiers to use when bumping a pre-release version. " +

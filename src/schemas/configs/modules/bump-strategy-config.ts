@@ -87,4 +87,6 @@ export const BumpStrategyConfigSchema = v.pipe(
 );
 
 type _BumpStrategyConfigInput = v.InferInput<typeof BumpStrategyConfigSchema>;
-type _BumpStrategyConfigOutput = v.InferOutput<typeof BumpStrategyConfigSchema>;
+export type BumpStrategyConfigOutput = v.InferOutput<
+  typeof BumpStrategyConfigSchema
+>;

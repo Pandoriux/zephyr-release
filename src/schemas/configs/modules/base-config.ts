@@ -39,7 +39,7 @@ export const BaseConfigSchema = v.object({
     }),
   ),
   versionFiles: v.pipe(
-    v.union([VersionFileSchema, v.array(VersionFileSchema)]),
+    v.union([VersionFileSchema, v.pipe(v.array(VersionFileSchema), v.nonEmpty())]),
     v.metadata({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
@@ -50,7 +50,7 @@ export const BaseConfigSchema = v.object({
   ),
 
   commitTypes: v.pipe(
-    v.optional(v.array(CommitTypeSchema), DEFAULT_COMMIT_TYPES),
+    v.optional(v.pipe(v.array(CommitTypeSchema), v.nonEmpty()), DEFAULT_COMMIT_TYPES),
     v.metadata({
       description:
         "List of commit types used for version calculation and changelog generation.\n" +
@@ -64,13 +64,21 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
-  releaseAsIgnoreTypes: v.pipe(
-    v.optional(v.boolean(), true),
+  allowReleaseAs: v.pipe(
+    v.optional(
+      v.union([
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
+      ]),
+      "ALL",
+    ),
     v.metadata({
       description:
-        "If true, 'release-as' works on all commits. Otherwise, only commits with types listed in `commitTypes` work.\n" +
-        "See: [lnk]\n" +
-        "Default: true",
+        "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
+        'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
+        "About 'release-as': [links]\n" +
+        'Default: "ALL"',
+      examples: [["BASE", "chore", "ci", "cd"]],
     }),
   ),
 });

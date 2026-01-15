@@ -13,7 +13,7 @@ import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
 import { prepareWorkflow } from "./workflows/prepare.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
 
-export async function run(provider: PlatformProvider, startTime: Date) {
+export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Setup operation");
   setupOperation();
   logger.stepFinish("Finished: Setup operation");
@@ -27,11 +27,7 @@ export async function run(provider: PlatformProvider, startTime: Date) {
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.debugStepStart("Starting: Get base string patterns");
-  const baseStringPatternCtx = getBaseStringPatternContext(
-    provider,
-    startTime,
-    config,
-  );
+  const baseStringPatternCtx = getBaseStringPatternContext(provider, config);
   logger.debugStepFinish("Finished: Get base string patterns");
 
   logger.stepStart("Starting: Get associated pull requests");

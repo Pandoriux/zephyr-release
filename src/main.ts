@@ -5,18 +5,18 @@ import { getProviderOrThrow } from "./providers/provider.ts";
 import { logger, setLogger } from "./tasks/logger.ts";
 import { formatErrorHierarchy } from "./utils/formatters/error.ts";
 
-async function main() {
-  const startTime = new Date();
+export const startTime = new Date();
 
+async function main() {
   try {
     const provider = await getProviderOrThrow();
     setLogger(provider.logger);
 
-    markProcessStart(startTime);
+    markProcessStart();
 
-    await run(provider, startTime);
+    await run(provider);
 
-    markProcessEnd("Finished", startTime);
+    markProcessEnd("Finished");
   } catch (error) {
     logger.setFailed(
       "❌ Operation Failed! • An error occurred:\n" +
@@ -29,7 +29,7 @@ async function main() {
       logger.endGroup();
     }
 
-    markProcessEnd("Failed", startTime);
+    markProcessEnd("Failed");
   }
 }
 

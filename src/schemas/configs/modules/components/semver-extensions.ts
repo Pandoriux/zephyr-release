@@ -7,7 +7,7 @@ import {
   type SemverExtensionType,
 } from "../../../../constants/semver-extension-options.ts";
 
-function SemverExtensionTypeSchema(type: SemverExtensionType) {
+function SemverExtensionTypeSchema<T extends SemverExtensionType>(type: T) {
   return v.pipe(
     v.literal(type),
     v.metadata({
@@ -86,7 +86,7 @@ export const SemverExtensionsSchema = v.variant("type", [
       v.optional(
         v.union([
           v.enum(SemverExtensionResetOnOptions),
-          v.array(v.enum(SemverExtensionResetOnOptions)),
+          v.pipe(v.array(v.enum(SemverExtensionResetOnOptions)), v.nonEmpty()),
         ]),
         "none",
       ),
@@ -136,6 +136,6 @@ export const SemverExtensionsSchema = v.variant("type", [
 type _SemverExtensionsInput = v.InferInput<
   typeof SemverExtensionsSchema
 >;
-type _SemverExtensionsOutput = v.InferOutput<
+export type SemverExtensionsOutput = v.InferOutput<
   typeof SemverExtensionsSchema
 >;

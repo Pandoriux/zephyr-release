@@ -1,13 +1,14 @@
 import { VERSION } from "./version.generated.ts";
 import { logger } from "./tasks/logger.ts";
+import { startTime } from "./main.ts";
 
-export function markProcessStart(startTime: Date) {
+export function markProcessStart() {
   logger.info(
     `🔹 Zephyr Release Started 🍃 • version: ${VERSION} • at: ${startTime.toISOString()}`,
   );
 }
 
-export function markProcessEnd(reason: "Finished" | "Failed", startTime: Date) {
+export function markProcessEnd(reason: "Finished" | "Failed") {
   const endTime = new Date();
 
   logger.info(
