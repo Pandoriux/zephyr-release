@@ -91,9 +91,9 @@
       "enabled": true,
       // This setting should only be used in workflow inputs, not in config file
       "override": [],
-      "identifiers": [
+      "extensions": [
         { "type": "static", "value": "alpha" },
-        { "type": "incremental", "initial-value": 0, "next-value-expression": "v+1", "reset-on": "patch" }
+        { "type": "incremental", "initial-value": 0, "reset-on": "patch" }
       ]
     },
     // Ex: Build metadata strategy with timestamp
@@ -101,7 +101,7 @@
       "enabled": false,
       // This setting should only be used in workflow inputs, not in config file
       "override": [],
-      "metadata": [
+      "extensions": [
         { "type": "timestamp", "unit": "s" }
       ]
     },

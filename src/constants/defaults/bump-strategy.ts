@@ -1,4 +1,4 @@
-import type { BumpRuleInput } from "../../schemas/configs/modules/components/bump-rule.ts";
+import type { BumpRuleInput } from "../../schemas/configs/modules/components/bump-rule-core.ts";
 
 export const DEFAULT_MAJOR_BUMP_STRATEGY: BumpRuleInput = {
   countBreakingAs: "bump",

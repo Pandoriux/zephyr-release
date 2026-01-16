@@ -66,8 +66,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
   - [Command](#command)
   - [VersionFile](#versionfile)
   - [BumpRule](#bumprule)
-  - [BumpRulePrerelease](#bumpruleprerelease)
-  - [BumpRuleBuild](#bumprulebuild)
+  - [BumpRuleExtension](#bumpruleextension)
   - [SemverExtension](#semverextension)
   - [Label](#label)
   
@@ -197,21 +196,21 @@ See [`BumpRule`](#bumprule) for the type definition.
 
 #### bump... > prerelease (Optional)
 
-Type: [`BumpRulePrerelease`](#bumpruleprerelease)  
+Type: [`BumpRuleExtension`](#bumpruleextension)  
 Default: `{}`
 
 Strategy for bumping prerelease version (1.2.3-x.x).
 
-See [`BumpRulePrerelease`](#bumpruleprerelease) for the type definition.
+See [`BumpRuleExtension`](#bumpruleextension) for the type definition.
 
 #### bump... > build (Optional)
 
-Type: [`BumpRuleBuild`](#bumprulebuild)  
+Type: [`BumpRuleExtension`](#bumpruleextension)  
 Default: `{}`
 
 Strategy for bumping build metadata (1.2.3+x.x).
 
-See [`BumpRuleBuild`](#bumprulebuild) and [`SemverExtension`](#semverextension) for the type definitions.
+See [`BumpRuleExtension`](#bumpruleextension) and [`SemverExtension`](#semverextension) for the type definitions.
 
 #### bump... > bump-minor-for-major-pre-stable (Optional)
 
@@ -505,23 +504,15 @@ Type: `object`
 
 Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
-### BumpRulePrerelease
+### BumpRuleExtension
 
 Type: `object`  
 **Properties:**
 
-- `enabled` (Optional): Enable/disable handling of pre-release identifiers. Default: `false`
-- `override` (Optional): Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `identifiers` (Optional): Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers. Type: [`SemverExtension[]`](#semverextension)
-
-### BumpRuleBuild
-
-Type: `object`  
-**Properties:**
-
-- `enabled` (Optional): Enable/disable handling of build metadata. Default: `false`
-- `override` (Optional): Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `metadata` (Optional): Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata. Type: [`SemverExtension[]`](#semverextension)
+- `enabled` (Optional): Enable/disable handling of SemVer extensions (pre-release identifiers / build metadata). Default: `false`
+- `override` (Optional): Overrides extension items to use for the next version. When provided, these values take precedence over all other bump rules in `extensions`. Should only be set dynamically, not in static config.
+- `treat-override-as-significant` (Optional): If set to `true`, the presence of an `override` is strictly treated as a structural change. This immediately triggers resets on any dependent version components (e.g., resetting the Build number). If `false`, overrides are treated as volatile/dynamic and ignored by reset logic. Default: `false`
+- `extensions` (Optional): Specifies the items to use for SemVer extensions. Type: [`SemverExtension[]`](#semverextension)
 
 ### SemverExtension
 
@@ -538,13 +529,11 @@ A discriminated union based on the `type` field. Specifies the type of pre-relea
 - `value` (Optional): The string value to use, should be set dynamically.
 - `fallback-value` (Optional): The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array.
 
-**Type: `"incremental"`** — Integer value that changes over time.
+**Type: `"incremental"`** — Integer value that auto-increments by 1.
 
 - `type` (Required): `"incremental"`
-- `initial-value` (Optional): Initial integer number value. Default: `0`
-- `expression-variables` (Optional): Defines custom variables for use in `next-value-expression`, `v` is reserved for current value. These variables are usually set dynamically.
-- `next-value-expression` (Optional): Expression for computing the next value, where `v` represents the current value. The expression must evaluate to an integer number. Evaluated with [`expr-eval`](https://www.npmjs.com/package/expr-eval). Default: `"v+1"`
-- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, or `"timestamp"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
+- `initial-value` (Optional): Initial integer number value. The value will auto-increment by 1 on each bump. Default: `0`
+- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, `"timestamp"` or `"date"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
 
 **Type: `"timestamp"`** — Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).
 

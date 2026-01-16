@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import { countBreakingAsOptions } from "../../../../constants/bump-rules.ts";
 
-export const BumpRuleSchema = v.object({
+export const BumpRuleCoreSchema = v.object({
   types: v.pipe(
     v.optional(
       v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
@@ -42,5 +42,5 @@ export const BumpRuleSchema = v.object({
   ),
 });
 
-export type BumpRuleInput = v.InferInput<typeof BumpRuleSchema>;
-export type BumpRuleOutput = v.InferOutput<typeof BumpRuleSchema>;
+export type BumpRuleInput = v.InferInput<typeof BumpRuleCoreSchema>;
+export type BumpRuleOutput = v.InferOutput<typeof BumpRuleCoreSchema>;

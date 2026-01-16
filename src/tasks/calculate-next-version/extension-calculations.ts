@@ -1,32 +1,54 @@
 import type { SemVer } from "@std/semver";
 import type { BumpStrategyConfigOutput } from "../../schemas/configs/modules/bump-strategy-config.ts";
 import { startTime } from "../../main.ts";
-import type { SemverExtensionsOutput } from "../../schemas/configs/modules/components/semver-extensions.ts";
-import { SemverExtensionTypes } from "../../constants/semver-extension-options.ts";
+import type { BumpRuleExtensionOutput } from "../../schemas/configs/modules/components/bump-rule-extension.ts";
+import type { SemverExtensionOutput } from "../../schemas/configs/modules/components/semver-extension.ts";
+import {
+  SemverExtensionDateFormatMap,
+  SemverExtensionResetOnOptions,
+  SemverExtensionTimestampUnitTypes,
+} from "../../constants/semver-extension-options.ts";
+import { DateTimeFormatter, nativeJs, ZoneId } from "@js-joda/core";
+
+interface VersionChangeContext {
+  majorChanged: boolean;
+  minorChanged: boolean;
+  patchChanged: boolean;
+  prereleaseChanged: boolean;
+}
 
 export function calculateNextExtensionsSemVer(
-  currentVer: SemVer,
-  nextCoreVer: SemVer,
+  currentSemVer: SemVer,
+  nextCoreSemVer: SemVer,
   strategy: BumpStrategyConfigOutput,
   baseTimeZone: string,
 ): SemVer {
-  const extensionSemVer = { ...currentVer };
+  const extensionSemVer = { ...currentSemVer };
 
-  // Determine if Core Version changed (to trigger "reset-on")
-  const coreChanged = nextCoreVer.major !== currentVer.major ||
-    nextCoreVer.minor !== currentVer.minor ||
-    nextCoreVer.patch !== currentVer.patch;
+  const versionChangeCtx: VersionChangeContext = {
+    majorChanged: nextCoreSemVer.major !== currentSemVer.major,
+    minorChanged: nextCoreSemVer.minor !== currentSemVer.minor,
+    patchChanged: nextCoreSemVer.patch !== currentSemVer.patch,
+    prereleaseChanged: false,
+  };
 
   // 1. Prerelease
   if (!strategy.prerelease.enabled) {
     extensionSemVer.prerelease = [];
+
+    versionChangeCtx.prereleaseChanged =
+      (currentSemVer.prerelease?.length ?? 0) > 0;
   } else {
     extensionSemVer.prerelease = resolveExtensionList(
-      currentVer.prerelease ?? [],
-      strategy.prerelease.override,
-      strategy.prerelease.identifiers,
-      coreChanged,
+      currentSemVer.prerelease,
+      strategy.prerelease,
+      versionChangeCtx,
       baseTimeZone,
+    );
+
+    versionChangeCtx.prereleaseChanged = detectSemVerExtensionSignificantChange(
+      currentSemVer.prerelease,
+      strategy.prerelease,
     );
   }
 
@@ -35,10 +57,9 @@ export function calculateNextExtensionsSemVer(
     extensionSemVer.build = [];
   } else {
     extensionSemVer.build = resolveExtensionList(
-      currentVer.build ?? [],
-      strategy.build.override,
-      strategy.build.metadata,
-      coreChanged,
+      currentSemVer.build,
+      strategy.build,
+      versionChangeCtx,
       baseTimeZone,
     );
   }
@@ -46,74 +67,106 @@ export function calculateNextExtensionsSemVer(
   return extensionSemVer;
 }
 
-function resolveExtensionList(
-  currentValues: (string | number)[],
-  override: (string | number)[] | undefined,
-  extensionItems: SemverExtensionsOutput[] | undefined,
-  coreChanged: boolean,
-  timeZone: string,
-): string[] {
-  // 1. Check Override
-  if (override && override.length > 0) {
-    return override.map(String);
+/**
+ * Detects if a "Significant" change occurred.
+ * Per schema: Only triggers on "static" value changes or Add/Remove items.
+ * Ignores changes in "dynamic", "incremental", "timestamp", "date".
+ */
+function detectSemVerExtensionSignificantChange(
+  currentSemVerExtensionValues: (string | number)[] | undefined,
+  rule: BumpRuleExtensionOutput,
+): boolean {
+  const currentExtensions = currentSemVerExtensionValues?.map(String) ?? [];
+
+  if (rule.override) {
+    if (rule.treatOverrideAsSignificant) return true;
+    else return false;
   }
 
-  // 2. If no schema items defined, return empty array
-  if (!extensionItems || extensionItems.length === 0) {
+  const ruleExtensions = rule.extensions ?? [];
+
+  // Length mismatch
+  if (currentExtensions.length !== ruleExtensions.length) {
+    return true;
+  }
+
+  // Check "static" value changes
+  for (let i = 0; i < ruleExtensions.length; i++) {
+    const item = ruleExtensions[i];
+    const val = currentExtensions[i];
+
+    if (item && item.type === "static" && val !== item.value) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function resolveExtensionList(
+  SemVerExtensionValues: (string | number)[] | undefined,
+  rule: BumpRuleExtensionOutput,
+  versionChangeCtx: VersionChangeContext,
+  baseTimeZone: string,
+): string[] {
+  const extensions = SemVerExtensionValues?.map(String) ?? [];
+
+  // 1. Check Override
+  if (rule.override && rule.override.length > 0) {
+    return rule.override.map(String);
+  }
+
+  // 2. Check Extensions Config
+  if (!rule.extensions || rule.extensions.length === 0) {
     return [];
   }
 
-  // 3. Resolve Items
-  const resolvedExtItems: (string | number)[] = [];
+  const resolvedExtensions: string[] = [];
+
+  // Internal structure change for each pre-release/build operation
   let structureChanged = false;
 
-  extensionItems.forEach((item, index) => {
-    const previousValue = currentValues[index];
+  rule.extensions.forEach((item, index) => {
+    const previousValue = extensions[index];
 
-    // Structural Change Detection
     if (!structureChanged) {
       if (previousValue === undefined) {
-        structureChanged = true;
-      } else if (item.type === "static") {
-        if (String(previousValue) !== item.value) {
-          structureChanged = true;
-        }
-      } else if (item.type === "incremental") {
-        // Loose check: is it a number, or a string that looks like a number?
-        const isNumber = typeof previousValue === "number";
-        const isStringNumber = typeof previousValue === "string" &&
-          !isNaN(Number(previousValue)) && previousValue.trim() !== "";
-
-        if (!isNumber && !isStringNumber) {
-          structureChanged = true;
-        }
+        structureChanged = item.type !== "dynamic"; // New item added and it is not "dynamic" type
+      } else if (item.type === "static" && previousValue !== item.value) {
+        structureChanged = true; // Static label changed
+      } else if (
+        item.type === "incremental" &&
+        (isNaN(Number(previousValue)) || !previousValue.trim())
+      ) {
+        structureChanged = true; // Type number mismatch
       }
-      // dynamic/date/timestamp are assumed continuous if present
+
+      // Dynamic/Date/Timestamp are considered structurally consistent if they exist
     }
 
     const resolvedValue = resolveExtensionItem(
       item,
       previousValue,
-      coreChanged,
+      versionChangeCtx,
       structureChanged,
-      timeZone,
+      baseTimeZone,
     );
 
-    if (resolvedValue !== null && resolvedValue !== undefined) {
-      resolvedExtItems.push(resolvedValue);
+    if (resolvedValue) {
+      resolvedExtensions.push(resolvedValue);
     }
   });
 
-  return resolvedExtItems;
+  return resolvedExtensions;
 }
 
 function resolveExtensionItem(
-  item: SemverExtensionsOutput,
-  previousValue: string | number | undefined,
-  coreChanged: boolean,
+  item: SemverExtensionOutput,
+  previousValue: string | undefined,
+  versionChangeCtx: VersionChangeContext,
   structureChanged: boolean,
-  timeZone: string,
-): string | number {
+  baseTimeZone: string,
+): string {
   switch (item.type) {
     case "static":
       return item.value;
@@ -121,95 +174,71 @@ function resolveExtensionItem(
     case "dynamic":
       return item.value ?? item.fallbackValue ?? "";
 
-    case "date": {
-      const targetZoneId = ZoneId.of(item.timeZone ?? timeZone);
-      const zonedDateTime = nativeJs(startTime, targetZoneId);
-      const pattern =
-        item.format === SemverExtensionDateFormatTypes["YYYY-MM-DD"]
-          ? "yyyy-MM-dd"
-          : "yyyyMMdd";
-      return zonedDateTime.format(DateTimeFormatter.ofPattern(pattern));
-    }
-
-    case "timestamp": {
-      const timeMs = startTime.getTime();
-      if (item.unit === SemverExtensionTimestampUnitTypes.s) {
-        return Math.floor(timeMs / 1000);
-      }
-      return timeMs;
-    }
-
     case "incremental":
       return resolveIncremental(
         item,
         previousValue,
-        coreChanged,
+        versionChangeCtx,
         structureChanged,
       );
 
-    default:
-      return 0;
+    case "timestamp": {
+      const timeMs = startTime.getTime();
+
+      if (item.unit === SemverExtensionTimestampUnitTypes.s) {
+        return Math.floor(timeMs / 1000).toString();
+      }
+      return timeMs.toString();
+    }
+
+    case "date": {
+      const targetZoneId = ZoneId.of(item.timeZone ?? baseTimeZone);
+      const zonedDateTime = nativeJs(startTime, targetZoneId);
+      const pattern = SemverExtensionDateFormatMap[item.format];
+
+      return zonedDateTime.format(DateTimeFormatter.ofPattern(pattern));
+    }
   }
 }
 
 function resolveIncremental(
-  item: Extract<SemverExtensionsSchemaType, { type: "incremental" }>,
-  previousValue: string | number | undefined,
-  coreChanged: boolean,
+  item: Extract<SemverExtensionOutput, { type: "incremental" }>,
+  previousValue: string | undefined,
+  versionChangeCtx: VersionChangeContext,
   structureChanged: boolean,
-): number {
-  const parser = new Parser();
-  const startValue = item.initialValue ?? 0;
-
-  // 1. Check for Reset
+): string {
   let shouldReset = false;
 
-  // A. Structural Change
+  // Priority A: Structural Change (Internal Cascade)
   if (structureChanged) {
     shouldReset = true;
-  }
-
-  // B. Core Version Change
-  if (!shouldReset && coreChanged) {
-    const resetOn = Array.isArray(item.resetOn)
-      ? item.resetOn
-      : [item.resetOn ?? SemverExtensionResetOnOptions.none];
+  } // Priority B: Configured 'reset-on' triggers (External Context)
+  else {
+    const resetOn = Array.isArray(item.resetOn) ? item.resetOn : [item.resetOn];
 
     if (
-      resetOn.includes(SemverExtensionResetOnOptions.major) ||
-      resetOn.includes(SemverExtensionResetOnOptions.minor) ||
-      resetOn.includes(SemverExtensionResetOnOptions.patch)
+      (resetOn.includes(SemverExtensionResetOnOptions.major) &&
+        versionChangeCtx.majorChanged) ||
+      (resetOn.includes(SemverExtensionResetOnOptions.minor) &&
+        versionChangeCtx.minorChanged) ||
+      (resetOn.includes(SemverExtensionResetOnOptions.patch) &&
+        versionChangeCtx.patchChanged) ||
+      (resetOn.includes(SemverExtensionResetOnOptions.prerelease) &&
+        versionChangeCtx.prereleaseChanged)
     ) {
       shouldReset = true;
     }
   }
 
-  // 2. Reset or Increment
   if (shouldReset) {
-    return startValue;
+    return item.initialValue.toString();
   }
 
-  // Handle "string number" from previous build metadata safely
-  let v = startValue;
-  if (typeof previousValue === "number") {
-    v = previousValue;
-  } else if (typeof previousValue === "string") {
-    const parsed = Number(previousValue);
-    if (!isNaN(parsed)) {
-      v = parsed;
-    }
+  const v = parseInt(previousValue ?? "", 10);
+
+  if (isNaN(v)) {
+    return item.initialValue.toString();
   }
 
-  // 3. Evaluate Expression
-  const expr = item.nextValueExpression ?? "v+1";
-
-  try {
-    const result = parser.evaluate(expr, {
-      v,
-      ...item.expressionVariables,
-    });
-    return Math.floor(Number(result));
-  } catch (_e) {
-    return startValue;
-  }
+  return (v + 1).toString();
 }

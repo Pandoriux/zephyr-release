@@ -1,18 +1,17 @@
 import * as v from "@valibot/valibot";
-import { BumpRuleSchema } from "./components/bump-rule.ts";
+import { BumpRuleCoreSchema } from "./components/bump-rule-core.ts";
+import { BumpRuleExtensionSchema } from "./components/bump-rule-extension.ts";
 import {
   DEFAULT_MAJOR_BUMP_STRATEGY,
   DEFAULT_MINOR_BUMP_STRATEGY,
   DEFAULT_PATCH_BUMP_STRATEGY,
 } from "../../../constants/defaults/bump-strategy.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
-import { BumpRulePrereleaseSchema } from "./components/bump-rule-prerelease.ts";
-import { BumpRuleBuildSchema } from "./components/bump-rule-build.ts";
 
 export const BumpStrategyConfigSchema = v.pipe(
   v.object({
     major: v.pipe(
-      v.optional(BumpRuleSchema, DEFAULT_MAJOR_BUMP_STRATEGY),
+      v.optional(BumpRuleCoreSchema, DEFAULT_MAJOR_BUMP_STRATEGY),
       v.metadata({
         description: "Strategy for bumping major version (x.2.3).\n" +
           `Default: ${
@@ -25,7 +24,7 @@ export const BumpStrategyConfigSchema = v.pipe(
       }),
     ),
     minor: v.pipe(
-      v.optional(BumpRuleSchema, DEFAULT_MINOR_BUMP_STRATEGY),
+      v.optional(BumpRuleCoreSchema, DEFAULT_MINOR_BUMP_STRATEGY),
       v.metadata({
         description: "Strategy for bumping minor version (1.x.3).\n" +
           `Default: ${
@@ -38,7 +37,7 @@ export const BumpStrategyConfigSchema = v.pipe(
       }),
     ),
     patch: v.pipe(
-      v.optional(BumpRuleSchema, DEFAULT_PATCH_BUMP_STRATEGY),
+      v.optional(BumpRuleCoreSchema, DEFAULT_PATCH_BUMP_STRATEGY),
       v.metadata({
         description: "Strategy for bumping patch version (1.2.x).\n" +
           `Default: ${
@@ -52,13 +51,13 @@ export const BumpStrategyConfigSchema = v.pipe(
     ),
 
     prerelease: v.pipe(
-      v.optional(BumpRulePrereleaseSchema, {}),
+      v.optional(BumpRuleExtensionSchema, {}),
       v.metadata({
         description: "Strategy for bumping prerelease version (1.2.3-x.x).",
       }),
     ),
     build: v.pipe(
-      v.optional(BumpRuleBuildSchema, {}),
+      v.optional(BumpRuleExtensionSchema, {}),
       v.metadata({
         description: "Strategy for bumping build metadata (1.2.3+x.x).",
       }),

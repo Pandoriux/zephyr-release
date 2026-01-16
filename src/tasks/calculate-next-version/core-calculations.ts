@@ -1,7 +1,7 @@
 import type { SemVer } from "@std/semver";
 import type { ResolvedCommit } from "../commit.ts";
 import type { BumpStrategyConfigOutput } from "../../schemas/configs/modules/bump-strategy-config.ts";
-import type { BumpRuleOutput } from "../../schemas/configs/modules/components/bump-rule.ts";
+import type { BumpRuleOutput } from "../../schemas/configs/modules/components/bump-rule-core.ts";
 import { countBreakingAsOptions } from "../../constants/bump-rules.ts";
 
 export function calculateNextCoreSemVer(
