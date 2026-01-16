@@ -26,7 +26,7 @@ First, you will need a config file, below is a minial working one:
 }
 ```
 
-> for full list of options, see config-options.md
+> for full list of options, see [config-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md)
 
 Second, you need an input file. For github, it is your `.github/workflows/zephyr-release.yml`:
 
@@ -70,7 +70,7 @@ jobs:
           source-mode: "local"
 ```
 
-> for full list of options, see inputs-options.md
+> for full list of options, see [inputs-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md)
 
 <br/>
 
@@ -112,14 +112,35 @@ END_OVERRIDE_CHANGES
 
 Once a change is detected, Zephyr Release automatically creates (or updates) a **"Release Preparation" Pull Request**.
 
-* **Version Calculation**: It calculates the next [Semantic Version](https://semver.org/) based on your commit history.
-* **File Updates**: It updates the version in the files defined in your `version-files` configuration (e.g., `deno.json`).
-* **Changelog Preview**: It generates a preview of the upcoming release notes for your review.
-* **Sync**: The PR stays open and updates automatically with every new commit pushed to your branch.
+- **Version Calculation**: It calculates the next [Semantic Version](https://semver.org/) based on your commit history.
+- **File Updates**: It updates the version in the files defined in your `version-files` configuration (e.g., `deno.json`).
+- **Changelog Preview**: It generates a preview of the upcoming release notes for your review.
+- **Sync**: The PR stays open and updates automatically with every new commit pushed to your branch.
 
 ### 3. The Release
 
 When you are ready to ship, simply **merge** the "Release Preparation" PR. Zephyr Release detects that this specific "prepare" commit has landed in your default branch and will:
 
-* **Create a Git Tag**: Automatically tags the repository with the new version number.
-* **Publish Release Notes**: Generates and publishes the final release.
+- **Create a Git Tag**: Automatically tags the repository with the new version number.
+- **Publish Release Notes**: Generates and publishes the final release.
+
+## Force a Specific Version
+
+Sometimes you need to set a version number manually instead of letting the tool calculate it for you.
+
+You can do this by adding `release-as:` or `release as:` (case insensitive) followed by the version you want.
+
+**Example:**
+
+```text
+feat: add a massive new feature
+
+This change is so big we want to jump to 2.0.0.
+
+release-as: 2.0.0
+```
+
+### Important things to know
+
+- **Only the current commit works:** Zephyr Release only looks for this footer in the **specific commit** that triggers the release. If you had a "release-as" footer in an old commit from last week, it will be ignored.
+- **Permissions:** By default, any commit can use this. However, you can change the [`allowReleaseAs`](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#allow-release-as-optional) setting in your config if you only want certain commit types (like `feat`) to be allowed to force a version.

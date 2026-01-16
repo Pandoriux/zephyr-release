@@ -37,7 +37,7 @@ export const CommandHookSchema = v.object({
     ),
     v.metadata({
       description: "Commands to run before the operation.\n" +
-        "List of exposed env variables: to-do-insert-later",
+        "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
     }),
   ),
   post: v.pipe(
@@ -46,7 +46,7 @@ export const CommandHookSchema = v.object({
     ),
     v.metadata({
       description: "Commands to run after the operation.\n" +
-        "List of exposed env variables: to-do-insert-later",
+        "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
     }),
   ),
 });

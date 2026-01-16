@@ -30,7 +30,7 @@ inputs:
   source-mode:
     description: > 
       Execution strategy (`remote` or `local`). Accepts a string or a JSON object for granular control over which operations 
-      use the local filesystem vs remote API. See: [link-to-docs]
+      use the local filesystem vs remote API. See: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
     required: false
     default: "remote"
 

@@ -11,7 +11,7 @@ In GitHub: using [`@actions/core`](https://github.com/actions/toolkit/tree/main/
   - [Zephyr Release operation variables](#zephyr-release-operation-variables)
 - [Variable availability stages](#variable-availability-stages)
   - [Base (available at all time)](#base-available-at-all-time)
-  - [When target is "prepare"](#when-target-is-prepare)
+  - [Prepare (when target is "prepare")](#prepare-when-target-is-prepare)
 
 ## Summary
 

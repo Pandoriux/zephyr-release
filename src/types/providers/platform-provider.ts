@@ -15,6 +15,8 @@ export interface PlatformProvider {
   getNamespace: () => string;
   getRepositoryName: () => string;
 
+  manageConcurrency: (token: string) => Promise<void>;
+
   getTextFileOrThrow: (
     workspacePath: string,
     filePath: string,
@@ -47,5 +49,4 @@ export interface PlatformProvider {
   exportVariables: (exportObj: Record<string, unknown>) => void;
 
   getConventionalCommitParserOptions: () => ParserOptions;
-  // more
 }

@@ -79,7 +79,6 @@ export const SemverExtensionSchema = v.variant("type", [
           'For "prerelease" and "build", a reset is triggered only when "static" values change, ' +
           'or when "static", "incremental", "timestamp" or "date" are added or removed. ' +
           'Any changes to "dynamic" values, including their addition or removal, do not trigger a reset.\n' +
-          "link insert here\n" +
           'Default: "none"',
       }),
     ),
