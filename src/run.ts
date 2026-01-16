@@ -12,6 +12,7 @@ import {
 import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
 import { prepareWorkflow } from "./workflows/prepare.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
+import { manageConcurrency } from "./tasks/concurrency.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Setup operation");
@@ -21,6 +22,10 @@ export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get inputs");
   const inputs = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get inputs");
+
+  logger.stepStart("Starting: Manage concurrency");
+  await manageConcurrency(provider, inputs);
+  logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
   const config = await resolveConfigOrThrow(provider, inputs);
