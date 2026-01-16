@@ -7,7 +7,7 @@ import {
   type SemverExtensionType,
 } from "../../../../constants/semver-extension-options.ts";
 
-function SemverExtensionTypeSchema(type: SemverExtensionType) {
+function SemverExtensionTypeSchema<T extends SemverExtensionType>(type: T) {
   return v.pipe(
     v.literal(type),
     v.metadata({
@@ -15,14 +15,14 @@ function SemverExtensionTypeSchema(type: SemverExtensionType) {
         "Specifies the type of pre-release/build identifier/metadata.\n" +
         '"static": A stable label that should not change often. Examples: "alpha", "beta", "rc".\n' +
         '"dynamic": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n' +
-        '"incremental": Integer value that changes over time.\n' +
+        '"incremental": Integer value that auto-increments by 1.\n' +
         '"timestamp": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n' +
         '"date": A date string that changes over time.',
     }),
   );
 }
 
-export const SemverExtensionsSchema = v.variant("type", [
+export const SemverExtensionSchema = v.variant("type", [
   v.object({
     type: SemverExtensionTypeSchema("static"),
     value: v.pipe(
@@ -59,34 +59,16 @@ export const SemverExtensionsSchema = v.variant("type", [
     initialValue: v.pipe(
       v.optional(v.pipe(v.number(), v.safeInteger()), 0),
       v.metadata({
-        description: "Initial integer number value.\n" + "Default: 0",
-      }),
-    ),
-    expressionVariables: v.pipe(
-      v.optional(
-        v.record(v.pipe(v.string(), v.trim(), v.nonEmpty()), v.unknown()),
-      ),
-      v.metadata({
         description:
-          'Defines custom variables for use in `nextValueExpression`, "v" is reserved for current value. ' +
-          "These variables are usually set dynamically.",
-      }),
-    ),
-    nextValueExpression: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "v+1"),
-      v.metadata({
-        description:
-          'Expression for computing the next value, where "v" represents the current value. The expression ' +
-          "must evaluate to an integer number.\n" +
-          "Evaluated with `expr-eval`: https://www.npmjs.com/package/expr-eval \n" +
-          'Default: "v+1"',
+          "Initial integer number value, will auto-increment by 1 on each bump.\n" +
+          "Default: 0",
       }),
     ),
     resetOn: v.pipe(
       v.optional(
         v.union([
           v.enum(SemverExtensionResetOnOptions),
-          v.array(v.enum(SemverExtensionResetOnOptions)),
+          v.pipe(v.array(v.enum(SemverExtensionResetOnOptions)), v.nonEmpty()),
         ]),
         "none",
       ),
@@ -95,7 +77,7 @@ export const SemverExtensionsSchema = v.variant("type", [
           "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. " +
           'Allowed values: "major", "minor", "patch", "prerelease", "build", and "none".\n' +
           'For "prerelease" and "build", a reset is triggered only when "static" values change, ' +
-          'or when "static", "incremental", or "timestamp" values are added or removed. ' +
+          'or when "static", "incremental", "timestamp" or "date" are added or removed. ' +
           'Any changes to "dynamic" values, including their addition or removal, do not trigger a reset.\n' +
           "link insert here\n" +
           'Default: "none"',
@@ -133,9 +115,9 @@ export const SemverExtensionsSchema = v.variant("type", [
   }),
 ]);
 
-type _SemverExtensionsInput = v.InferInput<
-  typeof SemverExtensionsSchema
+type _SemverExtensionInput = v.InferInput<
+  typeof SemverExtensionSchema
 >;
-type _SemverExtensionsOutput = v.InferOutput<
-  typeof SemverExtensionsSchema
+export type SemverExtensionOutput = v.InferOutput<
+  typeof SemverExtensionSchema
 >;

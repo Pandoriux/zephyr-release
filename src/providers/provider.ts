@@ -1,5 +1,5 @@
 import process from "node:process";
-import type { PlatformProvider } from "../types/platform-provider.ts";
+import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 
 export async function getProviderOrThrow(): Promise<PlatformProvider> {
   if (process.env.GITHUB_ACTIONS === "true") {

@@ -5,13 +5,14 @@ export const CommitTypeSchema = v.object({
     v.string(),
     v.trim(),
     v.nonEmpty(),
+    v.toLowerCase(),
     v.metadata({ description: "Commit type name." }),
   ),
   section: v.pipe(
-    v.optional(v.pipe(v.string(), v.trim())),
+    v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
     v.metadata({
       description:
-        "Changelog section heading for this commit type. When empty, `type` value is used.\n",
+        "Changelog section heading for this commit type. When not provided, `type` value is used.\n",
     }),
   ),
   hidden: v.pipe(

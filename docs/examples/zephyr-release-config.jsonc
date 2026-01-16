@@ -43,15 +43,6 @@
     }
   ],
 
-  // Ex: Include base files plus additional docs/artifacts
-  "files-to-commit": [
-    "base",
-    "docs/**/*.md",
-    "dist/**"
-  ],
-  // Ex: Only custom paths (no keywords)
-  // "files-to-commit": ["CHANGELOG.md", "package.json"],
-
   "commit-types": [
     {
       "type": "feat",
@@ -70,6 +61,12 @@
       "hidden": true
     }
   ],
+
+  // Ex: List of commit type(s) allowed to trigger 'release-as'. Use "ALL" for any commit type, "BASE" for types in commit-types, or combine them
+  "allow-release-as": "ALL",
+  // Other examples:
+  // "allow-release-as": ["BASE", "chore", "ci", "cd"],
+  // "allow-release-as": "BASE",
 
   "bump-strategy": {
     // Ex: This strategy will trigger major bump only on breaking changes
@@ -94,9 +91,9 @@
       "enabled": true,
       // This setting should only be used in workflow inputs, not in config file
       "override": [],
-      "identifiers": [
+      "extensions": [
         { "type": "static", "value": "alpha" },
-        { "type": "incremental", "initial-value": 0, "next-value-expression": "v+1", "reset-on": "patch" }
+        { "type": "incremental", "initial-value": 0, "reset-on": "patch" }
       ]
     },
     // Ex: Build metadata strategy with timestamp
@@ -104,7 +101,7 @@
       "enabled": false,
       // This setting should only be used in workflow inputs, not in config file
       "override": [],
-      "metadata": [
+      "extensions": [
         { "type": "timestamp", "unit": "s" }
       ]
     },
@@ -117,7 +114,8 @@
   },
 
   "changelog": {
-    "enabled": true,
+    "writeToFile": true,
+    "path": "CHANGELOG.md",
 
     // Ex: Run commands before and after changelog generation
     "command-hook": {
@@ -129,8 +127,6 @@
 
     // This setting should only be used in workflow inputs, not in config file
     "content-body-override": "",
-
-    "path": "CHANGELOG.md",
 
     "header-pattern": "# Changelog\\n\\n<br/>\\n",
     // "header-pattern-path": "",
@@ -144,8 +140,6 @@
   },
 
   "pull-request": {
-    "enabled": true,
-
     // Ex: Run commands before and after pull request creation
     "command-hook": {
       "timeout": 60000,
@@ -153,6 +147,13 @@
       "pre": [],
       "post": ["npm run notify:pr"]
     },
+
+    // Ex: Include additional files using "ALL" option
+    "files-to-commit": "ALL",
+    // Ex: Include specific paths/globs
+    // "files-to-commit": ["docs/**/*.md", "dist/**"],
+    // Ex: Single path
+    // "files-to-commit": ["CHANGELOG.md"],
 
     "branch-name-pattern": "release/zephyr-release",
 

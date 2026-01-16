@@ -1,4 +1,3 @@
 export const filesToCommitOptions = {
-  base: "base",
-  all: "all",
+  all: "ALL",
 } as const;

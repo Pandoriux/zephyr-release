@@ -7,6 +7,8 @@ export interface CoreLogger {
   debug: (message: string) => void;
   isDebugEnabled?: () => boolean;
 
+  warn: (message: string) => void;
+
   setFailed: (message: string | Error) => void;
 }
 
@@ -22,7 +24,12 @@ export interface Logger {
   endGroup: () => void;
 
   debug: (message: string) => void;
+  debugStepStart: (message: string) => void;
+  debugStepFinish: (message: string) => void;
+  debugStepSkip: (message: string) => void;
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => void;
+
+  warn: (message: string) => void;
 
   setFailed: (message: string | Error) => void;
 
@@ -38,5 +45,5 @@ export type DebugLogger = Pick<Logger, "info" | "startGroup" | "endGroup">;
 
 export type IndentLogger = Pick<
   Logger,
-  "info" | "startGroup" | "endGroup" | "debug" | "debugWrap"
+  "info" | "startGroup" | "endGroup" | "debug" | "debugWrap" | "warn"
 >;

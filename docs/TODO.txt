@@ -41,3 +41,41 @@ resetOn: v.pipe(
     }),
   ),
 });
+
+source-mode:
+    description: > 
+      Execution strategy (`remote` or `local`). Accepts a string or a JSON object for granular control over which operations 
+      use the local filesystem vs remote API. See: [link-to-docs]
+    required: false
+    default: "remote"
+
+```json
+{
+  "$schema": "../../schemas/config-v1.json",
+
+  "version-files": {
+    "path": "deno.json",
+    "selector": "$.version"
+  }
+}
+```
+
+for full list of options, see inputs-options.md
+
+allowReleaseAs: v.pipe(
+    v.optional(
+      v.union([
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+      ]),
+      "ALL",
+    ),
+    v.metadata({
+      description:
+        "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
+        'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
+        "About 'release-as': [links]\n" +
+        'Default: "ALL"',
+      examples: [["BASE", "chore", "ci", "cd"]],
+    }),
+  ),

@@ -6,6 +6,8 @@ It is recommended to use `schema link to be inserted later` when writing the con
 
 Some example config JSON files: `example links to be inserted later`
 
+String interpolation in templates (like `"version-${version}"`) using string patterns like `${version}` is documented in [String Patterns](./string-patterns.md), including operation-defined `${namespace}` and `${repository}`.
+
 ## Table of Content <!-- omit from toc -->
 
 - [Options](#options)
@@ -14,11 +16,11 @@ Some example config JSON files: `example links to be inserted later`
   - [command-hook (Optional)](#command-hook-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
-  - [files-to-commit (Optional)](#files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
     - [commit... \> hidden (Optional)](#commit--hidden-optional)
+  - [allow-release-as (Optional)](#allow-release-as-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
@@ -28,50 +30,45 @@ Some example config JSON files: `example links to be inserted later`
     - [bump... \> bump-minor-for-major-pre-stable (Optional)](#bump--bump-minor-for-major-pre-stable-optional)
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
-    - [changelog \> enabled (Optional)](#changelog--enabled-optional)
+    - [changelog \> writeToFile (Optional)](#changelog--writetofile-optional)
+    - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> command-hook (Optional)](#changelog--command-hook-optional)
     - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
-    - [changelog \> path (Optional)](#changelog--path-optional)
-    - [changelog \> header-pattern (Optional)](#changelog--header-pattern-optional)
-    - [changelog \> header-pattern-path (Optional)](#changelog--header-pattern-path-optional)
-    - [changelog \> footer-pattern (Optional)](#changelog--footer-pattern-optional)
-    - [changelog \> footer-pattern-path (Optional)](#changelog--footer-pattern-path-optional)
-    - [changelog \> heading-pattern (Optional)](#changelog--heading-pattern-optional)
-    - [changelog \> body-pattern (Optional)](#changelog--body-pattern-optional)
-    - [changelog \> body-pattern-path (Optional)](#changelog--body-pattern-path-optional)
+    - [changelog \> header-template (Optional)](#changelog--header-template-optional)
+    - [changelog \> header-template-path (Optional)](#changelog--header-template-path-optional)
+    - [changelog \> footer-template (Optional)](#changelog--footer-template-optional)
+    - [changelog \> footer-template-path (Optional)](#changelog--footer-template-path-optional)
+    - [changelog \> heading-template (Optional)](#changelog--heading-template-optional)
+    - [changelog \> body-template (Optional)](#changelog--body-template-optional)
+    - [changelog \> body-template-path (Optional)](#changelog--body-template-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
-    - [pull... \> enabled (Optional)](#pull--enabled-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
-    - [pull... \> branch-name-pattern (Optional)](#pull--branch-name-pattern-optional)
+    - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
+    - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
     - [pull... \> label (Optional)](#pull--label-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
-    - [pull... \> title-pattern (Optional)](#pull--title-pattern-optional)
-    - [pull... \> header-pattern (Optional)](#pull--header-pattern-optional)
-    - [pull... \> body-pattern (Optional)](#pull--body-pattern-optional)
-    - [pull... \> body-pattern-path (Optional)](#pull--body-pattern-path-optional)
-    - [pull... \> footer-pattern (Optional)](#pull--footer-pattern-optional)
+    - [pull... \> title-template (Optional)](#pull--title-template-optional)
+    - [pull... \> header-template (Optional)](#pull--header-template-optional)
+    - [pull... \> body-template (Optional)](#pull--body-template-optional)
+    - [pull... \> body-template-path (Optional)](#pull--body-template-path-optional)
+    - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> skip-release (Optional)](#release--skip-release-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
-    - [release \> tag-name-pattern (Optional)](#release--tag-name-pattern-optional)
-    - [release \> title-pattern (Optional)](#release--title-pattern-optional)
-    - [release \> body-pattern (Optional)](#release--body-pattern-optional)
+    - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
+    - [release \> title-template (Optional)](#release--title-template-optional)
+    - [release \> body-template (Optional)](#release--body-template-optional)
 - [Type Definitions](#type-definitions)
   - [CommandHook](#commandhook)
   - [Command](#command)
   - [VersionFile](#versionfile)
   - [BumpRule](#bumprule)
-  - [BumpRulePrerelease](#bumpruleprerelease)
-  - [BumpRuleBuild](#bumprulebuild)
+  - [BumpRuleExtension](#bumpruleextension)
   - [SemverExtension](#semverextension)
   - [Label](#label)
-- [Exposed env variables](#exposed-env-variables)
-  - [All](#all)
-  - [placeholder 1](#placeholder-1)
-  - [placeholder 2](#placeholder-2)
   
 ## Options
 
@@ -80,7 +77,7 @@ Some example config JSON files: `example links to be inserted later`
 Type: `string`  
 Default: `""`
 
-The project name used in [naming patterns](./string-patterns.md) (available as `${name}`).
+The project name used in [string templates](./string-patterns.md) (available as `${name}`).
 
 ### time-zone (Optional)
 
@@ -88,7 +85,7 @@ Type: `string`
 Default: `"UTC"`
 
 IANA time zone used to format and display times.  
-This value is also available for use in [naming patterns](./string-patterns.md) as `${timeZone}`.
+This value is also available for use in [string templates](./string-patterns.md) as `${timeZone}`.
 
 ### command-hook (Optional)
 
@@ -96,7 +93,7 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the main operation. Each command runs from the repository root.
 
-List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
 
@@ -122,25 +119,6 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 See [`VersionFile`](#versionfile) for the type definition.
-
-### files-to-commit (Optional)
-
-Type: `"base" | "all" | string[]`  
-Default: `"base"`
-
-Files to include in the commit. Accepts `base`, `all` or an array of paths/globs. Paths are relative to the repo root.
-
-- **`base`**: Includes files affected by the script, such as:
-  - Changelog file (defined in [`changelog > file-path`](#changelog--file-path-optional))
-  - Version files (defined in [`version-files`](#version-files-required))
-  
-- **`all`**: Includes all files from `base` plus optionally changed files created by commands from:
-  - Base [`command-hook`](#command-hook-optional)
-  - [`changelog > command-hook`](#changelog--command-hook-optional)
-  - [`pull-request > command-hook`](#pull--command-hook-optional)
-  - [`release > command-hook`](#release--command-hook-optional)
-
-- **Array of options/paths/globs**: Allows `base`, `all` or/and paths, globs. For example, `["base", "docs/**/*.md", "dist/**"]` or `["CHANGELOG.md", "package.json"]`.
 
 ### commit-types (Optional)
 
@@ -169,6 +147,22 @@ Type: `boolean`
 Default: `false`
 
 Exclude this commit type from changelog generation (does not affect version bump calculation).
+
+### allow-release-as (Optional)
+
+Type: `string | string[]`  
+Default: `"ALL"`
+
+List of commit type(s) allowed to trigger `release-as`. Accepts a single string or an array of strings.
+
+**Special values:**
+
+- `"ALL"`: Accepts any commit type (default behavior)
+- `"BASE"`: Uses the list of commit types defined in [`commit-types`](#commit-types-optional)
+
+You can combine `"BASE"` with other commit types. For example: `["BASE", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
+
+`release-as`: [links]
 
 ### bump-strategy (Optional)
 
@@ -202,21 +196,21 @@ See [`BumpRule`](#bumprule) for the type definition.
 
 #### bump... > prerelease (Optional)
 
-Type: [`BumpRulePrerelease`](#bumpruleprerelease)  
+Type: [`BumpRuleExtension`](#bumpruleextension)  
 Default: `{}`
 
 Strategy for bumping prerelease version (1.2.3-x.x).
 
-See [`BumpRulePrerelease`](#bumpruleprerelease) for the type definition.
+See [`BumpRuleExtension`](#bumpruleextension) for the type definition.
 
 #### bump... > build (Optional)
 
-Type: [`BumpRuleBuild`](#bumprulebuild)  
+Type: [`BumpRuleExtension`](#bumpruleextension)  
 Default: `{}`
 
 Strategy for bumping build metadata (1.2.3+x.x).
 
-See [`BumpRuleBuild`](#bumprulebuild) and [`SemverExtension`](#semverextension) for the type definitions.
+See [`BumpRuleExtension`](#bumpruleextension) and [`SemverExtension`](#semverextension) for the type definitions.
 
 #### bump... > bump-minor-for-major-pre-stable (Optional)
 
@@ -235,16 +229,23 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#changelog--enabled-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`path`](#changelog--path-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
 
-Configuration specific to changelogs. All generated changelog content are available in [string patterns](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
+Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
-#### changelog > enabled (Optional)
+#### changelog > writeToFile (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Enable/disable changelog. When disabled, changelogs are still generated for pull requests, releases and [string patterns](./string-patterns.md) but they won't be written to file.
+Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-patterns.md) but they won't be written to file.
+
+#### changelog > path (Optional)
+
+Type: `string`  
+Default: `"CHANGELOG.md"`
+
+Path to the file where the generated changelog will be written to, relative to the project root.
 
 #### changelog > command-hook (Optional)
 
@@ -257,73 +258,59 @@ Pre/post command lists to run around the changelog operation. Each command runs 
 Type: `string`  
 Default: `""`
 
-User-provided changelog content body, available in [string patterns](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
+User-provided changelog content body, available in [string templates](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
 
-#### changelog > path (Optional)
-
-Type: `string`  
-Default: `"CHANGELOG.md"`
-
-Path to the file where the generated changelog will be written to, relative to the project root.
-
-#### changelog > header-pattern (Optional)
+#### changelog > header-template (Optional)
 
 Type: `string`  
 Default: `"# Changelog\n\n<br/>\n"`
 
-Pattern for changelog file header. Placed above any changelog content sections.
+String template for changelog file header, using with string patterns like `${version}`. Placed above any changelog content sections.
 
-#### changelog > header-pattern-path (Optional)
-
-Type: `string`
-
-Path to text file containing changelog file header. Overrides `header-pattern` when both are provided.
-
-#### changelog > footer-pattern (Optional)
+#### changelog > header-template-path (Optional)
 
 Type: `string`
 
-Pattern for changelog file footer. Placed below any changelog content section.
+Path to text file containing changelog file header. Overrides `header-template` when both are provided.
 
-#### changelog > footer-pattern-path (Optional)
+#### changelog > footer-template (Optional)
 
 Type: `string`
 
-Path to text file containing changelog file footer. Overrides `footer-pattern` when both are provided.
+String template for changelog file footer, using with string patterns like `${version}`. Placed below any changelog content section.
 
-#### changelog > heading-pattern (Optional)
+#### changelog > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog file footer. Overrides `footer-template` when both are provided.
+
+#### changelog > heading-template (Optional)
 
 Type: `string`  
 Default: `"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"`
 
-Pattern for heading of a changelog content section.
+String template for heading of a changelog content section, using with string patterns like `${tagName}`.
 
-#### changelog > body-pattern (Optional)
+#### changelog > body-template (Optional)
 
 Type: `string`  
 Default: `"${changelogContentBody}"`
 
-Pattern for body of a changelog content section.
+String template for body of a changelog content section, using with string patterns like `${changelogContentBody}`.
 
-#### changelog > body-pattern-path (Optional)
+#### changelog > body-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing body of a changelog content section. Overrides `body-pattern` when both are provided.
+Path to text file containing body of a changelog content section. Overrides `body-template` when both are provided.
 
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#pull--enabled-optional), [`command-hook`](#pull--command-hook-optional), [`branch-name-pattern`](#pull--branch-name-pattern-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-pattern`](#pull--title-pattern-optional), [`header-pattern`](#pull--header-pattern-optional), [`body-pattern`](#pull--body-pattern-optional), [`body-pattern-path`](#pull--body-pattern-path-optional), [`footer-pattern`](#pull--footer-pattern-optional)
+**Properties:** [`command-hook`](#pull--command-hook-optional), [`files-to-commit`](#pull--files-to-commit-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
-
-#### pull... > enabled (Optional)
-
-Type: `boolean`  
-Default: `true`
-
-Enable/disable pull request creation. If disabled, version changes, changelog, tags, and releases will be committed and created directly.
 
 #### pull... > command-hook (Optional)
 
@@ -331,14 +318,20 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
-List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+List of exposed env variables: see [Export operation variables](./export-variables.md).
 
-#### pull... > branch-name-pattern (Optional)
+#### pull... > files-to-commit (Optional)
+
+Type: `string | string[]`
+
+Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
+
+#### pull... > branch-name-template (Optional)
 
 Type: `string`  
 Default: `"release/zephyr-release"`
 
-Pattern for branch name that Zephyr Release uses.
+String template for branch name that Zephyr Release uses, using with string patterns like `${name}`, `${namespace}`, `${repository}`.
 
 #### pull... > label (Optional)
 
@@ -364,44 +357,44 @@ Additional labels to attach to pull requests, managed and supplied by you. Unlik
 - `onCloseAdd` (Optional): Additional labels to add when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names).
 - `onCloseRemove` (Optional): Additional labels to remove when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names). Use `"allOnCreate"` to remove all labels added in `onCreateAdd`.
 
-#### pull... > title-pattern (Optional)
+#### pull... > title-template (Optional)
 
 Type: `string`  
 Default: `"chore: release v${version}"`
 
-Pattern for pull request title.
+String template for pull request title, using with string patterns like `${version}`.
 
-#### pull... > header-pattern (Optional)
+#### pull... > header-template (Optional)
 
 Type: `string | string[]`  
 Default: `"🤖 New release created. Stand by for approval"`
 
-Pattern for pull request header. If an array is provided, it will randomly choose one from it.
+String template for pull request header, using with string patterns like `${version}`. If an array is provided, it will randomly choose one from it.
 
-#### pull... > body-pattern (Optional)
+#### pull... > body-template (Optional)
 
 Type: `string`  
 Default: `"${changelogContent}"`
 
-Pattern for pull request body.
+String template for pull request body, using with string patterns like `${changelogContent}`.
 
-#### pull... > body-pattern-path (Optional)
+#### pull... > body-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing pull request body pattern. Overrides body pattern if both are provided.
+Path to text file containing pull request body template. Overrides body template if both are provided.
 
-#### pull... > footer-pattern (Optional)
+#### pull... > footer-template (Optional)
 
 Type: `string`  
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
-Pattern for pull request footer.
+String template for pull request footer, using with string patterns.
 
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`command-hook`](#release--command-hook-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-pattern`](#release--tag-name-pattern-optional), [`title-pattern`](#release--title-pattern-optional), [`body-pattern`](#release--body-pattern-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`command-hook`](#release--command-hook-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`title-template`](#release--title-template-optional), [`body-template`](#release--body-template-optional)
 
 Configuration specific to tags and releases.
 
@@ -439,26 +432,26 @@ Default: `false`
 
 If enabled, the release will be marked as prerelease.
 
-#### release > tag-name-pattern (Optional)
+#### release > tag-name-template (Optional)
 
 Type: `string`  
 Default: `"v${version}"`
 
-Pattern for tag name, must always include `${version}`. Available in [string patterns](./string-patterns.md) as `${tagName}`.
+String template for tag name, using with string patterns like `${version}`. Must always include `${version}`. Available in [string templates](./string-patterns.md) as `${tagName}`.
 
-#### release > title-pattern (Optional)
+#### release > title-template (Optional)
 
 Type: `string`  
 Default: `"${tagName}"`
 
-Pattern for release title.
+String template for release title, using with string patterns like `${tagName}`.
 
-#### release > body-pattern (Optional)
+#### release > body-template (Optional)
 
 Type: `string`  
 Default: `"${changelogContent}"`
 
-Pattern for release body.
+String template for release body, using with string patterns like `${changelogContent}`.
 
 ## Type Definitions
 
@@ -471,10 +464,10 @@ Type: `object`
 - `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
 - `pre` (Optional): Commands to run before the operation.  
   Each command can be either a `string` or a [`Command`](#command) object.  
-  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+  List of exposed env variables: see [Export operation variables](./export-variables.md).
 - `post` (Optional): Commands to run after the operation.  
   Each command can be either a `string` or a [`Command`](#command) object.  
-  List of exposed env variables: see [Exposed env variables](#exposed-env-variables).
+  List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 ### Command
 
@@ -511,23 +504,15 @@ Type: `object`
 
 Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
-### BumpRulePrerelease
+### BumpRuleExtension
 
 Type: `object`  
 **Properties:**
 
-- `enabled` (Optional): Enable/disable handling of pre-release identifiers. Default: `false`
-- `override` (Optional): Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `identifiers` (Optional): Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers. Type: [`SemverExtension[]`](#semverextension)
-
-### BumpRuleBuild
-
-Type: `object`  
-**Properties:**
-
-- `enabled` (Optional): Enable/disable handling of build metadata. Default: `false`
-- `override` (Optional): Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config.
-- `metadata` (Optional): Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata. Type: [`SemverExtension[]`](#semverextension)
+- `enabled` (Optional): Enable/disable handling of SemVer extensions (pre-release identifiers / build metadata). Default: `false`
+- `override` (Optional): Overrides extension items to use for the next version. When provided, these values take precedence over all other bump rules in `extensions`. Should only be set dynamically, not in static config.
+- `treat-override-as-significant` (Optional): If set to `true`, the presence of an `override` is strictly treated as a structural change. This immediately triggers resets on any dependent version components (e.g., resetting the Build number). If `false`, overrides are treated as volatile/dynamic and ignored by reset logic. Default: `false`
+- `extensions` (Optional): Specifies the items to use for SemVer extensions. Type: [`SemverExtension[]`](#semverextension)
 
 ### SemverExtension
 
@@ -544,13 +529,11 @@ A discriminated union based on the `type` field. Specifies the type of pre-relea
 - `value` (Optional): The string value to use, should be set dynamically.
 - `fallback-value` (Optional): The fallback string value used when `value` is empty. If this is also empty, the identifier/metadata will be omitted from the array.
 
-**Type: `"incremental"`** — Integer value that changes over time.
+**Type: `"incremental"`** — Integer value that auto-increments by 1.
 
 - `type` (Required): `"incremental"`
-- `initial-value` (Optional): Initial integer number value. Default: `0`
-- `expression-variables` (Optional): Defines custom variables for use in `next-value-expression`, `v` is reserved for current value. These variables are usually set dynamically.
-- `next-value-expression` (Optional): Expression for computing the next value, where `v` represents the current value. The expression must evaluate to an integer number. Evaluated with [`expr-eval`](https://www.npmjs.com/package/expr-eval). Default: `"v+1"`
-- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, or `"timestamp"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
+- `initial-value` (Optional): Initial integer number value. The value will auto-increment by 1 on each bump. Default: `0`
+- `reset-on` (Optional): Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: `"major"`, `"minor"`, `"patch"`, `"prerelease"`, `"build"`, and `"none"`. For `"prerelease"` and `"build"`, a reset is triggered only when `"static"` values change, or when `"static"`, `"incremental"`, `"timestamp"` or `"date"` values are added or removed. Any changes to `"dynamic"` values, including their addition or removal, do not trigger a reset. Default: `"none"`
 
 **Type: `"timestamp"`** — Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).
 
@@ -571,16 +554,3 @@ Type: `object`
 - `name` (Required): Label name.
 - `description` (Optional): Label description.
 - `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
-
-## Exposed env variables
-
-### All
-
-These environment variables can be used in all commands.
-
-- `...process.env.*`: all env currently exposed by the system
-- Placeholder item 2
-
-### placeholder 1
-
-### placeholder 2

@@ -1,7 +1,6 @@
 import { VERSION } from "./version.generated.ts";
 import { logger } from "./tasks/logger.ts";
-
-const startTime = new Date();
+import { startTime } from "./main.ts";
 
 export function markProcessStart() {
   logger.info(

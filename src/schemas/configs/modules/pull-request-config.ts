@@ -1,31 +1,17 @@
 import * as v from "@valibot/valibot";
-import { LabelSchema } from "./components/label.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import { CoreLabelSchema } from "./components/core-label.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
+import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_PATTERN,
   DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
   DEFAULT_PULL_REQUEST_HEADER_PATTERN,
   DEFAULT_PULL_REQUEST_TITLE_PATTERN,
 } from "../../../constants/defaults/string-pattern.ts";
-import {
-  DEFAULT_LABEL_ON_CLOSE,
-  DEFAULT_LABEL_ON_CREATE,
-} from "../../../constants/defaults/label.ts";
-import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
-    enabled: v.pipe(
-      v.optional(v.boolean(), true),
-      v.metadata({
-        description:
-          "Enable/disable pull request. If disabled, version changes, changelog, tags, and releases " +
-          "will be committed and created directly.\n" +
-          "Default: true",
-      }),
-    ),
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
@@ -33,14 +19,33 @@ export const PullRequestConfigSchema = v.pipe(
           "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
       }),
     ),
+    filesToCommit: v.pipe(
+      v.optional(
+        v.union([
+          v.pipe(v.string(), v.trim(), v.nonEmpty()),
+          v.pipe(
+            v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+            v.nonEmpty(),
+          ),
+        ]),
+      ),
+      v.metadata({
+        description:
+          'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
+          "Paths are relative to the repo root.",
+        examples: ["ALL", ["some/path"], ["src/release-artifacts/*"]],
+      }),
+    ),
 
-    branchNamePattern: v.pipe(
+    branchNameTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
         "release/zephyr-release",
       ),
       v.metadata({
-        description: "Pattern for branch name that Zephyr Release uses.\n" +
+        description:
+          "String template for branch name that Zephyr Release uses. Allowed patterns to use are: " +
+          '"${name}", "${namespace}", "${repository}"\n' +
           'Default: "release/zephyr-release"',
       }),
     ),
@@ -62,54 +67,57 @@ export const PullRequestConfigSchema = v.pipe(
       }),
     ),
 
-    titlePattern: v.pipe(
+    titleTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
         DEFAULT_PULL_REQUEST_TITLE_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for pull request title.\n" +
+        description:
+          "String template for pull request title, using with string patterns like ${version}.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_PATTERN)}`,
       }),
     ),
-    headerPattern: v.pipe(
+    headerTemplate: v.pipe(
       v.optional(
         v.union([
           v.pipe(v.string(), v.trim()),
-          v.array(v.pipe(v.string(), v.trim())),
+          v.pipe(v.array(v.pipe(v.string(), v.trim())), v.nonEmpty()),
         ]),
         DEFAULT_PULL_REQUEST_HEADER_PATTERN,
       ),
       v.metadata({
         description:
-          "Pattern for pull request header. If an array is provided, one will be randomly chosen.\n" +
+          "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_PATTERN)}`,
       }),
     ),
-    bodyPattern: v.pipe(
+    bodyTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
         DEFAULT_PULL_REQUEST_BODY_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for pull request body.\n" +
+        description:
+          "String template for pull request body, using with string patterns like ${changelogContent}.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_PATTERN)}`,
       }),
     ),
-    bodyPatternPath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim())),
+    bodyTemplatePath: v.pipe(
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
       v.metadata({
         description:
-          "Path to text file containing pull request body pattern. Overrides body pattern if both are provided.",
+          "Path to text file containing pull request body template. Overrides body template if both are provided.",
       }),
     ),
-    footerPattern: v.pipe(
+    footerTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
         DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
       ),
       v.metadata({
-        description: "Pattern for pull request footer.\n" +
+        description:
+          "String template for pull request footer, using with string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_PATTERN)}`,
       }),
     ),
@@ -120,4 +128,6 @@ export const PullRequestConfigSchema = v.pipe(
 );
 
 type _PullRequestConfigInput = v.InferInput<typeof PullRequestConfigSchema>;
-type _PullRequestConfigOutput = v.InferOutput<typeof PullRequestConfigSchema>;
+export type PullRequestConfigOutput = v.InferOutput<
+  typeof PullRequestConfigSchema
+>;

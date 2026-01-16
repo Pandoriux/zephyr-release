@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 import { FileFormatsWithAuto } from "../../../../constants/file-formats.ts";
-import { VersionFileExtractors } from "../../../../constants/version-file-options.ts";
+import { VersionFileExtractorsWithAuto } from "../../../../constants/version-file-options.ts";
 
 export const VersionFileSchema = v.object({
   path: v.pipe(
@@ -20,7 +20,7 @@ export const VersionFileSchema = v.object({
     }),
   ),
   extractor: v.pipe(
-    v.optional(v.enum(VersionFileExtractors), "auto"),
+    v.optional(v.enum(VersionFileExtractorsWithAuto), "auto"),
     v.metadata({
       description:
         "Defines how to extract the version from the parsed file.\n" +
@@ -46,4 +46,4 @@ export const VersionFileSchema = v.object({
 });
 
 type _VersionFileInput = v.InferInput<typeof VersionFileSchema>;
-type _VersionFileOutput = v.InferOutput<typeof VersionFileSchema>;
+export type VersionFileOutput = v.InferOutput<typeof VersionFileSchema>;

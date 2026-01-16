@@ -1,16 +1,19 @@
 import { toCamelCase, toKebabCase } from "@std/text";
 import { map } from "obj-walker";
+import { isPlainObject, isPlainObjectOrArray } from "../validations/object.ts";
 
 export function transformObjKeyToKebabCase(
   obj: unknown,
   mutate: boolean = false,
 ): unknown {
-  if (!obj || typeof obj !== "object") {
-    return obj;
+  if (!isPlainObjectOrArray(obj)) {
+    throw new Error(
+      `'${transformObjKeyToKebabCase.name}' error: expected a plain object or array input`,
+    );
   }
 
   return map(obj, ({ val }) => {
-    if (val && typeof val === "object" && !Array.isArray(val)) {
+    if (isPlainObject(val)) {
       return Object.fromEntries(
         Object.entries(val).map(([k, v]) => [toKebabCase(k), v]),
       );
@@ -27,12 +30,14 @@ export function transformObjKeyToCamelCase(
   obj: unknown,
   mutate: boolean = false,
 ): unknown {
-  if (!obj || typeof obj !== "object") {
-    return obj;
+  if (!isPlainObjectOrArray(obj)) {
+    throw new Error(
+      `'${transformObjKeyToCamelCase.name}' error: expected a plain object or array input`,
+    );
   }
 
   return map(obj, ({ val }) => {
-    if (val && typeof val === "object" && !Array.isArray(val)) {
+    if (isPlainObject(val)) {
       return Object.fromEntries(
         Object.entries(val).map(([k, v]) => [toCamelCase(k), v]),
       );

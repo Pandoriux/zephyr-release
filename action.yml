@@ -8,13 +8,13 @@ branding:
 
 inputs:
   token:
-    description: Token for Zephyr Release. Defaults to GITHUB_TOKEN.
+    description: Token for Zephyr Release operations. Defaults to GITHUB_TOKEN.
     required: false
     default: ${{ github.token }}
   config-path:
     description: Path to config file, relative to project root.
     required: false
-    default: ""
+    default: "zephyr-release-config.json"
   config-format:
     description: The format of config file. Allowed formats are `auto`, `json/jsonc/json5`, `yaml`, `toml`.
     required: false
@@ -27,6 +27,12 @@ inputs:
     description: The format of config override. Allowed values are `auto`, `json/jsonc/json5`, `yaml/yml`, `toml`.
     required: false
     default: "auto"
+  source-mode:
+    description: > 
+      Execution strategy (`remote` or `local`). Accepts a string or a JSON object for granular control over which operations 
+      use the local filesystem vs remote API. See: [link-to-docs]
+    required: false
+    default: "remote"
 
 runs:
   using: "node24"

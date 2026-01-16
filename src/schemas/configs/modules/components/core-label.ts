@@ -44,4 +44,4 @@ export const CoreLabelSchema = v.object({
 });
 
 type _CoreLabelInput = v.InferInput<typeof CoreLabelSchema>;
-type _CoreLabelOutput = v.InferOutput<typeof CoreLabelSchema>;
+export type CoreLabelOutput = v.InferOutput<typeof CoreLabelSchema>;

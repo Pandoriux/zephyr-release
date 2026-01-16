@@ -3,23 +3,22 @@ import { TimeZoneSchema } from "./components/timezone.ts";
 import { CommitTypeSchema } from "./components/commit-type.ts";
 import { VersionFileSchema } from "./components/version-file.ts";
 import { CommandHookSchema } from "./components/command-hook.ts";
-import { SEMVER_REGEX } from "../../../constants/regex.ts";
+import { SEMVER_REGEX } from "../../../constants/semver.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
-import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
     v.optional(v.pipe(v.string(), v.trim())),
     v.metadata({
-      description: "Project name, available in string pattern as ${name}.",
+      description: "Project name, available in string templates as ${name}.",
     }),
   ),
   timeZone: v.pipe(
     v.optional(TimeZoneSchema, "UTC"),
     v.metadata({
       description:
-        "IANA timezone used to display times, available in string pattern as ${timeZone}.\n" +
+        "IANA timezone used to display times, available in string templates as ${timeZone}.\n" +
         'Default: "UTC"',
     }),
   ),
@@ -40,7 +39,7 @@ export const BaseConfigSchema = v.object({
     }),
   ),
   versionFiles: v.pipe(
-    v.union([VersionFileSchema, v.array(VersionFileSchema)]),
+    v.union([VersionFileSchema, v.pipe(v.array(VersionFileSchema), v.nonEmpty())]),
     v.metadata({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
@@ -50,27 +49,8 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
-  filesToCommit: v.pipe(
-    v.optional(
-      v.union([
-        v.enum(filesToCommitOptions),
-        v.array(
-          v.union([v.enum(filesToCommitOptions), v.pipe(v.string(), v.trim())]),
-        ),
-      ]),
-      "base",
-    ),
-    v.metadata({
-      description:
-        'Files to include in the commit. Accepts "base", "all" options or an array of options and paths/globs. ' +
-        "Paths are relative to the repo root.\n" +
-        'Default: "base"',
-      examples: [[], ["base", "src/release-artifacts/*"]],
-    }),
-  ),
-
   commitTypes: v.pipe(
-    v.optional(v.array(CommitTypeSchema), DEFAULT_COMMIT_TYPES),
+    v.optional(v.pipe(v.array(CommitTypeSchema), v.nonEmpty()), DEFAULT_COMMIT_TYPES),
     v.metadata({
       description:
         "List of commit types used for version calculation and changelog generation.\n" +
@@ -81,6 +61,24 @@ export const BaseConfigSchema = v.object({
             2,
           )
         }`,
+    }),
+  ),
+
+  allowReleaseAs: v.pipe(
+    v.optional(
+      v.union([
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
+      ]),
+      "ALL",
+    ),
+    v.metadata({
+      description:
+        "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
+        'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
+        "About 'release-as': [links]\n" +
+        'Default: "ALL"',
+      examples: [["BASE", "chore", "ci", "cd"]],
     }),
   ),
 });

@@ -1,25 +1,61 @@
-import type { PlatformProvider } from "./types/platform-provider.ts";
+import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
-import { prepareTools } from "./tasks/tools.ts";
+import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
+import { getBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
+import {
+  findPullRequestForCommitOrThrow,
+  findPullRequestFromBranchOrThrow,
+} from "./tasks/pull-request.ts";
+import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
+import { prepareWorkflow } from "./workflows/prepare.ts";
+import { releaseWorkflow } from "./workflows/release.ts";
 
 export async function run(provider: PlatformProvider) {
-  logger.stepStart("Starting: Prepare tools");
-  prepareTools();
-  logger.stepFinish("Finished: Prepare tools");
+  logger.stepStart("Starting: Setup operation");
+  setupOperation();
+  logger.stepFinish("Finished: Setup operation");
 
   logger.stepStart("Starting: Get inputs");
   const inputs = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get inputs");
 
-  // keep for now
-  // isRepoCheckedOut(inputs.workspacePath);
-
   logger.stepStart("Starting: Resolve config from file and override");
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
+
+  logger.debugStepStart("Starting: Get base string patterns");
+  const baseStringPatternCtx = getBaseStringPatternContext(provider, config);
+  logger.debugStepFinish("Finished: Get base string patterns");
+
+  logger.stepStart("Starting: Get associated pull requests");
+  const associatedPrForCommit = await findPullRequestForCommitOrThrow(
+    provider,
+    baseStringPatternCtx,
+    inputs,
+    config,
+  );
+  const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
+    provider,
+    baseStringPatternCtx,
+    inputs.token,
+    config,
+  );
+  logger.stepFinish(
+    "Finished: Get associated pull requests",
+  );
+
+  logger.debugStepStart("Starting: Export base operation variables");
+  exportBaseOperationVariables(
+    provider,
+    inputs,
+    config,
+    Boolean(associatedPrForCommit),
+    Boolean(associatedPrFromBranch),
+  );
+  logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
   const result = await runCommandsOrThrow(config.commandHook, "pre");
@@ -28,4 +64,22 @@ export async function run(provider: PlatformProvider) {
   } else {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
   }
+
+  if (!associatedPrForCommit) {
+    logger.stepStart("Workflow: Prepare release with pull request");
+    await prepareWorkflow(
+      provider,
+      {
+        inputs,
+        config,
+        baseStringPatternCtx,
+      },
+    );
+  } else {
+    logger.stepStart("Workflow: Release finalize");
+    await releaseWorkflow(provider);
+  }
+
+  logger.stepStart("Starting: Execute base post commands");
+  // post cmds.... todo
 }

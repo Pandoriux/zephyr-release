@@ -48,13 +48,14 @@ export async function runCommandsOrThrow(
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      taskLogger.info(message);
-      failedCommands.push(cmdStr);
-
-      if (!continueOnError) {
+      if (continueOnError) {
+        taskLogger.info(message);
+        failedCommands.push(cmdStr);
+      } else {
         taskLogger.endGroup();
         throw new Error(
-          `\`${runCommandsOrThrow.name}\` - ${message}`,
+          `\`${runCommandsOrThrow.name}\` failed!`,
+          { cause: error },
         );
       }
     }
@@ -91,7 +92,7 @@ async function runChildProcessOrThrow(
       }, 1000);
 
       reject(
-        new Error(`Command timed out after ${timeout}ms - ${cmd}`),
+        new Error(`Command timed out after ${timeout}ms: ${cmd}`),
       );
     }, timeout);
 
@@ -109,7 +110,7 @@ async function runChildProcessOrThrow(
           new Error(
             `Command failed with code ${code ?? "unknown"}${
               signal ? ` (signal: ${signal})` : ""
-            } - ${cmd}`,
+            }: ${cmd}`,
           ),
         );
       }

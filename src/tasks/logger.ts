@@ -7,8 +7,10 @@ import type {
 } from "../types/logger.ts";
 import {
   formatDebugMessage,
+  formatDebugStepMessage,
   formatIndentedMessage,
   formatStepMessage,
+  formatWarnMessage,
 } from "../utils/formatters/log.ts";
 
 let activeCoreLogger: CoreLogger;
@@ -21,6 +23,8 @@ const defaultCoreLogger: CoreLogger = {
 
   debug: (message: string) => console.debug(message),
   isDebugEnabled: () => process.env.DEBUG?.toLowerCase() === "true",
+
+  warn: (message: string) => console.warn(message),
 
   setFailed: (message: string | Error) => {
     const msg = message instanceof Error ? message.message : message;
@@ -70,6 +74,11 @@ const indentLogger: IndentLogger = {
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
     if (isDebugEnabled()) fn(indentDebugLogger);
   },
+
+  warn: (message: string) =>
+    activeCoreLogger.warn(
+      formatWarnMessage(formatIndentedMessage(message)),
+    ),
 };
 
 activeCoreLogger = defaultCoreLogger;
@@ -90,9 +99,17 @@ export const logger: Logger = {
 
   debug: (message: string) =>
     activeCoreLogger.debug(formatDebugMessage(message)),
+  debugStepStart: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "start")),
+  debugStepFinish: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "finish")),
+  debugStepSkip: (message: string) =>
+    activeCoreLogger.debug(formatDebugStepMessage(message, "skip")),
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
     if (isDebugEnabled()) fn(debugLogger);
   },
+
+  warn: (message: string) => activeCoreLogger.warn(formatWarnMessage(message)),
 
   setFailed: (message: string | Error) => activeCoreLogger.setFailed(message),
 
