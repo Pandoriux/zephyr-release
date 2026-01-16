@@ -39,18 +39,24 @@ export const BaseConfigSchema = v.object({
     }),
   ),
   versionFiles: v.pipe(
-    v.union([VersionFileSchema, v.pipe(v.array(VersionFileSchema), v.nonEmpty())]),
+    v.union([
+      VersionFileSchema,
+      v.pipe(v.array(VersionFileSchema), v.nonEmpty()),
+    ]),
     v.metadata({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
         "primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, " +
         "the first file in the array will be used.\n" +
-        "About primary file: link-to-be-insert-later",
+        "About primary file: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#version-files-required",
     }),
   ),
 
   commitTypes: v.pipe(
-    v.optional(v.pipe(v.array(CommitTypeSchema), v.nonEmpty()), DEFAULT_COMMIT_TYPES),
+    v.optional(
+      v.pipe(v.array(CommitTypeSchema), v.nonEmpty()),
+      DEFAULT_COMMIT_TYPES,
+    ),
     v.metadata({
       description:
         "List of commit types used for version calculation and changelog generation.\n" +
@@ -68,7 +74,10 @@ export const BaseConfigSchema = v.object({
     v.optional(
       v.union([
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
+        v.pipe(
+          v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+          v.nonEmpty(),
+        ),
       ]),
       "ALL",
     ),
