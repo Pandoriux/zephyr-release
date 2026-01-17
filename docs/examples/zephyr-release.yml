@@ -17,6 +17,7 @@ jobs:
       actions: write
 
     steps:
+      # Optional checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 

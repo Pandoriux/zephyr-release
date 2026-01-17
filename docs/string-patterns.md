@@ -9,21 +9,12 @@ Available string patterns (like `${version}`) that can be used in string templat
 
 For more information about configuration options, see [Configuration Options](./config-options.md).
 
-## User-defined
+## Fixed
 
-These string patterns are resolved based on user configuration.
+These string patterns are resolved at runtime and remain fixed for the lifetime of the process.
 
 - `${name}`: Project name [[→ name](./config-options.md#name-optional)].
 - `${timeZone}`: IANA time zone [[→ time-zone](./config-options.md#time-zone-optional)].
-
-<br/>
-
-- `${tagName}`: Tag name [[→ tag-name-template](./config-options.md#release--tag-name-template-optional)].
-
-## Operation-defined
-
-These string patterns are resolved based on where or how the operation is run.
-
 - `${namespace}`: Repository namespace (organization or user).
 - `${repository}`: Repository name.
 
@@ -34,6 +25,9 @@ These string patterns are resolved based on where or how the operation is run.
 - `${YYYY}`: Four-digit year (e.g., `2025`).
 - `${MM}`: Two-digit month (01–12).
 - `${DD}`: Two-digit day of the month (01–31).
+
+<br/>
+
 - `${HH:mm:ss}`: Full time in 24-hour format (e.g., `14:37:05`).
 - `${HH}`: Two-digit hour in 24-hour format (00–23).
 - `${mm}`: Two-digit minute (00–59).
@@ -48,10 +42,18 @@ These string patterns are resolved based on where or how the operation is run.
 
 <br/>
 
+- `${tagName}`: Tag name [[→ tag-name-template](./config-options.md#release--tag-name-template-optional)].
+
+## Dynamic
+
+These string patterns are resolved dynamically at runtime and may change each time they are used.
+
 - `${changelogContent}`: The generated changelog content section (→ [heading](./config-options.md#changelog--heading-template-optional) + [body](./config-options.md#changelog--body-template-optional)).
 - `${changelogContentBody}`: The generated changelog body. You can override it with your own computed content [[→ content-body-override](./config-options.md#changelog--content-body-override-optional)].
 
-<br/>
+## Derived
+
+These patterns compute their value by applying a transformation or expression to one or more resolved patterns or literals.
 
 - `${<key>:mdLink(compare=tagPrev,prev=<N>)}`: Wraps the resolved `${key}` as a markdown-formatted GitHub compare link from the previous tag to the current tag.  
 \- `<key>` must be either a string pattern name (e.g. `tagName`) or a quoted literal label (`"Release v1.0"`).  
