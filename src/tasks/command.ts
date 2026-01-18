@@ -1,10 +1,7 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 import { taskLogger } from "./logger.ts";
-import {
-  isCommandHookValid,
-  isCommandValid,
-} from "../utils/validations/command.ts";
+import { isCommandHookValid } from "../utils/validations/command.ts";
 import type {
   CommandHookKind,
   CommandHookOutput,
@@ -20,27 +17,21 @@ export async function runCommandsOrThrow(
   const baseTimeout = commandHook.timeout;
   const baseContinueOnError = commandHook.continueOnError;
 
-  const cmdList = Array.isArray(commands) ? commands : [commands];
-
   let succeedCount = 0;
   let skippedCount = 0;
   const failedCommands: string[] = [];
 
   taskLogger.startGroup("Commands log:");
-  for (const cmd of cmdList) {
+  for (const cmd of commands) {
     // Check if command is empty/invalid (skipped)
-    if (!isCommandValid(cmd)) {
+    if (!cmd.cmd) {
       skippedCount++;
       continue;
     }
 
-    const cmdStr = typeof cmd === "string" ? cmd : cmd.cmd;
-    const timeout = typeof cmd === "string"
-      ? baseTimeout
-      : (cmd.timeout ?? baseTimeout);
-    const continueOnError = typeof cmd === "string"
-      ? baseContinueOnError
-      : (cmd.continueOnError ?? baseContinueOnError);
+    const cmdStr = cmd.cmd;
+    const timeout = cmd.timeout ?? baseTimeout;
+    const continueOnError = cmd.continueOnError ?? baseContinueOnError;
 
     try {
       await runChildProcessOrThrow(cmdStr, timeout);

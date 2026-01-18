@@ -113,7 +113,7 @@ function resolveExtensionList(
 
   // 1. Check Override
   if (rule.override && rule.override.length > 0) {
-    return rule.override.map(String);
+    return rule.override;
   }
 
   // 2. Check Extensions Config
@@ -214,16 +214,14 @@ function resolveIncremental(
     shouldReset = true;
   } // Priority B: Configured 'reset-on' triggers (External Context)
   else {
-    const resetOn = Array.isArray(item.resetOn) ? item.resetOn : [item.resetOn];
-
     if (
-      (resetOn.includes(SemverExtensionResetOnOptions.major) &&
+      (item.resetOn.includes(SemverExtensionResetOnOptions.major) &&
         versionChangeCtx.majorChanged) ||
-      (resetOn.includes(SemverExtensionResetOnOptions.minor) &&
+      (item.resetOn.includes(SemverExtensionResetOnOptions.minor) &&
         versionChangeCtx.minorChanged) ||
-      (resetOn.includes(SemverExtensionResetOnOptions.patch) &&
+      (item.resetOn.includes(SemverExtensionResetOnOptions.patch) &&
         versionChangeCtx.patchChanged) ||
-      (resetOn.includes(SemverExtensionResetOnOptions.prerelease) &&
+      (item.resetOn.includes(SemverExtensionResetOnOptions.prerelease) &&
         versionChangeCtx.prereleaseChanged)
     ) {
       shouldReset = true;

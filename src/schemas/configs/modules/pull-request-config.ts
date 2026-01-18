@@ -29,6 +29,10 @@ export const PullRequestConfigSchema = v.pipe(
           ),
         ]),
       ),
+      v.transform((input) => {
+        if (input) return Array.isArray(input) ? input : [input];
+        return input;
+      }),
       v.metadata({
         description:
           'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
@@ -86,6 +90,7 @@ export const PullRequestConfigSchema = v.pipe(
         ]),
         DEFAULT_PULL_REQUEST_HEADER_PATTERN,
       ),
+      v.transform((input) => Array.isArray(input) ? input : [input]),
       v.metadata({
         description:
           "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\n" +

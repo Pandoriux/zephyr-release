@@ -72,6 +72,7 @@ export const SemverExtensionSchema = v.variant("type", [
         ]),
         "none",
       ),
+      v.transform((input) => Array.isArray(input) ? input : [input]),
       v.metadata({
         description:
           "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. " +

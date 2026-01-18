@@ -12,12 +12,15 @@ export const BumpRuleExtensionSchema = v.object({
   ),
 
   override: v.pipe(
-    v.optional(v.pipe(
-      v.array(
-        v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), v.number()]),
+    v.optional(
+      v.pipe(
+        v.array(
+          v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), v.number()]),
+        ),
+        v.nonEmpty(),
       ),
-      v.nonEmpty(),
-    )),
+    ),
+    v.transform((input) => typeof input === "undefined" ? input : input.map(String)),
     v.metadata({
       description:
         "Overrides extension items to use for the next version. When provided, these values take precedence over " +

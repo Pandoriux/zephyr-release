@@ -9,6 +9,10 @@ export const AdditionalLabelSchema = v.object({
         v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
+    v.transform((input) => {
+      if (input) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
     v.metadata({
       description: "Additional labels to add when pull request is created.",
     }),
@@ -20,6 +24,10 @@ export const AdditionalLabelSchema = v.object({
         v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
+    v.transform((input) => {
+      if (input) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
     v.metadata({
       description:
         "Additional labels to add when pull request is closed and release operation has completed.",
@@ -32,6 +40,10 @@ export const AdditionalLabelSchema = v.object({
         v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
       ]),
     ),
+    v.transform((input) => {
+      if (input) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
     v.metadata({
       description:
         "Additional labels to remove when pull request is closed and release operation has completed. Use " +

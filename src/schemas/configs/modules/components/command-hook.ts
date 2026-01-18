@@ -35,6 +35,10 @@ export const CommandHookSchema = v.object({
     v.optional(
       v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
+    v.transform((input) => {
+      if (input) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
     v.metadata({
       description: "Commands to run before the operation.\n" +
         "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
@@ -44,6 +48,10 @@ export const CommandHookSchema = v.object({
     v.optional(
       v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
+    v.transform((input) => {
+      if (input) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
     v.metadata({
       description: "Commands to run after the operation.\n" +
         "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
