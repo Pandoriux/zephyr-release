@@ -23,7 +23,12 @@ export const InputsSchema = v.pipe(
     configOverride: v.pipe(v.string(), v.trim()),
     configOverrideFormat: v.enum(ConfigFileFormatsWithAuto),
 
-    sourceMode: v.union([v.enum(SourceModeOptions), SourceModeSchema]),
+    sourceMode: v.pipe(
+      v.union([v.enum(SourceModeOptions), SourceModeSchema]),
+      v.transform((input) =>
+        typeof input === "string" ? { sourceMode: input } : input
+      ),
+    ),
   }),
   // custom checks
   v.forward(

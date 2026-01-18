@@ -9,25 +9,13 @@ export function isCommandHookValid<K extends CommandHookKind>(
   kind: K,
 ): commandHook is
   & CommandHookOutput
-  & Record<K, CommandOutput | CommandOutput[]> {
+  & Record<K, CommandOutput[]> {
   const commands = commandHook?.[kind];
   if (!commands) return false;
-
-  // Single command (not array)
-  if (!Array.isArray(commands)) {
-    return isCommandValid(commands);
-  }
 
   // Array: must have at least one valid command
   if (commands.length === 0) return false;
 
   // For arrays with multiple elements, find at least one valid command
-  return commands.some((cmd) => isCommandValid(cmd));
-}
-
-export function isCommandValid(command: CommandOutput): boolean {
-  if (typeof command === "string") {
-    return Boolean(command);
-  }
-  return Boolean(command.cmd);
+  return commands.some((cmd) => Boolean(cmd.cmd));
 }

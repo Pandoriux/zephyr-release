@@ -43,6 +43,7 @@ export const BaseConfigSchema = v.object({
       VersionFileSchema,
       v.pipe(v.array(VersionFileSchema), v.nonEmpty()),
     ]),
+    v.transform((input) => Array.isArray(input) ? input : [input]),
     v.metadata({
       description:
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
@@ -81,6 +82,7 @@ export const BaseConfigSchema = v.object({
       ]),
       "ALL",
     ),
+    v.transform((input) => Array.isArray(input) ? input : [input]),
     v.metadata({
       description:
         "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +

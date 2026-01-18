@@ -4,7 +4,7 @@ import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
-import { getBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
+import { resolveFixedBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
 import {
   findPullRequestForCommitOrThrow,
   findPullRequestFromBranchOrThrow,
@@ -32,19 +32,20 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.debugStepStart("Starting: Get base string patterns");
-  const baseStringPatternCtx = getBaseStringPatternContext(provider, config);
+  resolveFixedBaseStringPatternContext(
+    provider,
+    config,
+  );
   logger.debugStepFinish("Finished: Get base string patterns");
 
   logger.stepStart("Starting: Get associated pull requests");
   const associatedPrForCommit = await findPullRequestForCommitOrThrow(
     provider,
-    baseStringPatternCtx,
     inputs,
     config,
   );
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
-    baseStringPatternCtx,
     inputs.token,
     config,
   );
@@ -72,14 +73,7 @@ export async function run(provider: PlatformProvider) {
 
   if (!associatedPrForCommit) {
     logger.stepStart("Workflow: Prepare release with pull request");
-    await prepareWorkflow(
-      provider,
-      {
-        inputs,
-        config,
-        baseStringPatternCtx,
-      },
-    );
+    await prepareWorkflow(provider, { inputs, config });
   } else {
     logger.stepStart("Workflow: Release finalize");
     await releaseWorkflow(provider);

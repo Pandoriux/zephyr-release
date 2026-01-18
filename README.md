@@ -50,6 +50,7 @@ jobs:
       actions: write
 
     steps:
+      # Optional checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -66,7 +67,7 @@ jobs:
               "name": "Override name"
             }
           
-          # See docs for all available source-mode options: [link]
+          # See docs for all available source-mode options: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
 ```
 

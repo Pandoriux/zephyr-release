@@ -1,37 +1,42 @@
 import * as v from "@valibot/valibot";
 
-export const CommandSchema = v.union([
-  v.pipe(v.string(), v.trim(), v.nonEmpty()),
+export const CommandSchema = v.pipe(
+  v.union([
+    v.pipe(v.string(), v.trim(), v.nonEmpty()),
 
-  v.object({
-    cmd: v.pipe(v.string(), v.trim(), v.nonEmpty()),
-    timeout: v.pipe(
-      v.optional(
-        v.pipe(
-          v.union([
-            v.pipe(v.number(), v.minValue(1), v.safeInteger()),
-            v.literal(Infinity),
-            v.literal("Infinity"),
-            v.literal("infinity"),
-          ]),
-          v.transform((value) => typeof value === "string" ? Infinity : value),
+    v.object({
+      cmd: v.pipe(v.string(), v.trim(), v.nonEmpty()),
+      timeout: v.pipe(
+        v.optional(
+          v.pipe(
+            v.union([
+              v.pipe(v.number(), v.minValue(1), v.safeInteger()),
+              v.literal(Infinity),
+              v.literal("Infinity"),
+              v.literal("infinity"),
+            ]),
+            v.transform((value) =>
+              typeof value === "string" ? Infinity : value
+            ),
+          ),
         ),
+        v.metadata({
+          description:
+            "Timeout in milliseconds, use Infinity to never timeout (not recommended).\n" +
+            "Defaults to `commandHook` base `timeout` value",
+        }),
       ),
-      v.metadata({
-        description:
-          "Timeout in milliseconds, use Infinity to never timeout (not recommended).\n" +
-          "Defaults to `commandHook` base `timeout` value",
-      }),
-    ),
-    continueOnError: v.pipe(
-      v.optional(v.boolean()),
-      v.metadata({
-        description: "Continue or stop the process on commands error.\n" +
-          "Defaults to `commandHook` base `continueOnError` value",
-      }),
-    ),
-  }),
-]);
+      continueOnError: v.pipe(
+        v.optional(v.boolean()),
+        v.metadata({
+          description: "Continue or stop the process on commands error.\n" +
+            "Defaults to `commandHook` base `continueOnError` value",
+        }),
+      ),
+    }),
+  ]),
+  v.transform((input) => typeof input === "string" ? { cmd: input } : input),
+);
 
 type _CommandInput = v.InferInput<typeof CommandSchema>;
 export type CommandOutput = v.InferOutput<typeof CommandSchema>;

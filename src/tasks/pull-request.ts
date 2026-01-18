@@ -5,7 +5,6 @@ import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-re
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
-import type { BaseStringPatternContext } from "../types/string-patterns.ts";
 
 type FindPrForCommitInputsParams = Pick<
   InputsOutput,
@@ -21,14 +20,12 @@ interface PullRequestBranchAndLabelConfigParams {
 
 export async function findPullRequestForCommitOrThrow(
   provider: PlatformProvider,
-  strPatCtx: BaseStringPatternContext,
   inputs: FindPrForCommitInputsParams,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
   const { triggerCommitHash, token } = inputs;
   const sourceBranch = resolveStringTemplate(
     config.pullRequest.branchNameTemplate,
-    strPatCtx,
   );
   const label = typeof config.pullRequest.label.onCreate === "string"
     ? config.pullRequest.label.onCreate
@@ -51,13 +48,11 @@ export async function findPullRequestForCommitOrThrow(
 
 export async function findPullRequestFromBranchOrThrow(
   provider: PlatformProvider,
-  strPatCtx: BaseStringPatternContext,
   token: string,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
   const branchName = resolveStringTemplate(
     config.pullRequest.branchNameTemplate,
-    strPatCtx,
   );
   const label = typeof config.pullRequest.label.onCreate === "string"
     ? config.pullRequest.label.onCreate

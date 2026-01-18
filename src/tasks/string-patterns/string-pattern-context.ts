@@ -1,16 +1,26 @@
 import { DateTimeFormatter, nativeJs, ZoneId } from "@js-joda/core";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import type { BaseStringPatternContext } from "../../types/string-patterns.ts";
 import { taskLogger } from "../logger.ts";
 import { startTime } from "../../main.ts";
+import type { FixedBaseStringPattern } from "../../constants/string-patterns.ts";
 
-type GetBaseStrPatCtxConfigParams = Pick<ConfigOutput, "name" | "timeZone">;
+type ResolveStaticStrPatCtxConfigParams = Pick<
+  ConfigOutput,
+  "name" | "timeZone"
+>;
 
-export function getBaseStringPatternContext(
+/**
+ * Fixed string pattern context object
+ */
+export const FIXED_STR_PAT_CTX: Readonly<
+  Record<string, string | undefined>
+> = {};
+
+export function resolveFixedBaseStringPatternContext(
   provider: PlatformProvider,
-  config: GetBaseStrPatCtxConfigParams,
-): BaseStringPatternContext {
+  config: ResolveStaticStrPatCtxConfigParams,
+): void {
   const { name, timeZone } = config;
 
   const targetZoneId = ZoneId.of(timeZone);
@@ -20,8 +30,8 @@ export function getBaseStringPatternContext(
     return zonedDateTime.format(DateTimeFormatter.ofPattern(pattern));
   }
 
-  const patternContext = {
-    name: name ?? "",
+  const context = {
+    name: name,
     timeZone: timeZone,
     namespace: provider.getNamespace(),
     repository: provider.getRepositoryName(),
@@ -34,8 +44,9 @@ export function getBaseStringPatternContext(
     "HH": zdtFormat("HH"),
     "mm": zdtFormat("mm"),
     "ss": zdtFormat("ss"),
-  };
-  taskLogger.debug(JSON.stringify(patternContext, null, 2));
+  } satisfies Record<FixedBaseStringPattern, string | undefined>;
 
-  return patternContext;
+  Object.assign(FIXED_STR_PAT_CTX, context);
+
+  taskLogger.debug(JSON.stringify(FIXED_STR_PAT_CTX, null, 2));
 }

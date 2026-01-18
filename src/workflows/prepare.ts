@@ -4,29 +4,22 @@ import { setupWorkingBranchOrThrow } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
 import { resolveCommitsFromTriggerToLastRelease } from "../tasks/commit.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { BaseStringPatternContext } from "../types/string-patterns.ts";
 import { calculateNextVersion } from "../tasks/calculate-next-version/next-version.ts";
 
 interface PrepareWorkflowOptions {
   inputs: InputsOutput;
   config: ConfigOutput;
-  baseStringPatternCtx: BaseStringPatternContext;
 }
 
 export async function prepareWorkflow(
   provider: PlatformProvider,
   ops: PrepareWorkflowOptions,
 ) {
-  const {
-    inputs,
-    config,
-    baseStringPatternCtx,
-  } = ops;
+  const { inputs, config } = ops;
 
   logger.stepStart("Starting: Ensure working branch is prepared");
   const workBranch = await setupWorkingBranchOrThrow(
     provider,
-    baseStringPatternCtx,
     inputs,
     config,
   );

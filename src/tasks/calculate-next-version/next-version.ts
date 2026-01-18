@@ -103,8 +103,8 @@ function resolveManualReleaseAsVersion(
 
   const isAllowed = isReleaseAsAllowed(
     triggerCommit.type,
-    commitTypes,
     allowReleaseAs,
+    commitTypes,
   );
   if (!isAllowed) {
     taskLogger.info(
@@ -126,33 +126,19 @@ function resolveManualReleaseAsVersion(
  */
 function isReleaseAsAllowed(
   type: string | null | undefined,
-  commitTypes: CalculateNextVersionConfigParams["commitTypes"],
   allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
+  commitTypes: CalculateNextVersionConfigParams["commitTypes"],
 ): boolean {
-  const isAllowAll = typeof allowReleaseAs === "string"
-    ? allowReleaseAs === AllowReleaseAsOptions.all
-    : allowReleaseAs.includes(AllowReleaseAsOptions.all);
-  if (isAllowAll) return true;
+  if (allowReleaseAs.includes(AllowReleaseAsOptions.all)) return true;
 
   if (!type) return false;
 
   const currentType = type.toLowerCase();
 
-  if (typeof allowReleaseAs === "string") {
-    if (allowReleaseAs === AllowReleaseAsOptions.base) {
-      return commitTypes.some((ct) => ct.type === currentType);
-    }
-    return allowReleaseAs === currentType;
-  }
+  if (allowReleaseAs.includes(currentType)) return true;
 
-  if (Array.isArray(allowReleaseAs)) {
-    if (allowReleaseAs.includes(currentType)) {
-      return true;
-    }
-
-    if (allowReleaseAs.includes(AllowReleaseAsOptions.base)) {
-      return commitTypes.some((ct) => ct.type === currentType);
-    }
+  if (allowReleaseAs.includes(AllowReleaseAsOptions.base)) {
+    return commitTypes.some((ct) => ct.type === currentType);
   }
 
   return false;

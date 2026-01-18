@@ -1,4 +1,4 @@
-export const BaseStringPatterns = {
+export const FixedBaseStringPatterns = {
   // Project info
   name: "name", // ${name}
   timeZone: "timeZone", // ${timeZone}
@@ -19,11 +19,11 @@ export const BaseStringPatterns = {
   second: "ss", // ${ss}
 } as const;
 
-export type BaseStringPattern =
-  typeof BaseStringPatterns[keyof typeof BaseStringPatterns];
+export type FixedBaseStringPattern =
+  typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
 
-  // not used yet
-const _AfterVersionStringPatterns = {
+// not used yet
+const _VersionStringPatterns = {
   // Version components
   version: "version", // ${version}
   versionPrimary: "versionPri", // ${versionPri}

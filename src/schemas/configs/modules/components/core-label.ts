@@ -6,11 +6,18 @@ import {
 } from "../../../../constants/defaults/label.ts";
 import { transformObjKeyToKebabCase } from "../../../../utils/transformers/object.ts";
 
+const defaultLabelSchemaObject = v.getDefaults(LabelSchema);
+
 export const CoreLabelSchema = v.object({
   onCreate: v.pipe(
     v.optional(
       v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), LabelSchema]),
       DEFAULT_LABEL_ON_CREATE,
+    ),
+    v.transform((input) =>
+      typeof input === "string"
+        ? { ...defaultLabelSchemaObject, name: input }
+        : input
     ),
     v.metadata({
       description: "Label to add when pull request is created.\n" +
@@ -28,6 +35,11 @@ export const CoreLabelSchema = v.object({
     v.optional(
       v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), LabelSchema]),
       DEFAULT_LABEL_ON_CLOSE,
+    ),
+    v.transform((input) =>
+      typeof input === "string"
+        ? { ...defaultLabelSchemaObject, name: input }
+        : input
     ),
     v.metadata({
       description:
