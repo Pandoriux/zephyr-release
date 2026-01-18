@@ -34,7 +34,7 @@ export async function prepareWorkflow(
   logger.stepFinish("Finished: Resolve commits from trigger to last release");
 
   logger.stepStart("Starting: Calculate next version");
-  const nextVersion = await calculateNextVersion(
+  const nextVersionResult = await calculateNextVersion(
     provider,
     resolvedCommitsResult,
     inputs,

@@ -26,12 +26,17 @@ type CalculateNextVersionConfigParams = Pick<
   | "bumpStrategy"
 >;
 
+export interface NextVersionResult {
+  str: string;
+  semver: SemVer;
+}
+
 export async function calculateNextVersion(
   provider: PlatformProvider,
   resolvedCommitsResult: ResolvedCommitsResult,
   inputs: CalculateNextVersionInputsParams,
   config: CalculateNextVersionConfigParams,
-): Promise<string> {
+): Promise<NextVersionResult> {
   const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
   const { token, sourceMode } = inputs;
   const {
@@ -87,14 +92,17 @@ export async function calculateNextVersion(
   const finalVersion = format(finalSemVer);
   taskLogger.info(`Final calculated next version: ${finalVersion}`);
 
-  return finalVersion;
+  return {
+    str: finalVersion,
+    semver: finalSemVer,
+  };
 }
 
 function resolveManualReleaseAsVersion(
   triggerCommit: Commit,
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
   allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
-): string | undefined {
+): NextVersionResult | undefined {
   const releaseAsNote = triggerCommit.notes.find((n) =>
     n.title.toLowerCase() === "release as" ||
     n.title.toLowerCase() === "release-as"
@@ -118,7 +126,12 @@ function resolveManualReleaseAsVersion(
     return undefined;
   }
 
-  return format(parse(releaseAsNote.text));
+  const semver = parse(releaseAsNote.text);
+  
+  return {
+    str: format(semver),
+    semver,
+  };
 }
 
 /**

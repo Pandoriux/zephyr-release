@@ -54,6 +54,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
+          "Allowed patterns to use are: all fixed base string patterns ()\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
       }),
     ),
@@ -64,14 +65,16 @@ export const ReleaseConfigSchema = v.pipe(
         DEFAULT_RELEASE_TITLE_PATTERN,
       ),
       v.metadata({
-        description: "String template for release title, using with string patterns like ${tagName}.\n" +
+        description:
+          "String template for release title, using with string patterns like ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_PATTERN)}`,
       }),
     ),
     bodyTemplate: v.pipe(
       v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_PATTERN),
       v.metadata({
-        description: "String template for release body, using with string patterns like ${changelogContent}.\n" +
+        description:
+          "String template for release body, using with string patterns like ${changelogContent}.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_PATTERN)}`,
       }),
     ),
