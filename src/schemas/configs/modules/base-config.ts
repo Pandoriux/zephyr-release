@@ -87,7 +87,7 @@ export const BaseConfigSchema = v.object({
       description:
         "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
         'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
-        "About 'release-as': [links]\n" +
+        "About 'release-as': https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version \n" +
         'Default: "ALL"',
       examples: [["BASE", "chore", "ci", "cd"]],
     }),

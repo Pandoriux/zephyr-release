@@ -162,7 +162,7 @@ List of commit type(s) allowed to trigger `release-as`. Accepts a single string 
 
 You can combine `"BASE"` with other commit types. For example: `["BASE", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
 
-`release-as`: [links]
+About `release-as`: <https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version>
 
 ### bump-strategy (Optional)
 
