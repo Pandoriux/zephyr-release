@@ -14,6 +14,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
   - [name (Optional)](#name-optional)
   - [time-zone (Optional)](#time-zone-optional)
   - [command-hook (Optional)](#command-hook-optional)
+  - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
   - [commit-types (Optional)](#commit-types-optional)
@@ -96,6 +97,15 @@ Pre/post command lists to run around the main operation. Each command runs from 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
+
+### custom-string-patterns (Optional)
+
+Type: `object` (record of string to string)
+
+Custom string patterns to use in templates. The key is the pattern name, available as `${<key>}` in [string templates](./string-patterns.md), while the resolved value is the key's value.  
+These should normally be set dynamically through config override, not in static config files.
+
+**Notes:** If a custom pattern key name matches an existing built-in pattern name, the built-in pattern takes precedence and the custom value will be ignored.
 
 ### initial-version (Optional)
 
@@ -256,7 +266,6 @@ Pre/post command lists to run around the changelog operation. Each command runs 
 #### changelog > content-body-override (Optional)
 
 Type: `string`  
-Default: `""`
 
 User-provided changelog content body, available in [string templates](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
 

@@ -19,14 +19,14 @@ export const FIXED_STR_PAT_CTX: Readonly<
 
 type CreateFixedStrPatCtxConfigParams = Pick<
   ConfigOutput,
-  "name" | "timeZone"
+  "name" | "timeZone" | "customStringPatterns"
 >;
 
 export function createFixedBaseStringPatternContext(
   provider: PlatformProvider,
   config: CreateFixedStrPatCtxConfigParams,
 ): void {
-  const { name, timeZone } = config;
+  const { name, timeZone, customStringPatterns } = config;
 
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
@@ -51,7 +51,7 @@ export function createFixedBaseStringPatternContext(
     "ss": zdtFormat("ss"),
   } satisfies Record<FixedBaseStringPattern, string | undefined>;
 
-  Object.assign(FIXED_STR_PAT_CTX, context);
+  Object.assign(FIXED_STR_PAT_CTX, customStringPatterns, context);
 
   taskLogger.debug(
     "Fixed base string pattern context: " +

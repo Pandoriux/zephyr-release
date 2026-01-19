@@ -18,6 +18,13 @@
     "post": ["npm run deploy"]
   },
 
+  // Ex: Custom string patterns available in templates as ${customKey}
+  // This setting should normally be set dynamically through config override, not in static config
+  // "custom-string-patterns": {
+  //   "customKey": "custom value",
+  //   "anotherKey": "another value"
+  // },
+
   "initial-version": "0.1.0",
   // Ex: Multiple version files with primary source
   "version-files": [

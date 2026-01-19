@@ -30,6 +30,21 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
+  customStringPatterns: v.pipe(
+    v.optional(
+      v.record(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.pipe(v.string(), v.trim()),
+      ),
+    ),
+    v.metadata({
+      description:
+        "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while " +
+        "the resolved value is the key value.\n" +
+        "Normally, these should be set dynamically through config override.",
+    }),
+  ),
+
   initialVersion: v.pipe(
     v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"),
     v.metadata({
