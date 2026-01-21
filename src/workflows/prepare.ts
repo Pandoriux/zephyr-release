@@ -5,6 +5,7 @@ import { logger } from "../tasks/logger.ts";
 import { resolveCommitsFromTriggerToLastRelease } from "../tasks/commit.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { calculateNextVersion } from "../tasks/calculate-next-version/next-version.ts";
+import { createFixedVersionStringPatternContext } from "../tasks/string-patterns/string-pattern-context.ts";
 
 interface PrepareWorkflowOptions {
   inputs: InputsOutput;
@@ -34,11 +35,21 @@ export async function prepareWorkflow(
   logger.stepFinish("Finished: Resolve commits from trigger to last release");
 
   logger.stepStart("Starting: Calculate next version");
-  const nextVersion = await calculateNextVersion(
+  const nextVersionResult = await calculateNextVersion(
     provider,
     resolvedCommitsResult,
     inputs,
     config,
   );
   logger.stepFinish("Finished: Calculate next version");
+
+  logger.debugStepStart("Starting: Create fixed version string patterns");
+  createFixedVersionStringPatternContext(
+    nextVersionResult.semver,
+    config.release.tagNameTemplate,
+  );
+  logger.debugStepFinish("Finished: Create fixed version string patterns");
+
+  logger.stepStart("Starting: Generate changelog content");
+  logger.stepFinish("Finished: Generate changelog content");
 }

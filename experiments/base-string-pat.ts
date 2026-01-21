@@ -1,5 +1,5 @@
 import "@js-joda/timezone";
-import { resolveFixedBaseStringPatternContext } from "../src/tasks/string-patterns/string-pattern-context.ts";
+import { createFixedBaseStringPatternContext } from "../src/tasks/string-patterns/string-pattern-context.ts";
 import type { PlatformProvider } from "../src/types/providers/platform-provider.ts";
 
 // Mock provider - only needs getNamespace and getRepositoryName for this function
@@ -94,7 +94,7 @@ const testCases = [
 
 for (const testCase of testCases) {
   console.log(`--- Testing timezone: ${testCase.timeZone} ---`);
-  const result = resolveFixedBaseStringPatternContext(
+  const result = createFixedBaseStringPatternContext(
     mockProvider,
     fixedUtcDate,
     {

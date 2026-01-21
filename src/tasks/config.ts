@@ -12,27 +12,23 @@ import {
   getConfigFormatTrialOrder,
   parseConfigStringOrThrow,
 } from "../utils/parsers/config.ts";
+import { getTextFileOrThrow } from "./file.ts";
 
 type ResolveConfigInputsParams = Pick<
   InputsOutput,
-  | "workspacePath"
+  | "token"
   | "configPath"
   | "configFormat"
   | "configOverride"
   | "configOverrideFormat"
 >;
 
-interface ParseConfigResult {
-  parsedConfig: unknown;
-  resolvedFormat: string;
-}
-
 export async function resolveConfigOrThrow(
   provider: PlatformProvider,
   inputs: ResolveConfigInputsParams,
 ): Promise<ConfigOutput> {
   const {
-    workspacePath,
+    token,
     configPath,
     configFormat,
     configOverride,
@@ -45,10 +41,12 @@ export async function resolveConfigOrThrow(
 
   taskLogger.info("Reading config file from path...");
   if (configPath) {
-    const configText = await provider.getTextFileOrThrow(
-      workspacePath,
-      configPath,
-    );
+    const configText = await getTextFileOrThrow({
+      source: "remote",
+      provider,
+      token,
+      path: configPath,
+    });
 
     const parsedResult = parseConfigOrThrow(
       configText,
@@ -58,7 +56,7 @@ export async function resolveConfigOrThrow(
     parsedConfigFile = parsedResult.parsedConfig;
 
     taskLogger.info(
-      `Config file parsed successfully (${parsedResult.resolvedFormat})`,
+      `Config file parsed successfully (${parsedResult.resolvedFormatResult})`,
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config file:");
@@ -78,7 +76,7 @@ export async function resolveConfigOrThrow(
     parsedConfigOverride = parsedResult.parsedConfig;
 
     taskLogger.info(
-      `Config override parsed successfully (${parsedResult.resolvedFormat})`,
+      `Config override parsed successfully (${parsedResult.resolvedFormatResult})`,
     );
     taskLogger.debugWrap((dLogger) => {
       dLogger.startGroup("Parsed config override:");
@@ -124,6 +122,11 @@ export async function resolveConfigOrThrow(
   return parsedFinalConfigResult.output;
 }
 
+interface ParseConfigResult {
+  parsedConfig: unknown;
+  resolvedFormatResult: string;
+}
+
 function parseConfigOrThrow(
   configStr: string,
   configFormat: ConfigFileFormatWithAuto,
@@ -132,7 +135,7 @@ function parseConfigOrThrow(
   try {
     if (configFormat !== "auto") {
       const parsedConfig = parseConfigStringOrThrow(configStr, configFormat);
-      return { parsedConfig, resolvedFormat: configFormat };
+      return { parsedConfig, resolvedFormatResult: configFormat };
     }
 
     const detectedFormat = detectConfigFormatFromPath(configPath);
@@ -146,7 +149,7 @@ function parseConfigOrThrow(
       try {
         const parsedConfig = parseConfigStringOrThrow(configStr, fmt);
         const resolvedFormat = `auto -> ${triedFormats.join(" -> ")}`;
-        return { parsedConfig, resolvedFormat };
+        return { parsedConfig, resolvedFormatResult: resolvedFormat };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
 

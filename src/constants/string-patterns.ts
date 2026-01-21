@@ -22,15 +22,20 @@ export const FixedBaseStringPatterns = {
 export type FixedBaseStringPattern =
   typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
 
-// not used yet
-const _VersionStringPatterns = {
+const FixedVersionStringPatterns = {
   // Version components
   version: "version", // ${version}
-  versionPrimary: "versionPri", // ${versionPri}
+  versionCore: "versionCore", // ${versionCore}
   versionPrerelease: "versionPre", // ${versionPre}
   versionBuild: "versionBld", // ${versionBld}
 
-  // Generated content
-  changelog: "changelog", // ${changelog}
-  tagName: "tagName", // ${tagName}. Also support dynamic modifier ${tagName:prev:<N>}
+  // Tag
+  tagName: "tagName", // ${tagName}
 } as const;
+
+export type FixedVersionStringPattern =
+  typeof FixedVersionStringPatterns[keyof typeof FixedVersionStringPatterns];
+
+const undecided = {
+  changelog: "changelog", // ${changelog}
+};

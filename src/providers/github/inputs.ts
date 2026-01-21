@@ -4,9 +4,11 @@ import type { ProviderInputs } from "../../types/providers/inputs.ts";
 
 export function githubGetRawInputs(): ProviderInputs {
   return {
+    token: core.getInput("token", { required: true }),
+
     triggerCommitHash: process.env.GITHUB_SHA,
     workspacePath: process.env.GITHUB_WORKSPACE,
-    token: core.getInput("token", { required: true }),
+
     configPath: core.getInput("config-path"),
     configFormat: core.getInput("config-format"),
     configOverride: core.getInput("config-override"),

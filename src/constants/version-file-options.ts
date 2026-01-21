@@ -10,3 +10,8 @@ export const VersionFileExtractorsWithAuto = {
   ...VersionFileExtractors,
   auto: "auto",
 } as const;
+
+export type VersionFileExtractorWithAuto =
+  typeof VersionFileExtractorsWithAuto[
+    keyof typeof VersionFileExtractorsWithAuto
+  ];

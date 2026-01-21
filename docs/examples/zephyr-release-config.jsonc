@@ -18,6 +18,13 @@
     "post": ["npm run deploy"]
   },
 
+  // Ex: Custom string patterns available in templates as ${customKey}
+  // This setting should normally be set dynamically through config override, not in static config
+  // "custom-string-patterns": {
+  //   "customKey": "custom value",
+  //   "anotherKey": "another value"
+  // },
+
   "initial-version": "0.1.0",
   // Ex: Multiple version files with primary source
   "version-files": [
@@ -127,6 +134,7 @@
 
     // This setting should only be used in workflow inputs, not in config file
     "content-body-override": "",
+    // "content-body-override-path": "",
 
     "header-pattern": "# Changelog\\n\\n<br/>\\n",
     // "header-pattern-path": "",

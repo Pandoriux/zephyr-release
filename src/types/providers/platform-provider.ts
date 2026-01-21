@@ -18,7 +18,7 @@ export interface PlatformProvider {
   manageConcurrency: (token: string) => Promise<void>;
 
   getTextFileOrThrow: (
-    workspacePath: string,
+    token: string,
     filePath: string,
   ) => Promise<string>;
 

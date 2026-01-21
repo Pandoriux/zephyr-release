@@ -9,9 +9,11 @@ Available string patterns (like `${version}`) that can be used in string templat
 
 For more information about configuration options, see [Configuration Options](./config-options.md).
 
-## Fixed
+## Fixed String Patterns
 
 These string patterns are resolved at runtime and remain fixed for the lifetime of the process.
+
+### Base
 
 - `${name}`: Project name [[→ name](./config-options.md#name-optional)].
 - `${timeZone}`: IANA time zone [[→ time-zone](./config-options.md#time-zone-optional)].
@@ -33,10 +35,10 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 - `${mm}`: Two-digit minute (00–59).
 - `${ss}`: Two-digit second (00–59).
 
-<br/>
+### Version
 
 - `${version}`: The full semantic version (SemVer) number.
-- `${versionPri}`: The primary part of the semantic version (major.minor.patch).
+- `${versionCore}`: The core part of the semantic version (major.minor.patch).
 - `${versionPre}`: The prerelease identifier of the semantic version.
 - `${versionBld}`: The build metadata of the semantic version.
 
@@ -44,14 +46,14 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 - `${tagName}`: Tag name [[→ tag-name-template](./config-options.md#release--tag-name-template-optional)].
 
-## Dynamic
+## Dynamic String Patterns
 
 These string patterns are resolved dynamically at runtime and may change each time they are used.
 
 - `${changelogContent}`: The generated changelog content section (→ [heading](./config-options.md#changelog--heading-template-optional) + [body](./config-options.md#changelog--body-template-optional)).
 - `${changelogContentBody}`: The generated changelog body. You can override it with your own computed content [[→ content-body-override](./config-options.md#changelog--content-body-override-optional)].
 
-## Derived
+## Derived String Patterns
 
 These patterns compute their value by applying a transformation or expression to one or more resolved patterns or literals.
 

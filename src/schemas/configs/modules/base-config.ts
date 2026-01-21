@@ -30,6 +30,21 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
+  customStringPatterns: v.pipe(
+    v.optional(
+      v.record(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        v.pipe(v.string(), v.trim()),
+      ),
+    ),
+    v.metadata({
+      description:
+        "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while " +
+        "the resolved value is the key value.\n" +
+        "Normally, these should be set dynamically through config override.",
+    }),
+  ),
+
   initialVersion: v.pipe(
     v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"),
     v.metadata({
@@ -87,7 +102,7 @@ export const BaseConfigSchema = v.object({
       description:
         "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
         'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
-        "About 'release-as': [links]\n" +
+        "About 'release-as': https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version \n" +
         'Default: "ALL"',
       examples: [["BASE", "chore", "ci", "cd"]],
     }),

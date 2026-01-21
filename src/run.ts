@@ -4,7 +4,7 @@ import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
-import { resolveFixedBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
+import { createFixedBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
 import {
   findPullRequestForCommitOrThrow,
   findPullRequestFromBranchOrThrow,
@@ -31,12 +31,12 @@ export async function run(provider: PlatformProvider) {
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  logger.debugStepStart("Starting: Get base string patterns");
-  resolveFixedBaseStringPatternContext(
+  logger.debugStepStart("Starting: Create fixed base string patterns");
+  createFixedBaseStringPatternContext(
     provider,
     config,
   );
-  logger.debugStepFinish("Finished: Get base string patterns");
+  logger.debugStepFinish("Finished: Create fixed base string patterns");
 
   logger.stepStart("Starting: Get associated pull requests");
   const associatedPrForCommit = await findPullRequestForCommitOrThrow(

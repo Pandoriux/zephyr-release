@@ -43,6 +43,13 @@ export const ChangelogConfigSchema = v.pipe(
           "in static config.",
       }),
     ),
+    contentBodyOverridePath: v.pipe(
+      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Path to text file containing changelog content body override, will take precedence over `contentBodyOverride`.",
+      }),
+    ),
 
     headerTemplate: v.pipe(
       v.optional(
@@ -83,7 +90,8 @@ export const ChangelogConfigSchema = v.pipe(
         DEFAULT_CHANGELOG_HEADING_PATTERN,
       ),
       v.metadata({
-        description: "String template for heading of a changelog content section, using with string patterns like ${tagName}.\n" +
+        description:
+          "String template for heading of a changelog content section, using with string patterns like ${tagName}.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADING_PATTERN)}`,
       }),
     ),
@@ -93,7 +101,8 @@ export const ChangelogConfigSchema = v.pipe(
         DEFAULT_CHANGELOG_BODY_PATTERN,
       ),
       v.metadata({
-        description: "String template for body of a changelog content section, using with string patterns like ${changelogContentBody}.\n" +
+        description:
+          "String template for body of a changelog content section, using with string patterns like ${changelogContentBody}.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_BODY_PATTERN)}`,
       }),
     ),
@@ -113,4 +122,4 @@ export const ChangelogConfigSchema = v.pipe(
 );
 
 type _ChangelogConfigInput = v.InferInput<typeof ChangelogConfigSchema>;
-type _ChangelogConfigOutput = v.InferOutput<typeof ChangelogConfigSchema>;
+export type ChangelogConfigOutput = v.InferOutput<typeof ChangelogConfigSchema>;
