@@ -17,7 +17,21 @@ export const ConfigFileFormatsWithAuto = {
 export type ConfigFileFormatWithAuto =
   typeof ConfigFileFormatsWithAuto[keyof typeof ConfigFileFormatsWithAuto];
 
-const ConfigFileFormatAliases = {
+export const FileFormats = {
+  ...ConfigFileFormats,
+  txt: "txt",
+} as const;
+export type FileFormat = typeof FileFormats[keyof typeof FileFormats];
+
+export const FileFormatsWithAuto = {
+  ...FileFormats,
+  auto: "auto",
+} as const;
+
+export type FileFormatWithAuto =
+  typeof FileFormatsWithAuto[keyof typeof FileFormatsWithAuto];
+
+const FileFormatAliases = {
   yml: "yml",
 } as const;
 
@@ -29,15 +43,16 @@ export const ConfigFileFormatMap: Record<
     Object.values(ConfigFileFormats).map((val) => [val, val]),
   ),
 
-  [ConfigFileFormatAliases.yml]: ConfigFileFormats.yaml,
+  [FileFormatAliases.yml]: ConfigFileFormats.yaml,
 };
 
-const FileFormats = {
-  ...ConfigFileFormats,
-  txt: "txt",
-} as const;
+export const FileFormatMap: Record<
+  string,
+  FileFormat | undefined
+> = {
+  ...Object.fromEntries(
+    Object.values(FileFormats).map((val) => [val, val]),
+  ),
 
-export const FileFormatsWithAuto = {
-  ...FileFormats,
-  auto: "auto",
-} as const;
+  [FileFormatAliases.yml]: FileFormats.yaml,
+};

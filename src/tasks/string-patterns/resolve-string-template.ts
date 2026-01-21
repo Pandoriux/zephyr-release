@@ -39,6 +39,7 @@ export function resolveStringTemplate(
 
   // Cache the result, only apply to fixed pattern, might need to fix code order
   RESOLVED_FIXED_STRING_TEMPLATE_CACHE.set(strTemplate, resolvedTemplate);
+
   return resolvedTemplate;
 }
 

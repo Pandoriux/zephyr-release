@@ -35,6 +35,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
     - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> command-hook (Optional)](#changelog--command-hook-optional)
     - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
+    - [changelog \> content-body-override-path (Optional)](#changelog--content-body-override-path-optional)
     - [changelog \> header-template (Optional)](#changelog--header-template-optional)
     - [changelog \> header-template-path (Optional)](#changelog--header-template-path-optional)
     - [changelog \> footer-template (Optional)](#changelog--footer-template-optional)
@@ -239,7 +240,7 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`header-pattern`](#changelog--header-pattern-optional), [`header-pattern-path`](#changelog--header-pattern-path-optional), [`footer-pattern`](#changelog--footer-pattern-optional), [`footer-pattern-path`](#changelog--footer-pattern-path-optional), [`heading-pattern`](#changelog--heading-pattern-optional), [`body-pattern`](#changelog--body-pattern-optional), [`body-pattern-path`](#changelog--body-pattern-path-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`content-body-override-path`](#changelog--content-body-override-path-optional), [`header-template`](#changelog--header-template-optional), [`header-template-path`](#changelog--header-template-path-optional), [`footer-template`](#changelog--footer-template-optional), [`footer-template-path`](#changelog--footer-template-path-optional), [`heading-template`](#changelog--heading-template-optional), [`body-template`](#changelog--body-template-optional), [`body-template-path`](#changelog--body-template-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
 
@@ -268,6 +269,12 @@ Pre/post command lists to run around the changelog operation. Each command runs 
 Type: `string`  
 
 User-provided changelog content body, available in [string templates](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
+
+#### changelog > content-body-override-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog content body override. Overrides `content-body-override` when both are provided.
 
 #### changelog > header-template (Optional)
 

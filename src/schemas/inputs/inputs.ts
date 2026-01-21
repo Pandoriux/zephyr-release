@@ -5,6 +5,8 @@ import { SourceModeOptions } from "../../constants/source-mode-options.ts";
 
 export const InputsSchema = v.pipe(
   v.object({
+    token: v.pipe(v.string(), v.trim(), v.nonEmpty("Token is missing")),
+
     triggerCommitHash: v.pipe(
       v.string(),
       v.trim(),
@@ -15,7 +17,6 @@ export const InputsSchema = v.pipe(
       v.trim(),
       v.nonEmpty("Workspace not found"),
     ),
-    token: v.pipe(v.string(), v.trim(), v.nonEmpty("Token is missing")),
 
     configPath: v.pipe(v.string(), v.trim()),
     configFormat: v.enum(ConfigFileFormatsWithAuto),

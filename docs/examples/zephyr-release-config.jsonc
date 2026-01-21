@@ -134,6 +134,7 @@
 
     // This setting should only be used in workflow inputs, not in config file
     "content-body-override": "",
+    // "content-body-override-path": "",
 
     "header-pattern": "# Changelog\\n\\n<br/>\\n",
     // "header-pattern-path": "",

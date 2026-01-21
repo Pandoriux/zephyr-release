@@ -1,13 +1,37 @@
-import fs from "node:fs";
-import path from "node:path";
+import { Buffer } from "node:buffer";
+import { getOctokitClient } from "./octokit.ts";
+import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
 export async function githubGetTextFileOrThrow(
-  workspacePath: string,
+  token: string,
   filePath: string,
 ): Promise<string> {
-  // NOTE: local dev behavior for now: read from disk.
-  // TODO(platform): swap this to GitHub API fetch (contents) later.
-  return fs.readFileSync(path.join(workspacePath, filePath), {
-    encoding: "utf8",
+  const octokit = getOctokitClient(token);
+
+  const res = await octokit.rest.repos.getContent({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    path: filePath,
   });
+
+  const data = res.data;
+
+  if (Array.isArray(data)) {
+    throw new Error(`Path '${filePath}' is a directory, not a file.`);
+  }
+
+  if (data.type !== "file") {
+    throw new Error(
+      `Path '${filePath}' is not a standard file (type: ${data.type}).`,
+    );
+  }
+
+  if (!data.content) {
+    throw new Error(
+      `File '${filePath}' has no content, it might be too large (GitHub API limits to 1MB). Your file should not be that ` +
+        "large... right?",
+    );
+  }
+
+  return Buffer.from(data.content, "base64").toString("utf-8");
 }

@@ -1,7 +1,9 @@
 import { canParse, format, parse, type SemVer } from "@std/semver";
 import type { Commit } from "conventional-commits-parser";
-import { getPrimaryVersionFile } from "../version-files/get-file.ts";
-import { getVersionFromVersionFile } from "../version-files/get-version.ts";
+import {
+  getPrimaryVersionFile,
+  getVersionStringFromVersionFile,
+} from "../version-file.ts";
 import type { ResolvedCommitsResult } from "../commit.ts";
 import { taskLogger } from "../logger.ts";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
@@ -13,7 +15,7 @@ import { calculateNextExtensionsSemVer } from "./extension-calculations.ts";
 
 type CalculateNextVersionInputsParams = Pick<
   InputsOutput,
-  "token" | "sourceMode"
+  "token" | "workspacePath" | "sourceMode"
 >;
 
 type CalculateNextVersionConfigParams = Pick<
@@ -38,7 +40,7 @@ export async function calculateNextVersion(
   config: CalculateNextVersionConfigParams,
 ): Promise<NextVersionResult> {
   const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
-  const { token, sourceMode } = inputs;
+  const { token, workspacePath, sourceMode } = inputs;
   const {
     timeZone,
     initialVersion,
@@ -57,9 +59,15 @@ export async function calculateNextVersion(
     return manualReleaseAsVersion;
   }
 
-  taskLogger.info("Getting last version from primary version files...");
+  taskLogger.info("Getting current version from primary version files...");
   const primaryVersionFile = getPrimaryVersionFile(versionFiles);
-  const primaryVersion = await getVersionFromVersionFile(primaryVersionFile);
+  const primaryVersion = await getVersionStringFromVersionFile(
+    primaryVersionFile,
+    sourceMode,
+    provider,
+    token,
+    workspacePath,
+  );
 
   const currentVersion = primaryVersion ? primaryVersion : initialVersion;
   if (!canParse(currentVersion)) {
@@ -67,6 +75,8 @@ export async function calculateNextVersion(
       `Current version '${currentVersion}' from is not a valid semver object`,
     );
   }
+
+  taskLogger.info(`Current version got from version file is ${currentVersion}`);
   const currentSemVer = parse(currentVersion);
 
   const nextCoreSemVer = calculateNextCoreSemVer(
@@ -127,7 +137,7 @@ function resolveManualReleaseAsVersion(
   }
 
   const semver = parse(releaseAsNote.text);
-  
+
   return {
     str: format(semver),
     semver,

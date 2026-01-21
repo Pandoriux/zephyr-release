@@ -1,7 +1,7 @@
 export interface ProviderInputs {
+  token?: string;
   triggerCommitHash?: string;
   workspacePath?: string;
-  token?: string;
   configPath?: string;
   configFormat?: string;
   configOverride?: string;

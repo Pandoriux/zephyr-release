@@ -13,6 +13,8 @@ export const SourceModeSchema = v.object({
       ),
     ]),
   ),
+
+  contentBodyOverridePath: v.optional(v.enum(SourceModeOptions)),
 });
 
 type _SourceModeInput = v.InferInput<typeof SourceModeSchema>;
