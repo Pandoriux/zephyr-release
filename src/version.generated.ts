@@ -1,4 +1,4 @@
-// This file is auto-generated during build. 
+// This file is auto-generated during build.
 // No need to create or edit it manually.
 
 /**
@@ -6,4 +6,4 @@
  *
  * Mirrors deno.json { version }.
  */
-export const VERSION = "0.1.0";
+export const VERSION = "0.3.0";
