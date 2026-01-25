@@ -1,12 +1,13 @@
 # Configuration options <!-- omit from toc -->
 
-All possible config options of the Zephyr Release Configuration file. They are all optional - if you don't provide any options or don't have a config file, default values will be used.
+All possible config options of the Zephyr Release Configuration file. Most options are optional - if you don't provide them, default values will be used.  
+Except: [version-files](#version-files-required)
 
-It is recommended to use `schema link to be inserted later` when writing the config JSON.
+It is recommended to use [`JSON Schema (v1)`](https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/config-v1.json) when writing the config JSON.
 
-Some example config JSON files: `example links to be inserted later`
+To know more about templates, see [string-templates-and-patterns.md](./string-templates-and-patterns.md).
 
-String interpolation in templates (like `"version-${version}"`) using string patterns like `${version}` is documented in [String Patterns](./string-patterns.md), including operation-defined `${namespace}` and `${repository}`.
+Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples).
 
 ## Table of Content <!-- omit from toc -->
 
@@ -33,16 +34,13 @@ String interpolation in templates (like `"version-${version}"`) using string pat
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> writeToFile (Optional)](#changelog--writetofile-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
-    - [changelog \> command-hook (Optional)](#changelog--command-hook-optional)
     - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
     - [changelog \> content-body-override-path (Optional)](#changelog--content-body-override-path-optional)
-    - [changelog \> header-template (Optional)](#changelog--header-template-optional)
-    - [changelog \> header-template-path (Optional)](#changelog--header-template-path-optional)
-    - [changelog \> footer-template (Optional)](#changelog--footer-template-optional)
-    - [changelog \> footer-template-path (Optional)](#changelog--footer-template-path-optional)
-    - [changelog \> heading-template (Optional)](#changelog--heading-template-optional)
-    - [changelog \> body-template (Optional)](#changelog--body-template-optional)
-    - [changelog \> body-template-path (Optional)](#changelog--body-template-path-optional)
+    - [changelog \> file-header-template (Optional)](#changelog--file-header-template-optional)
+    - [changelog \> file-header-template-path (Optional)](#changelog--file-header-template-path-optional)
+    - [changelog \> file-footer-template (Optional)](#changelog--file-footer-template-optional)
+    - [changelog \> file-footer-template-path (Optional)](#changelog--file-footer-template-path-optional)
+    - [changelog \> content-header-template (Optional)](#changelog--content-header-template-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
@@ -79,7 +77,7 @@ String interpolation in templates (like `"version-${version}"`) using string pat
 Type: `string`  
 Default: `""`
 
-The project name used in [string templates](./string-patterns.md) (available as `${name}`).
+The project name used in [string templates](./string-templates-and-patterns.md) (available as `${name}`).
 
 ### time-zone (Optional)
 
@@ -87,7 +85,7 @@ Type: `string`
 Default: `"UTC"`
 
 IANA time zone used to format and display times.  
-This value is also available for use in [string templates](./string-patterns.md) as `${timeZone}`.
+This value is also available for use in [string templates](./string-templates-and-patterns.md) as `${timeZone}`.
 
 ### command-hook (Optional)
 
@@ -103,7 +101,7 @@ See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definit
 
 Type: `object` (record of string to string)
 
-Custom string patterns to use in templates. The key is the pattern name, available as `${<key>}` in [string templates](./string-patterns.md), while the resolved value is the key's value.  
+Custom string patterns to use in templates. The key is the pattern name, available as `${<key>}` in [string templates](./string-templates-and-patterns.md), while the resolved value is the key's value.  
 These should normally be set dynamically through config override, not in static config files.
 
 **Notes:** If a custom pattern key name matches an existing built-in pattern name, the built-in pattern takes precedence and the custom value will be ignored.
@@ -240,16 +238,16 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`command-hook`](#changelog--command-hook-optional), [`content-body-override`](#changelog--content-body-override-optional), [`content-body-override-path`](#changelog--content-body-override-path-optional), [`header-template`](#changelog--header-template-optional), [`header-template-path`](#changelog--header-template-path-optional), [`footer-template`](#changelog--footer-template-optional), [`footer-template-path`](#changelog--footer-template-path-optional), [`heading-template`](#changelog--heading-template-optional), [`body-template`](#changelog--body-template-optional), [`body-template-path`](#changelog--body-template-path-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`content-body-override`](#changelog--content-body-override-optional), [`content-body-override-path`](#changelog--content-body-override-path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`content-header-template`](#changelog--content-header-template-optional)
 
-Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-patterns.md) as `${changelogContent}` (heading + body) or `${changelogContentBody}` (body only).
+Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-templates-and-patterns.md) as `${changelogContent}` (content header + body) or `${changelogContentBody}` (body only).
 
 #### changelog > writeToFile (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-patterns.md) but they won't be written to file.
+Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-templates-and-patterns.md) but they won't be written to file.
 
 #### changelog > path (Optional)
 
@@ -258,17 +256,11 @@ Default: `"CHANGELOG.md"`
 
 Path to the file where the generated changelog will be written to, relative to the project root.
 
-#### changelog > command-hook (Optional)
-
-Type: [`CommandHook`](#commandhook)
-
-Pre/post command lists to run around the changelog operation. Each command runs from the repository root.
-
 #### changelog > content-body-override (Optional)
 
 Type: `string`  
 
-User-provided changelog content body, available in [string templates](./string-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
+User-provided changelog content body, available in [string templates](./string-templates-and-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
 
 #### changelog > content-body-override-path (Optional)
 
@@ -276,50 +268,37 @@ Type: `string`
 
 Path to text file containing changelog content body override. Overrides `content-body-override` when both are provided.
 
-#### changelog > header-template (Optional)
+#### changelog > file-header-template (Optional)
 
 Type: `string`  
 Default: `"# Changelog\n\n<br/>\n"`
 
 String template for changelog file header, using with string patterns like `${version}`. Placed above any changelog content sections.
 
-#### changelog > header-template-path (Optional)
+#### changelog > file-header-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing changelog file header. Overrides `header-template` when both are provided.
+Path to text file containing changelog file header. Overrides `file-header-template` when both are provided.
 
-#### changelog > footer-template (Optional)
+#### changelog > file-footer-template (Optional)
 
 Type: `string`
 
 String template for changelog file footer, using with string patterns like `${version}`. Placed below any changelog content section.
 
-#### changelog > footer-template-path (Optional)
+#### changelog > file-footer-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing changelog file footer. Overrides `footer-template` when both are provided.
+Path to text file containing changelog file footer. Overrides `file-footer-template` when both are provided.
 
-#### changelog > heading-template (Optional)
+#### changelog > content-header-template (Optional)
 
 Type: `string`  
 Default: `"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"`
 
-String template for heading of a changelog content section, using with string patterns like `${tagName}`.
-
-#### changelog > body-template (Optional)
-
-Type: `string`  
-Default: `"${changelogContentBody}"`
-
-String template for body of a changelog content section, using with string patterns like `${changelogContentBody}`.
-
-#### changelog > body-template-path (Optional)
-
-Type: `string`
-
-Path to text file containing body of a changelog content section. Overrides `body-template` when both are provided.
+String template for heading of a changelog content section, using with string patterns like `${version}`.
 
 ### pull-request (Optional)
 
@@ -358,8 +337,8 @@ Core label used by Zephyr Release to track pull requests, managed exclusively by
 
 **Properties:**
 
-- `onCreate` (Optional): Label to add when pull request is created. Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "zp-release: pending",...}`
-- `onClose` (Optional): Label to add when pull request is closed and release operation has completed (replaces `onCreate` label). Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "zp-release: released",...}`
+- `onCreate` (Optional): Label to add when pull request is created. Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "release: pending", description: "The pull request is pending release.", color: "FBCA04" }`
+- `onClose` (Optional): Label to add when pull request is closed and release operation has completed (replaces `onCreate` label). Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "release: released", description: "The pull request is closed and the release has completed.", color: "0E8A16" }`
 
 #### pull... > additional-label (Optional)
 
@@ -453,7 +432,7 @@ If enabled, the release will be marked as prerelease.
 Type: `string`  
 Default: `"v${version}"`
 
-String template for tag name, using with string patterns like `${version}`. Must always include `${version}`. Available in [string templates](./string-patterns.md) as `${tagName}`.
+String template for tag name, using with string patterns like `${version}`. Must always include `${version}`. Available in [string templates](./string-templates-and-patterns.md) as `${tagName}`.
 
 #### release > title-template (Optional)
 

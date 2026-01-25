@@ -124,10 +124,10 @@
                     ]
                   }
                 ]
-              }
+              },
+              "minItems": 1
             }
-          ],
-          "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
+          ]
         },
         "post": {
           "anyOf": [
@@ -216,14 +216,25 @@
                     ]
                   }
                 ]
-              }
+              },
+              "minItems": 1
             }
-          ],
-          "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
+          ]
         }
       },
       "required": [],
       "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root."
+    },
+    "custom-string-patterns": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while the resolved value is the key value.\nNormally, these should be set dynamically through config override."
     },
     "initial-version": {
       "type": "string",
@@ -256,9 +267,9 @@
             },
             "extractor": {
               "enum": [
-                "auto",
                 "json-path",
-                "regex"
+                "regex",
+                "auto"
               ],
               "default": "auto",
               "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
@@ -304,9 +315,9 @@
               },
               "extractor": {
                 "enum": [
-                  "auto",
                   "json-path",
-                  "regex"
+                  "regex",
+                  "auto"
                 ],
                 "default": "auto",
                 "description": "Defines how to extract the version from the parsed file.\nDefault: \"auto\""
@@ -326,10 +337,10 @@
               "path",
               "selector"
             ]
-          }
+          },
+          "minItems": 1
         }
-      ],
-      "description": "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, the first file in the array will be used.\nAbout primary file: link-to-be-insert-later"
+      ]
     },
     "commit-types": {
       "type": "array",
@@ -356,6 +367,7 @@
           "type"
         ]
       },
+      "minItems": 1,
       "default": [
         {
           "type": "feat",
@@ -376,6 +388,23 @@
       ],
       "description": "List of commit types used for version calculation and changelog generation.\nDefault: [\n  {\n    \"type\": \"feat\",\n    \"section\": \"Features\"\n  },\n  {\n    \"type\": \"fix\",\n    \"section\": \"Bug Fixes\"\n  },\n  {\n    \"type\": \"perf\",\n    \"section\": \"Performance Improvements\"\n  },\n  {\n    \"type\": \"revert\",\n    \"section\": \"Reverts\"\n  }\n]"
     },
+    "allow-release-as": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      ],
+      "default": "ALL"
+    },
     "bump-strategy": {
       "type": "object",
       "properties": {
@@ -388,6 +417,7 @@
                 "type": "string",
                 "minLength": 1
               },
+              "minItems": 1,
               "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
@@ -434,6 +464,7 @@
                 "type": "string",
                 "minLength": 1
               },
+              "minItems": 1,
               "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
@@ -482,6 +513,7 @@
                 "type": "string",
                 "minLength": 1
               },
+              "minItems": 1,
               "description": "Commit types that count toward version bumping, must be picked from the base `commit-types` list."
             },
             "count-breaking-as": {
@@ -528,7 +560,7 @@
             "enabled": {
               "type": "boolean",
               "default": false,
-              "description": "Enable/disable handling of pre-release identifiers.\nDefault: false"
+              "description": "Enable/disable handling of SemVer extensions (pre-release identifiers / build metadata).\nDefault: false"
             },
             "override": {
               "type": "array",
@@ -543,9 +575,14 @@
                   }
                 ]
               },
-              "description": "Overrides pre-release identifiers to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config."
+              "minItems": 1
             },
-            "identifiers": {
+            "treat-override-as-significant": {
+              "type": "boolean",
+              "default": false,
+              "description": "If set to `true`, the presence of an `override` is strictly treated as a structural change.\nThis immediately triggers resets on any dependent version components (e.g., resetting the Build number)\nIf `false`, overrides are treated as volatile/dynamic and ignored by reset logic.\nDefault: false"
+            },
+            "extensions": {
               "type": "array",
               "items": {
                 "oneOf": [
@@ -554,7 +591,7 @@
                     "properties": {
                       "type": {
                         "const": "static",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "value": {
                         "type": "string",
@@ -578,7 +615,7 @@
                     "properties": {
                       "type": {
                         "const": "dynamic",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "value": {
                         "type": "string",
@@ -598,27 +635,12 @@
                     "properties": {
                       "type": {
                         "const": "incremental",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "initial-value": {
                         "type": "number",
                         "default": 0,
-                        "description": "Initial integer number value.\nDefault: 0"
-                      },
-                      "expression-variables": {
-                        "type": "object",
-                        "propertyNames": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "additionalProperties": {},
-                        "description": "Defines custom variables for use in `next-value-expression`, \"v\" is reserved for current value. These variables are usually set dynamically."
-                      },
-                      "next-value-expression": {
-                        "type": "string",
-                        "minLength": 1,
-                        "default": "v+1",
-                        "description": "Expression for computing the next value, where \"v\" represents the current value. The expression must evaluate to an integer number.\nEvaluated with `expr-eval`: https://www.npmjs.com/package/expr-eval \nDefault: \"v+1\""
+                        "description": "Initial integer number value, will auto-increment by 1 on each bump.\nDefault: 0"
                       },
                       "reset-on": {
                         "anyOf": [
@@ -643,11 +665,11 @@
                                 "build",
                                 "none"
                               ]
-                            }
+                            },
+                            "minItems": 1
                           }
                         ],
-                        "default": "none",
-                        "description": "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: \"major\", \"minor\", \"patch\", \"prerelease\", \"build\", and \"none\".\nFor \"prerelease\" and \"build\", a reset is triggered only when \"static\" values change, or when \"static\", \"incremental\", or \"timestamp\" values are added or removed. Any changes to \"dynamic\" values, including their addition or removal, do not trigger a reset.\nlink insert here\nDefault: \"none\""
+                        "default": "none"
                       }
                     },
                     "required": [
@@ -659,7 +681,7 @@
                     "properties": {
                       "type": {
                         "const": "timestamp",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "unit": {
                         "enum": [
@@ -679,7 +701,7 @@
                     "properties": {
                       "type": {
                         "const": "date",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "format": {
                         "enum": [
@@ -700,7 +722,8 @@
                   }
                 ]
               },
-              "description": "Specifies the pre-release identifiers to use when bumping a pre-release version. If not provided, keep the current existing pre-release identifiers."
+              "minItems": 1,
+              "description": "Specifies the items to use for SemVer extensions."
             }
           },
           "required": [],
@@ -713,17 +736,29 @@
             "enabled": {
               "type": "boolean",
               "default": false,
-              "description": "Enable/disable handling of build metadata.\nDefault: false"
+              "description": "Enable/disable handling of SemVer extensions (pre-release identifiers / build metadata).\nDefault: false"
             },
             "override": {
               "type": "array",
               "items": {
-                "type": "string",
-                "minLength": 1
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
               },
-              "description": "Overrides build metadata to use for the next version. When provided, these values take precedence over all other bump rules. Should only be set dynamically, not in static config."
+              "minItems": 1
             },
-            "metadata": {
+            "treat-override-as-significant": {
+              "type": "boolean",
+              "default": false,
+              "description": "If set to `true`, the presence of an `override` is strictly treated as a structural change.\nThis immediately triggers resets on any dependent version components (e.g., resetting the Build number)\nIf `false`, overrides are treated as volatile/dynamic and ignored by reset logic.\nDefault: false"
+            },
+            "extensions": {
               "type": "array",
               "items": {
                 "oneOf": [
@@ -732,7 +767,7 @@
                     "properties": {
                       "type": {
                         "const": "static",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "value": {
                         "type": "string",
@@ -756,7 +791,7 @@
                     "properties": {
                       "type": {
                         "const": "dynamic",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "value": {
                         "type": "string",
@@ -776,27 +811,12 @@
                     "properties": {
                       "type": {
                         "const": "incremental",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "initial-value": {
                         "type": "number",
                         "default": 0,
-                        "description": "Initial integer number value.\nDefault: 0"
-                      },
-                      "expression-variables": {
-                        "type": "object",
-                        "propertyNames": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "additionalProperties": {},
-                        "description": "Defines custom variables for use in `next-value-expression`, \"v\" is reserved for current value. These variables are usually set dynamically."
-                      },
-                      "next-value-expression": {
-                        "type": "string",
-                        "minLength": 1,
-                        "default": "v+1",
-                        "description": "Expression for computing the next value, where \"v\" represents the current value. The expression must evaluate to an integer number.\nEvaluated with `expr-eval`: https://www.npmjs.com/package/expr-eval \nDefault: \"v+1\""
+                        "description": "Initial integer number value, will auto-increment by 1 on each bump.\nDefault: 0"
                       },
                       "reset-on": {
                         "anyOf": [
@@ -821,11 +841,11 @@
                                 "build",
                                 "none"
                               ]
-                            }
+                            },
+                            "minItems": 1
                           }
                         ],
-                        "default": "none",
-                        "description": "Resets the incremental value when the specified version component(s) change, could be a single or an array of options. Allowed values: \"major\", \"minor\", \"patch\", \"prerelease\", \"build\", and \"none\".\nFor \"prerelease\" and \"build\", a reset is triggered only when \"static\" values change, or when \"static\", \"incremental\", or \"timestamp\" values are added or removed. Any changes to \"dynamic\" values, including their addition or removal, do not trigger a reset.\nlink insert here\nDefault: \"none\""
+                        "default": "none"
                       }
                     },
                     "required": [
@@ -837,7 +857,7 @@
                     "properties": {
                       "type": {
                         "const": "timestamp",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "unit": {
                         "enum": [
@@ -857,7 +877,7 @@
                     "properties": {
                       "type": {
                         "const": "date",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that changes over time.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
                       },
                       "format": {
                         "enum": [
@@ -878,7 +898,8 @@
                   }
                 ]
               },
-              "description": "Specifies the build metadata to use when bumping a pre-release version. If not provided, keep the current existing build metadata."
+              "minItems": 1,
+              "description": "Specifies the items to use for SemVer extensions."
             }
           },
           "required": [],
@@ -914,265 +935,55 @@
           "default": "CHANGELOG.md",
           "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
         },
-        "command-hook": {
-          "type": "object",
-          "properties": {
-            "timeout": {
-              "anyOf": [
-                {
-                  "type": "number",
-                  "minimum": 1
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                },
-                {
-                  "const": "infinity"
-                }
-              ],
-              "default": 60000,
-              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
-            },
-            "continue-on-error": {
-              "type": "boolean",
-              "default": false,
-              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
-            },
-            "pre": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
-                        },
-                        "continue-on-error": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
-                          },
-                          "continue-on-error": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ],
-              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
-            },
-            "post": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
-                        },
-                        "continue-on-error": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `command-hook` base `timeout` value"
-                          },
-                          "continue-on-error": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `command-hook` base `continue-on-error` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ],
-              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
-            }
-          },
-          "required": [],
-          "description": "Pre/post command lists to run around the changelog operation. Each command runs from the repository root."
-        },
         "content-body-override": {
           "type": "string",
           "minLength": 1,
           "description": "User-provided changelog content body, available in string templates as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
         },
-        "header-template": {
+        "content-body-override-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog content body override, will take precedence over `content-body-override`."
+        },
+        "file-header-template": {
           "type": "string",
           "default": "# Changelog\n\n<br/>\n",
           "description": "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
         },
-        "header-template-path": {
+        "file-header-template-path": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing changelog file header. Overrides `header-template` when both are provided."
+          "description": "Path to text file containing changelog file header. Overrides `file-header-template` when both are provided."
         },
-        "footer-template": {
+        "file-footer-template": {
           "type": "string",
           "description": "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content section."
         },
-        "footer-template-path": {
+        "file-footer-template-path": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing changelog file footer. Overrides `footer-template` when both are provided."
+          "description": "Path to text file containing changelog file footer. Overrides `file-footer-template` when both are provided."
         },
-        "heading-template": {
+        "content-header-template": {
           "type": "string",
           "minLength": 1,
           "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
-          "description": "String template for heading of a changelog content section, using with string patterns like ${tagName}.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
+          "description": "String template for header of a changelog content section, using with string patterns like ${version}.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
         },
-        "body-template": {
+        "content-entry-template": {
           "type": "string",
           "minLength": 1,
-          "default": "${changelogContentBody}",
-          "description": "String template for body of a changelog content section, using with string patterns like ${changelogContentBody}.\nDefault: \"${changelogContentBody}\""
+          "default": "- ${ ${scope} | wrapAroundIfNotEmpty( ( , ): ) } ${desc} • [${ ${hash} | slice(0, 7) }](${host}/${namespace}/${repository}/)",
+          "description": "String template for each entries in the changelog content body, using with fixed base and version string patterns.\nAdditionally, you can use a special set of dynamic patterns which is ${type}, ${scope}, ${formatScope}, ${desc}, ${body}, ${footer}, ${hash}.\nAbout special patterns: [link-to-insert]Default: \"- ${ ${scope} | wrapAroundIfNotEmpty( ( , ): ) } ${desc} • [${ ${hash} | slice(0, 7) }](${host}/${namespace}/${repository}/)\""
         },
-        "body-template-path": {
+        "content-footer-template": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing body of a changelog content section. Overrides `body-template` when both are provided."
+          "description": "String template for footer of a changelog content section, using with string patterns."
         }
       },
       "required": [],
-      "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as ${changelogContent} (heading + body) or ${changelogContentBody} (body only).",
+      "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as ${changelogContent} (content header + body) or ${changelogContentBody} (body only).",
       "default": {}
     },
     "pull-request": {
@@ -1292,10 +1103,10 @@
                         ]
                       }
                     ]
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
+              ]
             },
             "post": {
               "anyOf": [
@@ -1384,10 +1195,10 @@
                         ]
                       }
                     ]
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
+              ]
             }
           },
           "required": [],
@@ -1396,44 +1207,24 @@
         "files-to-commit": {
           "anyOf": [
             {
-              "enum": [
-                "base",
-                "all"
-              ]
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "array",
               "items": {
-                "anyOf": [
-                  {
-                    "enum": [
-                      "base",
-                      "all"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                ]
-              }
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
             }
-          ],
-          "default": "base",
-          "description": "Files to include in the commit when creating a pull request. Accepts \"base\", \"all\" options or an array of options and paths/globs. Paths are relative to the repo root.\nDefault: \"base\"",
-          "examples": [
-            [],
-            [
-              "base",
-              "src/release-artifacts/*"
-            ]
           ]
         },
         "branch-name-template": {
           "type": "string",
           "minLength": 1,
           "default": "release/zephyr-release",
-          "description": "String template for branch name that Zephyr Release uses. Allowed patterns to use are: \"${name}\", \"${namespace}\", \"${repository}\"\nDefault: \"release/zephyr-release\""
+          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: \"${name}\", \"${namespace}\", \"${repository}\"\nDefault: \"release/zephyr-release\""
         },
         "label": {
           "type": "object",
@@ -1468,10 +1259,9 @@
               ],
               "default": {
                 "name": "release: pending",
-                "description": "Indicates that the pull request is pending release.",
+                "description": "The pull request is pending release.",
                 "color": "FBCA04"
-              },
-              "description": "Label to add when pull request is created.\nDefault: {\n  \"name\": \"release: pending\",\n  \"description\": \"Indicates that the pull request is pending release.\",\n  \"color\": \"FBCA04\"\n}"
+              }
             },
             "on-close": {
               "anyOf": [
@@ -1503,10 +1293,9 @@
               ],
               "default": {
                 "name": "release: released",
-                "description": "Indicates that the pull request is closed and the release has completed.",
+                "description": "The pull request is closed and the release has completed.",
                 "color": "0E8A16"
-              },
-              "description": "Label to add when pull request is closed and release operation has completed (replaces `on-create` label).\nDefault: {\n  \"name\": \"release: released\",\n  \"description\": \"Indicates that the pull request is closed and the release has completed.\",\n  \"color\": \"0E8A16\"\n}"
+              }
             }
           },
           "required": [],
@@ -1527,10 +1316,10 @@
                   "items": {
                     "type": "string",
                     "minLength": 1
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Additional labels to add when pull request is created."
+              ]
             },
             "on-close-add": {
               "anyOf": [
@@ -1543,10 +1332,10 @@
                   "items": {
                     "type": "string",
                     "minLength": 1
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Additional labels to add when pull request is closed and release operation has completed."
+              ]
             },
             "on-close-remove": {
               "anyOf": [
@@ -1559,10 +1348,10 @@
                   "items": {
                     "type": "string",
                     "minLength": 1
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Additional labels to remove when pull request is closed and release operation has completed. Use \"allOnCreate\" to remove all labels added in `on-create-add`."
+              ]
             }
           },
           "required": [],
@@ -1584,11 +1373,11 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "minItems": 1
             }
           ],
-          "default": "🤖 New release created. Stand by for approval",
-          "description": "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\nDefault: \"🤖 New release created. Stand by for approval\""
+          "default": "🤖 New release created. Stand by for approval"
         },
         "body-template": {
           "type": "string",
@@ -1737,10 +1526,10 @@
                         ]
                       }
                     ]
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Commands to run before the operation.\nList of exposed env variables: to-do-insert-later"
+              ]
             },
             "post": {
               "anyOf": [
@@ -1829,10 +1618,10 @@
                         ]
                       }
                     ]
-                  }
+                  },
+                  "minItems": 1
                 }
-              ],
-              "description": "Commands to run after the operation.\nList of exposed env variables: to-do-insert-later"
+              ]
             }
           },
           "required": [],
@@ -1852,7 +1641,7 @@
           "type": "string",
           "minLength": 1,
           "default": "v${version}",
-          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nDefault: \"v${version}\""
+          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nAllowed patterns to use are: all fixed base string patterns ()\nDefault: \"v${version}\""
         },
         "title-template": {
           "type": "string",

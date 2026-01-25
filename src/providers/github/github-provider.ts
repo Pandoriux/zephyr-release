@@ -5,7 +5,13 @@ import {
   githubFindUniquePullRequestForCommitOrThrow,
   githubFindUniquePullRequestFromBranchOrThrow,
 } from "./pull-request.ts";
-import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
+import {
+  githubGetCommitPathPart,
+  githubGetHost,
+  githubGetNamespace,
+  githubGetReferencePathPart,
+  githubGetRepositoryName,
+} from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { githubExportVariables } from "./export.ts";
 import { githubEnsureBranchAtCommitOrThrow } from "./branch.ts";
@@ -20,8 +26,11 @@ export const githubProvider = {
 
   getInputs: githubGetRawInputs,
 
+  getHost: githubGetHost,
   getNamespace: githubGetNamespace,
   getRepositoryName: githubGetRepositoryName,
+  getCommitPathPart: githubGetCommitPathPart,
+  getReferencePathPart: githubGetReferencePathPart,
 
   manageConcurrency: githubManageConcurrency,
 

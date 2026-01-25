@@ -124,27 +124,17 @@
     "writeToFile": true,
     "path": "CHANGELOG.md",
 
-    // Ex: Run commands before and after changelog generation
-    "command-hook": {
-      "timeout": 60000,
-      "continueOnError": false,
-      "pre": ["npm run format:changelog"],
-      "post": []
-    },
-
     // This setting should only be used in workflow inputs, not in config file
     "content-body-override": "",
     // "content-body-override-path": "",
 
-    "header-pattern": "# Changelog\\n\\n<br/>\\n",
-    // "header-pattern-path": "",
+    "file-header-template": "# Changelog\\n\\n<br/>\\n",
+    // "file-header-template-path": "",
 
-    // "footer-pattern": "",
-    // "footer-pattern-path": "",
+    // "file-footer-template": "",
+    // "file-footer-template-path": "",
 
-    "heading-pattern": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
-    "body-pattern": "${changelogContentBody}",
-    // "body-pattern-path": ""
+    "content-header-template": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"
   },
 
   "pull-request": {

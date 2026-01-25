@@ -12,8 +12,11 @@ export interface PlatformProvider {
 
   getInputs: () => ProviderInputs;
 
+  getHost: () => string;
   getNamespace: () => string;
   getRepositoryName: () => string;
+  getCommitPathPart: () => string;
+  getReferencePathPart: () => string;
 
   manageConcurrency: (token: string) => Promise<void>;
 

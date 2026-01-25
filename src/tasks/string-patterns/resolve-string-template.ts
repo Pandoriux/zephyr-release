@@ -17,27 +17,28 @@ export function resolveStringTemplate(
     /\$\{([^}]+)\}/g,
     (match, patternContent) => {
       const fixedValue = handleFixedStringPatterns(patternContent);
-      if (fixedValue) return fixedValue;
+      if (fixedValue !== undefined) return fixedValue;
 
       //dynamic?
 
       // derived??
       if (patternContent.includes(":")) {
-        return handleDerivedStringPatterns(
+        const derivedValue = handleDerivedStringPatterns(
           match,
           patternContent,
         );
+        if (derivedValue !== undefined) return derivedValue;
       }
 
       taskLogger.info(
         `Cannot resolve pattern '${match}' for string template '${strTemplate}'`,
       );
 
-      return "";
+      return match;
     },
   );
 
-  // Cache the result, only apply to fixed pattern, might need to fix code order
+  // Cache the result, only apply to fixed pattern, might need to fix code later
   RESOLVED_FIXED_STRING_TEMPLATE_CACHE.set(strTemplate, resolvedTemplate);
 
   return resolvedTemplate;
@@ -61,8 +62,8 @@ function handleDynamicStringPatterns(
 function handleDerivedStringPatterns(
   _match: string,
   _patternContent: string,
-): string {
+): string | undefined {
   // TODO: design a good way to solve
 
-  return "";
+  return undefined;
 }

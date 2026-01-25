@@ -38,6 +38,7 @@ export function createFixedBaseStringPatternContext(
   const context = {
     name: name,
     timeZone: timeZone,
+    host: provider.getHost(),
     namespace: provider.getNamespace(),
     repository: provider.getRepositoryName(),
     "YYYY-MM-DD": zdtFormat("yyyy-MM-dd"),

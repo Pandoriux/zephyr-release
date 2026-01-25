@@ -4,7 +4,10 @@ export const DEFAULT_CHANGELOG_HEADER_PATTERN = "# Changelog\n\n<br/>\n";
 export const DEFAULT_CHANGELOG_HEADING_PATTERN =
   "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->";
 
-export const DEFAULT_CHANGELOG_BODY_PATTERN = "${changelogContentBody}";
+export const DEFAULT_CHANGELOG_ENTRY_PATTERN =
+  "- ${ ${scope} | wrapAroundIfNotEmpty( ( , ): ) } ${desc}" +
+  " • " +
+  "[${ ${hash} | slice(0, 7) }](${host}/${namespace}/${repository}/)";
 
 // Pull request
 export const DEFAULT_PULL_REQUEST_TITLE_PATTERN = "chore: release v${version}";
