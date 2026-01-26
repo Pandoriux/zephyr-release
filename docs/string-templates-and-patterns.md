@@ -56,8 +56,8 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 #### Changelog
 
-- `{{ changelogContent }}`: The generated changelog content section ([content header](./config-options.md#changelog--content-header-template-optional) + body)
-- `{{ changelogContentBody }}`: The generated changelog body. You can override it with your own computed content ([content-body-override](./config-options.md#changelog--content-body-override-optional))
+- `{{ changelogContent }}`: In `prepare` operation (managing pull request), the generated changelog content section is [content header](./config-options.md#changelog--content-header-template-optional) + body. In `release` operation (create tag and publish release), the value is the **pull request body** (this means any edits made to the pull request body will also be included)
+- `{{ changelogContentBody }}`: The generated changelog body. You can override it with your own computed content via ([content-body-override](./config-options.md#changelog--content-body-override-optional))
 
 ## Transformers
 
@@ -69,12 +69,13 @@ Usage: `{{ <value> | <transformers>: <arg1>, <arg2>, ...  }}`
 
 Our custom transformers.
 
-- `mdLinkCompareTag: tag1, tag2`: Wraps the current text in a markdown link that compares `tag1` with `tag2`
+- `md_link_compare_tag: tag1, tag2`: Wraps the current text in a markdown link that compares `tag1` with `tag2`
   - tag1: `string`
   - tag2: `string`
 
-- `mdLinkCompareTagFromCurrentToPrev: offset`: Wraps the current text in a markdown link comparing the current tag to a tag `offset` positions earlier.  
-  - offset: `integer number` how many tags back from the current tag (e.g., `1` = direct previous tag)
+- `md_link_compare_tag_from_current_to_latest: skip`: Wraps the current text in a markdown link comparing the current tag to the latest tag.  
+  - skip (optional): `positive integer`, `DEFAULT: 0`  
+  how many tags back from the latest tag to compare against (`0` = latest tag, `1` = tag before the latest, etc.)
 
 ### LiquidJS built-in Transformers
 

@@ -4,11 +4,11 @@ import { CoreLabelSchema } from "./components/core-label.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
 import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import {
-  DEFAULT_PULL_REQUEST_BODY_PATTERN,
-  DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
-  DEFAULT_PULL_REQUEST_HEADER_PATTERN,
-  DEFAULT_PULL_REQUEST_TITLE_PATTERN,
-} from "../../../constants/defaults/string-pattern.ts";
+  DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
+  DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
+  DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
+  DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
+} from "../../../constants/defaults/string-templates.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
@@ -74,12 +74,12 @@ export const PullRequestConfigSchema = v.pipe(
     titleTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_PULL_REQUEST_TITLE_PATTERN,
+        DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for pull request title, using with string patterns like ${version}.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_TEMPLATE)}`,
       }),
     ),
     headerTemplate: v.pipe(
@@ -88,24 +88,24 @@ export const PullRequestConfigSchema = v.pipe(
           v.pipe(v.string(), v.trim()),
           v.pipe(v.array(v.pipe(v.string(), v.trim())), v.nonEmpty()),
         ]),
-        DEFAULT_PULL_REQUEST_HEADER_PATTERN,
+        DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
       ),
       v.transform((input) => Array.isArray(input) ? input : [input]),
       v.metadata({
         description:
           "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
       }),
     ),
     bodyTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
-        DEFAULT_PULL_REQUEST_BODY_PATTERN,
+        DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for pull request body, using with string patterns like ${changelogContent}.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_TEMPLATE)}`,
       }),
     ),
     bodyTemplatePath: v.pipe(
@@ -118,12 +118,12 @@ export const PullRequestConfigSchema = v.pipe(
     footerTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
-        DEFAULT_PULL_REQUEST_FOOTER_PATTERN,
+        DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for pull request footer, using with string patterns.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE)}`,
       }),
     ),
   }),

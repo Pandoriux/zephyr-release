@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import {
-  DEFAULT_RELEASE_BODY_PATTERN,
-  DEFAULT_RELEASE_TITLE_PATTERN,
-  DEFAULT_TAG_NAME_PATTERN,
-} from "../../../constants/defaults/string-pattern.ts";
+  DEFAULT_RELEASE_BODY_TEMPLATE,
+  DEFAULT_RELEASE_TITLE_TEMPLATE,
+  DEFAULT_TAG_NAME_TEMPLATE,
+} from "../../../constants/defaults/string-templates.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
@@ -49,33 +49,33 @@ export const ReleaseConfigSchema = v.pipe(
     tagNameTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_TAG_NAME_PATTERN,
+        DEFAULT_TAG_NAME_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
           "Allowed patterns to use are: all fixed base string patterns ()\n" +
-          `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
       }),
     ),
 
     titleTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_RELEASE_TITLE_PATTERN,
+        DEFAULT_RELEASE_TITLE_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for release title, using with string patterns like ${tagName}.\n" +
-          `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_TEMPLATE)}`,
       }),
     ),
     bodyTemplate: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_PATTERN),
+      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_TEMPLATE),
       v.metadata({
         description:
           "String template for release body, using with string patterns like ${changelogContent}.\n" +
-          `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_TEMPLATE)}`,
       }),
     ),
   }),

@@ -1,9 +1,9 @@
 import * as v from "@valibot/valibot";
 import {
-  DEFAULT_CHANGELOG_ENTRY_PATTERN,
-  DEFAULT_CHANGELOG_HEADER_PATTERN,
-  DEFAULT_CHANGELOG_HEADING_PATTERN,
-} from "../../../constants/defaults/string-pattern.ts";
+  DEFAULT_CHANGELOG_CONTENT_HEADER_TEMPLATE,
+  DEFAULT_CHANGELOG_ENTRY_TEMPLATE,
+  DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
+} from "../../../constants/defaults/string-templates.ts";
 
 export const ChangelogConfigSchema = v.pipe(
   v.object({
@@ -45,12 +45,12 @@ export const ChangelogConfigSchema = v.pipe(
     fileHeaderTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim()),
-        DEFAULT_CHANGELOG_HEADER_PATTERN,
+        DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content sections.\n" +
-          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADER_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE)}`,
       }),
     ),
     fileHeaderTemplatePath: v.pipe(
@@ -78,18 +78,20 @@ export const ChangelogConfigSchema = v.pipe(
     contentHeaderTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_HEADING_PATTERN,
+        DEFAULT_CHANGELOG_CONTENT_HEADER_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for header of a changelog content section, using with string patterns like ${version}.\n" +
-          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_HEADING_PATTERN)}`,
+          `Default: ${
+            JSON.stringify(DEFAULT_CHANGELOG_CONTENT_HEADER_TEMPLATE)
+          }`,
       }),
     ),
     contentEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_ENTRY_PATTERN,
+        DEFAULT_CHANGELOG_ENTRY_TEMPLATE,
       ),
       v.metadata({
         description:
@@ -97,7 +99,7 @@ export const ChangelogConfigSchema = v.pipe(
           "Additionally, you can use a special set of dynamic patterns which is ${type}, ${scope}, ${formatScope}, ${desc}, ${body}, ${footer}, " +
           "${hash}.\n" +
           "About special patterns: [link-to-insert]" +
-          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_ENTRY_PATTERN)}`,
+          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_ENTRY_TEMPLATE)}`,
       }),
     ),
     contentFooterTemplate: v.pipe(

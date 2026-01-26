@@ -18,6 +18,10 @@ import { githubEnsureBranchAtCommitOrThrow } from "./branch.ts";
 import { githubFindCommitsFromGivenToPreviousTaggedOrThrow } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import { githubManageConcurrency } from "./concurrency.ts";
+import {
+  githubGetCompareTagUrl,
+  githubGetCompareTagUrlFromCurrentToLatest,
+} from "./tag.ts";
 
 export const githubProvider = {
   platform: "github",
@@ -31,6 +35,10 @@ export const githubProvider = {
   getRepositoryName: githubGetRepositoryName,
   getCommitPathPart: githubGetCommitPathPart,
   getReferencePathPart: githubGetReferencePathPart,
+
+  getCompareTagUrl: githubGetCompareTagUrl,
+  getCompareTagUrlFromCurrentToLatest:
+    githubGetCompareTagUrlFromCurrentToLatest,
 
   manageConcurrency: githubManageConcurrency,
 

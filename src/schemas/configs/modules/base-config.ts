@@ -39,7 +39,7 @@ export const BaseConfigSchema = v.object({
     ),
     v.metadata({
       description:
-        "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while " +
+        "Custom string patterns to use in templates. The key is the pattern, available as '{{<key>}}' while " +
         "the resolved value is the key value.\n" +
         "Normally, these should be set dynamically through config override.",
     }),

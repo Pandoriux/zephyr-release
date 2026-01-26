@@ -1,7 +1,6 @@
 export const FixedBaseStringPatterns = {
   // Project info
   name: "name", // ${name}
-  timeZone: "timeZone", // ${timeZone}
   host: "host", // ${host}
   namespace: "namespace", // ${namespace}
   repository: "repository", // ${repository}
@@ -9,6 +8,7 @@ export const FixedBaseStringPatterns = {
   referencePathPart: "referencePathPart",
 
   // Date components (ISO format)
+  timeZone: "timeZone", // ${timeZone}
   year: "YYYY", // ${YYYY}
   month: "MM", // ${MM}
   day: "DD", // ${DD}

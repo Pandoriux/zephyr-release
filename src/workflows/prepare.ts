@@ -43,12 +43,16 @@ export async function prepareWorkflow(
   );
   logger.stepFinish("Finished: Calculate next version");
 
-  logger.debugStepStart("Starting: Create fixed version string patterns");
+  logger.debugStepStart(
+    "Starting: Create fixed version string pattern context",
+  );
   createFixedVersionStringPatternContext(
     nextVersionResult.semver,
     config.release.tagNameTemplate,
   );
-  logger.debugStepFinish("Finished: Create fixed version string patterns");
+  logger.debugStepFinish(
+    "Finished: Create fixed version string pattern context",
+  );
 
   logger.stepStart("Starting: Generate changelog content");
   logger.stepFinish("Finished: Generate changelog content");

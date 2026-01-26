@@ -18,6 +18,13 @@ export interface PlatformProvider {
   getCommitPathPart: () => string;
   getReferencePathPart: () => string;
 
+  getCompareTagUrl: (tag1: string, tag2: string) => string;
+  getCompareTagUrlFromCurrentToLatest: (
+    token: string,
+    currentTag: string,
+    skip?: number,
+  ) => Promise<string>;
+
   manageConcurrency: (token: string) => Promise<void>;
 
   getTextFileOrThrow: (
