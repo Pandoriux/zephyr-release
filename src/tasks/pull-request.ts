@@ -1,15 +1,12 @@
 import { taskLogger } from "./logger.ts";
-import { resolveStringTemplate } from "./string-patterns/resolve-string-template.ts";
+import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { CoreLabelOutput } from "../schemas/configs/modules/components/core-label.ts";
 import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 
-type FindPrForCommitInputsParams = Pick<
-  InputsOutput,
-  "triggerCommitHash" | "token"
->;
+type FindPrForCommitInputsParams = Pick<InputsOutput, "triggerCommitHash">;
 
 interface PullRequestBranchAndLabelConfigParams {
   pullRequest: {
@@ -23,8 +20,8 @@ export async function findPullRequestForCommitOrThrow(
   inputs: FindPrForCommitInputsParams,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
-  const { triggerCommitHash, token } = inputs;
-  const sourceBranch = resolveStringTemplate(
+  const { triggerCommitHash } = inputs;
+  const sourceBranch = await resolveStringTemplateOrThrow(
     config.pullRequest.branchNameTemplate,
   );
   const label = typeof config.pullRequest.label.onCreate === "string"
@@ -32,7 +29,6 @@ export async function findPullRequestForCommitOrThrow(
     : config.pullRequest.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestForCommitOrThrow(
-    token,
     triggerCommitHash,
     sourceBranch,
     label,
@@ -48,10 +44,9 @@ export async function findPullRequestForCommitOrThrow(
 
 export async function findPullRequestFromBranchOrThrow(
   provider: PlatformProvider,
-  token: string,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
-  const branchName = resolveStringTemplate(
+  const branchName = await resolveStringTemplateOrThrow(
     config.pullRequest.branchNameTemplate,
   );
   const label = typeof config.pullRequest.label.onCreate === "string"
@@ -59,7 +54,6 @@ export async function findPullRequestFromBranchOrThrow(
     : config.pullRequest.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestFromBranchOrThrow(
-    token,
     branchName,
     label,
   );

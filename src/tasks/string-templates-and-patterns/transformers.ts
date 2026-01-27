@@ -3,7 +3,6 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 
 export async function registerTransformersToTemplateEngine(
   provider: PlatformProvider,
-  token: string,
 ) {
   liquidEngine.registerFilter(
     "md_link_compare_tag",
@@ -12,6 +11,12 @@ export async function registerTransformersToTemplateEngine(
 
   liquidEngine.registerFilter(
     "md_link_compare_tag_from_current_to_latest",
-    (txt, skip) => `[${txt}]()`,
+    async (txt, currentTag, skip = 0) => {
+      const url = await provider.getCompareTagUrlFromCurrentToLatest(
+        currentTag,
+        skip,
+      );
+      return `[${txt}](${url})`;
+    },
   );
 }

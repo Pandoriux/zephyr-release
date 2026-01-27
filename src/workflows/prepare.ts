@@ -5,7 +5,7 @@ import { logger } from "../tasks/logger.ts";
 import { resolveCommitsFromTriggerToLastRelease } from "../tasks/commit.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { calculateNextVersion } from "../tasks/calculate-next-version/next-version.ts";
-import { createFixedVersionStringPatternContext } from "../tasks/string-patterns/string-pattern-context.ts";
+import { createFixedVersionStringPatternContext } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 
 interface PrepareWorkflowOptions {
   inputs: InputsOutput;

@@ -4,13 +4,15 @@ import type { ProviderBranch } from "./branch.ts";
 import type { ProviderCommit } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
+import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
 
   logger: CoreLogger;
 
-  getInputs: () => ProviderInputs;
+  getRawInputs: () => ProviderInputs;
+  setupProviderContext: (validatedInputs: InputsOutput) => void;
 
   getHost: () => string;
   getNamespace: () => string;
@@ -20,38 +22,30 @@ export interface PlatformProvider {
 
   getCompareTagUrl: (tag1: string, tag2: string) => string;
   getCompareTagUrlFromCurrentToLatest: (
-    token: string,
     currentTag: string,
     skip?: number,
   ) => Promise<string>;
 
-  manageConcurrency: (token: string) => Promise<void>;
+  manageConcurrency: () => Promise<void>;
 
-  getTextFileOrThrow: (
-    token: string,
-    filePath: string,
-  ) => Promise<string>;
+  getTextFileOrThrow: (filePath: string) => Promise<string>;
 
   ensureBranchAtCommitOrThrow: (
-    token: string,
     branchName: string,
     commitHash: string,
   ) => Promise<ProviderBranch>;
 
   findCommitsFromGivenToPreviousTaggedOrThrow: (
-    token: string,
     commitHash: string,
   ) => Promise<ProviderCommit[]>;
 
   findUniquePullRequestForCommitOrThrow: (
-    token: string,
     commitHash: string,
     sourceBranch: string,
     label: string,
   ) => Promise<ProviderPullRequest | undefined>;
 
   findUniquePullRequestFromBranchOrThrow: (
-    token: string,
     branchName: string,
     requiredLabel: string,
   ) => Promise<ProviderPullRequest | undefined>;

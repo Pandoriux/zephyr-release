@@ -24,8 +24,12 @@ export async function run(provider: PlatformProvider) {
   const inputs = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get inputs");
 
+  logger.stepStart("Starting: Setup provider context with inputs");
+  provider.setupProviderContext(inputs);
+  logger.stepFinish("Finished: Setup provider context with inputs");
+
   logger.stepStart("Starting: Manage concurrency");
-  await manageConcurrency(provider, inputs);
+  await manageConcurrency(provider);
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
@@ -48,7 +52,6 @@ export async function run(provider: PlatformProvider) {
   );
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
-    inputs.token,
     config,
   );
   logger.stepFinish(

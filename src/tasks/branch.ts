@@ -1,5 +1,5 @@
 import { taskLogger } from "./logger.ts";
-import { resolveStringTemplate } from "./string-patterns/resolve-string-template.ts";
+import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -7,7 +7,7 @@ import type { ProviderBranch } from "../types/providers/branch.ts";
 
 type SetupWorkingBranchInputsParams = Pick<
   InputsOutput,
-  "triggerCommitHash" | "token"
+  "triggerCommitHash"
 >;
 
 interface SetupWorkingBranchConfigParams {
@@ -21,13 +21,12 @@ export async function setupWorkingBranchOrThrow(
   inputs: SetupWorkingBranchInputsParams,
   config: SetupWorkingBranchConfigParams,
 ): Promise<ProviderBranch> {
-  const { triggerCommitHash, token } = inputs;
-  const branchName = resolveStringTemplate(
+  const { triggerCommitHash } = inputs;
+  const branchName = await resolveStringTemplateOrThrow(
     config.pullRequest.branchNameTemplate,
   );
 
   const workBranch = await provider.ensureBranchAtCommitOrThrow(
-    token,
     branchName,
     triggerCommitHash,
   );

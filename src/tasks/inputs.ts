@@ -5,7 +5,7 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
 
 export function getInputsOrThrow(provider: PlatformProvider): InputsOutput {
-  const rawInputs = provider.getInputs();
+  const rawInputs = provider.getRawInputs();
 
   const parsedInputsResult = v.safeParse(InputsSchema, rawInputs);
   if (!parsedInputsResult.success) {

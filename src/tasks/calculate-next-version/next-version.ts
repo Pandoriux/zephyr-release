@@ -15,7 +15,7 @@ import { calculateNextExtensionsSemVer } from "./extension-calculations.ts";
 
 type CalculateNextVersionInputsParams = Pick<
   InputsOutput,
-  "token" | "workspacePath" | "sourceMode"
+  "workspacePath" | "sourceMode"
 >;
 
 type CalculateNextVersionConfigParams = Pick<
@@ -40,7 +40,7 @@ export async function calculateNextVersion(
   config: CalculateNextVersionConfigParams,
 ): Promise<NextVersionResult> {
   const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
-  const { token, workspacePath, sourceMode } = inputs;
+  const { workspacePath, sourceMode } = inputs;
   const {
     timeZone,
     initialVersion,
@@ -65,7 +65,6 @@ export async function calculateNextVersion(
     primaryVersionFile,
     sourceMode,
     provider,
-    token,
     workspacePath,
   );
 

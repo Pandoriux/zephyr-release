@@ -56,7 +56,6 @@ export async function getVersionStringFromVersionFile(
   versionFile: VersionFileOutput,
   sourceMode: InputsOutput["sourceMode"],
   provider: PlatformProvider,
-  token: string,
   workspacePath: string,
 ): Promise<string | undefined> {
   const fileSourceMode = getVersionFileSourceMode(
@@ -64,13 +63,11 @@ export async function getVersionStringFromVersionFile(
     sourceMode,
   );
 
-  const fileContent = await getTextFileOrThrow({
-    source: fileSourceMode,
-    workspace: workspacePath,
-    path: versionFile.path,
-    provider,
-    token,
-  });
+  const fileContent = await getTextFileOrThrow(
+    fileSourceMode,
+    versionFile.path,
+    { workspace: workspacePath, provider },
+  );
 
   const parsedResult = parseVersionFileOrThrow(
     fileContent,

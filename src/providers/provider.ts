@@ -3,7 +3,8 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 
 export async function getProviderOrThrow(): Promise<PlatformProvider> {
   if (process.env.GITHUB_ACTIONS === "true") {
-    return (await import("./github/github-provider.ts")).githubProvider;
+    const { createGitHubProvider } = await import("./github/github-provider.ts");
+    return createGitHubProvider();
   }
 
   // TODO: if requested enough

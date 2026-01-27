@@ -16,7 +16,6 @@ import { getTextFileOrThrow } from "./file.ts";
 
 type ResolveConfigInputsParams = Pick<
   InputsOutput,
-  | "token"
   | "configPath"
   | "configFormat"
   | "configOverride"
@@ -28,7 +27,6 @@ export async function resolveConfigOrThrow(
   inputs: ResolveConfigInputsParams,
 ): Promise<ConfigOutput> {
   const {
-    token,
     configPath,
     configFormat,
     configOverride,
@@ -41,11 +39,8 @@ export async function resolveConfigOrThrow(
 
   taskLogger.info("Reading config file from path...");
   if (configPath) {
-    const configText = await getTextFileOrThrow({
-      source: "remote",
+    const configText = await getTextFileOrThrow("remote", configPath, {
       provider,
-      token,
-      path: configPath,
     });
 
     const parsedResult = parseConfigOrThrow(

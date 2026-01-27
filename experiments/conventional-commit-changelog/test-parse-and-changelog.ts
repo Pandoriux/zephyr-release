@@ -4,7 +4,7 @@ import type { ProviderCommit } from "../../src/types/providers/commit.ts";
 import { githubProvider } from "../../src/providers/github/github-provider.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../src/constants/defaults/commit.ts";
 
-export type ResolvedCommit = CommitBase & {
+type ResolvedCommit = CommitBase & {
   hash: string;
   type: string;
   scope?: string;

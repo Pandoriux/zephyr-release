@@ -14,16 +14,10 @@ const OctokitInstance = Octokit.plugin(
   throttling,
 );
 
-let activeOctokitInstance: InstanceType<typeof OctokitInstance>;
-
 export function getOctokitClient(
   token: string,
 ): InstanceType<typeof OctokitInstance> {
-  if (activeOctokitInstance) {
-    return activeOctokitInstance;
-  }
-
-  activeOctokitInstance = new OctokitInstance({
+  return new OctokitInstance({
     auth: token,
     request: {
       retries: 3,
@@ -67,6 +61,4 @@ export function getOctokitClient(
       },
     },
   });
-
-  return activeOctokitInstance;
 }
