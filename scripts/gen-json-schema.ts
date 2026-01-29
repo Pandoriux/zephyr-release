@@ -12,7 +12,7 @@ const propertyKeyMap = new Map<string, string>();
 const schema = toJsonSchema(ConfigSchema, {
   typeMode: "input",
   definitions: { timeZone: TimeZoneSchema },
-  ignoreActions: ["trim", "safe_integer"],
+  ignoreActions: ["trim", "safe_integer", "to_lower_case"],
 });
 
 // Transform function (from camelCase to kebab-case)
@@ -38,9 +38,13 @@ function transformKeys(
     if ("$ref" in schema && typeof schema.$ref === "string") {
       if (schema.$ref.startsWith("#")) {
         const parts = schema.$ref.split("/");
-        parts[parts.length - 1] = toKebabCase(parts[parts.length - 1]);
+        const lastPart = parts.at(-1);
 
-        schema.$ref = parts.join("/");
+        if (lastPart) {
+          parts[parts.length - 1] = toKebabCase(lastPart);
+
+          schema.$ref = parts.join("/");
+        }
       }
     }
 

@@ -6,37 +6,44 @@ import type {
   SourceModeOptions,
 } from "../constants/source-mode-options.ts";
 
-type GetFileArgs =
-  | {
-    source: typeof SourceModeOptions.remote;
-    provider: PlatformProvider;
-    token: string;
-    path: string;
-  }
-  | {
-    source: typeof SourceModeOptions.local;
-    workspace: string;
-    path: string;
-  };
-// | {
-//   source: SourceModeOption;
-//   path: string;
-//   provider: PlatformProvider;
-//   token: string;
-//   workspace: string;
-// };
+export async function getTextFileOrThrow(
+  source: typeof SourceModeOptions.remote,
+  path: string,
+  options: { provider: PlatformProvider },
+): Promise<string>;
+export async function getTextFileOrThrow(
+  source: typeof SourceModeOptions.local,
+  path: string,
+  options: { workspace: string },
+): Promise<string>;
+export async function getTextFileOrThrow(
+  source: SourceModeOption,
+  path: string,
+  options: { provider: PlatformProvider; workspace: string },
+): Promise<string>;
 
-export async function getTextFileOrThrow(args: GetFileArgs): Promise<string> {
-  switch (args.source) {
-    case "remote":
-      return await args.provider.getTextFileOrThrow(args.token, args.path);
+export async function getTextFileOrThrow(
+  source: SourceModeOption,
+  path: string,
+  opts: { provider?: PlatformProvider; workspace?: string },
+): Promise<string> {
+  switch (source) {
+    case "remote": {
+      if (!opts.provider) {
+        throw new Error("Provider is required for remote source.");
+      }
+      return await opts.provider.getTextFileOrThrow(path);
+    }
 
     case "local": {
-      const safePath = resolveSafeFilePath(args.workspace, args.path);
+      if (!opts.workspace) {
+        throw new Error("Workspace is required for local source.");
+      }
 
+      const safePath = resolveSafeFilePath(opts.workspace, path);
       if (!safePath) {
         throw new Error(
-          `Permission Denied: Path ${args.path} is outside the repository.`,
+          `Permission Denied: Path ${path} is outside the repository.`,
         );
       }
 

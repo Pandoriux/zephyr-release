@@ -6,6 +6,7 @@ import {
   SemverExtensionTimestampUnitTypes,
   type SemverExtensionType,
 } from "../../../../constants/semver-extension-options.ts";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 function SemverExtensionTypeSchema<T extends SemverExtensionType>(type: T) {
   return v.pipe(
@@ -26,9 +27,7 @@ export const SemverExtensionSchema = v.variant("type", [
   v.object({
     type: SemverExtensionTypeSchema("static"),
     value: v.pipe(
-      v.string(),
-      v.trim(),
-      v.nonEmpty(),
+      trimNonEmptyStringSchema,
       v.metadata({
         description: "The static string value to use.",
         examples: ["pre", "alpha", "beta", "rc"],

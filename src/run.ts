@@ -4,7 +4,7 @@ import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
 import { resolveConfigOrThrow } from "./tasks/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
-import { createFixedBaseStringPatternContext } from "./tasks/string-patterns/string-pattern-context.ts";
+import { createFixedBaseStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import {
   findPullRequestForCommitOrThrow,
   findPullRequestFromBranchOrThrow,
@@ -13,6 +13,7 @@ import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
 import { prepareWorkflow } from "./workflows/prepare.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
 import { manageConcurrency } from "./tasks/concurrency.ts";
+import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Setup operation");
@@ -23,20 +24,25 @@ export async function run(provider: PlatformProvider) {
   const inputs = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get inputs");
 
+  logger.stepStart("Starting: Setup provider context with inputs");
+  provider.setupProviderContext(inputs);
+  logger.stepFinish("Finished: Setup provider context with inputs");
+
   logger.stepStart("Starting: Manage concurrency");
-  await manageConcurrency(provider, inputs);
+  await manageConcurrency(provider);
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
   const config = await resolveConfigOrThrow(provider, inputs);
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  logger.debugStepStart("Starting: Create fixed base string patterns");
-  createFixedBaseStringPatternContext(
-    provider,
-    config,
-  );
-  logger.debugStepFinish("Finished: Create fixed base string patterns");
+  logger.debugStepStart("Starting: Create custom string pattern context");
+  createCustomStringPatternContext(config.customStringPatterns);
+  logger.debugStepFinish("Finished: Create custom string pattern context");
+
+  logger.debugStepStart("Starting: Create fixed base string pattern context");
+  createFixedBaseStringPatternContext(provider, config);
+  logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
   logger.stepStart("Starting: Get associated pull requests");
   const associatedPrForCommit = await findPullRequestForCommitOrThrow(
@@ -46,7 +52,6 @@ export async function run(provider: PlatformProvider) {
   );
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
-    inputs.token,
     config,
   );
   logger.stepFinish(

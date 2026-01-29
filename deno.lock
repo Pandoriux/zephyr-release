@@ -29,6 +29,7 @@
     "npm:conventional-changelog-writer@^8.2.0": "8.2.0",
     "npm:conventional-commits-filter@5": "5.0.0",
     "npm:conventional-commits-parser@^6.2.1": "6.2.1",
+    "npm:liquidjs@^10.24.0": "10.24.0",
     "npm:nimma@~0.7.2": "0.7.2",
     "npm:obj-walker@^2.5.0": "2.5.0",
     "npm:valibot@^1.2.0": "1.2.0",
@@ -255,6 +256,9 @@
     "bottleneck@2.19.5": {
       "integrity": "sha512-VHiNCbI1lKdl44tGrhNfU3lup0Tj/ZBMJB5/2ZbNXRCPuRCO7ed2mgcK4r17y+KB2EfuYuRaVlwNbAeaWGSpbw=="
     },
+    "commander@10.0.1": {
+      "integrity": "sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug=="
+    },
     "compare-func@2.0.0": {
       "integrity": "sha512-zHig5N+tPWARooBnb0Zx1MFcdfpyJrfTJ3Y5L+IFvUm8rM74hHz66z0gw0x4tijh5CorKkKUCnW82R2vmpeCRA==",
       "dependencies": [
@@ -321,6 +325,13 @@
     },
     "json-decycle@4.0.0": {
       "integrity": "sha512-3GFL/vWazCbMu1kw+NdIfAHh6Ugq5pxkKcSUnK1f/Fw1nDtt1i+BiBfRJs0iPEKscYAz4k4+osvgjY95hmuJXQ=="
+    },
+    "liquidjs@10.24.0": {
+      "integrity": "sha512-TAUNAdgwaAXjjcUFuYVJm9kOVH7zc0mTKxsG9t9Lu4qdWjB2BEblyVIYpjWcmJLMGgiYqnGNJjpNMHx0gp/46A==",
+      "dependencies": [
+        "commander"
+      ],
+      "bin": true
     },
     "lodash@4.17.21": {
       "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
@@ -413,6 +424,7 @@
       "npm:conventional-changelog-writer@^8.2.0",
       "npm:conventional-commits-filter@5",
       "npm:conventional-commits-parser@^6.2.1",
+      "npm:liquidjs@^10.24.0",
       "npm:nimma@~0.7.2",
       "npm:obj-walker@^2.5.0"
     ]

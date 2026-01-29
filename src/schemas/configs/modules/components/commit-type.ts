@@ -1,15 +1,14 @@
 import * as v from "@valibot/valibot";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const CommitTypeSchema = v.object({
   type: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty(),
+    trimNonEmptyStringSchema,
     v.toLowerCase(),
     v.metadata({ description: "Commit type name." }),
   ),
   section: v.pipe(
-    v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+    v.optional(trimNonEmptyStringSchema),
     v.metadata({
       description:
         "Changelog section heading for this commit type. When not provided, `type` value is used.\n",

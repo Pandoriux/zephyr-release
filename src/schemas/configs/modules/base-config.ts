@@ -6,12 +6,13 @@ import { CommandHookSchema } from "./components/command-hook.ts";
 import { SEMVER_REGEX } from "../../../constants/semver.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
+import { trimNonEmptyStringSchema } from "../../string.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
     v.optional(v.pipe(v.string(), v.trim())),
     v.metadata({
-      description: "Project name, available in string templates as ${name}.",
+      description: "Project name, available in string templates as {{ name }}.",
     }),
   ),
   timeZone: v.pipe(
@@ -26,20 +27,18 @@ export const BaseConfigSchema = v.object({
     v.optional(CommandHookSchema),
     v.metadata({
       description:
-        "Pre/post command lists to run around the main operation. Each command runs from the repository root.",
+        "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
+        "Available variables that cmds can use: [link-insert-later]",
     }),
   ),
 
   customStringPatterns: v.pipe(
     v.optional(
-      v.record(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.pipe(v.string(), v.trim()),
-      ),
+      v.record(trimNonEmptyStringSchema, v.unknown()),
     ),
     v.metadata({
       description:
-        "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while " +
+        "Custom string patterns to use in templates. The key is the pattern, available as '{{<key>}}' while " +
         "the resolved value is the key value.\n" +
         "Normally, these should be set dynamically through config override.",
     }),
@@ -89,11 +88,8 @@ export const BaseConfigSchema = v.object({
   allowReleaseAs: v.pipe(
     v.optional(
       v.union([
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        v.pipe(
-          v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
-          v.nonEmpty(),
-        ),
+        trimNonEmptyStringSchema,
+        v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
       ]),
       "ALL",
     ),

@@ -8,25 +8,27 @@ import type {
   FixedBaseStringPattern,
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
-import { resolveStringTemplate } from "./resolve-string-template.ts";
+import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
 
-/**
- * Fixed string pattern context object
- */
-export const FIXED_STR_PAT_CTX: Readonly<
-  Record<string, string | undefined>
-> = {};
+export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
-type CreateFixedStrPatCtxConfigParams = Pick<
-  ConfigOutput,
-  "name" | "timeZone" | "customStringPatterns"
->;
+export function createCustomStringPatternContext(
+  context: ConfigOutput["customStringPatterns"],
+): void {
+  Object.assign(STRING_PATTERN_CONTEXT, context);
+
+  taskLogger.debug(
+    "Custom string pattern context: " + JSON.stringify(context, null, 2),
+  );
+}
+
+type CreateFixedStrPatCtxConfigParams = Pick<ConfigOutput, "name" | "timeZone">;
 
 export function createFixedBaseStringPatternContext(
   provider: PlatformProvider,
   config: CreateFixedStrPatCtxConfigParams,
 ): void {
-  const { name, timeZone, customStringPatterns } = config;
+  const { name, timeZone } = config;
 
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
@@ -37,47 +39,56 @@ export function createFixedBaseStringPatternContext(
 
   const context = {
     name: name,
-    timeZone: timeZone,
+    host: provider.getHost(),
     namespace: provider.getNamespace(),
     repository: provider.getRepositoryName(),
-    "YYYY-MM-DD": zdtFormat("yyyy-MM-dd"),
-    "DD-MM-YYYY": zdtFormat("dd-MM-yyyy"),
+    commitPathPart: provider.getCommitPathPart(),
+    referencePathPart: provider.getReferencePathPart(),
+
+    timeZone: timeZone,
+    timestamp: startTime.getTime(),
     "YYYY": zdtFormat("yyyy"),
     "MM": zdtFormat("MM"),
     "DD": zdtFormat("dd"),
-    "HH:mm:ss": zdtFormat("HH:mm:ss"),
     "HH": zdtFormat("HH"),
     "mm": zdtFormat("mm"),
     "ss": zdtFormat("ss"),
-  } satisfies Record<FixedBaseStringPattern, string | undefined>;
+  } satisfies Record<FixedBaseStringPattern, string | number | undefined>;
 
-  Object.assign(FIXED_STR_PAT_CTX, customStringPatterns, context);
+  Object.assign(STRING_PATTERN_CONTEXT, context);
 
   taskLogger.debug(
     "Fixed base string pattern context: " +
-      JSON.stringify(FIXED_STR_PAT_CTX, null, 2),
+      JSON.stringify(context, null, 2),
   );
 }
 
-export function createFixedVersionStringPatternContext(
+export async function createFixedVersionStringPatternContext(
   version: SemVer,
   tagTemplate: string,
 ) {
-  const context = {
+  const versionContext = {
     version: format(version),
     versionCore: `${version.major}.${version.minor}.${version.patch}`,
     versionPre: version.prerelease?.length
       ? version.prerelease.join(".")
       : undefined,
     versionBld: version.build?.length ? version.build.join(".") : undefined,
+  } satisfies Omit<
+    Record<FixedVersionStringPattern, string | undefined>,
+    "tagName"
+  >;
 
-    tagName: resolveStringTemplate(tagTemplate),
-  } satisfies Record<FixedVersionStringPattern, string | undefined>;
+  Object.assign(STRING_PATTERN_CONTEXT, versionContext);
 
-  Object.assign(FIXED_STR_PAT_CTX, context);
+  const tagContext = {
+    tagName: await resolveStringTemplateOrThrow(tagTemplate),
+  } satisfies Pick<Record<FixedVersionStringPattern, string>, "tagName">;
+
+  Object.assign(STRING_PATTERN_CONTEXT, tagContext);
 
   taskLogger.debug(
     "Fixed version string pattern context: " +
-      JSON.stringify(FIXED_STR_PAT_CTX, null, 2),
+      JSON.stringify({ ...versionContext, ...tagContext }, null, 2),
   );
 }

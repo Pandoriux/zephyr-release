@@ -10,3 +10,38 @@
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
       }),
     ),
+
+    contentEntryTemplate: v.pipe(
+      v.optional(
+        v.pipe(v.string(), v.trim(), v.nonEmpty()),
+        DEFAULT_CHANGELOG_ENTRY_PATTERN,
+      ),
+      v.metadata({
+        description:
+          "String template for each entries in the changelog content body, using with fixed base and version string patterns.\n" +
+          "Additionally, you can use a special set of patterns which is ${type}, ${scope}, ${desc}, ${body}, ${footer}, " +
+          "${hash}, ${hash7}.\n" +
+          "About special patterns: [link-to-insert]" +
+          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_ENTRY_PATTERN)}`,
+      }),
+
+
+
+Zephyr Release engine options
+
+```typescript
+"to be insert"
+```
+
+
+commandHook: v.pipe(
+    v.optional(CommandHookSchema),
+    v.metadata({
+      description:
+        "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
+        "Available variables that cmds can use: [link-insert-later]",
+    }),
+  ),
+  VÀ TẤT CẢ CMD HOOK TƯƠNG TỰ
+
+SYNC docs cua SourceModeSchema

@@ -13,7 +13,7 @@ import type { ProviderCommit } from "../types/providers/commit.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
-  "triggerCommitHash" | "token"
+  "triggerCommitHash"
 >;
 
 type ResolveCommitsConfigParams = Pick<ConfigOutput, "commitTypes">;
@@ -44,12 +44,11 @@ export async function resolveCommitsFromTriggerToLastRelease(
   inputs: ResolveCommitsInputsParams,
   config: ResolveCommitsConfigParams,
 ): Promise<ResolvedCommitsResult> {
-  const { token, triggerCommitHash } = inputs;
+  const { triggerCommitHash } = inputs;
   const { commitTypes } = config;
 
   const rawCommits = await provider
     .findCommitsFromGivenToPreviousTaggedOrThrow(
-      token,
       triggerCommitHash,
     );
 

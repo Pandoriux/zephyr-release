@@ -5,13 +5,14 @@ import {
   DEFAULT_LABEL_ON_CREATE,
 } from "../../../../constants/defaults/label.ts";
 import { transformObjKeyToKebabCase } from "../../../../utils/transformers/object.ts";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 const defaultLabelSchemaObject = v.getDefaults(LabelSchema);
 
 export const CoreLabelSchema = v.object({
   onCreate: v.pipe(
     v.optional(
-      v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), LabelSchema]),
+      v.union([trimNonEmptyStringSchema, LabelSchema]),
       DEFAULT_LABEL_ON_CREATE,
     ),
     v.transform((input) =>
@@ -33,7 +34,7 @@ export const CoreLabelSchema = v.object({
 
   onClose: v.pipe(
     v.optional(
-      v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), LabelSchema]),
+      v.union([trimNonEmptyStringSchema, LabelSchema]),
       DEFAULT_LABEL_ON_CLOSE,
     ),
     v.transform((input) =>

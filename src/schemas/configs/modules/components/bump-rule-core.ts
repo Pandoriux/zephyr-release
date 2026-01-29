@@ -1,10 +1,11 @@
 import * as v from "@valibot/valibot";
 import { countBreakingAsOptions } from "../../../../constants/bump-rules.ts";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const BumpRuleCoreSchema = v.object({
   types: v.pipe(
     v.optional(
-      v.pipe(v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())), v.nonEmpty()),
+      v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
     ),
     v.metadata({
       description:
