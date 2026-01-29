@@ -34,13 +34,17 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> writeToFile (Optional)](#changelog--writetofile-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
-    - [changelog \> content-body-override (Optional)](#changelog--content-body-override-optional)
-    - [changelog \> content-body-override-path (Optional)](#changelog--content-body-override-path-optional)
     - [changelog \> file-header-template (Optional)](#changelog--file-header-template-optional)
     - [changelog \> file-header-template-path (Optional)](#changelog--file-header-template-path-optional)
     - [changelog \> file-footer-template (Optional)](#changelog--file-footer-template-optional)
     - [changelog \> file-footer-template-path (Optional)](#changelog--file-footer-template-path-optional)
-    - [changelog \> content-header-template (Optional)](#changelog--content-header-template-optional)
+    - [changelog \> release-header-template (Optional)](#changelog--release-header-template-optional)
+    - [changelog \> release-section-entry-template (Optional)](#changelog--release-section-entry-template-optional)
+    - [changelog \> release-breaking-section-heading-template (Optional)](#changelog--release-breaking-section-heading-template-optional)
+    - [changelog \> release-breaking-section-entry-template (Optional)](#changelog--release-breaking-section-entry-template-optional)
+    - [changelog \> release-footer-template (Optional)](#changelog--release-footer-template-optional)
+    - [changelog \> release-body-override (Optional)](#changelog--release-body-override-optional)
+    - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
@@ -77,7 +81,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
 Type: `string`  
 Default: `""`
 
-The project name used in [string templates](./string-templates-and-patterns.md) (available as `${name}`).
+The project name used in [string templates](./string-templates-and-patterns.md) (available as `{{ name }}`).
 
 ### time-zone (Optional)
 
@@ -238,9 +242,9 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`content-body-override`](#changelog--content-body-override-optional), [`content-body-override-path`](#changelog--content-body-override-path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`content-header-template`](#changelog--content-header-template-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-breaking-section-heading-template`](#changelog--release-breaking-section-heading-template-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
 
-Configuration specific to changelogs. All generated changelog content are available in [string templates](./string-templates-and-patterns.md) as `${changelogContent}` (content header + body) or `${changelogContentBody}` (body only).
+Configuration specific to changelogs. All generated changelog content are available in string templates as `{{ changelogRelease }}` (release header + body) or `{{ changelogReleaseHeader }}` and `{{ changelogReleaseBody }}`.
 
 #### changelog > writeToFile (Optional)
 
@@ -256,24 +260,12 @@ Default: `"CHANGELOG.md"`
 
 Path to the file where the generated changelog will be written to, relative to the project root.
 
-#### changelog > content-body-override (Optional)
-
-Type: `string`  
-
-User-provided changelog content body, available in [string templates](./string-templates-and-patterns.md) as `${changelogContentBody}`. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config.
-
-#### changelog > content-body-override-path (Optional)
-
-Type: `string`
-
-Path to text file containing changelog content body override. Overrides `content-body-override` when both are provided.
-
 #### changelog > file-header-template (Optional)
 
 Type: `string`  
 Default: `"# Changelog\n\n<br/>\n"`
 
-String template for changelog file header, using with string patterns like `${version}`. Placed above any changelog content sections.
+String template for changelog file header, using with string patterns like `${version}`. Placed above any changelog content.
 
 #### changelog > file-header-template-path (Optional)
 
@@ -285,7 +277,7 @@ Path to text file containing changelog file header. Overrides `file-header-templ
 
 Type: `string`
 
-String template for changelog file footer, using with string patterns like `${version}`. Placed below any changelog content section.
+String template for changelog file footer, using with string patterns like `${version}`. Placed below any changelog content.
 
 #### changelog > file-footer-template-path (Optional)
 
@@ -293,12 +285,52 @@ Type: `string`
 
 Path to text file containing changelog file footer. Overrides `file-footer-template` when both are provided.
 
-#### changelog > content-header-template (Optional)
+#### changelog > release-header-template (Optional)
 
 Type: `string`  
-Default: `"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"`
+Default: `"## {{ tagName | md_link_compare_tag_from_current_to_latest }} ({{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->"`
 
-String template for heading of a changelog content section, using with string patterns like `${version}`.
+String template for header of a changelog release, using with string patterns like `{{ version }}`.
+
+#### changelog > release-section-entry-template (Optional)
+
+Type: `string`  
+Default: `"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}]({{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})"`
+
+String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:  
+`{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}`.  
+About special patterns: [link-to-insert]
+
+#### changelog > release-breaking-section-heading-template (Optional)
+
+Type: `string`  
+Default: `"⚠ BREAKING CHANGES"`
+
+String template for heading of a changelog release BREAKING section, using with string patterns.
+
+#### changelog > release-breaking-section-entry-template (Optional)
+
+Type: `string`
+
+Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`
+
+#### changelog > release-footer-template (Optional)
+
+Type: `string`
+
+String template for footer of a changelog release, using with string patterns.
+
+#### changelog > release-body-override (Optional)
+
+Type: `string`
+
+User-provided changelog release body, available in string templates as `{{ changelogReleaseBody }}`. If set, completely ignores the built-in generation and uses this value as the content. Should only be set dynamically, not in static config.
+
+#### changelog > release-body-override-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release body override, will take precedence over `release-body-override`.
 
 ### pull-request (Optional)
 

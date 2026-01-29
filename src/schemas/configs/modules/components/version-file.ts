@@ -1,12 +1,11 @@
 import * as v from "@valibot/valibot";
 import { FileFormatsWithAuto } from "../../../../constants/file-formats.ts";
 import { VersionFileExtractorsWithAuto } from "../../../../constants/version-file-options.ts";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const VersionFileSchema = v.object({
   path: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty(),
+    trimNonEmptyStringSchema,
     v.metadata({
       description: "Path to the version file, relative to the project root.",
     }),
@@ -28,9 +27,7 @@ export const VersionFileSchema = v.object({
     }),
   ),
   selector: v.pipe(
-    v.string(),
-    v.trim(),
-    v.nonEmpty(),
+    trimNonEmptyStringSchema,
     v.metadata({
       description:
         "Defines how to locate the version field, depends on `extractor`.",

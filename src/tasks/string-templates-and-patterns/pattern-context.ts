@@ -46,13 +46,14 @@ export function createFixedBaseStringPatternContext(
     referencePathPart: provider.getReferencePathPart(),
 
     timeZone: timeZone,
+    timestamp: startTime.getTime(),
     "YYYY": zdtFormat("yyyy"),
     "MM": zdtFormat("MM"),
     "DD": zdtFormat("dd"),
     "HH": zdtFormat("HH"),
     "mm": zdtFormat("mm"),
     "ss": zdtFormat("ss"),
-  } satisfies Record<FixedBaseStringPattern, string | undefined>;
+  } satisfies Record<FixedBaseStringPattern, string | number | undefined>;
 
   Object.assign(STRING_PATTERN_CONTEXT, context);
 

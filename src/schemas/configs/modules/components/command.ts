@@ -1,11 +1,12 @@
 import * as v from "@valibot/valibot";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const CommandSchema = v.pipe(
   v.union([
-    v.pipe(v.string(), v.trim(), v.nonEmpty()),
+    trimNonEmptyStringSchema,
 
     v.object({
-      cmd: v.pipe(v.string(), v.trim(), v.nonEmpty()),
+      cmd: trimNonEmptyStringSchema,
       timeout: v.pipe(
         v.optional(
           v.pipe(

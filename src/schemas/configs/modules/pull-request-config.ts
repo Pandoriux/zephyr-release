@@ -9,6 +9,7 @@ import {
   DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
   DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
+import { trimNonEmptyStringSchema } from "../../string.ts";
 
 export const PullRequestConfigSchema = v.pipe(
   v.object({
@@ -22,9 +23,9 @@ export const PullRequestConfigSchema = v.pipe(
     filesToCommit: v.pipe(
       v.optional(
         v.union([
-          v.pipe(v.string(), v.trim(), v.nonEmpty()),
+          trimNonEmptyStringSchema,
           v.pipe(
-            v.array(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+            v.array(trimNonEmptyStringSchema),
             v.nonEmpty(),
           ),
         ]),
@@ -42,10 +43,7 @@ export const PullRequestConfigSchema = v.pipe(
     ),
 
     branchNameTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        "release/zephyr-release",
-      ),
+      v.optional(trimNonEmptyStringSchema, "release/zephyr-release"),
       v.metadata({
         description:
           "String template for branch name that Zephyr Release uses.\n" +
@@ -72,10 +70,7 @@ export const PullRequestConfigSchema = v.pipe(
     ),
 
     titleTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
-      ),
+      v.optional(trimNonEmptyStringSchema, DEFAULT_PULL_REQUEST_TITLE_TEMPLATE),
       v.metadata({
         description:
           "String template for pull request title, using with string patterns like ${version}.\n" +
@@ -84,10 +79,7 @@ export const PullRequestConfigSchema = v.pipe(
     ),
     headerTemplate: v.pipe(
       v.optional(
-        v.union([
-          v.pipe(v.string(), v.trim()),
-          v.pipe(v.array(v.pipe(v.string(), v.trim())), v.nonEmpty()),
-        ]),
+        v.union([v.string(), v.pipe(v.array(v.string()), v.nonEmpty())]),
         DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
       ),
       v.transform((input) => Array.isArray(input) ? input : [input]),
@@ -98,10 +90,7 @@ export const PullRequestConfigSchema = v.pipe(
       }),
     ),
     bodyTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim()),
-        DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
-      ),
+      v.optional(v.string(), DEFAULT_PULL_REQUEST_BODY_TEMPLATE),
       v.metadata({
         description:
           "String template for pull request body, using with string patterns like ${changelogContent}.\n" +
@@ -109,17 +98,14 @@ export const PullRequestConfigSchema = v.pipe(
       }),
     ),
     bodyTemplatePath: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty())),
+      v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
           "Path to text file containing pull request body template. Overrides body template if both are provided.",
       }),
     ),
     footerTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim()),
-        DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
-      ),
+      v.optional(v.string(), DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE),
       v.metadata({
         description:
           "String template for pull request footer, using with string patterns.\n" +

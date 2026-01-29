@@ -1,5 +1,6 @@
 import * as v from "@valibot/valibot";
 import { SemverExtensionSchema } from "./semver-extension.ts";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const BumpRuleExtensionSchema = v.object({
   enabled: v.pipe(
@@ -15,12 +16,14 @@ export const BumpRuleExtensionSchema = v.object({
     v.optional(
       v.pipe(
         v.array(
-          v.union([v.pipe(v.string(), v.trim(), v.nonEmpty()), v.number()]),
+          v.union([trimNonEmptyStringSchema, v.number()]),
         ),
         v.nonEmpty(),
       ),
     ),
-    v.transform((input) => typeof input === "undefined" ? input : input.map(String)),
+    v.transform((input) =>
+      typeof input === "undefined" ? input : input.map(String)
+    ),
     v.metadata({
       description:
         "Overrides extension items to use for the next version. When provided, these values take precedence over " +

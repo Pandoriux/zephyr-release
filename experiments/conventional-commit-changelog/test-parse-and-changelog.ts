@@ -1,8 +1,8 @@
 import { type CommitBase, CommitParser } from "conventional-commits-parser";
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
 import type { ProviderCommit } from "../../src/types/providers/commit.ts";
-import { githubProvider } from "../../src/providers/github/github-provider.ts";
 import { DEFAULT_COMMIT_TYPES } from "../../src/constants/defaults/commit.ts";
+import { createGitHubProvider } from "../../src/providers/github/github-provider.ts";
 
 type ResolvedCommit = CommitBase & {
   hash: string;
@@ -71,7 +71,7 @@ const mockRawCommits: ProviderCommit[] = [
   },
 ];
 
-const provider = githubProvider;
+const provider = createGitHubProvider();
 const commitTypes = DEFAULT_COMMIT_TYPES;
 
 const rawCommits = mockRawCommits;

@@ -1,10 +1,11 @@
 import * as v from "@valibot/valibot";
+import { trimNonEmptyStringSchema } from "../../../string.ts";
 
 export const LabelSchema = v.object({
-  name: v.pipe(v.string(), v.trim(), v.nonEmpty()),
+  name: trimNonEmptyStringSchema,
   description: v.optional(v.pipe(v.string(), v.trim())),
   color: v.pipe(
-    v.optional(v.pipe(v.string(), v.trim(), v.nonEmpty()), "ededed"),
+    v.optional(trimNonEmptyStringSchema, "ededed"),
     v.metadata({
       description:
         "The hexadecimal color code for the label, without the leading #.\n" +

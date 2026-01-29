@@ -25,30 +25,24 @@ By default, all environment variables available on your system are automatically
 
 Zephyr Release additional operation-scoped variables. These variables are not immediately available, they become available as the operation progresses through each stage. See [Variable availability stages](#variable-availability-stages) for details on when each variable becomes available.
 
-- **inputs:** Inputs object with original kebab-case keys (JSON stringified)
-  
+- **inputs:** Inputs object with original kebab-case keys (JSON stringified)  
   Export: `zr-inputs`; Env: `ZR_INPUTS`
 
-- **config:** Config object with original kebab-case keys (JSON stringified)
-  
+- **config:** Config object with original kebab-case keys (JSON stringified)  
   Export: `zr-config`; Env: `ZR_CONFIG`
 
-- **inputsCamelCase:** Inputs object with keys transformed to camelCase (JSON stringified)
-  
+- **inputsCamelCase:** Inputs object with keys transformed to camelCase (JSON stringified)  
   Export: `zr-inputs-camel-case`; Env: `ZR_INPUTS_CAMEL_CASE`
 
-- **configCamelCase:** Config object with keys transformed to camelCase (JSON stringified)
-  
+- **configCamelCase:** Config object with keys transformed to camelCase (JSON stringified)  
   Export: `zr-config-camel-case`; Env: `ZR_CONFIG_CAMEL_CASE`
 
   <br/>
 
-- **target:** "prepare" when create/update pull request, "release" when create tag and publish release
-  
+- **target:** "prepare" when create/update pull request, "release" when create tag and publish release  
   Export: `zr-target`; Env: `ZR_TARGET`
 
-- **job:** "create-pr" or "update-pr" when **target** is "prepare", "create-release" when **target** is "release"
-  
+- **job:** "create-pr" or "update-pr" when **target** is "prepare", "create-release" when **target** is "release"  
   Export: `zr-job`; Env: `ZR_JOB`
 
 ## Variable availability stages

@@ -1,22 +1,21 @@
 export const FixedBaseStringPatterns = {
   // Project info
-  name: "name", // ${name}
-  host: "host", // ${host}
-  namespace: "namespace", // ${namespace}
-  repository: "repository", // ${repository}
+  name: "name",
+  host: "host",
+  namespace: "namespace",
+  repository: "repository",
   commitPathPart: "commitPathPart",
   referencePathPart: "referencePathPart",
 
-  // Date components (ISO format)
-  timeZone: "timeZone", // ${timeZone}
-  year: "YYYY", // ${YYYY}
-  month: "MM", // ${MM}
-  day: "DD", // ${DD}
-
-  // Time components
-  hour: "HH", // ${HH}
-  minute: "mm", // ${mm}
-  second: "ss", // ${ss}
+  // Date Time components
+  timeZone: "timeZone",
+  timestamp: "timestamp",
+  year: "YYYY",
+  month: "MM",
+  day: "DD",
+  hour: "HH",
+  minute: "mm",
+  second: "ss",
 } as const;
 
 export type FixedBaseStringPattern =
@@ -24,13 +23,13 @@ export type FixedBaseStringPattern =
 
 const FixedVersionStringPatterns = {
   // Version components
-  version: "version", // ${version}
-  versionCore: "versionCore", // ${versionCore}
-  versionPrerelease: "versionPre", // ${versionPre}
-  versionBuild: "versionBld", // ${versionBld}
+  version: "version",
+  versionCore: "versionCore",
+  versionPrerelease: "versionPre",
+  versionBuild: "versionBld",
 
   // Tag
-  tagName: "tagName", // ${tagName}
+  tagName: "tagName",
 } as const;
 
 export type FixedVersionStringPattern =
@@ -39,3 +38,18 @@ export type FixedVersionStringPattern =
 const undecided = {
   changelog: "changelog", // ${changelog}
 };
+
+const ChangelogReleaseEntryPatterns = {
+  hash: "hash",
+  type: "type",
+  scope: "scope",
+  desc: "desc",
+  body: "body",
+  footer: "footer",
+  isBreaking: "isBreaking",
+} as const;
+
+export type ChangelogReleaseEntryPattern =
+  typeof ChangelogReleaseEntryPatterns[
+    keyof typeof ChangelogReleaseEntryPatterns
+  ];

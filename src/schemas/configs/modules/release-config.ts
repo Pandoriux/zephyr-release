@@ -5,6 +5,7 @@ import {
   DEFAULT_RELEASE_TITLE_TEMPLATE,
   DEFAULT_TAG_NAME_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
+import { trimNonEmptyStringSchema } from "../../string.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
@@ -47,10 +48,7 @@ export const ReleaseConfigSchema = v.pipe(
     ),
 
     tagNameTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_TAG_NAME_TEMPLATE,
-      ),
+      v.optional(trimNonEmptyStringSchema, DEFAULT_TAG_NAME_TEMPLATE),
       v.metadata({
         description:
           "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
@@ -60,18 +58,15 @@ export const ReleaseConfigSchema = v.pipe(
     ),
 
     titleTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_RELEASE_TITLE_TEMPLATE,
-      ),
+      v.optional(v.string(), DEFAULT_RELEASE_TITLE_TEMPLATE),
       v.metadata({
         description:
-          "String template for release title, using with string patterns like ${tagName}.\n" +
+          "String template for release title, using with string patterns like {{ tagName }}.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_TEMPLATE)}`,
       }),
     ),
     bodyTemplate: v.pipe(
-      v.optional(v.pipe(v.string(), v.trim()), DEFAULT_RELEASE_BODY_TEMPLATE),
+      v.optional(v.string(), DEFAULT_RELEASE_BODY_TEMPLATE),
       v.metadata({
         description:
           "String template for release body, using with string patterns like ${changelogContent}.\n" +

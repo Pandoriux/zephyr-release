@@ -16,7 +16,7 @@ Under the hood, Zephyr Release uses **LiquidJS** as the template engine. For mor
 Zephyr Release engine options
 
 ```typescript
-"to be insert"
+export const liquidEngine = new Liquid({ jsTruthy: true });
 ```
 
 ## Available String Patterns
@@ -36,7 +36,8 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 <br/>
 
-- `${timeZone}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional)).
+- `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
+- `{{ timestamp }}`: Timestamp, always UTC
 - `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` — date/time components
 
 #### Version
@@ -56,8 +57,9 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 #### Changelog
 
-- `{{ changelogContent }}`: In `prepare` operation (managing pull request), the generated changelog content section is [content header](./config-options.md#changelog--content-header-template-optional) + body. In `release` operation (create tag and publish release), the value is the **pull request body** (this means any edits made to the pull request body will also be included)
-- `{{ changelogContentBody }}`: The generated changelog body. You can override it with your own computed content via ([content-body-override](./config-options.md#changelog--content-body-override-optional))
+- `{{ changelogRelease }}`: In `prepare` operation (managing pull request), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body. In `release` operation (create tag and publish release), the value is the **pull request body** (this means any edits made to the pull request body will also be included)
+-
+- `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)).
 
 ## Transformers
 

@@ -32,3 +32,16 @@ Zephyr Release engine options
 ```typescript
 "to be insert"
 ```
+
+
+commandHook: v.pipe(
+    v.optional(CommandHookSchema),
+    v.metadata({
+      description:
+        "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
+        "Available variables that cmds can use: [link-insert-later]",
+    }),
+  ),
+  VÀ TẤT CẢ CMD HOOK TƯƠNG TỰ
+
+SYNC docs cua SourceModeSchema
