@@ -69,6 +69,13 @@ export const ChangelogConfigSchema = v.pipe(
           }`,
       }),
     ),
+    releaseHeaderTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release header. Overrides `releaseHeaderTemplate` when both are provided.",
+      }),
+    ),
     releaseSectionEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
@@ -85,11 +92,17 @@ export const ChangelogConfigSchema = v.pipe(
           }`,
       }),
     ),
-    releaseBreakingSectionHeadingTemplate: v.pipe(
-      v.optional(v.string(), "⚠ BREAKING CHANGES"),
+    releaseSectionEntryTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "String template for heading of a changelog release BREAKING section, using with string patterns.",
+          "Path to text file containing changelog release section entry template. Overrides `releaseSectionEntryTemplate` when both are provided.",
+      }),
+    ),
+    releaseBreakingSectionHeading: v.pipe(
+      v.optional(v.string(), "⚠ BREAKING CHANGES"),
+      v.metadata({
+        description: "Heading of a changelog release BREAKING section.",
       }),
     ),
     releaseBreakingSectionEntryTemplate: v.pipe(
@@ -100,11 +113,25 @@ export const ChangelogConfigSchema = v.pipe(
           "to `releaseSectionEntryTemplate`",
       }),
     ),
+    releaseBreakingSectionEntryTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release breaking section entry template. Overrides `releaseBreakingSectionEntryTemplate` when both are provided.",
+      }),
+    ),
     releaseFooterTemplate: v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
           "String template for footer of a changelog release, using with string patterns.",
+      }),
+    ),
+    releaseFooterTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release footer. Overrides `releaseFooterTemplate` when both are provided.",
       }),
     ),
 
