@@ -69,9 +69,9 @@ export async function run(provider: PlatformProvider) {
   logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
-  const result = await runCommandsOrThrow(config.commandHook, "pre");
-  if (result) {
-    logger.stepFinish(`Finished: Execute base pre commands. ${result}`);
+  const preResult = await runCommandsOrThrow(config.commandHook, "pre");
+  if (preResult) {
+    logger.stepFinish(`Finished: Execute base pre commands. ${preResult}`);
   } else {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
   }
