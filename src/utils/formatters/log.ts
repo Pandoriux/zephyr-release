@@ -1,4 +1,4 @@
-import { blue, gray, yellow } from "@std/fmt/colors";
+import { blue, cyan, gray, yellow } from "@std/fmt/colors";
 
 function prefixLines(message: string, prefix: string): string {
   return message.split(/\r?\n/).map((line) => `${prefix}${line}`).join("\n");
@@ -6,6 +6,10 @@ function prefixLines(message: string, prefix: string): string {
 
 export function formatDebugMessage(message: string): string {
   return gray(message);
+}
+
+export function formatNoticeMessage(message: string): string {
+  return cyan(message);
 }
 
 export function formatWarnMessage(message: string): string {
