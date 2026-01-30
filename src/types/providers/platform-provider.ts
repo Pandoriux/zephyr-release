@@ -50,7 +50,7 @@ export interface PlatformProvider {
     requiredLabel: string,
   ) => Promise<ProviderPullRequest | undefined>;
 
-  exportVariables: (exportObj: Record<string, unknown>) => void;
+  exportVariables: (exportObj: Record<string, string>) => void;
 
   getConventionalCommitParserOptions: () => ParserOptions;
 }

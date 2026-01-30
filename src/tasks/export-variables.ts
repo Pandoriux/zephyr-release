@@ -20,12 +20,21 @@ export function exportBaseOperationVariables(
     ? "update-pr"
     : "create-pr";
 
-  const prepareExportObject = {
-    inputs: transformObjKeyToKebabCase(inputs),
-    config: transformObjKeyToKebabCase(config),
+  const { token: _t, sourceMode: _sm, ...excludedInputs } = inputs;
 
-    inputsCamelCase: inputs,
-    configCamelCase: config,
+  const prepareExportObject = {
+    ...excludedInputs,
+
+    sourceModeStr: JSON.stringify(
+      transformObjKeyToKebabCase(inputs.sourceMode),
+    ),
+    sourceModeCamelCaseStr: JSON.stringify(inputs.sourceMode),
+
+    configStr: JSON.stringify(
+      transformObjKeyToKebabCase(config),
+      jsonValueNormalizer,
+    ),
+    configCamelCaseStr: JSON.stringify(config, jsonValueNormalizer),
 
     target: resolvedTarget,
     job: resolvedJob,
@@ -41,3 +50,7 @@ export function exportBaseOperationVariables(
 
   provider.exportVariables(prepareExportObject);
 }
+
+export function exportPrePrepareOperationVariables(
+  provider: PlatformProvider,
+) {}

@@ -7,6 +7,7 @@ export function githubGetRawInputs(): ProviderInputs {
     token: core.getInput("token", { required: true }),
 
     triggerCommitHash: process.env.GITHUB_SHA,
+    triggerBranchName: process.env.GITHUB_REF_NAME,
     workspacePath: process.env.GITHUB_WORKSPACE,
 
     configPath: core.getInput("config-path"),

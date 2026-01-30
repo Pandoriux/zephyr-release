@@ -25,17 +25,38 @@ By default, all environment variables available on your system are automatically
 
 Zephyr Release additional operation-scoped variables. These variables are not immediately available, they become available as the operation progresses through each stage. See [Variable availability stages](#variable-availability-stages) for details on when each variable becomes available.
 
-- **inputs:** Inputs object with original kebab-case keys (JSON stringified)  
-  Export: `zr-inputs`; Env: `ZR_INPUTS`
+- **triggerCommitHash:** Trigger commit hash  
+  Export: `zr-trigger-commit-hash`; Env: `ZR_TRIGGER_COMMIT_HASH`
 
-- **config:** Config object with original kebab-case keys (JSON stringified)  
-  Export: `zr-config`; Env: `ZR_CONFIG`
+- **triggerBranchName:** Trigger branch name  
+  Export: `zr-trigger-branch-name`; Env: `ZR_TRIGGER_BRANCH_NAME`
 
-- **inputsCamelCase:** Inputs object with keys transformed to camelCase (JSON stringified)  
-  Export: `zr-inputs-camel-case`; Env: `ZR_INPUTS_CAMEL_CASE`
+- **workspacePath:** Workspace path  
+  Export: `zr-workspace-path`; Env: `ZR_WORKSPACE_PATH`
 
-- **configCamelCase:** Config object with keys transformed to camelCase (JSON stringified)  
-  Export: `zr-config-camel-case`; Env: `ZR_CONFIG_CAMEL_CASE`
+- **configPath:** Config file path  
+  Export: `zr-config-path`; Env: `ZR_CONFIG_PATH`
+
+- **configFormat:** Config file format  
+  Export: `zr-config-format`; Env: `ZR_CONFIG_FORMAT`
+
+- **configOverride:** Config override string  
+  Export: `zr-config-override`; Env: `ZR_CONFIG_OVERRIDE`
+
+- **configOverrideFormat:** Config override format  
+  Export: `zr-config-override-format`; Env: `ZR_CONFIG_OVERRIDE_FORMAT`
+
+- **sourceModeStr:** Source mode object with original kebab-case keys (JSON stringified)  
+  Export: `zr-source-mode-str`; Env: `ZR_SOURCE_MODE_STR`
+
+- **sourceModeCamelCaseStr:** Source mode object with keys transformed to camelCase (JSON stringified)  
+  Export: `zr-source-mode-camel-case-str`; Env: `ZR_SOURCE_MODE_CAMEL_CASE_STR`
+
+- **configStr:** Config object with original kebab-case keys (JSON stringified)  
+  Export: `zr-config-str`; Env: `ZR_CONFIG_STR`
+
+- **configCamelCaseStr:** Config object with keys transformed to camelCase (JSON stringified)  
+  Export: `zr-config-camel-case-str`; Env: `ZR_CONFIG_CAMEL_CASE_STR`
 
   <br/>
 
@@ -51,10 +72,17 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 
 These variables are available starting from the first [`command-hook > pre`](./config-options.md#command-hook-optional) command runs. See [Zephyr Release operation variables](#zephyr-release-operation-variables) for the complete list.
 
-- **inputs**
-- **config**
-- **inputsCamelCase**
-- **configCamelCase**
+- **triggerCommitHash**
+- **triggerBranchName**
+- **workspacePath**
+- **configPath**
+- **configFormat**
+- **configOverride**
+- **configOverrideFormat**
+- **sourceModeStr**
+- **sourceModeCamelCaseStr**
+- **configStr**
+- **configCamelCaseStr**
 - **target**
 - **job**
 

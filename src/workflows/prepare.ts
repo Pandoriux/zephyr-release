@@ -8,6 +8,7 @@ import { calculateNextVersion } from "../tasks/calculate-next-version/next-versi
 import { createFixedVersionStringPatternContext } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
+import { exportPrePrepareOperationVariables } from "../tasks/export-variables.ts";
 
 interface PrepareWorkflowOptions {
   inputs: InputsOutput;
@@ -55,6 +56,10 @@ export async function prepareWorkflow(
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
   );
+
+  logger.debugStepStart("Starting: Export pre prepare operation variables");
+  exportPrePrepareOperationVariables(provider);
+  logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
   logger.stepStart("Starting: Execute pull request pre commands");
   const preResult = await runCommandsOrThrow(

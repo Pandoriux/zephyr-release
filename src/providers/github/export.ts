@@ -3,15 +3,10 @@ import {
   toExportEnvVariableKey,
   toExportVariableKey,
 } from "../../utils/transformers/case.ts";
-import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 
-export function githubExportVariables(exportObj: Record<string, unknown>) {
+export function githubExportVariables(exportObj: Record<string, string>) {
   Object.entries(exportObj).forEach(([k, v]) => {
-    const stringifiedValue = typeof v === "object" && v !== null
-      ? JSON.stringify(v, jsonValueNormalizer)
-      : String(v);
-
-    core.setOutput(toExportVariableKey(k), stringifiedValue);
-    core.exportVariable(toExportEnvVariableKey(k), stringifiedValue);
+    core.setOutput(toExportVariableKey(k), v);
+    core.exportVariable(toExportEnvVariableKey(k), v);
   });
 }
