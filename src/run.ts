@@ -16,17 +16,13 @@ import { manageConcurrency } from "./tasks/concurrency.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 
 export async function run(provider: PlatformProvider) {
-  logger.stepStart("Starting: Setup operation");
-  setupOperation();
-  logger.stepFinish("Finished: Setup operation");
-
-  logger.stepStart("Starting: Get inputs");
+  logger.stepStart("Starting: Get operation inputs");
   const inputs = getInputsOrThrow(provider);
-  logger.stepFinish("Finished: Get inputs");
+  logger.stepFinish("Finished: Get operation inputs");
 
-  logger.stepStart("Starting: Setup provider context with inputs");
-  provider.setupProviderContext(inputs);
-  logger.stepFinish("Finished: Setup provider context with inputs");
+  logger.stepStart("Starting: Set up operation");
+  setupOperation(provider, inputs);
+  logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Manage concurrency");
   await manageConcurrency(provider);
@@ -69,9 +65,9 @@ export async function run(provider: PlatformProvider) {
   logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
-  const result = await runCommandsOrThrow(config.commandHook, "pre");
-  if (result) {
-    logger.stepFinish(`Finished: Execute base pre commands. ${result}`);
+  const preResult = await runCommandsOrThrow(config.commandHook, "pre");
+  if (preResult) {
+    logger.stepFinish(`Finished: Execute base pre commands. ${preResult}`);
   } else {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
   }

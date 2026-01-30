@@ -39,10 +39,14 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> file-footer-template (Optional)](#changelog--file-footer-template-optional)
     - [changelog \> file-footer-template-path (Optional)](#changelog--file-footer-template-path-optional)
     - [changelog \> release-header-template (Optional)](#changelog--release-header-template-optional)
+    - [changelog \> release-header-template-path (Optional)](#changelog--release-header-template-path-optional)
     - [changelog \> release-section-entry-template (Optional)](#changelog--release-section-entry-template-optional)
-    - [changelog \> release-breaking-section-heading-template (Optional)](#changelog--release-breaking-section-heading-template-optional)
+    - [changelog \> release-section-entry-template-path (Optional)](#changelog--release-section-entry-template-path-optional)
+    - [changelog \> release-breaking-section-heading (Optional)](#changelog--release-breaking-section-heading-optional)
     - [changelog \> release-breaking-section-entry-template (Optional)](#changelog--release-breaking-section-entry-template-optional)
+    - [changelog \> release-breaking-section-entry-template-path (Optional)](#changelog--release-breaking-section-entry-template-path-optional)
     - [changelog \> release-footer-template (Optional)](#changelog--release-footer-template-optional)
+    - [changelog \> release-footer-template-path (Optional)](#changelog--release-footer-template-path-optional)
     - [changelog \> release-body-override (Optional)](#changelog--release-body-override-optional)
     - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
@@ -242,7 +246,7 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-breaking-section-heading-template`](#changelog--release-breaking-section-heading-template-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
+**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in string templates as `{{ changelogRelease }}` (release header + body) or `{{ changelogReleaseHeader }}` and `{{ changelogReleaseBody }}`.
 
@@ -292,6 +296,12 @@ Default: `"## {{ tagName | md_link_compare_tag_from_current_to_latest }} ({{- YY
 
 String template for header of a changelog release, using with string patterns like `{{ version }}`.
 
+#### changelog > release-header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release header. Overrides `release-header-template` when both are provided.
+
 #### changelog > release-section-entry-template (Optional)
 
 Type: `string`  
@@ -301,12 +311,18 @@ String template for each entries in the changelog release sections, using with f
 `{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}`.  
 About special patterns: [link-to-insert]
 
-#### changelog > release-breaking-section-heading-template (Optional)
+#### changelog > release-section-entry-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release section entry template. Overrides `release-section-entry-template` when both are provided.
+
+#### changelog > release-breaking-section-heading (Optional)
 
 Type: `string`  
 Default: `"⚠ BREAKING CHANGES"`
 
-String template for heading of a changelog release BREAKING section, using with string patterns.
+Heading of a changelog release BREAKING section.
 
 #### changelog > release-breaking-section-entry-template (Optional)
 
@@ -314,11 +330,23 @@ Type: `string`
 
 Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`
 
+#### changelog > release-breaking-section-entry-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release breaking section entry template. Overrides `release-breaking-section-entry-template` when both are provided.
+
 #### changelog > release-footer-template (Optional)
 
 Type: `string`
 
 String template for footer of a changelog release, using with string patterns.
+
+#### changelog > release-footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release footer. Overrides `release-footer-template` when both are provided.
 
 #### changelog > release-body-override (Optional)
 

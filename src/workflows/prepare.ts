@@ -6,6 +6,8 @@ import { resolveCommitsFromTriggerToLastRelease } from "../tasks/commit.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { calculateNextVersion } from "../tasks/calculate-next-version/next-version.ts";
 import { createFixedVersionStringPatternContext } from "../tasks/string-templates-and-patterns/pattern-context.ts";
+import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
+import { runCommandsOrThrow } from "../tasks/command.ts";
 
 interface PrepareWorkflowOptions {
   inputs: InputsOutput;
@@ -54,6 +56,25 @@ export async function prepareWorkflow(
     "Finished: Create fixed version string pattern context",
   );
 
-  logger.stepStart("Starting: Generate changelog content");
-  logger.stepFinish("Finished: Generate changelog content");
+  logger.stepStart("Starting: Execute pull request pre commands");
+  const preResult = await runCommandsOrThrow(
+    config.pullRequest.commandHook,
+    "pre",
+  );
+  if (preResult) {
+    logger.stepFinish(
+      `Finished: Execute pull request pre commands. ${preResult}`,
+    );
+  } else {
+    logger.stepSkip("Skipped: Execute pull request pre commands (empty)");
+  }
+
+  logger.stepStart("Starting: Generate changelog release content");
+  const changelogRelease = await generateChangelogReleaseContent(
+    provider,
+    resolvedCommitsResult.entries,
+    inputs,
+    config,
+  );
+  logger.stepFinish("Finished: Generate changelog release content");
 }

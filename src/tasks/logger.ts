@@ -9,6 +9,7 @@ import {
   formatDebugMessage,
   formatDebugStepMessage,
   formatIndentedMessage,
+  formatNoticeMessage,
   formatStepMessage,
   formatWarnMessage,
 } from "../utils/formatters/log.ts";
@@ -23,6 +24,8 @@ const defaultCoreLogger: CoreLogger = {
 
   debug: (message: string) => console.debug(message),
   isDebugEnabled: () => process.env.DEBUG?.toLowerCase() === "true",
+
+  notice: (message: string) => console.info(message),
 
   warn: (message: string) => console.warn(message),
 
@@ -75,6 +78,11 @@ const indentLogger: IndentLogger = {
     if (isDebugEnabled()) fn(indentDebugLogger);
   },
 
+  notice: (message: string) =>
+    activeCoreLogger.notice(
+      formatNoticeMessage(formatIndentedMessage(message)),
+    ),
+
   warn: (message: string) =>
     activeCoreLogger.warn(
       formatWarnMessage(formatIndentedMessage(message)),
@@ -108,6 +116,9 @@ export const logger: Logger = {
   debugWrap: (fn: (debugLogger: DebugLogger) => void) => {
     if (isDebugEnabled()) fn(debugLogger);
   },
+
+  notice: (message: string) =>
+    activeCoreLogger.notice(formatNoticeMessage(message)),
 
   warn: (message: string) => activeCoreLogger.warn(formatWarnMessage(message)),
 
