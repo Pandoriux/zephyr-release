@@ -47,7 +47,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for branch name that Zephyr Release uses.\n" +
-          'Allowed patterns to use are: "${name}", "${namespace}", "${repository}"\n' +
+          "Allowed patterns to use are: all fixed base string patterns.\n" +
           'Default: "release/zephyr-release"',
       }),
     ),

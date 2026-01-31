@@ -52,7 +52,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
-          "Allowed patterns to use are: all fixed base string patterns ()\n" +
+          "Allowed patterns to use are: all fixed base string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
       }),
     ),

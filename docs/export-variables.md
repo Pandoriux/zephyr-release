@@ -46,17 +46,19 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 - **configOverrideFormat:** Config override format  
   Export: `zr-config-override-format`; Env: `ZR_CONFIG_OVERRIDE_FORMAT`
 
-- **sourceModeStr:** Source mode object with original kebab-case keys (JSON stringified)  
+- **sourceMode:** Source mode string from inputs, preserved as-is (JSON stringified)  
   Export: `zr-source-mode-str`; Env: `ZR_SOURCE_MODE_STR`
 
-- **sourceModeCamelCaseStr:** Source mode object with keys transformed to camelCase (JSON stringified)  
-  Export: `zr-source-mode-camel-case-str`; Env: `ZR_SOURCE_MODE_CAMEL_CASE_STR`
+- **internalSourceMode:** Internally resolved source mode object, with keys converted to camelCase and values normalized to always be an object (JSON stringified). See: [source-mode.ts](../src/schemas/inputs/source-mode.ts)  
+  Export: `zr-internal-source-mode`; Env: `ZR_INTERNAL_SOURCE_MODE`
 
-- **configStr:** Config object with original kebab-case keys (JSON stringified)  
-  Export: `zr-config-str`; Env: `ZR_CONFIG_STR`
+  <br/>
 
-- **configCamelCaseStr:** Config object with keys transformed to camelCase (JSON stringified)  
-  Export: `zr-config-camel-case-str`; Env: `ZR_CONFIG_CAMEL_CASE_STR`
+- **config:** Resolved config object (config + override) taken directly from the user, preserved as-is (JSON stringified)  
+  Export: `zr-config`; Env: `ZR_CONFIG`
+
+- **internalConfig:** Internally resolved config object (config + override), with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). See: [config.ts](../src/schemas/configs/config.ts)  
+  Export: `zr-internal-config`; Env: `ZR_INTERNAL_CONFIG`
 
   <br/>
 

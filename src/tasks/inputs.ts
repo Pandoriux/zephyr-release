@@ -4,15 +4,29 @@ import { type InputsOutput, InputsSchema } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { formatValibotIssues } from "../utils/formatters/valibot.ts";
 import { transformObjKeyToCamelCase } from "../utils/transformers/object.ts";
+import type { ProviderInputs } from "../types/providers/inputs.ts";
+import { SourceModeOptions } from "../constants/source-mode-options.ts";
 
-export function getInputsOrThrow(provider: PlatformProvider): InputsOutput {
+export interface GetInputsResult {
+  rawInputs: ProviderInputs;
+  inputs: InputsOutput;
+}
+
+export function getInputsOrThrow(provider: PlatformProvider): GetInputsResult {
   const rawInputs = provider.getRawInputs();
-  const processedRawInputs = rawInputs.sourceMode
-    ? {
+  let processedRawInputs: unknown = rawInputs;
+
+  if (
+    rawInputs.sourceMode &&
+    !v.safeParse(v.enum(SourceModeOptions), rawInputs.sourceMode).success
+  ) {
+    processedRawInputs = {
       ...rawInputs,
-      sourceMode: transformObjKeyToCamelCase(JSON.parse(rawInputs.sourceMode)),
-    }
-    : rawInputs;
+      sourceMode: transformObjKeyToCamelCase(
+        JSON.parse(rawInputs.sourceMode),
+      ),
+    };
+  }
 
   const parsedInputsResult = v.safeParse(InputsSchema, processedRawInputs);
   if (!parsedInputsResult.success) {
@@ -26,5 +40,5 @@ export function getInputsOrThrow(provider: PlatformProvider): InputsOutput {
   taskLogger.info(JSON.stringify(parsedInputsResult.output, null, 2));
   taskLogger.endGroup();
 
-  return parsedInputsResult.output;
+  return { rawInputs, inputs: parsedInputsResult.output };
 }

@@ -17,7 +17,8 @@ import { createCustomStringPatternContext } from "./tasks/string-templates-and-p
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
-  const inputs = getInputsOrThrow(provider);
+  const inputsResult = getInputsOrThrow(provider);
+  const { rawInputs, inputs } = inputsResult;
   logger.stepFinish("Finished: Get operation inputs");
 
   logger.stepStart("Starting: Set up operation");
@@ -29,7 +30,8 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
-  const config = await resolveConfigOrThrow(provider, inputs);
+  const configResult = await resolveConfigOrThrow(provider, inputs);
+  const { rawConfig, config } = configResult;
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.debugStepStart("Starting: Create custom string pattern context");
@@ -37,7 +39,11 @@ export async function run(provider: PlatformProvider) {
   logger.debugStepFinish("Finished: Create custom string pattern context");
 
   logger.debugStepStart("Starting: Create fixed base string pattern context");
-  createFixedBaseStringPatternContext(provider, config);
+  await createFixedBaseStringPatternContext(
+    provider,
+    inputs.triggerBranchName,
+    config,
+  );
   logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
   logger.stepStart("Starting: Get associated pull requests");
@@ -57,8 +63,8 @@ export async function run(provider: PlatformProvider) {
   logger.debugStepStart("Starting: Export base operation variables");
   exportBaseOperationVariables(
     provider,
-    inputs,
-    config,
+    inputsResult,
+    configResult,
     Boolean(associatedPrForCommit),
     Boolean(associatedPrFromBranch),
   );

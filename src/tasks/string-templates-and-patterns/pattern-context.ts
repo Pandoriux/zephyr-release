@@ -9,6 +9,7 @@ import type {
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
+import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -22,13 +23,18 @@ export function createCustomStringPatternContext(
   );
 }
 
-type CreateFixedStrPatCtxConfigParams = Pick<ConfigOutput, "name" | "timeZone">;
+type CreateFixedStrPatCtxConfigParams =
+  & Pick<ConfigOutput, "name" | "timeZone">
+  & {
+    pullRequest: Pick<PullRequestConfigOutput, "branchNameTemplate">;
+  };
 
-export function createFixedBaseStringPatternContext(
+export async function createFixedBaseStringPatternContext(
   provider: PlatformProvider,
+  triggerBranchName: string,
   config: CreateFixedStrPatCtxConfigParams,
-): void {
-  const { name, timeZone } = config;
+): Promise<void> {
+  const { name, timeZone, pullRequest: { branchNameTemplate } } = config;
 
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
@@ -45,6 +51,8 @@ export function createFixedBaseStringPatternContext(
     commitPathPart: provider.getCommitPathPart(),
     referencePathPart: provider.getReferencePathPart(),
 
+    triggerBranchName: triggerBranchName,
+
     timeZone: timeZone,
     timestamp: startTime.getTime(),
     "YYYY": zdtFormat("yyyy"),
@@ -53,13 +61,22 @@ export function createFixedBaseStringPatternContext(
     "HH": zdtFormat("HH"),
     "mm": zdtFormat("mm"),
     "ss": zdtFormat("ss"),
-  } satisfies Record<FixedBaseStringPattern, string | number | undefined>;
+  } satisfies Omit<
+    Record<FixedBaseStringPattern, string | number | undefined>,
+    "workingBranchName"
+  >;
 
   Object.assign(STRING_PATTERN_CONTEXT, context);
 
+  const workingBranchContext = {
+    workingBranchName: await resolveStringTemplateOrThrow(branchNameTemplate),
+  } satisfies Pick<Record<FixedBaseStringPattern, string>, "workingBranchName">;
+
+  Object.assign(STRING_PATTERN_CONTEXT, workingBranchContext);
+
   taskLogger.debug(
     "Fixed base string pattern context: " +
-      JSON.stringify(context, null, 2),
+      JSON.stringify({ ...context, ...workingBranchContext }, null, 2),
   );
 }
 

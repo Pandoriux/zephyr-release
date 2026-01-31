@@ -13,7 +13,7 @@ import {
   githubGetRepositoryName,
 } from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import { githubExportVariables } from "./export.ts";
+import { githubExportEnvVars, githubExportOutputs } from "./export.ts";
 import { githubEnsureBranchAtCommitOrThrow } from "./branch.ts";
 import { githubFindCommitsFromGivenToPreviousTaggedOrThrow } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
@@ -132,7 +132,8 @@ export function createGitHubProvider(): PlatformProvider {
       );
     },
 
-    exportVariables: githubExportVariables,
+    exportOutputs: githubExportOutputs,
+    exportEnvVars: githubExportEnvVars,
 
     getConventionalCommitParserOptions:
       githubGetConventionalCommitParserOptions,

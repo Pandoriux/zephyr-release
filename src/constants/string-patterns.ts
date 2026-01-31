@@ -7,6 +7,9 @@ export const FixedBaseStringPatterns = {
   commitPathPart: "commitPathPart",
   referencePathPart: "referencePathPart",
 
+  triggerBranchName: "triggerBranchName",
+  workingBranchName: "workingBranchName",
+
   // Date Time components
   timeZone: "timeZone",
   timestamp: "timestamp",
@@ -49,7 +52,6 @@ const ChangelogReleaseEntryPatterns = {
   isBreaking: "isBreaking",
 } as const;
 
-export type ChangelogReleaseEntryPattern =
-  typeof ChangelogReleaseEntryPatterns[
-    keyof typeof ChangelogReleaseEntryPatterns
-  ];
+export type ChangelogReleaseEntryPattern = typeof ChangelogReleaseEntryPatterns[
+  keyof typeof ChangelogReleaseEntryPatterns
+];
