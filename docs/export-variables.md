@@ -62,6 +62,11 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 
   <br/>
 
+- **patternContext:** **Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts)  
+  Export: `zr-pattern-context`; Env: `ZR_PATTERN_CONTEXT`
+
+  <br/>
+
 - **target:** "prepare" when create/update pull request, "release" when create tag and publish release  
   Export: `zr-target`; Env: `ZR_TARGET`
 
@@ -85,6 +90,7 @@ These variables are available starting from the first [`command-hook > pre`](./c
 - **sourceModeCamelCaseStr**
 - **configStr**
 - **configCamelCaseStr**
+- **patternContext**
 - **target**
 - **job**
 

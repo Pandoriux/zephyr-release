@@ -1,5 +1,3 @@
-import type { ConfigOutput } from "../schemas/configs/config.ts";
-import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { BaseOperationVariables } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import {
@@ -7,12 +5,12 @@ import {
   toExportOutputKey,
 } from "../utils/transformers/case.ts";
 import { jsonValueNormalizer } from "../utils/transformers/json.ts";
-import { transformObjKeyToKebabCase } from "../utils/transformers/object.ts";
 import type { ResolveConfigResult } from "./config.ts";
 import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
+import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 
-export function exportBaseOperationVariables(
+export async function exportBaseOperationVariables(
   provider: PlatformProvider,
   inputsResult: GetInputsResult,
   configResult: ResolveConfigResult,
@@ -40,6 +38,8 @@ export function exportBaseOperationVariables(
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
+    patternContext: await stringifyCurrentPatternContext(),
+
     target: resolvedTarget,
     job: resolvedJob,
   } satisfies BaseOperationVariables;
@@ -59,5 +59,5 @@ export function exportBaseOperationVariables(
 }
 
 export function exportPrePrepareOperationVariables(
-  provider: PlatformProvider,
+  _provider: PlatformProvider,
 ) {}

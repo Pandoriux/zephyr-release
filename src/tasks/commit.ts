@@ -1,3 +1,4 @@
+import { normalize } from "@std/path";
 import {
   type Commit,
   type CommitBase,
@@ -5,11 +6,14 @@ import {
 } from "conventional-commits-parser";
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
 import { taskLogger } from "./logger.ts";
+import { prepareVersionFilesToCommit } from "./version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
 import type { ProviderCommit } from "../types/providers/commit.ts";
+import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
+import { prepareChangelogFileToCommit } from "./changelog.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -47,10 +51,9 @@ export async function resolveCommitsFromTriggerToLastRelease(
   const { triggerCommitHash } = inputs;
   const { commitTypes } = config;
 
-  const rawCommits = await provider
-    .findCommitsFromGivenToPreviousTaggedOrThrow(
-      triggerCommitHash,
-    );
+  const rawCommits = await provider.findCommitsFromGivenToPreviousTaggedOrThrow(
+    triggerCommitHash,
+  );
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup("Raw collected commits:");
@@ -176,4 +179,64 @@ function extractBlock(
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
+}
+
+type PrepareChangesInputsParams = Pick<
+  InputsOutput,
+  "workspacePath" | "sourceMode"
+>;
+
+type PrepareChangesConfigParams =
+  & Pick<
+    ConfigOutput,
+    "versionFiles" | "localFilesToCommit"
+  >
+  & {
+    changelog: Pick<
+      ChangelogConfigOutput,
+      | "writeToFile"
+      | "path"
+      | "fileHeaderTemplate"
+      | "fileHeaderTemplatePath"
+      | "fileFooterTemplate"
+      | "fileFooterTemplatePath"
+    >;
+  };
+
+export async function prepareChangesToCommit(
+  provider: PlatformProvider,
+  inputs: PrepareChangesInputsParams,
+  config: PrepareChangesConfigParams,
+  newData: { changelogRelease: string; nextVersion: string },
+): Promise<Map<string, string>> {
+  const { workspacePath, sourceMode } = inputs;
+  const { versionFiles, localFilesToCommit, changelog } = config;
+  const { writeToFile, path } = changelog;
+  const { changelogRelease, nextVersion } = newData;
+
+  const changesData = new Map<string, string>();
+
+  if (writeToFile) {
+    const clContent = await prepareChangelogFileToCommit(
+      provider,
+      changelog,
+      sourceMode,
+      workspacePath,
+      changelogRelease,
+    );
+    changesData.set(normalize(path), clContent);
+  }
+
+  const vfChangesData = await prepareVersionFilesToCommit(
+    provider,
+    versionFiles,
+    sourceMode,
+    workspacePath,
+    nextVersion,
+  );
+  for (const [vfPath, vfContent] of vfChangesData) {
+    changesData.set(normalize(vfPath), vfContent);
+  }
+
+  return changesData;
 }

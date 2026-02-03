@@ -45,3 +45,7 @@ commandHook: v.pipe(
   VÀ TẤT CẢ CMD HOOK TƯƠNG TỰ
 
 SYNC docs cua SourceModeSchema
+
+THÊM FEATURE kiểm tra trigger commit có phải thuộc commit type không, nếu ko thì exit early (nhớ check cả body)
+
+REFACTOR version-files.ts trong cả đống utils, logic này không nên ở utils, suy nghĩ nên hợp luôn với parser của config.ts không

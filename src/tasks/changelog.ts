@@ -7,6 +7,7 @@ import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { ChangelogReleaseEntryPattern } from "../constants/string-patterns.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
+import { CHANGELOG_MARKERS } from "../constants/changelog-markers.ts";
 
 type GenerateChangelogReleaseInputsParams = Pick<
   InputsOutput,
@@ -58,11 +59,12 @@ export async function generateChangelogReleaseContent(
 
   let releaseHeader: string;
   if (releaseHeaderTemplatePath) {
-    releaseHeader = await getTextFileOrThrow(
+    const headerTemplate = await getTextFileOrThrow(
       sourceMode.sourceMode,
       releaseHeaderTemplatePath,
       { provider, workspace: workspacePath },
     );
+    releaseHeader = await resolveStringTemplateOrThrow(headerTemplate);
   } else {
     releaseHeader = await resolveStringTemplateOrThrow(
       releaseHeaderTemplate,
@@ -71,11 +73,12 @@ export async function generateChangelogReleaseContent(
 
   let releaseFooter: string | undefined;
   if (releaseFooterTemplatePath) {
-    releaseFooter = await getTextFileOrThrow(
+    const footerTemplate = await getTextFileOrThrow(
       sourceMode.sourceMode,
       releaseFooterTemplatePath,
       { provider, workspace: workspacePath },
     );
+    releaseFooter = await resolveStringTemplateOrThrow(footerTemplate);
   } else if (releaseFooterTemplate) {
     releaseFooter = await resolveStringTemplateOrThrow(
       releaseFooterTemplate,
@@ -85,7 +88,7 @@ export async function generateChangelogReleaseContent(
   let releaseBody: string;
   if (releaseBodyOverridePath) {
     releaseBody = await getTextFileOrThrow(
-      sourceMode.releaseBodyOverridePath ?? sourceMode.sourceMode,
+      sourceMode.changelogReleaseBodyOverridePath ?? sourceMode.sourceMode,
       releaseBodyOverridePath,
       { provider, workspace: workspacePath },
     );
@@ -218,4 +221,139 @@ function createCommitExtraPatterns(
     footer: commit.footer,
     isBreaking: commit.isBreaking,
   };
+}
+
+type PrepareChangelogParams = Pick<
+  ChangelogConfigOutput,
+  | "path"
+  | "fileHeaderTemplate"
+  | "fileHeaderTemplatePath"
+  | "fileFooterTemplate"
+  | "fileFooterTemplatePath"
+>;
+
+export async function prepareChangelogFileToCommit(
+  provider: PlatformProvider,
+  changelogConfig: PrepareChangelogParams,
+  sourceMode: InputsOutput["sourceMode"],
+  workspacePath: string,
+  releaseContent: string,
+): Promise<string> {
+  const {
+    path,
+    fileHeaderTemplate,
+    fileHeaderTemplatePath,
+    fileFooterTemplate,
+    fileFooterTemplatePath,
+  } = changelogConfig;
+
+  const changelogSourceMode = sourceMode.changelogPath
+    ? sourceMode.changelogPath
+    : sourceMode.sourceMode;
+
+  const currentFileContent = await getTextFileOrThrow(
+    changelogSourceMode,
+    path,
+    { provider, workspace: workspacePath },
+  );
+
+  let header: string;
+  if (fileHeaderTemplatePath) {
+    const headerTemplate = await getTextFileOrThrow(
+      sourceMode.sourceMode,
+      fileHeaderTemplatePath,
+      { provider, workspace: workspacePath },
+    );
+    header = await resolveStringTemplateOrThrow(headerTemplate);
+  } else header = await resolveStringTemplateOrThrow(fileHeaderTemplate);
+
+  let footer: string | undefined;
+  if (fileFooterTemplatePath) {
+    const footerTemplate = await getTextFileOrThrow(
+      sourceMode.sourceMode,
+      fileFooterTemplatePath,
+      { provider, workspace: workspacePath },
+    );
+    footer = await resolveStringTemplateOrThrow(footerTemplate);
+  } else if (fileFooterTemplate) {
+    footer = await resolveStringTemplateOrThrow(fileFooterTemplate);
+  }
+
+  if (!currentFileContent.trim()) {
+    const bodyWithMarkers = [
+      CHANGELOG_MARKERS.bodyStart,
+      releaseContent,
+      CHANGELOG_MARKERS.bodyEnd,
+    ].join("\n");
+
+    return [header, bodyWithMarkers, footer].filter(Boolean).join("\n\n");
+  } else {
+    // check if fileContent have the marker from CHANGELOG_MARKERS start and end
+    const bodyStartMarkerIndex = currentFileContent.indexOf(
+      CHANGELOG_MARKERS.bodyStart,
+    );
+    const bodyEndMarkerIndex = currentFileContent.lastIndexOf(
+      CHANGELOG_MARKERS.bodyEnd,
+    );
+
+    if (bodyStartMarkerIndex === -1 || bodyEndMarkerIndex === -1) {
+      // Markers not found - treat current content as old and archive it
+      const archivedContent = [
+        CHANGELOG_MARKERS.archived,
+        "---",
+        currentFileContent,
+      ].join("\n");
+
+      const bodyWithMarkers = [
+        CHANGELOG_MARKERS.bodyStart,
+        releaseContent,
+        CHANGELOG_MARKERS.bodyEnd,
+      ].join("\n");
+
+      return [header, bodyWithMarkers, footer, archivedContent].filter(Boolean)
+        .join("\n\n");
+    } else {
+      // Markers exist - update content between outermost markers
+
+      // Handle update body
+      const bodyStartMarkerEndIndex = bodyStartMarkerIndex +
+        CHANGELOG_MARKERS.bodyStart.length;
+
+      const existingBodyContent = currentFileContent.substring(
+        bodyStartMarkerEndIndex,
+        bodyEndMarkerIndex,
+      ).trim();
+
+      const updatedBody = existingBodyContent
+        ? [releaseContent, existingBodyContent].join("\n\n")
+        : releaseContent;
+
+      const updatedBodyWithMarkers = [
+        CHANGELOG_MARKERS.bodyStart,
+        updatedBody,
+        CHANGELOG_MARKERS.bodyEnd,
+      ].join("\n");
+
+      // Handle archive
+      const bodyEndMarkerEndIndex = bodyEndMarkerIndex +
+        CHANGELOG_MARKERS.bodyEnd.length;
+      const contentAfterBodyEnd = currentFileContent.substring(
+        bodyEndMarkerEndIndex,
+      );
+
+      const archivedMarkerIndex = contentAfterBodyEnd.indexOf(
+        CHANGELOG_MARKERS.archived,
+      );
+
+      let archivedContent: string | undefined;
+      if (archivedMarkerIndex !== -1) {
+        archivedContent = contentAfterBodyEnd.substring(archivedMarkerIndex);
+      }
+
+      return [header, updatedBodyWithMarkers, footer, archivedContent].filter(
+        Boolean,
+      )
+        .join("\n\n");
+    }
+  }
 }

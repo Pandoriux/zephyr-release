@@ -10,6 +10,8 @@ export interface BaseOperationVariables
   config: string;
   internalConfig: string;
 
+  patternContext: string;
+
   target: "prepare" | "release";
   job: "create-pr" | "update-pr" | "create-release";
 }

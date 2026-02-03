@@ -2,7 +2,6 @@ import * as v from "@valibot/valibot";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import { CoreLabelSchema } from "./components/core-label.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
-import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
   DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
@@ -18,27 +17,6 @@ export const PullRequestConfigSchema = v.pipe(
       v.metadata({
         description:
           "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
-      }),
-    ),
-    filesToCommit: v.pipe(
-      v.optional(
-        v.union([
-          trimNonEmptyStringSchema,
-          v.pipe(
-            v.array(trimNonEmptyStringSchema),
-            v.nonEmpty(),
-          ),
-        ]),
-      ),
-      v.transform((input) => {
-        if (input) return Array.isArray(input) ? input : [input];
-        return input;
-      }),
-      v.metadata({
-        description:
-          'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
-          "Paths are relative to the repo root.",
-        examples: ["ALL", ["some/path"], ["src/release-artifacts/*"]],
       }),
     ),
 

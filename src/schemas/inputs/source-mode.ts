@@ -12,7 +12,8 @@ export const SourceModeSchema = v.object({
     ]),
   ),
 
-  releaseBodyOverridePath: v.optional(v.enum(SourceModeOptions)),
+  changelogPath: v.optional(v.enum(SourceModeOptions)),
+  changelogReleaseBodyOverridePath: v.optional(v.enum(SourceModeOptions)),
 });
 
 type _SourceModeInput = v.InferInput<typeof SourceModeSchema>;

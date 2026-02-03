@@ -1,5 +1,5 @@
 import { taskLogger } from "./logger.ts";
-import { initTomlEditJs } from "../libs/toml-edit-js/initWasm.ts";
+import { initTomlEditJs } from "../libs/@rainbowatcher/toml-edit-js/initWasm.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 

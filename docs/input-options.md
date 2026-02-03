@@ -68,7 +68,8 @@ Example: `{"source-mode": "local", "version-files": "local", "changelog": "remot
 **Supported Keys:**
 
 - `version-files`: Either `"local"` or `"remote"`, or an **object** with keys as version file path strings and values as `"local"` or `"remote"`. Any file paths not listed fall back to the default `source-mode` value.  
-More about version file config in [config-options.md](./config-options.md#version-files-required)
-- `release-body-override-path`: Either `"local"` or `"remote"`. Controls whether the [changelog content body override file](./config-options.md#changelog--release-body-override-path-optional) is read from the local filesystem or remote repository.
+  More about version file config in [config-options.md](./config-options.md#version-files-required)
+- `changelog-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file](./config-options.md#changelog--path-optional) is read from the local filesystem or remote repository.
+- `changelog-release-body-override-path`: Either `"local"` or `"remote"`. Controls whether the [changelog content body override file](./config-options.md#changelog--release-body-override-path-optional) is read from the local filesystem or remote repository.
 
 > **Important:** If `source-mode` is set to `local` (globally or for a specific operation), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.

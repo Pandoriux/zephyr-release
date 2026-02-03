@@ -1,12 +1,9 @@
 import { parse } from "nimma/parser";
 import Nimma from "nimma";
-import {
-  type VersionFileExtractor,
-  VersionFileExtractorsWithAuto,
-  type VersionFileExtractorWithAuto,
-} from "../../constants/version-file-options.ts";
+import type { VersionFileExtractor } from "../../constants/version-file-options.ts";
+import { parseRegExpFromSelector } from "../parsers/regex.ts";
 
-function detectVersionFileExtractor(
+export function detectVersionFileExtractor(
   selector: string,
 ): VersionFileExtractor | undefined {
   if (
@@ -35,68 +32,36 @@ function detectVersionFileExtractor(
 
 export function extractVersionStringOrThrow(
   parsedVersionFile: unknown,
-  extractor: VersionFileExtractorWithAuto,
+  extractor: VersionFileExtractor,
   selector: string,
-): string | undefined {
+): string | null | undefined {
   if (!parsedVersionFile) {
     throw new Error(
       "Cannot extract version, parsed version file content is empty or invalid",
     );
   }
 
-  const validExtractor = extractor === VersionFileExtractorsWithAuto.auto
-    ? detectVersionFileExtractor(selector)
-    : extractor;
-  if (!validExtractor) {
-    throw new Error(
-      `Unable to determine a version file extractor for selector '${selector}'`,
-    );
-  }
-
-  switch (validExtractor) {
+  switch (extractor) {
     case "json-path": {
-      let result: string | undefined;
+      let result: string | null | undefined;
 
-      try {
-        const nimma = new Nimma([selector]);
-        nimma.query(parsedVersionFile, {
-          [selector]({ value }) {
-            // Only assign if we haven't found a result yet and value is not null/undefined
-            if (value !== undefined && value !== null && result === undefined) {
-              result = String(value);
-            }
-          },
-        });
-      } catch (error) {
-        throw new Error(
-          `Invalid JSONPath syntax: '${selector}'`,
-          { cause: error },
-        );
-      }
+      Nimma.query(parsedVersionFile, {
+        [selector]({ value }) {
+          // Only assign if we haven't found a result yet and value is not null/undefined
+          // Nimma may fire this callback multiple times if the selector matches many nodes.
+          // We use 'result === undefined' to enforce "First Match Wins" logic.
+          if (value !== undefined && (typeof value === "string" || value === null) && result === undefined) {
+            result = value;
+          }
+        },
+      });
 
       return result;
     }
 
     case "regex": {
       const content = JSON.stringify(parsedVersionFile, null, 2);
-
-      // Handle /pattern/flags format or raw strings const match = selector.match(/^\/(.*)\/([gimyus]*)$/);
-      const matchArray = selector.match(/^\/(.*)\/([gimyus]*)$/);
-
-      let regex: RegExp;
-      try {
-        if (matchArray) {
-          const pattern = matchArray[1] ?? selector;
-          const flags = matchArray[2];
-          regex = new RegExp(pattern, flags);
-        } else {
-          regex = new RegExp(selector);
-        }
-      } catch (error) {
-        throw new Error(`Invalid Regular Expression syntax: ${selector}`, {
-          cause: error,
-        });
-      }
+      const regex = parseRegExpFromSelector(selector);
 
       const executionMatch = content.match(regex);
       if (!executionMatch) {

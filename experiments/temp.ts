@@ -1,3 +1,8 @@
-import { transformObjKeyToCamelCase } from "../src/utils/transformers/object.ts";
+import { parseDocument } from "@eemeli/yaml";
 
-console.log(transformObjKeyToCamelCase(JSON.parse("string")));
+const doc = parseDocument(""); // Empty document
+
+// Path: ['server', 'users', 0, 'name']
+doc.setIn(["server", "users", 0, "name"], "Alice");
+
+console.log(doc.toString());

@@ -10,6 +10,7 @@ import type {
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
 import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
+import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -108,4 +109,25 @@ export async function createFixedVersionStringPatternContext(
     "Fixed version string pattern context: " +
       JSON.stringify({ ...versionContext, ...tagContext }, null, 2),
   );
+}
+
+export async function stringifyCurrentPatternContext(): Promise<string> {
+  const resolvedContext: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
+    if (typeof value === "function") {
+      try {
+        const result = await value();
+        // If result is not a function, use it; otherwise use original value
+        resolvedContext[key] = typeof result === "function" ? value : result;
+      } catch {
+        // If function throws, use original value
+        resolvedContext[key] = value;
+      }
+    } else {
+      resolvedContext[key] = value;
+    }
+  }
+
+  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }

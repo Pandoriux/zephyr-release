@@ -18,6 +18,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
+  - [local-files-to-commit (Optional)](#local-files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
@@ -51,7 +52,6 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
-    - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
     - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
     - [pull... \> label (Optional)](#pull--label-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
@@ -136,6 +136,12 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 See [`VersionFile`](#versionfile) for the type definition.
+
+### local-files-to-commit (Optional)
+
+Type: `string | string[]`
+
+Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
 
 ### commit-types (Optional)
 
@@ -363,7 +369,7 @@ Path to text file containing changelog release body override, will take preceden
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#pull--command-hook-optional), [`files-to-commit`](#pull--files-to-commit-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
+**Properties:** [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
 
@@ -374,12 +380,6 @@ Type: [`CommandHook`](#commandhook)
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-#### pull... > files-to-commit (Optional)
-
-Type: `string | string[]`
-
-Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
 
 #### pull... > branch-name-template (Optional)
 

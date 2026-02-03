@@ -1,7 +1,7 @@
 import { liquidEngine } from "./resolve-template.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 
-export async function registerTransformersToTemplateEngine(
+export function registerTransformersToTemplateEngine(
   provider: PlatformProvider,
 ) {
   liquidEngine.registerFilter(
