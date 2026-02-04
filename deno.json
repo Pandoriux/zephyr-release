@@ -42,6 +42,7 @@
     "conventional-changelog-writer": "npm:conventional-changelog-writer@^8.2.0",
     "conventional-commits-filter": "npm:conventional-commits-filter@^5.0.0",
     "conventional-commits-parser": "npm:conventional-commits-parser@^6.2.1",
+    "fast-glob": "npm:fast-glob@^3.3.3",
     "liquidjs": "npm:liquidjs@^10.24.0",
     "nimma": "npm:nimma@^0.7.2",
     "obj-walker": "npm:obj-walker@^2.5.0",

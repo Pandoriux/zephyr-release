@@ -5,6 +5,7 @@ import {
   CommitParser,
 } from "conventional-commits-parser";
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
+import fg from "fast-glob";
 import { taskLogger } from "./logger.ts";
 import { prepareVersionFilesToCommit } from "./version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
@@ -14,6 +15,9 @@ import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
 import type { ProviderCommit } from "../types/providers/commit.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import { prepareChangelogFileToCommit } from "./changelog.ts";
+import { localFilesToCommitOptions } from "../constants/local-files-to-commit-options.ts";
+import { execSync } from "node:child_process";
+import { getTextFileOrThrow } from "./file.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -216,6 +220,7 @@ export async function prepareChangesToCommit(
 
   const changesData = new Map<string, string>();
 
+  taskLogger.info("Collecting channgelog data to commit...");
   if (writeToFile) {
     const clContent = await prepareChangelogFileToCommit(
       provider,
@@ -225,8 +230,11 @@ export async function prepareChangesToCommit(
       changelogRelease,
     );
     changesData.set(normalize(path), clContent);
-  }
+  } else taskLogger.info("Changelog write to file config is off. Skipping...");
 
+  taskLogger.info(
+    `Collecting version files data to commit (${versionFiles.length} files)...`,
+  );
   const vfChangesData = await prepareVersionFilesToCommit(
     provider,
     versionFiles,
@@ -236,6 +244,52 @@ export async function prepareChangesToCommit(
   );
   for (const [vfPath, vfContent] of vfChangesData) {
     changesData.set(normalize(vfPath), vfContent);
+  }
+
+  if (localFilesToCommit) {
+    let targetLocalFiles: string[] = [];
+
+    taskLogger.info(
+      `Collecting local files data to commit (${localFilesToCommit.length} files)...`,
+    );
+    if (localFilesToCommit.includes(localFilesToCommitOptions.all)) {
+      try {
+        const output = execSync("git status --porcelain", {
+          cwd: workspacePath,
+          encoding: "utf-8",
+        });
+
+        targetLocalFiles = output
+          .split("\n")
+          .filter((line) => line.trim().length > 0)
+          .map((line) => line.slice(3).trim()); // Removes the status code " M "
+      } catch (error) {
+        throw new Error("Error while executing 'git status --porcelain'", {
+          cause: error,
+        });
+      }
+    } else {
+      targetLocalFiles = await fg(localFilesToCommit, {
+        cwd: workspacePath,
+        dot: true, // Users might want to commit .config files
+        onlyFiles: true,
+        absolute: false, // We want relative paths for the manifest keys
+      });
+    }
+
+    for (const filePath of targetLocalFiles) {
+      const normalizedPath = normalize(filePath);
+
+      // DEDUPLICATION:
+      // If "changelog.md" is already in the manifest from step 1,
+      // we do NOT overwrite it with the old version from disk.
+      if (changesData.has(normalizedPath)) continue;
+
+      const fileContent = await getTextFileOrThrow("local", normalizedPath, {
+        workspace: workspacePath,
+      });
+      changesData.set(normalizedPath, fileContent);
+    }
   }
 
   return changesData;
