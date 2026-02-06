@@ -15,6 +15,7 @@ import { releaseWorkflow } from "./workflows/release.ts";
 import { manageConcurrency } from "./tasks/concurrency.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
+import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -51,14 +52,24 @@ export async function run(provider: PlatformProvider) {
   );
   logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
+  logger.stepStart("Starting: Ensure working branch is prepared");
+  const workingBranchResult = await setupWorkingBranchOrThrow(
+    provider,
+    inputs,
+    config,
+  );
+  logger.stepFinish("Finished: Ensure working branch is prepared");
+
   logger.stepStart("Starting: Get associated pull requests");
   const associatedPrForCommit = await findPullRequestForCommitOrThrow(
     provider,
+    workingBranchResult.name,
     inputs,
     config,
   );
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
+    workingBranchResult.name,
     config,
   );
   logger.stepFinish(
@@ -68,10 +79,11 @@ export async function run(provider: PlatformProvider) {
   logger.debugStepStart("Starting: Export base operation variables");
   await exportBaseOperationVariables(
     provider,
-    inputsResult,
-    configResult,
+    workingBranchResult,
     Boolean(associatedPrForCommit),
     Boolean(associatedPrFromBranch),
+    inputsResult,
+    configResult,
   );
   logger.debugStepFinish("Finished: Export base operation variables");
 
@@ -85,7 +97,12 @@ export async function run(provider: PlatformProvider) {
 
   if (!associatedPrForCommit) {
     logger.stepStart("Workflow: Prepare release with pull request");
-    await prepareWorkflow(provider, { inputs, config });
+    await prepareWorkflow(provider, {
+      workingBranchResult,
+      associatedPrFromBranch,
+      inputs,
+      config,
+    });
   } else {
     logger.stepStart("Workflow: Release finalize");
     await releaseWorkflow(provider);

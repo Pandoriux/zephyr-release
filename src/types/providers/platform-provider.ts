@@ -1,7 +1,7 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import type { CoreLogger } from "../logger.ts";
 import type { ProviderBranch } from "./branch.ts";
-import type { ProviderCommit } from "./commit.ts";
+import type { ProviderCommit, ProviderWorkingCommit } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
@@ -30,7 +30,7 @@ export interface PlatformProvider {
 
   getTextFileOrThrow: (filePath: string) => Promise<string>;
 
-  ensureBranchAtCommitOrThrow: (
+  ensureBranchExistOrThrow: (
     branchName: string,
     commitHash: string,
   ) => Promise<ProviderBranch>;
@@ -49,6 +49,14 @@ export interface PlatformProvider {
     branchName: string,
     requiredLabel: string,
   ) => Promise<ProviderPullRequest | undefined>;
+
+  createCommitOnBranchOrThrow: (
+    triggerCommitHash: string,
+    baseTreeHash: string,
+    changesToCommit: Map<string, string>,
+    message: string,
+    workingBranchName: string,
+  ) => Promise<ProviderWorkingCommit>;
 
   exportOutputs: (k: string, v: string) => void;
   exportEnvVars: (k: string, v: string) => void;

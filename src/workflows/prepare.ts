@@ -1,8 +1,9 @@
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import { setupWorkingBranchOrThrow } from "../tasks/branch.ts";
+import type { WorkingBranchResult } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
 import {
+  commitChangesToBranch,
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
@@ -14,6 +15,7 @@ import { runCommandsOrThrow } from "../tasks/command.ts";
 import { exportPrePrepareOperationVariables } from "../tasks/export-variables.ts";
 
 interface PrepareWorkflowOptions {
+  workingBranchResult: WorkingBranchResult;
   inputs: InputsOutput;
   config: ConfigOutput;
 }
@@ -22,15 +24,7 @@ export async function prepareWorkflow(
   provider: PlatformProvider,
   ops: PrepareWorkflowOptions,
 ) {
-  const { inputs, config } = ops;
-
-  logger.stepStart("Starting: Ensure working branch is prepared");
-  const workBranch = await setupWorkingBranchOrThrow(
-    provider,
-    inputs,
-    config,
-  );
-  logger.stepFinish("Finished: Ensure working branch is prepared");
+  const { workingBranchResult, associatedPrFromBranch, inputs, config } = ops;
 
   logger.stepStart("Starting: Resolve commits from trigger to last release");
   const resolvedCommitsResult = await resolveCommitsFromTriggerToLastRelease(
@@ -61,7 +55,10 @@ export async function prepareWorkflow(
   );
 
   logger.debugStepStart("Starting: Export pre prepare operation variables");
-  exportPrePrepareOperationVariables(provider);
+  await exportPrePrepareOperationVariables(
+    provider,
+    nextVersionResult,
+  );
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
   logger.stepStart("Starting: Execute pull request pre commands");
@@ -87,11 +84,17 @@ export async function prepareWorkflow(
   logger.stepFinish("Finished: Generate changelog release content");
 
   logger.stepStart("Starting: Prepare and collect changes data to commit");
-  const changesData = prepareChangesToCommit(
+  const changesData = await prepareChangesToCommit(
     provider,
     inputs,
     config,
     { changelogRelease, nextVersion: nextVersionResult.str },
   );
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
+
+  logger.stepStart("Starting: Commit changes and create pull request");
+  const commitResult = await commitChangesToBranch(provider, {});
+  logger.stepFinish("Finished: Commit changes and create pull request");
+
+  // run post cmds
 }

@@ -1,10 +1,11 @@
 import process from "node:process";
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import { taskLogger } from "../../tasks/logger.ts";
 
-export async function githubManageConcurrency(token: string): Promise<void> {
-  const octokit = getOctokitClient(token);
+export async function githubManageConcurrency(
+  octokit: OctokitClient,
+): Promise<void> {
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 

@@ -10,27 +10,25 @@ type FindPrForCommitInputsParams = Pick<InputsOutput, "triggerCommitHash">;
 
 interface PullRequestBranchAndLabelConfigParams {
   pullRequest: {
-    branchNameTemplate: PullRequestConfigOutput["branchNameTemplate"];
     label: { onCreate: CoreLabelOutput["onCreate"] };
   };
 }
 
 export async function findPullRequestForCommitOrThrow(
   provider: PlatformProvider,
+  workingBranchName: string,
   inputs: FindPrForCommitInputsParams,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
   const { triggerCommitHash } = inputs;
-  const sourceBranch = await resolveStringTemplateOrThrow(
-    config.pullRequest.branchNameTemplate,
-  );
+
   const label = typeof config.pullRequest.label.onCreate === "string"
     ? config.pullRequest.label.onCreate
     : config.pullRequest.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestForCommitOrThrow(
     triggerCommitHash,
-    sourceBranch,
+    workingBranchName,
     label,
   );
 
@@ -44,22 +42,20 @@ export async function findPullRequestForCommitOrThrow(
 
 export async function findPullRequestFromBranchOrThrow(
   provider: PlatformProvider,
+  workingBranchName: string,
   config: PullRequestBranchAndLabelConfigParams,
 ): Promise<ProviderPullRequest | undefined> {
-  const branchName = await resolveStringTemplateOrThrow(
-    config.pullRequest.branchNameTemplate,
-  );
   const label = typeof config.pullRequest.label.onCreate === "string"
     ? config.pullRequest.label.onCreate
     : config.pullRequest.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestFromBranchOrThrow(
-    branchName,
+    workingBranchName,
     label,
   );
 
   taskLogger.debug(
-    `Found associated pull request for branch '${branchName}':\n` +
+    `Found associated pull request for branch '${workingBranchName}':\n` +
       JSON.stringify(foundPr, null, 2),
   );
 

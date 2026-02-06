@@ -18,6 +18,7 @@ import { prepareChangelogFileToCommit } from "./changelog.ts";
 import { localFilesToCommitOptions } from "../constants/local-files-to-commit-options.ts";
 import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
+import { ProviderPullRequest } from "../types/providers/pull-request.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -293,4 +294,33 @@ export async function prepareChangesToCommit(
   }
 
   return changesData;
+}
+
+export async function commitChangesToBranch(
+  provider: PlatformProvider,
+  commitData: {
+    triggerCommitHash: string;
+    baseTreeHash: string;
+    changesToCommit: Map<string, string>;
+    message: string;
+    workingBranchName: string;
+  },
+  associatedPrFromBranch: ProviderPullRequest,
+) {
+  const {
+    triggerCommitHash,
+    baseTreeHash,
+    changesToCommit,
+    message,
+    workingBranchName,
+  } = commitData;
+
+  taskLogger.info("Pushing");
+  const createdCommit = await provider.createCommitOnBranchOrThrow(
+    triggerCommitHash,
+    baseTreeHash,
+    changesToCommit,
+    message,
+    workingBranchName,
+  );
 }

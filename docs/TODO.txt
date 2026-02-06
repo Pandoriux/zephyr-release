@@ -46,6 +46,7 @@ commandHook: v.pipe(
 
 SYNC docs cua SourceModeSchema
 
-THÊM FEATURE kiểm tra trigger commit có phải thuộc commit type không, nếu ko thì exit early (nhớ check cả body)
+THÊM FEATURE kiểm tra trigger commit có phải thuộc commit type không, nếu ko thì exit early. ngoài ra, nếu thuộc type thì nhớ parse nó rồi 
+trả về data là triggercommit
 
 REFACTOR version-files.ts trong cả đống utils, logic này không nên ở utils, suy nghĩ nên hợp luôn với parser của config.ts không

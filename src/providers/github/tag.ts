@@ -5,7 +5,7 @@ import {
   githubGetNamespace,
   githubGetRepositoryName,
 } from "./repository.ts";
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 
 export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
   let compareSegment = tag1 + "..." + tag2;
@@ -30,12 +30,10 @@ export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
 }
 
 export async function githubGetCompareTagUrlFromCurrentToLatest(
-  token: string,
+  octokit: OctokitClient,
   currentTag: string,
   skip: number = 0,
 ): Promise<string> {
-  const octokit = getOctokitClient(token);
-
   if (skip < 0) {
     throw new Error(`Skip value cannot be a negative number: ${skip}`);
   }

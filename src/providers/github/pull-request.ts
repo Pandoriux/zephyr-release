@@ -1,10 +1,10 @@
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
 import { taskLogger } from "../../tasks/logger.ts";
 
 export async function githubFindUniquePullRequestForCommitOrThrow(
-  token: string,
+  octokit: OctokitClient,
   commitHash: string,
   sourceBranch: string,
   requiredLabel: string,
@@ -12,7 +12,6 @@ export async function githubFindUniquePullRequestForCommitOrThrow(
   let foundPr: ProviderPullRequest | undefined = undefined;
   const orphanPrs: number[] = [];
 
-  const octokit = getOctokitClient(token);
   const paginatedIterator = octokit.paginate.iterator(
     octokit.rest.repos.listPullRequestsAssociatedWithCommit,
     {
@@ -63,14 +62,13 @@ export async function githubFindUniquePullRequestForCommitOrThrow(
 }
 
 export async function githubFindUniquePullRequestFromBranchOrThrow(
-  token: string,
+  octokit: OctokitClient,
   branchName: string,
   requiredLabel: string,
 ): Promise<ProviderPullRequest | undefined> {
   let foundPr: ProviderPullRequest | undefined = undefined;
   const orphanPrs: number[] = [];
 
-  const octokit = getOctokitClient(token);
   const owner = githubGetNamespace();
   const paginatedIterator = octokit.paginate.iterator(
     octokit.rest.pulls.list,

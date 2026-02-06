@@ -31,6 +31,7 @@ type CalculateNextVersionConfigParams = Pick<
 export interface NextVersionResult {
   str: string;
   semver: SemVer;
+  currentVersionStr: string;
 }
 
 export async function calculateNextVersion(
@@ -50,15 +51,6 @@ export async function calculateNextVersion(
     bumpStrategy,
   } = config;
 
-  const manualReleaseAsVersion = resolveManualReleaseAsVersion(
-    resolvedTriggerCommit,
-    commitTypes,
-    allowReleaseAs,
-  );
-  if (manualReleaseAsVersion) {
-    return manualReleaseAsVersion;
-  }
-
   taskLogger.info("Getting current version from primary version files...");
   const primaryVersionFile = getPrimaryVersionFile(versionFiles);
   const primaryVersion = await getVersionStringFromVersionFile(
@@ -73,6 +65,17 @@ export async function calculateNextVersion(
     throw new Error(
       `Current version '${currentVersion}' from is not a valid semver object`,
     );
+  }
+
+  taskLogger.info("Checking if there is release-as trigger...");
+  const manualReleaseAsVersion = resolveManualReleaseAsVersion(
+    currentVersion,
+    resolvedTriggerCommit,
+    commitTypes,
+    allowReleaseAs,
+  );
+  if (manualReleaseAsVersion) {
+    return manualReleaseAsVersion;
   }
 
   taskLogger.info(`Current version got from version file is ${currentVersion}`);
@@ -104,10 +107,12 @@ export async function calculateNextVersion(
   return {
     str: finalVersion,
     semver: finalSemVer,
+    currentVersionStr: currentVersion,
   };
 }
 
 function resolveManualReleaseAsVersion(
+  currentVersionStr: string,
   triggerCommit: Commit,
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
   allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
@@ -140,6 +145,7 @@ function resolveManualReleaseAsVersion(
   return {
     str: format(semver),
     semver,
+    currentVersionStr,
   };
 }
 

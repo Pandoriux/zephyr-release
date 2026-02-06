@@ -10,11 +10,22 @@ export interface BaseOperationVariables
   config: string;
   internalConfig: string;
 
-  patternContext: string;
+  workingBranchName: string;
+  workingBranchRef: string;
+  workingBranchHash: string;
 
   target: "prepare" | "release";
   job: "create-pr" | "update-pr" | "create-release";
 }
 
+export interface DynamicOperationVariables {
+  patternContext: string;
+}
+
 export interface PrePrepareOperationVariables {
+  triggerCommit: string; // maybe swicth this to base?
+  resolvedCommits: string;
+
+  currentVersion: string;
+  nextVersion: string;
 }

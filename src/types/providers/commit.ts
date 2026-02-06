@@ -8,3 +8,8 @@ export interface ProviderCommit {
    */
   message: string;
 }
+
+export interface ProviderWorkingCommit {
+  workingCommitHash: string;
+  workingTreeHash: string;
+}
