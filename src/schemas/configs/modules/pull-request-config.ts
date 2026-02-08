@@ -55,6 +55,13 @@ export const PullRequestConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_TEMPLATE)}`,
       }),
     ),
+    titleTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.",
+      }),
+    ),
     headerTemplate: v.pipe(
       v.optional(
         v.union([v.string(), v.pipe(v.array(v.string()), v.nonEmpty())]),
@@ -65,6 +72,13 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
+      }),
+    ),
+    headerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -79,7 +93,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request body template. Overrides body template if both are provided.",
+          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.",
       }),
     ),
     footerTemplate: v.pipe(
@@ -88,6 +102,13 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "String template for pull request footer, using with string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE)}`,
+      }),
+    ),
+    footerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.",
       }),
     ),
   }),

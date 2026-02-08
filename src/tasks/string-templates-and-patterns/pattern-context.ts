@@ -5,12 +5,14 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import { taskLogger } from "../logger.ts";
 import { startTime } from "../../main.ts";
 import type {
+  DynamicChangelogStringPattern,
   FixedBaseStringPattern,
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
 import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
 import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
+import { GenerateChangelogReleaseResult } from "../changelog.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -108,6 +110,22 @@ export async function createFixedVersionStringPatternContext(
   taskLogger.debug(
     "Fixed version string pattern context: " +
       JSON.stringify({ ...versionContext, ...tagContext }, null, 2),
+  );
+}
+
+export function createDynamicChangelogStringPatternContext(
+  changelogResult: GenerateChangelogReleaseResult,
+) {
+  const context = {
+    changelogRelease: changelogResult.release,
+    changelogReleaseBody: changelogResult.releaseBody,
+  } satisfies Record<DynamicChangelogStringPattern, string>;
+
+  Object.assign(STRING_PATTERN_CONTEXT, context);
+
+  taskLogger.debug(
+    "Dynamic changelog string pattern context: " +
+      JSON.stringify(context, null, 2),
   );
 }
 

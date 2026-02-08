@@ -29,9 +29,9 @@ type CalculateNextVersionConfigParams = Pick<
 >;
 
 export interface NextVersionResult {
-  str: string;
-  semver: SemVer;
-  currentVersionStr: string;
+  nextVerStr: string;
+  nextVerSemVer: SemVer;
+  currentVerStr: string;
 }
 
 export async function calculateNextVersion(
@@ -105,9 +105,9 @@ export async function calculateNextVersion(
   taskLogger.info(`Final calculated next version: ${finalVersion}`);
 
   return {
-    str: finalVersion,
-    semver: finalSemVer,
-    currentVersionStr: currentVersion,
+    nextVerStr: finalVersion,
+    nextVerSemVer: finalSemVer,
+    currentVerStr: currentVersion,
   };
 }
 
@@ -143,9 +143,9 @@ function resolveManualReleaseAsVersion(
   const semver = parse(releaseAsNote.text);
 
   return {
-    str: format(semver),
-    semver,
-    currentVersionStr,
+    nextVerStr: format(semver),
+    nextVerSemVer: semver,
+    currentVerStr: currentVersionStr,
   };
 }
 

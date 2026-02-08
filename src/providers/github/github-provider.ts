@@ -2,8 +2,10 @@ import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
 import { githubGetTextFileOrThrow } from "./file.ts";
 import {
+  githubCreatePullRequestOrThrow,
   githubFindUniquePullRequestForCommitOrThrow,
   githubFindUniquePullRequestFromBranchOrThrow,
+  githubUpdatePullRequestOrThrow,
 } from "./pull-request.ts";
 import {
   githubGetCommitPathPart,
@@ -27,6 +29,7 @@ import {
 } from "./tag.ts";
 import { getOctokitClient, OctokitClient } from "./octokit.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
+import { githubGetOperationContextOrThrow } from "./operation.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -64,6 +67,7 @@ export function createGitHubProvider(): PlatformProvider {
     getRepositoryName: githubGetRepositoryName,
     getCommitPathPart: githubGetCommitPathPart,
     getReferencePathPart: githubGetReferencePathPart,
+    getOperationContextOrThrow: githubGetOperationContextOrThrow,
 
     getCompareTagUrl: githubGetCompareTagUrl,
 
@@ -112,6 +116,7 @@ export function createGitHubProvider(): PlatformProvider {
     findUniquePullRequestForCommitOrThrow: async (
       commitHash: string,
       sourceBranch: string,
+      targetBranch: string,
       label: string,
     ) => {
       const { octokit } = ensureProviderContextOrThrow();
@@ -119,18 +124,21 @@ export function createGitHubProvider(): PlatformProvider {
         octokit,
         commitHash,
         sourceBranch,
+        targetBranch,
         label,
       );
     },
 
     findUniquePullRequestFromBranchOrThrow: async (
       branchName: string,
+      targetBranch: string,
       requiredLabel: string,
     ) => {
       const { octokit } = ensureProviderContextOrThrow();
       return await githubFindUniquePullRequestFromBranchOrThrow(
         octokit,
         branchName,
+        targetBranch,
         requiredLabel,
       );
     },
@@ -152,6 +160,35 @@ export function createGitHubProvider(): PlatformProvider {
           message,
           workingBranchName,
         },
+      );
+    },
+
+    createPullRequestOrThrow: async (
+      sourceBranch: string,
+      targetBranch: string,
+      title: string,
+      body: string,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubCreatePullRequestOrThrow(
+        octokit,
+        sourceBranch,
+        targetBranch,
+        title,
+        body,
+      );
+    },
+    updatePullRequestOrThrow: async (
+      number: number,
+      title: string,
+      body: string,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubUpdatePullRequestOrThrow(
+        octokit,
+        number,
+        title,
+        body,
       );
     },
 

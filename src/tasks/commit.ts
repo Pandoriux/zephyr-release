@@ -18,7 +18,8 @@ import { prepareChangelogFileToCommit } from "./changelog.ts";
 import { localFilesToCommitOptions } from "../constants/local-files-to-commit-options.ts";
 import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
-import { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -296,31 +297,42 @@ export async function prepareChangesToCommit(
   return changesData;
 }
 
+interface CommitChangesConfigParams {
+  pullRequest: Pick<
+    PullRequestConfigOutput,
+    | "titleTemplate"
+    | "titleTemplatePath"
+  >;
+}
+
 export async function commitChangesToBranch(
   provider: PlatformProvider,
-  commitData: {
+  options: {
     triggerCommitHash: string;
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
-    message: string;
     workingBranchName: string;
   },
-  associatedPrFromBranch: ProviderPullRequest,
+  config: CommitChangesConfigParams,
 ) {
   const {
     triggerCommitHash,
     baseTreeHash,
     changesToCommit,
-    message,
     workingBranchName,
-  } = commitData;
+  } = options;
+  const { titleTemplate } = config.pullRequest;
 
-  taskLogger.info("Pushing");
+  const commitMessage = await resolveStringTemplateOrThrow(titleTemplate);
+
+  taskLogger.info("Creating commit and pushing to working branch...");
   const createdCommit = await provider.createCommitOnBranchOrThrow(
     triggerCommitHash,
     baseTreeHash,
     changesToCommit,
-    message,
+    commitMessage,
     workingBranchName,
   );
+
+  return createdCommit;
 }

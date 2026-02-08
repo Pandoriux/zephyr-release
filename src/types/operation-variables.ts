@@ -10,6 +10,9 @@ export interface BaseOperationVariables
   config: string;
   internalConfig: string;
 
+  parsedTriggerCommit: string;
+  parsedTriggerCommitList: string;
+
   workingBranchName: string;
   workingBranchRef: string;
   workingBranchHash: string;
@@ -20,11 +23,11 @@ export interface BaseOperationVariables
 
 export interface DynamicOperationVariables {
   patternContext: string;
+  pullRequestNumber: number | undefined;
 }
 
 export interface PrePrepareOperationVariables {
-  triggerCommit: string; // maybe swicth this to base?
-  resolvedCommits: string;
+  resolvedCommitEntries: string;
 
   currentVersion: string;
   nextVersion: string;

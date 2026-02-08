@@ -56,10 +56,13 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> label (Optional)](#pull--label-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
     - [pull... \> title-template (Optional)](#pull--title-template-optional)
+    - [pull... \> title-template-path (Optional)](#pull--title-template-path-optional)
     - [pull... \> header-template (Optional)](#pull--header-template-optional)
+    - [pull... \> header-template-path (Optional)](#pull--header-template-path-optional)
     - [pull... \> body-template (Optional)](#pull--body-template-optional)
     - [pull... \> body-template-path (Optional)](#pull--body-template-path-optional)
     - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
+    - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> skip-release (Optional)](#release--skip-release-optional)
@@ -369,7 +372,7 @@ Path to text file containing changelog release body override, will take preceden
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
+**Properties:** [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`title-template-path`](#pull--title-template-path-optional), [`header-template`](#pull--header-template-optional), [`header-template-path`](#pull--header-template-path-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional), [`footer-template-path`](#pull--footer-template-path-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
 
@@ -419,12 +422,24 @@ Default: `"chore: release v${version}"`
 
 String template for pull request title, using with string patterns like `${version}`.
 
+#### pull... > title-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request title template. Overrides `title-template` when both are provided.
+
 #### pull... > header-template (Optional)
 
 Type: `string | string[]`  
 Default: `"🤖 New release created. Stand by for approval"`
 
 String template for pull request header, using with string patterns like `${version}`. If an array is provided, it will randomly choose one from it.
+
+#### pull... > header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request header template. Overrides `header-template` when both are provided.
 
 #### pull... > body-template (Optional)
 
@@ -437,7 +452,7 @@ String template for pull request body, using with string patterns like `${change
 
 Type: `string`
 
-Path to text file containing pull request body template. Overrides body template if both are provided.
+Path to text file containing pull request body template. Overrides `body-template` when both are provided.
 
 #### pull... > footer-template (Optional)
 
@@ -445,6 +460,12 @@ Type: `string`
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
 String template for pull request footer, using with string patterns.
+
+#### pull... > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.
 
 ### release (Optional)
 

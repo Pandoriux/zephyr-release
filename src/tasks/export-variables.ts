@@ -1,9 +1,11 @@
+import type { OperationContext } from "../types/operation-context.ts";
 import type {
   BaseOperationVariables,
   DynamicOperationVariables,
   PrePrepareOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
+import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import {
   toExportEnvVarKey,
   toExportOutputKey,
@@ -11,6 +13,7 @@ import {
 import { jsonValueNormalizer } from "../utils/transformers/json.ts";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { NextVersionResult } from "./calculate-next-version/next-version.ts";
+import type { ResolvedCommit } from "./commit.ts";
 import type { ResolveConfigResult } from "./config.ts";
 import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
@@ -18,19 +21,30 @@ import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
-  workingBranchResult: WorkingBranchResult,
-  isCommitPr: boolean,
-  workingPrExist: boolean,
-  inputsResult: GetInputsResult,
-  configResult: ResolveConfigResult,
+  options: {
+    operationContext: OperationContext;
+    workingBranchResult: WorkingBranchResult;
+    prForCommit: ProviderPullRequest | undefined;
+    prFromBranch: ProviderPullRequest | undefined;
+    inputsResult: GetInputsResult;
+    configResult: ResolveConfigResult;
+  },
 ) {
+  const {
+    operationContext,
+    workingBranchResult,
+    prForCommit,
+    prFromBranch,
+    inputsResult,
+    configResult,
+  } = options;
   const { rawInputs, inputs } = inputsResult;
   const { rawConfig, config } = configResult;
 
-  const resolvedTarget = isCommitPr ? "release" : "prepare";
+  const resolvedTarget = prForCommit ? "release" : "prepare";
   const resolvedJob = resolvedTarget === "release"
     ? "create-release"
-    : workingPrExist
+    : prFromBranch
     ? "update-pr"
     : "create-pr";
 
@@ -45,6 +59,11 @@ export async function exportBaseOperationVariables(
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
+    parsedTriggerCommit: JSON.stringify(
+      operationContext.latestTriggerCommit.commit,
+    ),
+    parsedTriggerCommitList: JSON.stringify(operationContext.triggerCommits),
+
     workingBranchName: workingBranchResult.name,
     workingBranchRef: workingBranchResult.ref,
     workingBranchHash: workingBranchResult.object.sha,
@@ -52,6 +71,9 @@ export async function exportBaseOperationVariables(
     target: resolvedTarget,
     job: resolvedJob,
 
+    pullRequestNumber: resolvedTarget === "prepare"
+      ? prFromBranch?.number
+      : prForCommit?.number,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies BaseOperationVariables & DynamicOperationVariables;
 
@@ -71,20 +93,19 @@ export async function exportBaseOperationVariables(
 
 export async function exportPrePrepareOperationVariables(
   provider: PlatformProvider,
-  // resolvedCommitsResult: ResolvedCommitsResult, // TODO: accept trigger commit data obj
+  resolvedCommitEntries: ResolvedCommit[],
   nextVersionResult: NextVersionResult,
 ) {
   const prepareExportObject = {
-    // triggerCommit: resolvedCommitsResult.raw, // need raw
-    // resolvedCommits: JSON.stringify(resolvedCommitsResult.entries),
-    triggerCommit: "to-do",
-    resolvedCommits: "to-do",
+    resolvedCommitEntries: JSON.stringify(resolvedCommitEntries),
 
-    currentVersion: nextVersionResult.currentVersionStr,
-    nextVersion: nextVersionResult.str,
+    currentVersion: nextVersionResult.currentVerStr,
+    nextVersion: nextVersionResult.nextVerStr,
 
     patternContext: await stringifyCurrentPatternContext(),
-  } satisfies PrePrepareOperationVariables & DynamicOperationVariables;
+  } satisfies
+    & PrePrepareOperationVariables
+    & Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(

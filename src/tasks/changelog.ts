@@ -7,7 +7,7 @@ import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { ChangelogReleaseEntryPattern } from "../constants/string-patterns.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import { CHANGELOG_MARKERS } from "../constants/changelog-markers.ts";
+import { CHANGELOG_MARKERS } from "../constants/markers.ts";
 
 type GenerateChangelogReleaseInputsParams = Pick<
   InputsOutput,
@@ -33,12 +33,17 @@ type GenerateChangelogReleaseConfigParams =
     >;
   };
 
+export interface GenerateChangelogReleaseResult {
+  release: string;
+  releaseBody: string;
+}
+
 export async function generateChangelogReleaseContent(
   provider: PlatformProvider,
   resolvedCommits: ResolvedCommit[],
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<string> {
+): Promise<GenerateChangelogReleaseResult> {
   const { workspacePath, sourceMode } = inputs;
   const {
     // commitTypes,
@@ -60,7 +65,7 @@ export async function generateChangelogReleaseContent(
   let releaseHeader: string;
   if (releaseHeaderTemplatePath) {
     const headerTemplate = await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogReleaseHeaderTemplatePath ?? sourceMode.sourceMode,
       releaseHeaderTemplatePath,
       { provider, workspace: workspacePath },
     );
@@ -74,7 +79,7 @@ export async function generateChangelogReleaseContent(
   let releaseFooter: string | undefined;
   if (releaseFooterTemplatePath) {
     const footerTemplate = await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogReleaseFooterTemplatePath ?? sourceMode.sourceMode,
       releaseFooterTemplatePath,
       { provider, workspace: workspacePath },
     );
@@ -103,7 +108,10 @@ export async function generateChangelogReleaseContent(
     );
   }
 
-  return [releaseHeader, releaseBody, releaseFooter].join("\n\n");
+  return {
+    release: [releaseHeader, releaseBody, releaseFooter].join("\n\n"),
+    releaseBody,
+  };
 }
 
 async function generateReleaseBody(
@@ -147,7 +155,7 @@ async function generateReleaseBody(
 
   const sectionEntryTemplate = releaseSectionEntryTemplatePath
     ? await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogReleaseSectionEntryTemplatePath ?? sourceMode.sourceMode,
       releaseSectionEntryTemplatePath,
       { provider, workspace: workspacePath },
     )
@@ -155,7 +163,7 @@ async function generateReleaseBody(
 
   const breakingSectionEntryTemplate = releaseBreakingSectionEntryTemplatePath
     ? await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogReleaseBreakingSectionEntryTemplatePath ?? sourceMode.sourceMode,
       releaseBreakingSectionEntryTemplatePath,
       { provider, workspace: workspacePath },
     )
@@ -260,7 +268,7 @@ export async function prepareChangelogFileToCommit(
   let header: string;
   if (fileHeaderTemplatePath) {
     const headerTemplate = await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogFileHeaderTemplatePath ?? sourceMode.sourceMode,
       fileHeaderTemplatePath,
       { provider, workspace: workspacePath },
     );
@@ -270,7 +278,7 @@ export async function prepareChangelogFileToCommit(
   let footer: string | undefined;
   if (fileFooterTemplatePath) {
     const footerTemplate = await getTextFileOrThrow(
-      sourceMode.sourceMode,
+      sourceMode.changelogFileFooterTemplatePath ?? sourceMode.sourceMode,
       fileFooterTemplatePath,
       { provider, workspace: workspacePath },
     );

@@ -69,7 +69,23 @@ Example: `{"source-mode": "local", "version-files": "local", "changelog": "remot
 
 - `version-files`: Either `"local"` or `"remote"`, or an **object** with keys as version file path strings and values as `"local"` or `"remote"`. Any file paths not listed fall back to the default `source-mode` value.  
   More about version file config in [config-options.md](./config-options.md#version-files-required)
+
+<br/>
+
 - `changelog-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file](./config-options.md#changelog--path-optional) is read from the local filesystem or remote repository.
 - `changelog-release-body-override-path`: Either `"local"` or `"remote"`. Controls whether the [changelog content body override file](./config-options.md#changelog--release-body-override-path-optional) is read from the local filesystem or remote repository.
+- `changelog-file-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file header template file](./config-options.md#changelog--file-header-template-path-optional) is read from the local filesystem or remote repository.
+- `changelog-file-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file footer template file](./config-options.md#changelog--file-footer-template-path-optional) is read from the local filesystem or remote repository.
+- `changelog-release-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release header template file](./config-options.md#changelog--release-header-template-path-optional) is read from the local filesystem or remote repository.
+- `changelog-release-section-entry-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release section entry template file](./config-options.md#changelog--release-section-entry-template-path-optional) is read from the local filesystem or remote repository.
+- `changelog-release-breaking-section-entry-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release breaking section entry template file](./config-options.md#changelog--release-breaking-section-entry-template-path-optional) is read from the local filesystem or remote repository.
+- `changelog-release-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release footer template file](./config-options.md#changelog--release-footer-template-path-optional) is read from the local filesystem or remote repository.
+
+<br/>
+
+- `pr-title-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request title template file](./config-options.md#pull--title-template-path-optional) is read from the local filesystem or remote repository.
+- `pr-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request header template file](./config-options.md#pull--header-template-path-optional) is read from the local filesystem or remote repository.
+- `pr-body-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request body template file](./config-options.md#pull--body-template-path-optional) is read from the local filesystem or remote repository.
+- `pr-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request footer template file](./config-options.md#pull--footer-template-path-optional) is read from the local filesystem or remote repository.
 
 > **Important:** If `source-mode` is set to `local` (globally or for a specific operation), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.

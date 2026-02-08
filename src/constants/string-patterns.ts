@@ -38,9 +38,15 @@ const FixedVersionStringPatterns = {
 export type FixedVersionStringPattern =
   typeof FixedVersionStringPatterns[keyof typeof FixedVersionStringPatterns];
 
-const undecided = {
-  changelog: "changelog", // ${changelog}
-};
+const DynamicChangelogStringPatterns = {
+  changelogRelease: "changelogRelease",
+  changelogReleaseBody: "changelogReleaseBody",
+} as const;
+
+export type DynamicChangelogStringPattern =
+  typeof DynamicChangelogStringPatterns[
+    keyof typeof DynamicChangelogStringPatterns
+  ];
 
 const ChangelogReleaseEntryPatterns = {
   hash: "hash",

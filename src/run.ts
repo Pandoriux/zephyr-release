@@ -12,10 +12,11 @@ import {
 import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
 import { prepareWorkflow } from "./workflows/prepare.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
-import { manageConcurrency } from "./tasks/concurrency.ts";
+import { manageConcurrencyOrExit } from "./tasks/concurrency.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
+import { validateCurrentOperationCtxOrExit } from "./tasks/operation.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -28,13 +29,20 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Manage concurrency");
-  await manageConcurrency(provider);
+  await manageConcurrencyOrExit(provider);
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
   const configResult = await resolveConfigOrThrow(provider, inputs);
   const { rawConfig, config } = configResult;
   logger.stepFinish("Finished: Resolve config from file and override");
+
+  logger.stepStart("Starting: Parse and validate current operation context");
+  const operationContext = validateCurrentOperationCtxOrExit(
+    provider,
+    config.commitTypes,
+  );
+  logger.stepFinish("Finished: Parse and validate current operation context");
 
   logger.stepStart("Starting: Register transformers to template engine");
   registerTransformersToTemplateEngine(provider);
@@ -70,6 +78,7 @@ export async function run(provider: PlatformProvider) {
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
     workingBranchResult.name,
+    inputs,
     config,
   );
   logger.stepFinish(
@@ -77,14 +86,14 @@ export async function run(provider: PlatformProvider) {
   );
 
   logger.debugStepStart("Starting: Export base operation variables");
-  await exportBaseOperationVariables(
-    provider,
+  await exportBaseOperationVariables(provider, {
+    operationContext,
     workingBranchResult,
-    Boolean(associatedPrForCommit),
-    Boolean(associatedPrFromBranch),
+    prForCommit: associatedPrForCommit,
+    prFromBranch: associatedPrFromBranch,
     inputsResult,
     configResult,
-  );
+  });
   logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
@@ -100,6 +109,7 @@ export async function run(provider: PlatformProvider) {
     await prepareWorkflow(provider, {
       workingBranchResult,
       associatedPrFromBranch,
+      operationContext,
       inputs,
       config,
     });

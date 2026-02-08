@@ -2,6 +2,7 @@ import process from "node:process";
 import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import { taskLogger } from "../../tasks/logger.ts";
+import { SafeExit } from "../../errors/safe-exit.ts";
 
 export async function githubManageConcurrency(
   octokit: OctokitClient,
@@ -56,7 +57,7 @@ export async function githubManageConcurrency(
           run_id: wfRun.id,
         });
       } else {
-        throw new Error(
+        throw new SafeExit(
           `Workflow run '${wfRun.id}' is newer than current run (${currentRunId}). This instance is obsolete.`,
         );
       }
