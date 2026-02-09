@@ -1,10 +1,12 @@
 import type { ParserOptions } from "conventional-commits-parser";
-import type { CoreLogger } from "../logger.ts";
 import type { ProviderBranch } from "./branch.ts";
-import type { ProviderCommit } from "./commit.ts";
+import type { ProviderLabel } from "./label.ts";
+import type { CoreLogger } from "../logger.ts";
+import type { ProviderCommit, ProviderWorkingCommit } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
+import type { ProviderOperationContext } from "../operation-context.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
@@ -19,6 +21,7 @@ export interface PlatformProvider {
   getRepositoryName: () => string;
   getCommitPathPart: () => string;
   getReferencePathPart: () => string;
+  getOperationContextOrThrow: () => ProviderOperationContext;
 
   getCompareTagUrl: (tag1: string, tag2: string) => string;
   getCompareTagUrlFromCurrentToLatest: (
@@ -30,7 +33,7 @@ export interface PlatformProvider {
 
   getTextFileOrThrow: (filePath: string) => Promise<string>;
 
-  ensureBranchAtCommitOrThrow: (
+  ensureBranchExistOrThrow: (
     branchName: string,
     commitHash: string,
   ) => Promise<ProviderBranch>;
@@ -42,15 +45,44 @@ export interface PlatformProvider {
   findUniquePullRequestForCommitOrThrow: (
     commitHash: string,
     sourceBranch: string,
+    targetBranch: string,
     label: string,
   ) => Promise<ProviderPullRequest | undefined>;
 
   findUniquePullRequestFromBranchOrThrow: (
     branchName: string,
+    targetBranch: string,
     requiredLabel: string,
   ) => Promise<ProviderPullRequest | undefined>;
 
-  exportVariables: (exportObj: Record<string, unknown>) => void;
+  createCommitOnBranchOrThrow: (
+    triggerCommitHash: string,
+    baseTreeHash: string,
+    changesToCommit: Map<string, string>,
+    message: string,
+    workingBranchName: string,
+  ) => Promise<ProviderWorkingCommit>;
+
+  createPullRequestOrThrow: (
+    sourceBranch: string,
+    targetBranch: string,
+    title: string,
+    body: string,
+  ) => Promise<ProviderPullRequest>;
+  updatePullRequestOrThrow: (
+    number: number,
+    title: string,
+    body: string,
+  ) => Promise<ProviderPullRequest>;
+
+  addLabelsToPullRequestOrThrow: (
+    prNumber: number,
+    labels: ProviderLabel[],
+    optionalLabels?: string[],
+  ) => Promise<void>;
+
+  exportOutputs: (k: string, v: string | number | null | undefined) => void;
+  exportEnvVars: (k: string, v: string | number | null | undefined) => void;
 
   getConventionalCommitParserOptions: () => ParserOptions;
 }

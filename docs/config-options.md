@@ -18,6 +18,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
+  - [local-files-to-commit (Optional)](#local-files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
@@ -51,15 +52,17 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
-    - [pull... \> files-to-commit (Optional)](#pull--files-to-commit-optional)
     - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
     - [pull... \> label (Optional)](#pull--label-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
     - [pull... \> title-template (Optional)](#pull--title-template-optional)
+    - [pull... \> title-template-path (Optional)](#pull--title-template-path-optional)
     - [pull... \> header-template (Optional)](#pull--header-template-optional)
+    - [pull... \> header-template-path (Optional)](#pull--header-template-path-optional)
     - [pull... \> body-template (Optional)](#pull--body-template-optional)
     - [pull... \> body-template-path (Optional)](#pull--body-template-path-optional)
     - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
+    - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> skip-release (Optional)](#release--skip-release-optional)
@@ -136,6 +139,12 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 See [`VersionFile`](#versionfile) for the type definition.
+
+### local-files-to-commit (Optional)
+
+Type: `string | string[]`
+
+Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
 
 ### commit-types (Optional)
 
@@ -363,7 +372,7 @@ Path to text file containing changelog release body override, will take preceden
 ### pull-request (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#pull--command-hook-optional), [`files-to-commit`](#pull--files-to-commit-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`header-template`](#pull--header-template-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional)
+**Properties:** [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`title-template-path`](#pull--title-template-path-optional), [`header-template`](#pull--header-template-optional), [`header-template-path`](#pull--header-template-path-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional), [`footer-template-path`](#pull--footer-template-path-optional)
 
 An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
 
@@ -374,12 +383,6 @@ Type: [`CommandHook`](#commandhook)
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-#### pull... > files-to-commit (Optional)
-
-Type: `string | string[]`
-
-Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
 
 #### pull... > branch-name-template (Optional)
 
@@ -419,12 +422,24 @@ Default: `"chore: release v${version}"`
 
 String template for pull request title, using with string patterns like `${version}`.
 
+#### pull... > title-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request title template. Overrides `title-template` when both are provided.
+
 #### pull... > header-template (Optional)
 
 Type: `string | string[]`  
 Default: `"🤖 New release created. Stand by for approval"`
 
 String template for pull request header, using with string patterns like `${version}`. If an array is provided, it will randomly choose one from it.
+
+#### pull... > header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request header template. Overrides `header-template` when both are provided.
 
 #### pull... > body-template (Optional)
 
@@ -437,7 +452,7 @@ String template for pull request body, using with string patterns like `${change
 
 Type: `string`
 
-Path to text file containing pull request body template. Overrides body template if both are provided.
+Path to text file containing pull request body template. Overrides `body-template` when both are provided.
 
 #### pull... > footer-template (Optional)
 
@@ -445,6 +460,12 @@ Type: `string`
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
 String template for pull request footer, using with string patterns.
+
+#### pull... > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.
 
 ### release (Optional)
 
@@ -608,4 +629,4 @@ Type: `object`
 
 - `name` (Required): Label name.
 - `description` (Optional): Label description.
-- `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
+- `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`

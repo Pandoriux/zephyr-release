@@ -1,19 +1,37 @@
 import { taskLogger } from "../../tasks/logger.ts";
 import type { ProviderBranch } from "../../types/providers/branch.ts";
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
-export async function githubEnsureBranchAtCommitOrThrow(
-  token: string,
+export async function githubEnsureBranchExistOrThrow(
+  octokit: OctokitClient,
   branchName: string,
   commitHash: string,
 ): Promise<ProviderBranch> {
-  const refForUpdate = `heads/${branchName}`;
-  const refForCreate = `refs/${refForUpdate}`;
+  const refForGet = `heads/${branchName}`;
+  const refForCreate = `refs/${refForGet}`;
 
-  const octokit = getOctokitClient(token);
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
+
+  try {
+    const existingRefRes = await octokit.rest.git.getRef({
+      owner,
+      repo,
+      ref: refForGet,
+    });
+
+    return existingRefRes.data;
+  } catch (error) {
+    // If the ref is missing (404), fall through and create it. Otherwise rethrow.
+    if (!isGitHubBranchNotFoundError(error)) {
+      throw error;
+    }
+
+    taskLogger.debug(
+      `Branch ${branchName} does not exist. Creating at ${commitHash}...`,
+    );
+  }
 
   try {
     const createRefRes = await octokit.rest.git.createRef({
@@ -25,24 +43,23 @@ export async function githubEnsureBranchAtCommitOrThrow(
 
     return createRefRes.data;
   } catch (error) {
-    // If it already exists (422), force update it instead
+    // In a race, the branch may have been created after our initial getRef call.
+    // If we now see "already exists", fetch and return the existing ref.
     if (isGitHubBranchAlreadyExistsError(error)) {
       taskLogger.debug(
-        `Branch ${branchName} exists. Force-resetting to ${commitHash}...`,
+        `Branch ${branchName} was created concurrently. Fetching existing reference...`,
       );
 
-      const updateRefRes = await octokit.rest.git.updateRef({
+      const existingRefRes = await octokit.rest.git.getRef({
         owner,
         repo,
-        ref: refForUpdate,
-        sha: commitHash,
-        force: true,
+        ref: refForGet,
       });
 
-      return updateRefRes.data;
-    } else {
-      throw error;
+      return existingRefRes.data;
     }
+
+    throw error;
   }
 }
 
@@ -89,4 +106,10 @@ function isGitHubBranchAlreadyExistsError(error: unknown): boolean {
   // GitHub API returns messages like "Reference already exists" or "Reference refs/heads/... already exists"
   const message = error.response.data.message.toLowerCase();
   return message.includes("reference") && message.includes("already exists");
+}
+
+function isGitHubBranchNotFoundError(error: unknown): boolean {
+  return typeof error === "object" && error !== null &&
+    "status" in error && typeof error.status === "number" &&
+    error.status === 404;
 }

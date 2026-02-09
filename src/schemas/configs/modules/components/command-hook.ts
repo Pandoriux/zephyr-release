@@ -36,7 +36,7 @@ export const CommandHookSchema = v.object({
       v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
     v.transform((input) => {
-      if (input) return Array.isArray(input) ? input : [input];
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
       return input;
     }),
     v.metadata({
@@ -49,7 +49,7 @@ export const CommandHookSchema = v.object({
       v.union([CommandSchema, v.pipe(v.array(CommandSchema), v.nonEmpty())]),
     ),
     v.transform((input) => {
-      if (input) return Array.isArray(input) ? input : [input];
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
       return input;
     }),
     v.metadata({

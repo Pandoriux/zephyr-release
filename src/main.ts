@@ -4,6 +4,7 @@ import { run } from "./run.ts";
 import { getProviderOrThrow } from "./providers/provider.ts";
 import { logger, setLogger } from "./tasks/logger.ts";
 import { formatErrorHierarchy } from "./utils/formatters/error.ts";
+import { SafeExit } from "./errors/safe-exit.ts";
 
 export const startTime = new Date();
 
@@ -18,18 +19,24 @@ async function main() {
 
     markProcessEnd("Finished");
   } catch (error) {
-    logger.setFailed(
-      "❌ Operation Failed! • An error occurred:\n" +
-        formatErrorHierarchy(error),
-    );
+    if (error instanceof SafeExit) {
+      logger.info(`ℹ️  ${error.message}`);
 
-    if (error instanceof Error && error.stack) {
-      logger.startGroup("Stack trace:");
-      logger.info(error.stack);
-      logger.endGroup();
+      markProcessEnd("Exit");
+    } else {
+      logger.setFailed(
+        "❌ Operation Failed! • An error occurred:\n" +
+          formatErrorHierarchy(error),
+      );
+
+      if (error instanceof Error && error.stack) {
+        logger.startGroup("Stack trace:");
+        logger.info(error.stack);
+        logger.endGroup();
+      }
+
+      markProcessEnd("Failed");
     }
-
-    markProcessEnd("Failed");
   }
 }
 

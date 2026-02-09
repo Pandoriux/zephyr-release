@@ -7,6 +7,9 @@ export const FixedBaseStringPatterns = {
   commitPathPart: "commitPathPart",
   referencePathPart: "referencePathPart",
 
+  triggerBranchName: "triggerBranchName",
+  workingBranchName: "workingBranchName",
+
   // Date Time components
   timeZone: "timeZone",
   timestamp: "timestamp",
@@ -35,9 +38,15 @@ const FixedVersionStringPatterns = {
 export type FixedVersionStringPattern =
   typeof FixedVersionStringPatterns[keyof typeof FixedVersionStringPatterns];
 
-const undecided = {
-  changelog: "changelog", // ${changelog}
-};
+const DynamicChangelogStringPatterns = {
+  changelogRelease: "changelogRelease",
+  changelogReleaseBody: "changelogReleaseBody",
+} as const;
+
+export type DynamicChangelogStringPattern =
+  typeof DynamicChangelogStringPatterns[
+    keyof typeof DynamicChangelogStringPatterns
+  ];
 
 const ChangelogReleaseEntryPatterns = {
   hash: "hash",
@@ -49,7 +58,6 @@ const ChangelogReleaseEntryPatterns = {
   isBreaking: "isBreaking",
 } as const;
 
-export type ChangelogReleaseEntryPattern =
-  typeof ChangelogReleaseEntryPatterns[
-    keyof typeof ChangelogReleaseEntryPatterns
-  ];
+export type ChangelogReleaseEntryPattern = typeof ChangelogReleaseEntryPatterns[
+  keyof typeof ChangelogReleaseEntryPatterns
+];

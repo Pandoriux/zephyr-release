@@ -1,6 +1,6 @@
 export const SourceModeOptions = {
-  "remote": "remote",
-  "local": "local",
+  remote: "remote",
+  local: "local",
 } as const;
 
 export type SourceModeOption =

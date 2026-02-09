@@ -67,6 +67,28 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
+  localFilesToCommit: v.pipe(
+    v.optional(
+      v.union([
+        trimNonEmptyStringSchema,
+        v.pipe(
+          v.array(trimNonEmptyStringSchema),
+          v.nonEmpty(),
+        ),
+      ]),
+    ),
+    v.transform((input) => {
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
+      return input;
+    }),
+    v.metadata({
+      description:
+        'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
+        "Paths are relative to the repo root.",
+      examples: ["ALL", ["some/path"], ["src/release-artifacts/*"]],
+    }),
+  ),
+
   commitTypes: v.pipe(
     v.optional(
       v.pipe(v.array(CommitTypeSchema), v.nonEmpty()),

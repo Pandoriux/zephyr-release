@@ -1,13 +1,11 @@
 import { Buffer } from "node:buffer";
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
 export async function githubGetTextFileOrThrow(
-  token: string,
+  octokit: OctokitClient,
   filePath: string,
 ): Promise<string> {
-  const octokit = getOctokitClient(token);
-
   const res = await octokit.rest.repos.getContent({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),

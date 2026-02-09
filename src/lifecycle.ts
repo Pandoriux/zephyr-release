@@ -8,7 +8,7 @@ export function markProcessStart() {
   );
 }
 
-export function markProcessEnd(reason: "Finished" | "Failed") {
+export function markProcessEnd(reason: "Finished" | "Failed" | "Exit") {
   const endTime = new Date();
 
   logger.info(

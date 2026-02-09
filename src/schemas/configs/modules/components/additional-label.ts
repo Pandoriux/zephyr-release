@@ -11,7 +11,7 @@ export const AdditionalLabelSchema = v.object({
       ]),
     ),
     v.transform((input) => {
-      if (input) return Array.isArray(input) ? input : [input];
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
       return input;
     }),
     v.metadata({
@@ -29,7 +29,7 @@ export const AdditionalLabelSchema = v.object({
       ]),
     ),
     v.transform((input) => {
-      if (input) return Array.isArray(input) ? input : [input];
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
       return input;
     }),
     v.metadata({
@@ -48,7 +48,7 @@ export const AdditionalLabelSchema = v.object({
       ]),
     ),
     v.transform((input) => {
-      if (input) return Array.isArray(input) ? input : [input];
+      if (input !== undefined) return Array.isArray(input) ? input : [input];
       return input;
     }),
     v.metadata({

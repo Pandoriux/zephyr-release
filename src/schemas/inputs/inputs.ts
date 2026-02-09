@@ -12,6 +12,11 @@ export const InputsSchema = v.pipe(
       v.trim(),
       v.nonEmpty("Commit hash not found"),
     ),
+    triggerBranchName: v.pipe(
+      v.string(),
+      v.trim(),
+      v.nonEmpty("Branch name not found"),
+    ),
     workspacePath: v.pipe(
       v.string(),
       v.trim(),

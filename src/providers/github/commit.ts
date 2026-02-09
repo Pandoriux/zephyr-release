@@ -1,7 +1,10 @@
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import type { ProviderCommit } from "../../types/providers/commit.ts";
+import type {
+  ProviderCommit,
+  ProviderWorkingCommit,
+} from "../../types/providers/commit.ts";
 
 const RawCommitNodeSchema = v.object({
   oid: v.string(),
@@ -18,11 +21,10 @@ const RawCommitNodeSchema = v.object({
 });
 
 export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
-  token: string,
+  octokit: OctokitClient,
   commitHash: string,
 ): Promise<ProviderCommit[]> {
   const collectedCommits: ProviderCommit[] = [];
-  const octokit = getOctokitClient(token);
 
   const paginatedIterator = octokit.graphql.paginate.iterator(
     `
@@ -95,4 +97,63 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
   }
 
   return collectedCommits;
+}
+
+export async function githubCreateCommitOnBranchOrThrow(
+  octokit: OctokitClient,
+  data: {
+    triggerCommitHash: string;
+    baseTreeHash: string;
+    changesToCommit: Map<string, string>;
+    message: string;
+    workingBranchName: string;
+  },
+): Promise<ProviderWorkingCommit> {
+  const {
+    triggerCommitHash,
+    baseTreeHash,
+    changesToCommit,
+    message,
+    workingBranchName,
+  } = data;
+
+  const owner = githubGetNamespace();
+  const repo = githubGetRepositoryName();
+
+  const newTreeItems = Array.from(changesToCommit, ([path, content]) => ({
+    path,
+    mode: "100644" as const,
+    type: "blob" as const,
+    content,
+  }));
+
+  const createTreeRes = await octokit.rest.git.createTree({
+    owner,
+    repo,
+    base_tree: baseTreeHash,
+    tree: newTreeItems,
+  });
+
+  // Explicitly linking to "parentSha" ensures the history is exactly what we expect
+  const createCommitRes = await octokit.rest.git.createCommit({
+    owner,
+    repo,
+    message,
+    tree: createTreeRes.data.sha,
+    parents: [triggerCommitHash],
+  });
+
+  // We are effectively "overwriting" the branch history with this new timeline.
+  await octokit.rest.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${workingBranchName}`,
+    sha: createCommitRes.data.sha,
+    force: true,
+  });
+
+  return {
+    workingCommitHash: createCommitRes.data.sha,
+    workingTreeHash: createTreeRes.data.sha,
+  };
 }

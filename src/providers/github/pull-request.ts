@@ -1,116 +1,246 @@
-import { getOctokitClient } from "./octokit.ts";
+import type { OctokitClient } from "./octokit.ts";
+import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
-import { taskLogger } from "../../tasks/logger.ts";
+
+const RawPullRequestNodeSchema = v.object({
+  number: v.number(),
+  headRefName: v.string(),
+  baseRefName: v.string(),
+  state: v.string(),
+  labels: v.object({
+    nodes: v.array(
+      v.object({
+        name: v.string(),
+      }),
+    ),
+  }),
+});
+
+const RawCommitPullRequestsSchema = v.object({
+  repository: v.object({
+    object: v.nullable(
+      v.object({
+        associatedPullRequests: v.object({
+          nodes: v.array(RawPullRequestNodeSchema),
+          pageInfo: v.object({
+            hasNextPage: v.boolean(),
+            endCursor: v.string(),
+          }),
+        }),
+      }),
+    ),
+  }),
+});
+
+const RawBranchPullRequestsSchema = v.object({
+  repository: v.object({
+    pullRequests: v.object({
+      nodes: v.array(RawPullRequestNodeSchema),
+      pageInfo: v.object({
+        hasNextPage: v.boolean(),
+        endCursor: v.string(),
+      }),
+    }),
+  }),
+});
 
 export async function githubFindUniquePullRequestForCommitOrThrow(
-  token: string,
+  octokit: OctokitClient,
   commitHash: string,
   sourceBranch: string,
+  targetBranch: string,
   requiredLabel: string,
 ): Promise<ProviderPullRequest | undefined> {
   let foundPr: ProviderPullRequest | undefined = undefined;
-  const orphanPrs: number[] = [];
 
-  const octokit = getOctokitClient(token);
-  const paginatedIterator = octokit.paginate.iterator(
-    octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+  const owner = githubGetNamespace();
+  const repo = githubGetRepositoryName();
+
+  const paginatedIterator = octokit.graphql.paginate.iterator(
+    `
+    query getPullRequestsForCommit($owner: String!, $repo: String!, $sha: GitObjectID!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        object(oid: $sha) {
+          ... on Commit {
+            associatedPullRequests(first: 100, after: $cursor) @paginate {
+              nodes {
+                number
+                headRefName
+                baseRefName
+                state
+                labels(first: 100) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
     {
-      owner: githubGetNamespace(),
-      repo: githubGetRepositoryName(),
-      commit_sha: commitHash,
-      per_page: 100,
+      owner,
+      repo,
+      sha: commitHash,
     },
   );
 
-  for await (const res of paginatedIterator) {
-    for (const pr of res.data) {
-      if (pr.head.ref !== sourceBranch) continue;
+  for await (const response of paginatedIterator) {
+    const rawResponse = v.parse(RawCommitPullRequestsSchema, response, {
+      message: "Received malformed pull request data from GitHub GraphQL API",
+    });
 
-      const hasLabel = pr.labels.some((l) => l.name === requiredLabel);
+    const commitObject = rawResponse.repository.object;
+    if (!commitObject || commitObject === null) {
+      continue;
+    }
+
+    for (const pr of commitObject.associatedPullRequests.nodes) {
+      if (pr.headRefName !== sourceBranch || pr.baseRefName !== targetBranch) {
+        continue;
+      }
+
+      const hasLabel = pr.labels.nodes.some((l) => l.name === requiredLabel);
       if (hasLabel) {
         if (foundPr) {
           throw new Error(
-            `Multiple PRs with label '${requiredLabel}' found while searching for PRs on branch '${sourceBranch}' associated with commit ${
+            `Multiple PRs with label '${requiredLabel}' found while searching for PRs on branch '${sourceBranch}' targeting '${targetBranch}' associated with commit ${
               commitHash.substring(0, 7)
             }`,
           );
         }
 
         foundPr = {
-          sourceBranch: pr.head.ref,
-          targetBranch: pr.base.ref,
-          label: { name: requiredLabel },
+          number: pr.number,
+          sourceBranch: pr.headRefName,
+          targetBranch: pr.baseRefName,
         };
-      } else {
-        // ORPHAN PRs
-        orphanPrs.push(pr.number);
       }
     }
-  }
-
-  if (orphanPrs.length > 0) {
-    taskLogger.warn(
-      `Detected ${orphanPrs.length} "orphan" PRs (#${
-        orphanPrs.join(", #")
-      }) on branch '${sourceBranch}' without the '${requiredLabel}' label while searching PRs associated with commit ${
-        commitHash.substring(0, 7)
-      }. These were ignored`,
-    );
   }
 
   return foundPr;
 }
 
 export async function githubFindUniquePullRequestFromBranchOrThrow(
-  token: string,
+  octokit: OctokitClient,
   branchName: string,
+  targetBranch: string,
   requiredLabel: string,
 ): Promise<ProviderPullRequest | undefined> {
   let foundPr: ProviderPullRequest | undefined = undefined;
-  const orphanPrs: number[] = [];
 
-  const octokit = getOctokitClient(token);
   const owner = githubGetNamespace();
-  const paginatedIterator = octokit.paginate.iterator(
-    octokit.rest.pulls.list,
+  const repo = githubGetRepositoryName();
+
+  const paginatedIterator = octokit.graphql.paginate.iterator(
+    `
+    query getPullRequestsFromBranch($owner: String!, $repo: String!, $headRefName: String!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequests(first: 100, after: $cursor, states: [OPEN], headRefName: $headRefName) @paginate {
+          nodes {
+            number
+            headRefName
+            baseRefName
+            state
+            labels(first: 100) {
+              nodes {
+                name
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  `,
     {
-      owner: owner,
-      repo: githubGetRepositoryName(),
-      head: `${owner}:${branchName}`,
-      per_page: 100,
+      owner,
+      repo,
+      headRefName: branchName,
     },
   );
 
-  for await (const res of paginatedIterator) {
-    for (const pr of res.data) {
-      const hasLabel = pr.labels.some((l) => l.name === requiredLabel);
+  for await (const response of paginatedIterator) {
+    const rawResponse = v.parse(RawBranchPullRequestsSchema, response, {
+      message: "Received malformed pull request data from GitHub GraphQL API",
+    });
+
+    for (const pr of rawResponse.repository.pullRequests.nodes) {
+      if (pr.baseRefName !== targetBranch) {
+        continue;
+      }
+
+      const hasLabel = pr.labels.nodes.some((l) => l.name === requiredLabel);
       if (hasLabel) {
         if (foundPr) {
           throw new Error(
-            `Multiple PRs with label '${requiredLabel}' found while searching for PRs originating from branch '${branchName}'`,
+            `Multiple PRs with label '${requiredLabel}' found while searching for PRs originating from branch '${branchName}' targeting '${targetBranch}'`,
           );
         }
 
         foundPr = {
-          sourceBranch: pr.head.ref,
-          targetBranch: pr.base.ref,
-          label: { name: requiredLabel },
+          number: pr.number,
+          sourceBranch: pr.headRefName,
+          targetBranch: pr.baseRefName,
         };
-      } else {
-        // ORPHAN PRs
-        orphanPrs.push(pr.number);
       }
     }
   }
 
-  if (orphanPrs.length > 0) {
-    taskLogger.warn(
-      `Detected ${orphanPrs.length} "orphan" PRs (#${
-        orphanPrs.join(", #")
-      }) originating from branch '${branchName}' without the '${requiredLabel}' label while listing PRs from that branch. These were ignored`,
-    );
-  }
-
   return foundPr;
+}
+
+export async function githubCreatePullRequestOrThrow(
+  octokit: OctokitClient,
+  sourceBranch: string,
+  targetBranch: string,
+  title: string,
+  body: string,
+): Promise<ProviderPullRequest> {
+  const res = await octokit.rest.pulls.create({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    head: sourceBranch,
+    base: targetBranch,
+    title,
+    body,
+  });
+
+  return {
+    number: res.data.number,
+    sourceBranch: res.data.head.ref,
+    targetBranch: res.data.base.ref,
+  };
+}
+
+export async function githubUpdatePullRequestOrThrow(
+  octokit: OctokitClient,
+  number: number,
+  title: string,
+  body: string,
+): Promise<ProviderPullRequest> {
+  const res = await octokit.rest.pulls.update({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    pull_number: number,
+    title,
+    body,
+  });
+
+  return {
+    number: res.data.number,
+    sourceBranch: res.data.head.ref,
+    targetBranch: res.data.base.ref,
+  }
 }

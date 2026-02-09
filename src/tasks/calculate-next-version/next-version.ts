@@ -29,8 +29,9 @@ type CalculateNextVersionConfigParams = Pick<
 >;
 
 export interface NextVersionResult {
-  str: string;
-  semver: SemVer;
+  nextVerStr: string;
+  nextVerSemVer: SemVer;
+  currentVerStr: string;
 }
 
 export async function calculateNextVersion(
@@ -50,15 +51,6 @@ export async function calculateNextVersion(
     bumpStrategy,
   } = config;
 
-  const manualReleaseAsVersion = resolveManualReleaseAsVersion(
-    resolvedTriggerCommit,
-    commitTypes,
-    allowReleaseAs,
-  );
-  if (manualReleaseAsVersion) {
-    return manualReleaseAsVersion;
-  }
-
   taskLogger.info("Getting current version from primary version files...");
   const primaryVersionFile = getPrimaryVersionFile(versionFiles);
   const primaryVersion = await getVersionStringFromVersionFile(
@@ -73,6 +65,17 @@ export async function calculateNextVersion(
     throw new Error(
       `Current version '${currentVersion}' from is not a valid semver object`,
     );
+  }
+
+  taskLogger.info("Checking if there is release-as trigger...");
+  const manualReleaseAsVersion = resolveManualReleaseAsVersion(
+    currentVersion,
+    resolvedTriggerCommit,
+    commitTypes,
+    allowReleaseAs,
+  );
+  if (manualReleaseAsVersion) {
+    return manualReleaseAsVersion;
   }
 
   taskLogger.info(`Current version got from version file is ${currentVersion}`);
@@ -102,12 +105,14 @@ export async function calculateNextVersion(
   taskLogger.info(`Final calculated next version: ${finalVersion}`);
 
   return {
-    str: finalVersion,
-    semver: finalSemVer,
+    nextVerStr: finalVersion,
+    nextVerSemVer: finalSemVer,
+    currentVerStr: currentVersion,
   };
 }
 
 function resolveManualReleaseAsVersion(
+  currentVersionStr: string,
   triggerCommit: Commit,
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
   allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
@@ -138,8 +143,9 @@ function resolveManualReleaseAsVersion(
   const semver = parse(releaseAsNote.text);
 
   return {
-    str: format(semver),
-    semver,
+    nextVerStr: format(semver),
+    nextVerSemVer: semver,
+    currentVerStr: currentVersionStr,
   };
 }
 

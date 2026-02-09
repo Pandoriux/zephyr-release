@@ -50,6 +50,13 @@
     }
   ],
 
+  // Ex: Include additional files using "ALL" option when creating pull request
+  "local-files-to-commit": "ALL",
+  // Ex: Include specific paths/globs
+  // "local-files-to-commit": ["docs/**/*.md", "dist/**"],
+  // Ex: Single path
+  // "local-files-to-commit": ["CHANGELOG.md"],
+
   "commit-types": [
     {
       "type": "feat",
@@ -145,13 +152,6 @@
       "pre": [],
       "post": ["npm run notify:pr"]
     },
-
-    // Ex: Include additional files using "ALL" option
-    "files-to-commit": "ALL",
-    // Ex: Include specific paths/globs
-    // "files-to-commit": ["docs/**/*.md", "dist/**"],
-    // Ex: Single path
-    // "files-to-commit": ["CHANGELOG.md"],
 
     "branch-name-pattern": "release/zephyr-release",
 

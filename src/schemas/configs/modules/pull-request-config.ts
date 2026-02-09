@@ -2,7 +2,6 @@ import * as v from "@valibot/valibot";
 import { CommandHookSchema } from "./components/command-hook.ts";
 import { CoreLabelSchema } from "./components/core-label.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
-import { filesToCommitOptions } from "../../../constants/files-to-commit-options.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
   DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
@@ -20,34 +19,13 @@ export const PullRequestConfigSchema = v.pipe(
           "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.",
       }),
     ),
-    filesToCommit: v.pipe(
-      v.optional(
-        v.union([
-          trimNonEmptyStringSchema,
-          v.pipe(
-            v.array(trimNonEmptyStringSchema),
-            v.nonEmpty(),
-          ),
-        ]),
-      ),
-      v.transform((input) => {
-        if (input) return Array.isArray(input) ? input : [input];
-        return input;
-      }),
-      v.metadata({
-        description:
-          'Additional local files to include in the commit. Accepts "ALL" options or an array of paths/globs. ' +
-          "Paths are relative to the repo root.",
-        examples: ["ALL", ["some/path"], ["src/release-artifacts/*"]],
-      }),
-    ),
 
     branchNameTemplate: v.pipe(
       v.optional(trimNonEmptyStringSchema, "release/zephyr-release"),
       v.metadata({
         description:
           "String template for branch name that Zephyr Release uses.\n" +
-          'Allowed patterns to use are: "${name}", "${namespace}", "${repository}"\n' +
+          "Allowed patterns to use are: all fixed base string patterns.\n" +
           'Default: "release/zephyr-release"',
       }),
     ),
@@ -77,6 +55,13 @@ export const PullRequestConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_TEMPLATE)}`,
       }),
     ),
+    titleTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.",
+      }),
+    ),
     headerTemplate: v.pipe(
       v.optional(
         v.union([v.string(), v.pipe(v.array(v.string()), v.nonEmpty())]),
@@ -87,6 +72,13 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "String template for pull request header, using with string patterns like ${version}. If an array is provided, one will be randomly chosen.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
+      }),
+    ),
+    headerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -101,7 +93,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request body template. Overrides body template if both are provided.",
+          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.",
       }),
     ),
     footerTemplate: v.pipe(
@@ -110,6 +102,13 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "String template for pull request footer, using with string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE)}`,
+      }),
+    ),
+    footerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.",
       }),
     ),
   }),

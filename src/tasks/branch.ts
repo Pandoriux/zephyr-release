@@ -16,25 +16,30 @@ interface SetupWorkingBranchConfigParams {
   };
 }
 
+export type WorkingBranchResult = ProviderBranch & { name: string };
+
 export async function setupWorkingBranchOrThrow(
   provider: PlatformProvider,
   inputs: SetupWorkingBranchInputsParams,
   config: SetupWorkingBranchConfigParams,
-): Promise<ProviderBranch> {
+): Promise<WorkingBranchResult> {
   const { triggerCommitHash } = inputs;
   const branchName = await resolveStringTemplateOrThrow(
     config.pullRequest.branchNameTemplate,
   );
 
-  const workBranch = await provider.ensureBranchAtCommitOrThrow(
+  const workingBranch = await provider.ensureBranchExistOrThrow(
     branchName,
     triggerCommitHash,
   );
 
   taskLogger.debug(
     `Ensured working branch '${branchName}' at commit ${triggerCommitHash}:\n` +
-      JSON.stringify(workBranch, null, 2),
+      JSON.stringify(workingBranch, null, 2),
   );
 
-  return workBranch;
+  return {
+    ...workingBranch,
+    name: workingBranch.ref.replace("refs/heads/", ""),
+  };
 }

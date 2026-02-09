@@ -45,3 +45,5 @@ commandHook: v.pipe(
   VÀ TẤT CẢ CMD HOOK TƯƠNG TỰ
 
 SYNC docs cua SourceModeSchema
+
+REFACTOR version-files.ts trong cả đống utils, logic này không nên ở utils, suy nghĩ nên hợp luôn với parser của config.ts không

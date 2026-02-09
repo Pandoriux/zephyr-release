@@ -14,9 +14,11 @@ const OctokitInstance = Octokit.plugin(
   throttling,
 );
 
+export type OctokitClient = InstanceType<typeof OctokitInstance>;
+
 export function getOctokitClient(
   token: string,
-): InstanceType<typeof OctokitInstance> {
+): OctokitClient {
   return new OctokitInstance({
     auth: token,
     request: {

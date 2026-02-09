@@ -7,7 +7,6 @@ import {
   ConfigFileFormatMap,
   ConfigFileFormats,
 } from "../../constants/file-formats.ts";
-import { transformObjKeyToCamelCase } from "../transformers/object.ts";
 
 export function detectConfigFormatFromPath(
   configPath?: string,
@@ -37,23 +36,16 @@ export function parseConfigStringOrThrow(
   configStr: string,
   configFormat: ConfigFileFormat,
 ): unknown {
-  let parsedConfig: unknown;
-
   switch (configFormat) {
     case "json":
     case "jsonc":
     case "json5":
-      parsedConfig = JsonParser.parse(configStr, JsonObjectNode).toJSON();
-      break;
+      return JsonParser.parse(configStr, JsonObjectNode).toJSON();
 
     case "yaml":
-      parsedConfig = parseYaml(configStr);
-      break;
+      return parseYaml(configStr);
 
     case "toml":
-      parsedConfig = parseToml(configStr);
-      break;
+      return parseToml(configStr);
   }
-
-  return transformObjKeyToCamelCase(parsedConfig);
 }

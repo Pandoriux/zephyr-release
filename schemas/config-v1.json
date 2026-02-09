@@ -3,7 +3,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Project name, available in string templates as ${name}."
+      "description": "Project name, available in string templates as {{ name }}."
     },
     "time-zone": {
       "$ref": "#/$defs/time-zone",
@@ -223,7 +223,7 @@
         }
       },
       "required": [],
-      "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root."
+      "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root.\nAvailable variables that cmds can use: [link-insert-later]"
     },
     "custom-string-patterns": {
       "type": "object",
@@ -231,10 +231,8 @@
         "type": "string",
         "minLength": 1
       },
-      "additionalProperties": {
-        "type": "string"
-      },
-      "description": "Custom string patterns to use in templates. The key is the pattern, avaialbe as '${<key>}' while the resolved value is the key value.\nNormally, these should be set dynamically through config override."
+      "additionalProperties": {},
+      "description": "Custom string patterns to use in templates. The key is the pattern, available as '{{<key>}}' while the resolved value is the key value.\nNormally, these should be set dynamically through config override."
     },
     "initial-version": {
       "type": "string",
@@ -337,6 +335,22 @@
               "path",
               "selector"
             ]
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "local-files-to-commit": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
           },
           "minItems": 1
         }
@@ -935,20 +949,10 @@
           "default": "CHANGELOG.md",
           "description": "Path to the file where the generated changelog will be written to, relative to the project root.\nDefault: \"CHANGELOG.md\""
         },
-        "content-body-override": {
-          "type": "string",
-          "minLength": 1,
-          "description": "User-provided changelog content body, available in string templates as ${changelogContentBody}. If set, completely skips the built-in generation process and uses this value as the content. Should only be set dynamically, not in static config."
-        },
-        "content-body-override-path": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Path to text file containing changelog content body override, will take precedence over `content-body-override`."
-        },
         "file-header-template": {
           "type": "string",
           "default": "# Changelog\n\n<br/>\n",
-          "description": "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content sections.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
+          "description": "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
         },
         "file-header-template-path": {
           "type": "string",
@@ -957,33 +961,72 @@
         },
         "file-footer-template": {
           "type": "string",
-          "description": "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content section."
+          "description": "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content."
         },
         "file-footer-template-path": {
           "type": "string",
           "minLength": 1,
           "description": "Path to text file containing changelog file footer. Overrides `file-footer-template` when both are provided."
         },
-        "content-header-template": {
+        "release-header-template": {
           "type": "string",
           "minLength": 1,
-          "default": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->",
-          "description": "String template for header of a changelog content section, using with string patterns like ${version}.\nDefault: \"## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->\""
+          "default": "## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->",
+          "description": "String template for header of a changelog release, using with string patterns like {{ version }}.\nDefault: \"## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->\""
         },
-        "content-entry-template": {
+        "release-header-template-path": {
           "type": "string",
           "minLength": 1,
-          "default": "- ${ ${scope} | wrapAroundIfNotEmpty( ( , ): ) } ${desc} • [${ ${hash} | slice(0, 7) }](${host}/${namespace}/${repository}/)",
-          "description": "String template for each entries in the changelog content body, using with fixed base and version string patterns.\nAdditionally, you can use a special set of dynamic patterns which is ${type}, ${scope}, ${formatScope}, ${desc}, ${body}, ${footer}, ${hash}.\nAbout special patterns: [link-to-insert]Default: \"- ${ ${scope} | wrapAroundIfNotEmpty( ( , ): ) } ${desc} • [${ ${hash} | slice(0, 7) }](${host}/${namespace}/${repository}/)\""
+          "description": "Path to text file containing changelog release header. Overrides `release-header-template` when both are provided."
         },
-        "content-footer-template": {
+        "release-section-entry-template": {
           "type": "string",
           "minLength": 1,
-          "description": "String template for footer of a changelog content section, using with string patterns."
+          "default": "- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}](\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})",
+          "description": "String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:\n{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\nAbout special patterns: [link-to-insert]Default: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}](\\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})\""
+        },
+        "release-section-entry-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog release section entry template. Overrides `release-section-entry-template` when both are provided."
+        },
+        "release-breaking-section-heading": {
+          "type": "string",
+          "default": "⚠ BREAKING CHANGES",
+          "description": "Heading of a changelog release BREAKING section."
+        },
+        "release-breaking-section-entry-template": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`"
+        },
+        "release-breaking-section-entry-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog release breaking section entry template. Overrides `release-breaking-section-entry-template` when both are provided."
+        },
+        "release-footer-template": {
+          "type": "string",
+          "description": "String template for footer of a changelog release, using with string patterns."
+        },
+        "release-footer-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog release footer. Overrides `release-footer-template` when both are provided."
+        },
+        "release-body-override": {
+          "type": "string",
+          "minLength": 1,
+          "description": "User-provided changelog release body, available in string templates as {{ changelogReleaseBody }}. If set, completely ignores the built-in generation and uses this value as the content. Should only be set dynamically, not in static config."
+        },
+        "release-body-override-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog release body override, will take precedence over `release-body-override`."
         }
       },
       "required": [],
-      "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as ${changelogContent} (content header + body) or ${changelogContentBody} (body only).",
+      "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as {{ changelogRelease }} (release header + body) or {{ changelogReleaseHeader }} and {{ changelogReleaseBody }}.",
       "default": {}
     },
     "pull-request": {
@@ -1204,27 +1247,11 @@
           "required": [],
           "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root."
         },
-        "files-to-commit": {
-          "anyOf": [
-            {
-              "type": "string",
-              "minLength": 1
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1
-              },
-              "minItems": 1
-            }
-          ]
-        },
         "branch-name-template": {
           "type": "string",
           "minLength": 1,
           "default": "release/zephyr-release",
-          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: \"${name}\", \"${namespace}\", \"${repository}\"\nDefault: \"release/zephyr-release\""
+          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: all fixed base string patterns.\nDefault: \"release/zephyr-release\""
         },
         "label": {
           "type": "object",
@@ -1361,8 +1388,8 @@
         "title-template": {
           "type": "string",
           "minLength": 1,
-          "default": "chore: release v${version}",
-          "description": "String template for pull request title, using with string patterns like ${version}.\nDefault: \"chore: release v${version}\""
+          "default": "chore: release v{{ version }}",
+          "description": "String template for pull request title, using with string patterns like ${version}.\nDefault: \"chore: release v{{ version }}\""
         },
         "header-template": {
           "anyOf": [
@@ -1377,12 +1404,12 @@
               "minItems": 1
             }
           ],
-          "default": "🤖 New release created. Stand by for approval"
+          "default": "🤖 New release prepared. Awaiting approval~"
         },
         "body-template": {
           "type": "string",
-          "default": "${changelogContent}",
-          "description": "String template for pull request body, using with string patterns like ${changelogContent}.\nDefault: \"${changelogContent}\""
+          "default": "{{ changelogContent }}",
+          "description": "String template for pull request body, using with string patterns like ${changelogContent}.\nDefault: \"{{ changelogContent }}\""
         },
         "body-template-path": {
           "type": "string",
@@ -1640,19 +1667,18 @@
         "tag-name-template": {
           "type": "string",
           "minLength": 1,
-          "default": "v${version}",
-          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nAllowed patterns to use are: all fixed base string patterns ()\nDefault: \"v${version}\""
+          "default": "v{{ version }}",
+          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nAllowed patterns to use are: all fixed base string patterns.\nDefault: \"v{{ version }}\""
         },
         "title-template": {
           "type": "string",
-          "minLength": 1,
-          "default": "${tagName}",
-          "description": "String template for release title, using with string patterns like ${tagName}.\nDefault: \"${tagName}\""
+          "default": "{{ tagName }}",
+          "description": "String template for release title, using with string patterns like {{ tagName }}.\nDefault: \"{{ tagName }}\""
         },
         "body-template": {
           "type": "string",
-          "default": "${changelogContent}",
-          "description": "String template for release body, using with string patterns like ${changelogContent}.\nDefault: \"${changelogContent}\""
+          "default": "{{ changelogContent }}",
+          "description": "String template for release body, using with string patterns like ${changelogContent}.\nDefault: \"{{ changelogContent }}\""
         }
       },
       "required": [],

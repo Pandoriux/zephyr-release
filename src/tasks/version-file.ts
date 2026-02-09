@@ -10,8 +10,14 @@ import {
   detectVersionFileFormatFromPath,
   getVersionFileFormatTrialOrder,
   parseVersionFileStringOrThrow,
+  resolveStructuredVersionFileFormatOrThrow,
 } from "../utils/parsers/version-file.ts";
-import { extractVersionStringOrThrow } from "../utils/extractors/version-file.ts";
+import {
+  detectVersionFileExtractor,
+  extractVersionStringOrThrow,
+} from "../utils/extractors/version-file.ts";
+import { updateVersionInStructuredFile } from "../utils/transformers/version-file.ts";
+import { parseRegExpFromSelector } from "../utils/parsers/regex.ts";
 
 function getVersionFileSourceMode(
   filePath: string,
@@ -57,7 +63,7 @@ export async function getVersionStringFromVersionFile(
   sourceMode: InputsOutput["sourceMode"],
   provider: PlatformProvider,
   workspacePath: string,
-): Promise<string | undefined> {
+): Promise<string | null | undefined> {
   const fileSourceMode = getVersionFileSourceMode(
     versionFile.path,
     sourceMode,
@@ -78,9 +84,18 @@ export async function getVersionStringFromVersionFile(
     `Version file parsed successfully (${parsedResult.resolvedFormatResult})`,
   );
 
+  const extractor = versionFile.extractor === "auto"
+    ? detectVersionFileExtractor(versionFile.selector)
+    : versionFile.extractor;
+  if (!extractor) {
+    throw new Error(
+      `Unable to determine a version file extractor for selector '${versionFile.selector}'`,
+    );
+  }
+
   return extractVersionStringOrThrow(
     parsedResult.parsedContent,
-    versionFile.extractor,
+    extractor,
     versionFile.selector,
   );
 }
@@ -137,4 +152,73 @@ function parseVersionFileOrThrow(
       { cause: error },
     );
   }
+}
+
+export async function prepareVersionFilesToCommit(
+  provider: PlatformProvider,
+  versionFiles: ConfigOutput["versionFiles"],
+  sourceMode: InputsOutput["sourceMode"],
+  workspacePath: string,
+  nextVersion: string,
+): Promise<[string, string][]> {
+  const vfChangesData: [string, string][] = [];
+
+  for (const vf of versionFiles) {
+    const fileContent = await getTextFileOrThrow(
+      getVersionFileSourceMode(vf.path, sourceMode),
+      vf.path,
+      {
+        provider,
+        workspace: workspacePath,
+      },
+    );
+
+    const extractor = vf.extractor === "auto"
+      ? detectVersionFileExtractor(vf.selector)
+      : vf.extractor;
+
+    if (!extractor) {
+      throw new Error(
+        `Unable to determine extractor for version file '${vf.path}' (selector: ${vf.selector})`,
+      );
+    }
+
+    switch (extractor) {
+      case "json-path": {
+        const resolvedFormat = resolveStructuredVersionFileFormatOrThrow(
+          fileContent,
+          vf.path,
+          vf.format,
+        );
+
+        const newContent = updateVersionInStructuredFile(
+          fileContent,
+          resolvedFormat,
+          vf.selector,
+          nextVersion,
+        );
+
+        vfChangesData.push([vf.path, newContent]);
+        break;
+      }
+
+      case "regex": {
+        const regex = parseRegExpFromSelector(vf.selector);
+
+        const newContent = fileContent.replace(regex, (match, ...groups) => {
+          const firstGroup = groups[0];
+          if (firstGroup !== undefined) {
+            return match.replace(firstGroup, nextVersion);
+          }
+
+          return nextVersion;
+        });
+
+        vfChangesData.push([vf.path, newContent]);
+        break;
+      }
+    }
+  }
+
+  return vfChangesData;
 }
