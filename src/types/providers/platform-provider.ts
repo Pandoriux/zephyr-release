@@ -1,6 +1,7 @@
 import type { ParserOptions } from "conventional-commits-parser";
-import type { CoreLogger } from "../logger.ts";
 import type { ProviderBranch } from "./branch.ts";
+import type { ProviderLabel } from "./label.ts";
+import type { CoreLogger } from "../logger.ts";
 import type { ProviderCommit, ProviderWorkingCommit } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
@@ -73,6 +74,12 @@ export interface PlatformProvider {
     title: string,
     body: string,
   ) => Promise<ProviderPullRequest>;
+
+  addLabelsToPullRequestOrThrow: (
+    prNumber: number,
+    labels: ProviderLabel[],
+    optionalLabels?: string[],
+  ) => Promise<void>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

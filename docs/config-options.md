@@ -629,4 +629,4 @@ Type: `object`
 
 - `name` (Required): Label name.
 - `description` (Optional): Label description.
-- `color` (Optional): The hexadecimal color code for the label, without the leading #. Default: `"ededed"`
+- `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`

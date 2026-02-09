@@ -16,9 +16,13 @@ import {
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
-import { exportPrePrepareOperationVariables } from "../tasks/export-variables.ts";
+import {
+  exportPostPrepareOperationVariables,
+  exportPrePrepareOperationVariables,
+} from "../tasks/export-variables.ts";
 import type { OperationContext } from "../types/operation-context.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
 
 interface PrepareWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
@@ -133,7 +137,7 @@ export async function prepareWorkflow(
   logger.stepFinish("Finished: Commit changes");
 
   logger.stepStart("Starting: Create or update pull request");
-  const _prNumber = await createOrUpdatePullRequestOrThrow(
+  const prNumber = await createOrUpdatePullRequestOrThrow(
     provider,
     {
       workingBranchName: workingBranchResult.name,
@@ -145,10 +149,24 @@ export async function prepareWorkflow(
   );
   logger.stepFinish("Finished: Create or update pull request");
 
-  // export post prepare
+  logger.stepStart("Starting: Add labels to pull request");
+  await addLabelsToPullRequestOrThrow(provider, prNumber, config);
+  logger.stepFinish("Finished: Add labels to pull request");
+
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  // await exportPrePrepareOperationVariables();
+  await exportPostPrepareOperationVariables(provider, prNumber, changesData);
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
-  // run post cmds
+  logger.stepStart("Starting: Execute pull request post commands");
+  const postResult = await runCommandsOrThrow(
+    config.pullRequest.commandHook,
+    "post",
+  );
+  if (postResult) {
+    logger.stepFinish(
+      `Finished: Execute pull request post commands. ${postResult}`,
+    );
+  } else {
+    logger.stepSkip("Skipped: Execute pull request post commands (empty)");
+  }
 }

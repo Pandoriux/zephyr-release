@@ -27,9 +27,10 @@ import {
   githubGetCompareTagUrl,
   githubGetCompareTagUrlFromCurrentToLatest,
 } from "./tag.ts";
-import { getOctokitClient, OctokitClient } from "./octokit.ts";
+import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import { githubGetOperationContextOrThrow } from "./operation.ts";
+import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -189,6 +190,20 @@ export function createGitHubProvider(): PlatformProvider {
         number,
         title,
         body,
+      );
+    },
+
+    addLabelsToPullRequestOrThrow: async (
+      prNumber: number,
+      labels: { name: string; color?: string; description?: string }[],
+      optionalLabel?: string[],
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubAddLabelsToPullRequestOrThrow(
+        octokit,
+        prNumber,
+        labels,
+        optionalLabel,
       );
     },
 

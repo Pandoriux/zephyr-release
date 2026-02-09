@@ -13,6 +13,7 @@ In GitHub: using [`@actions/core`](https://github.com/actions/toolkit/tree/main/
   - [Base (available at all time)](#base-available-at-all-time)
   - [Prepare (when target is "prepare")](#prepare-when-target-is-prepare)
     - [Pre Prepare](#pre-prepare)
+    - [Post Prepare](#post-prepare)
 
 ## Summary
 
@@ -86,16 +87,6 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 
 <br/>
 
-- **patternContext:** **Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts)  
-  **Addtionally**, this value will be updated for each stages. For example, the patternContext exposed at `command-hook > pre` might be differ compared to the patternContext exposed at `pull-request > command-hook > pre`  
-  Export: `zr-pattern-context`; Env: `ZR_PATTERN_CONTEXT`
-
-- **pullRequestNumber:** Pull request number. For "prepare" target (create/update PR), it is the PR number we are working with. For "release" target, it is the PR number we just merged into. Will be undefined if PR not found  
-  **Addtionally**, this value will be updated for each stages. For example, when there is no PR open for "prepare" target yet, the "create-pr" job will create the PR, and re-update the number later on; ([`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional))  
-  Export: `zr-pull-request-number`; Env: `ZR_PULL_REQUEST_NUMBER`
-
-<br/>
-
 - **resolvedCommitEntries:** Array of resolved commit entries (parsed and filtered) from the trigger commit to the last release (JSON stringified). Each entry contains fields such as hash, type, scope, subject, isBreaking, etc. See: [commit.ts](../src/tasks/commit.ts)  
   Export: `zr-resolved-commit-entries`; Env: `ZR_RESOLVED_COMMIT_ENTRIES`
 
@@ -104,6 +95,19 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 
 - **nextVersion:** Next version string  
   Export: `zr-next-version`; Env: `ZR_NEXT_VERSION`
+
+- **committedFilePaths:** Stringified array of file paths that have been committed  
+  Export: `zr-committed-file-paths`; Env: `ZR_COMMITTED_FILE_PATHS`
+
+<br/>
+
+- **patternContext:** **Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts)  
+  **Addtionally**, this value will be updated for each stages. For example, the patternContext exposed at `command-hook > pre` might be differ compared to the patternContext exposed at `pull-request > command-hook > pre`  
+  Export: `zr-pattern-context`; Env: `ZR_PATTERN_CONTEXT`
+
+- **pullRequestNumber:** Pull request number. For "prepare" target (create/update PR), it is the PR number we are working with. For "release" target, it is the PR number we just merged into. Will be undefined if PR not found  
+  **Addtionally**, this value will be updated for each stages. For example, when there is no PR open for "prepare" target yet, the "create-pr" job will create the PR, and re-update the number later on; ([`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional))  
+  Export: `zr-pull-request-number`; Env: `ZR_PULL_REQUEST_NUMBER`
 
 ## Variable availability stages
 
@@ -144,3 +148,9 @@ These variables are available starting from the first [`pull-request > command-h
 - **resolvedCommitEntries**
 - **currentVersion**
 - **nextVersion**
+
+#### Post Prepare
+
+These variables are available starting from the first [`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional) command runs.
+
+- **committedFilePaths**

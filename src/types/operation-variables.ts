@@ -32,3 +32,7 @@ export interface PrePrepareOperationVariables {
   currentVersion: string;
   nextVersion: string;
 }
+
+export interface PostPrepareOperationVariables {
+  committedFilePaths: string;
+}

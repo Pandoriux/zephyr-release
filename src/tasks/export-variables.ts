@@ -2,6 +2,7 @@ import type { OperationContext } from "../types/operation-context.ts";
 import type {
   BaseOperationVariables,
   DynamicOperationVariables,
+  PostPrepareOperationVariables,
   PrePrepareOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -110,6 +111,34 @@ export async function exportPrePrepareOperationVariables(
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
       "Pre prepare operation variables to export (internal key name):",
+    );
+    dLogger.info(JSON.stringify(prepareExportObject, null, 2));
+    dLogger.endGroup();
+  });
+
+  Object.entries(prepareExportObject).forEach(([k, v]) => {
+    provider.exportOutputs(toExportOutputKey(k), v);
+    provider.exportEnvVars(toExportEnvVarKey(k), v);
+  });
+}
+
+export async function exportPostPrepareOperationVariables(
+  provider: PlatformProvider,
+  prNumber: number,
+  changesData: Map<string, string>,
+) {
+  const prepareExportObject = {
+    committedFilePaths: JSON.stringify([...changesData.keys()]),
+
+    pullRequestNumber: prNumber,
+    patternContext: await stringifyCurrentPatternContext(),
+  } satisfies
+    & PostPrepareOperationVariables
+    & DynamicOperationVariables;
+
+  taskLogger.debugWrap((dLogger) => {
+    dLogger.startGroup(
+      "Post prepare operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();

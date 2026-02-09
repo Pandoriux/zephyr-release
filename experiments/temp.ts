@@ -1,8 +1,8 @@
-import { parseDocument } from "@eemeli/yaml";
+import * as v from "@valibot/valibot";
 
-const doc = parseDocument(""); // Empty document
+const result = v.parse(
+  v.pipe(v.string(), v.hexColor()),
+  "#ededed",
+);
 
-// Path: ['server', 'users', 0, 'name']
-doc.setIn(["server", "users", 0, "name"], "Alice");
-
-console.log(doc.toString());
+console.log(result); // "example label"
