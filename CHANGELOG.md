@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/Pandoriux/zephyr-release/compare/v0.3.0...v0.4.0) (2026-02-10)
+
+### Features
+
+- add generate changelog ([#11](https://github.com/Pandoriux/zephyr-release/issues/11)) ([bc0a901](https://github.com/Pandoriux/zephyr-release/commit/bc0a901208c3381b11dcd53943678dd7cea1b194))
+- modify files and commit create pull request ([#12](https://github.com/Pandoriux/zephyr-release/issues/12)) ([9740ba5](https://github.com/Pandoriux/zephyr-release/commit/9740ba5b48df96a94a2db1a858f6398085d0a040))
+- revamp string templates and patterns ([#10](https://github.com/Pandoriux/zephyr-release/issues/10)) ([d4dffc0](https://github.com/Pandoriux/zephyr-release/commit/d4dffc047b66bd4ee4dbbe32878fc12e3ceda420))
+
 ## [0.3.0](https://github.com/Pandoriux/zephyr-release/compare/v0.2.0...v0.3.0) (2026-01-23)
 
 ### Features
