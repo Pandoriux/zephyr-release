@@ -1,15 +1,4 @@
-  tagNameTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_TAG_NAME_PATTERN,
-      ),
-      v.metadata({
-        description:
-          "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\n" +
-          "Allowed patterns to use are: all fixed base string patterns ()\n" +
-          `Default: ${JSON.stringify(DEFAULT_TAG_NAME_PATTERN)}`,
-      }),
-    ),
+ 
 
     contentEntryTemplate: v.pipe(
       v.optional(

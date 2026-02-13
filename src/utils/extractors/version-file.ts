@@ -1,4 +1,4 @@
-import { parse } from "nimma/parser";
+import parser from "nimma/parser";
 import Nimma from "nimma";
 import type { VersionFileExtractor } from "../../constants/version-file-options.ts";
 import { parseRegExpFromSelector } from "../parsers/regex.ts";
@@ -18,7 +18,7 @@ export function detectVersionFileExtractor(
   }
 
   try {
-    parse(selector);
+    parser(selector);
     return "json-path";
   } catch {
     try {
@@ -50,7 +50,11 @@ export function extractVersionStringOrThrow(
           // Only assign if we haven't found a result yet and value is not null/undefined
           // Nimma may fire this callback multiple times if the selector matches many nodes.
           // We use 'result === undefined' to enforce "First Match Wins" logic.
-          if (value !== undefined && (typeof value === "string" || value === null) && result === undefined) {
+          if (
+            value !== undefined &&
+            (typeof value === "string" || value === null) &&
+            result === undefined
+          ) {
             result = value;
           }
         },

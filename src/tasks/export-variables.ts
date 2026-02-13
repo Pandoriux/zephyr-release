@@ -1,4 +1,4 @@
-import type { OperationContext } from "../types/operation-context.ts";
+import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type {
   BaseOperationVariables,
   DynamicOperationVariables,
@@ -23,7 +23,7 @@ import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
   options: {
-    operationContext: OperationContext;
+    operationContext: OperationTriggerContext;
     workingBranchResult: WorkingBranchResult;
     prForCommit: ProviderPullRequest | undefined;
     prFromBranch: ProviderPullRequest | undefined;

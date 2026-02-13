@@ -13,3 +13,8 @@ export interface ProviderWorkingCommit {
   workingCommitHash: string;
   workingTreeHash: string;
 }
+
+export interface ProviderCompareCommits {
+  commits: { message: string }[];
+  totalCommits: number;
+}

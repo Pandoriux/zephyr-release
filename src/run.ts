@@ -21,7 +21,7 @@ import { validateCurrentOperationCtxOrExit } from "./tasks/operation.ts";
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
   const inputsResult = getInputsOrThrow(provider);
-  const { rawInputs, inputs } = inputsResult;
+  const { inputs } = inputsResult;
   logger.stepFinish("Finished: Get operation inputs");
 
   logger.stepStart("Starting: Set up operation");
@@ -29,17 +29,18 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Manage concurrency");
-  await manageConcurrencyOrExit(provider);
+  const concurrencyResult = await manageConcurrencyOrExit(provider);
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
   const configResult = await resolveConfigOrThrow(provider, inputs);
-  const { rawConfig, config } = configResult;
+  const { config } = configResult;
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.stepStart("Starting: Parse and validate current operation context");
-  const operationContext = validateCurrentOperationCtxOrExit(
+  const operationContext = await validateCurrentOperationCtxOrExit(
     provider,
+    concurrencyResult,
     config.commitTypes,
   );
   logger.stepFinish("Finished: Parse and validate current operation context");

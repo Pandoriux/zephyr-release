@@ -20,14 +20,14 @@ import {
   exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
-import type { OperationContext } from "../types/operation-context.ts";
+import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
 
 interface PrepareWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
   associatedPrFromBranch: ProviderPullRequest | undefined;
-  operationContext: OperationContext;
+  operationContext: OperationTriggerContext;
   inputs: InputsOutput;
   config: ConfigOutput;
 }
