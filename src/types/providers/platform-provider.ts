@@ -1,12 +1,17 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import type { ProviderBranch } from "./branch.ts";
+import type { ProviderConcurrencyResult } from "./concurrency.ts";
 import type { ProviderLabel } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
-import type { ProviderCommit, ProviderWorkingCommit } from "./commit.ts";
+import type {
+  ProviderCommit,
+  ProviderCompareCommits,
+  ProviderWorkingCommit,
+} from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
-import type { ProviderOperationContext } from "../operation-context.ts";
+import type { ProviderOperationTriggerContext } from "../operation-context.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
@@ -21,7 +26,7 @@ export interface PlatformProvider {
   getRepositoryName: () => string;
   getCommitPathPart: () => string;
   getReferencePathPart: () => string;
-  getOperationContextOrThrow: () => ProviderOperationContext;
+  getOperationTriggerContextOrThrow: () => ProviderOperationTriggerContext;
 
   getCompareTagUrl: (tag1: string, tag2: string) => string;
   getCompareTagUrlFromCurrentToLatest: (
@@ -29,7 +34,7 @@ export interface PlatformProvider {
     skip?: number,
   ) => Promise<string>;
 
-  manageConcurrency: () => Promise<void>;
+  manageConcurrency: () => Promise<ProviderConcurrencyResult>;
 
   getTextFileOrThrow: (filePath: string) => Promise<string>;
 
@@ -37,10 +42,6 @@ export interface PlatformProvider {
     branchName: string,
     commitHash: string,
   ) => Promise<ProviderBranch>;
-
-  findCommitsFromGivenToPreviousTaggedOrThrow: (
-    commitHash: string,
-  ) => Promise<ProviderCommit[]>;
 
   findUniquePullRequestForCommitOrThrow: (
     commitHash: string,
@@ -55,6 +56,13 @@ export interface PlatformProvider {
     requiredLabel: string,
   ) => Promise<ProviderPullRequest | undefined>;
 
+  findCommitsFromGivenToPreviousTaggedOrThrow: (
+    commitHash: string,
+  ) => Promise<ProviderCommit[]>;
+  compareCommitsOrThrow: (
+    base: string,
+    head: string,
+  ) => Promise<ProviderCompareCommits>;
   createCommitOnBranchOrThrow: (
     triggerCommitHash: string,
     baseTreeHash: string,
@@ -80,6 +88,8 @@ export interface PlatformProvider {
     labels: ProviderLabel[],
     optionalLabels?: string[],
   ) => Promise<void>;
+
+  getLatestReleaseTagOrThrow: () => Promise<string | undefined>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

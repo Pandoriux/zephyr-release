@@ -6,10 +6,10 @@ export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
 
 export const DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE =
   liquid`## {{ tagName | md_link_compare_tag_from_current_to_latest }} (
-    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->`;
+    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- timezone: {{ timeZone }} -->`;
 
 export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
-  liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}](
+  liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} [{{ hash | slice: 0, 7 }}](
   {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})`;
 
 // Pull request

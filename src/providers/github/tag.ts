@@ -1,11 +1,12 @@
 import { canParse, compare, parse } from "@std/semver";
-import { joinUrlSegments } from "../../utils/transformers/url.ts";
 import {
   githubGetHost,
   githubGetNamespace,
   githubGetRepositoryName,
 } from "./repository.ts";
 import type { OctokitClient } from "./octokit.ts";
+import { isGitHubErrorResponse } from "./utils/error-validations.ts";
+import { joinUrlSegments } from "../../utils/transformers/url.ts";
 
 export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
   let compareSegment = tag1 + "..." + tag2;
@@ -75,4 +76,24 @@ export async function githubGetCompareTagUrlFromCurrentToLatest(
     ),
     githubGetHost(),
   ).href;
+}
+
+export async function githubGetLatestReleaseTagOrThrow(
+  octokit: OctokitClient,
+): Promise<string | undefined> {
+  try {
+    const res = await octokit.rest.repos.getLatestRelease({
+      owner: githubGetNamespace(),
+      repo: githubGetRepositoryName(),
+    });
+
+    return res.data.tag_name;
+  } catch (error) {
+    if (isGitHubErrorResponse(error) && error.status === 404) {
+      // No releases found
+      return undefined;
+    }
+
+    throw error;
+  }
 }

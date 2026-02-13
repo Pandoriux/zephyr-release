@@ -29,7 +29,7 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Manage concurrency");
-  await manageConcurrencyOrExit(provider);
+  const concurrencyResult = await manageConcurrencyOrExit(provider);
   logger.stepFinish("Finished: Manage concurrency");
 
   logger.stepStart("Starting: Resolve config from file and override");
@@ -38,8 +38,9 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.stepStart("Starting: Parse and validate current operation context");
-  const operationContext = validateCurrentOperationCtxOrExit(
+  const operationContext = await validateCurrentOperationCtxOrExit(
     provider,
+    concurrencyResult,
     config.commitTypes,
   );
   logger.stepFinish("Finished: Parse and validate current operation context");

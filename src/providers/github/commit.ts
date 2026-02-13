@@ -3,6 +3,7 @@ import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type {
   ProviderCommit,
+  ProviderCompareCommits,
   ProviderWorkingCommit,
 } from "../../types/providers/commit.ts";
 
@@ -97,6 +98,24 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
   }
 
   return collectedCommits;
+}
+
+export async function githubCompareCommitsOrThrow(
+  octokit: OctokitClient,
+  base: string,
+  head: string,
+): Promise<ProviderCompareCommits> {
+  const res = await octokit.rest.repos.compareCommits({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    base,
+    head,
+  });
+
+  return {
+    commits: res.data.commits.map((c) => ({ message: c.commit.message })),
+    totalCommits: res.data.total_commits,
+  };
 }
 
 export async function githubCreateCommitOnBranchOrThrow(

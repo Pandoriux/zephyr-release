@@ -971,8 +971,8 @@
         "release-header-template": {
           "type": "string",
           "minLength": 1,
-          "default": "## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->",
-          "description": "String template for header of a changelog release, using with string patterns like {{ version }}.\nDefault: \"## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->\""
+          "default": "## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- timezone: {{ timeZone }} -->",
+          "description": "String template for header of a changelog release, using with string patterns like {{ version }}.\nDefault: \"## {{ tagName | md_link_compare_tag_from_current_to_latest }} (\\n    {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- timezone: {{ timeZone }} -->\""
         },
         "release-header-template-path": {
           "type": "string",
@@ -982,8 +982,8 @@
         "release-section-entry-template": {
           "type": "string",
           "minLength": 1,
-          "default": "- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}](\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})",
-          "description": "String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:\n{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\nAbout special patterns: [link-to-insert]Default: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}](\\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})\""
+          "default": "- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} [{{ hash | slice: 0, 7 }}](\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})",
+          "description": "String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:\n{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\nAbout special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optionalDefault: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} [{{ hash | slice: 0, 7 }}](\\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})\""
         },
         "release-section-entry-template-path": {
           "type": "string",
@@ -1275,8 +1275,9 @@
                     "color": {
                       "type": "string",
                       "minLength": 1,
-                      "default": "ededed",
-                      "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                      "default": "#ededed",
+                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
                     }
                   },
                   "required": [
@@ -1287,7 +1288,7 @@
               "default": {
                 "name": "release: pending",
                 "description": "The pull request is pending release.",
-                "color": "FBCA04"
+                "color": "#FBCA04"
               }
             },
             "on-close": {
@@ -1309,8 +1310,9 @@
                     "color": {
                       "type": "string",
                       "minLength": 1,
-                      "default": "ededed",
-                      "description": "The hexadecimal color code for the label, without the leading #.\nDefault: \"ededed\""
+                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                      "default": "#ededed",
+                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
                     }
                   },
                   "required": [
@@ -1321,7 +1323,7 @@
               "default": {
                 "name": "release: released",
                 "description": "The pull request is closed and the release has completed.",
-                "color": "0E8A16"
+                "color": "#0E8A16"
               }
             }
           },
@@ -1391,6 +1393,11 @@
           "default": "chore: release v{{ version }}",
           "description": "String template for pull request title, using with string patterns like ${version}.\nDefault: \"chore: release v{{ version }}\""
         },
+        "title-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing pull request title template. Overrides `title-template` when both are provided."
+        },
         "header-template": {
           "anyOf": [
             {
@@ -1406,6 +1413,11 @@
           ],
           "default": "🤖 New release prepared. Awaiting approval~"
         },
+        "header-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing pull request header template. Overrides `header-template` when both are provided."
+        },
         "body-template": {
           "type": "string",
           "default": "{{ changelogContent }}",
@@ -1414,12 +1426,17 @@
         "body-template-path": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing pull request body template. Overrides body template if both are provided."
+          "description": "Path to text file containing pull request body template. Overrides `body-template` when both are provided."
         },
         "footer-template": {
           "type": "string",
           "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
           "description": "String template for pull request footer, using with string patterns.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
+        },
+        "footer-template-path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing pull request footer template. Overrides `footer-template` when both are provided."
         }
       },
       "required": [],
@@ -1668,7 +1685,7 @@
           "type": "string",
           "minLength": 1,
           "default": "v{{ version }}",
-          "description": "String template for tag name, using with string patterns like ${version}. Available in string templates as ${tagName}.\nAllowed patterns to use are: all fixed base string patterns.\nDefault: \"v{{ version }}\""
+          "description": "String template for tag name, using with string patterns like {{ version }}. Available in string templates as {{ tagName }}.\nAllowed patterns to use are: fixed base and fixed version string patterns.\nDefault: \"v{{ version }}\""
         },
         "title-template": {
           "type": "string",

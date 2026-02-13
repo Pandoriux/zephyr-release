@@ -18,6 +18,7 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import { githubExportEnvVars, githubExportOutputs } from "./export.ts";
 import { githubEnsureBranchExistOrThrow } from "./branch.ts";
 import {
+  githubCompareCommitsOrThrow,
   githubCreateCommitOnBranchOrThrow,
   githubFindCommitsFromGivenToPreviousTaggedOrThrow,
 } from "./commit.ts";
@@ -26,10 +27,11 @@ import { githubManageConcurrency } from "./concurrency.ts";
 import {
   githubGetCompareTagUrl,
   githubGetCompareTagUrlFromCurrentToLatest,
+  githubGetLatestReleaseTagOrThrow,
 } from "./tag.ts";
 import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
-import { githubGetOperationContextOrThrow } from "./operation.ts";
+import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
 
 export function createGitHubProvider(): PlatformProvider {
@@ -68,7 +70,7 @@ export function createGitHubProvider(): PlatformProvider {
     getRepositoryName: githubGetRepositoryName,
     getCommitPathPart: githubGetCommitPathPart,
     getReferencePathPart: githubGetReferencePathPart,
-    getOperationContextOrThrow: githubGetOperationContextOrThrow,
+    getOperationTriggerContextOrThrow: githubGetOperationTriggerContextOrThrow,
 
     getCompareTagUrl: githubGetCompareTagUrl,
 
@@ -86,7 +88,7 @@ export function createGitHubProvider(): PlatformProvider {
 
     manageConcurrency: async () => {
       const { octokit } = ensureProviderContextOrThrow();
-      await githubManageConcurrency(octokit);
+      return await githubManageConcurrency(octokit);
     },
 
     getTextFileOrThrow: async (filePath: string) => {
@@ -102,14 +104,6 @@ export function createGitHubProvider(): PlatformProvider {
       return await githubEnsureBranchExistOrThrow(
         octokit,
         branchName,
-        commitHash,
-      );
-    },
-
-    findCommitsFromGivenToPreviousTaggedOrThrow: async (commitHash: string) => {
-      const { octokit } = ensureProviderContextOrThrow();
-      return await githubFindCommitsFromGivenToPreviousTaggedOrThrow(
-        octokit,
         commitHash,
       );
     },
@@ -144,6 +138,24 @@ export function createGitHubProvider(): PlatformProvider {
       );
     },
 
+    findCommitsFromGivenToPreviousTaggedOrThrow: async (commitHash: string) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubFindCommitsFromGivenToPreviousTaggedOrThrow(
+        octokit,
+        commitHash,
+      );
+    },
+    compareCommitsOrThrow: async (
+      base: string,
+      head: string,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubCompareCommitsOrThrow(
+        octokit,
+        base,
+        head,
+      );
+    },
     createCommitOnBranchOrThrow: async (
       triggerCommitHash: string,
       baseTreeHash: string,
@@ -205,6 +217,11 @@ export function createGitHubProvider(): PlatformProvider {
         labels,
         optionalLabel,
       );
+    },
+
+    getLatestReleaseTagOrThrow: async () => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubGetLatestReleaseTagOrThrow(octokit);
     },
 
     exportOutputs: githubExportOutputs,

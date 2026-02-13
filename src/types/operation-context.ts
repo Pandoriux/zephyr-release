@@ -1,6 +1,6 @@
 import type { Commit } from "conventional-commits-parser";
 
-export interface ProviderOperationContext {
+export interface ProviderOperationTriggerContext {
   latestTriggerCommit: {
     hash: string;
     treeHash: string;
@@ -15,7 +15,7 @@ export interface ProviderOperationContext {
   }[];
 }
 
-export interface OperationContext {
+export interface OperationTriggerContext {
   latestTriggerCommit: { commit: Commit; treeHash: string };
   triggerCommits: Commit[];
 }
