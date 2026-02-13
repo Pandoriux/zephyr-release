@@ -96,7 +96,7 @@ Type: `string`
 Default: `"UTC"`
 
 IANA time zone used to format and display times.  
-This value is also available for use in [string templates](./string-templates-and-patterns.md) as `${timeZone}`.
+This value is also available for use in [string templates](./string-templates-and-patterns.md) as `{{ timeZone }}`.
 
 ### command-hook (Optional)
 
@@ -112,8 +112,7 @@ See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definit
 
 Type: `object` (record of string to string)
 
-Custom string patterns to use in templates. The key is the pattern name, available as `${<key>}` in [string templates](./string-templates-and-patterns.md), while the resolved value is the key's value.  
-These should normally be set dynamically through config override, not in static config files.
+Custom string patterns to use in templates. The key is the pattern name, available as `{{ <key> }}` in [string templates](./string-templates-and-patterns.md), while the resolved value is the key's value.
 
 **Notes:** If a custom pattern key name matches an existing built-in pattern name, the built-in pattern takes precedence and the custom value will be ignored.
 
@@ -276,9 +275,9 @@ Path to the file where the generated changelog will be written to, relative to t
 #### changelog > file-header-template (Optional)
 
 Type: `string`  
-Default: `"# Changelog\n\n<br/>\n"`
+Default: [`DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for changelog file header, using with string patterns like `${version}`. Placed above any changelog content.
+String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.
 
 #### changelog > file-header-template-path (Optional)
 
@@ -290,7 +289,7 @@ Path to text file containing changelog file header. Overrides `file-header-templ
 
 Type: `string`
 
-String template for changelog file footer, using with string patterns like `${version}`. Placed below any changelog content.
+String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.
 
 #### changelog > file-footer-template-path (Optional)
 
@@ -314,11 +313,17 @@ Path to text file containing changelog release header. Overrides `release-header
 #### changelog > release-section-entry-template (Optional)
 
 Type: `string`  
-Default: `"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc }} • [{{ hash | slice: 0, 7 }}]({{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})"`
+Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:  
-`{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}`.  
-About special patterns: [link-to-insert]
+String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:
+
+- `{{ hash }}`: string
+- `{{ type }}`: string
+- `{{ scope }}`: string
+- `{{ desc }}`: string
+- `{{ body }}`: string
+- `{{ footer }}`: string
+- `{{ isBreaking }}`: boolean
 
 #### changelog > release-section-entry-template-path (Optional)
 
@@ -389,7 +394,8 @@ List of exposed env variables: see [Export operation variables](./export-variabl
 Type: `string`  
 Default: `"release/zephyr-release"`
 
-String template for branch name that Zephyr Release uses, using with string patterns like `${name}`, `${namespace}`, `${repository}`.
+String template for branch name that Zephyr Release uses.  
+Allowed patterns to use are: [fixed base](./string-templates-and-patterns.md#base) string patterns.
 
 #### pull... > label (Optional)
 
@@ -418,9 +424,9 @@ Additional labels to attach to pull requests, managed and supplied by you. Unlik
 #### pull... > title-template (Optional)
 
 Type: `string`  
-Default: `"chore: release v${version}"`
+Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request title, using with string patterns like `${version}`.
+String template for pull request title, using with string patterns like `{{ version }}`.
 
 #### pull... > title-template-path (Optional)
 
@@ -431,9 +437,9 @@ Path to text file containing pull request title template. Overrides `title-templ
 #### pull... > header-template (Optional)
 
 Type: `string | string[]`  
-Default: `"🤖 New release created. Stand by for approval"`
+Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like `${version}`. If an array is provided, it will randomly choose one from it.
+String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.
 
 #### pull... > header-template-path (Optional)
 
@@ -444,9 +450,9 @@ Path to text file containing pull request header template. Overrides `header-tem
 #### pull... > body-template (Optional)
 
 Type: `string`  
-Default: `"${changelogContent}"`
+Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request body, using with string patterns like `${changelogContent}`.
+String template for pull request body, using with string patterns like `{{ changelogRelease }}`.
 
 #### pull... > body-template-path (Optional)
 
@@ -511,23 +517,24 @@ If enabled, the release will be marked as prerelease.
 #### release > tag-name-template (Optional)
 
 Type: `string`  
-Default: `"v${version}"`
+Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for tag name, using with string patterns like `${version}`. Must always include `${version}`. Available in [string templates](./string-templates-and-patterns.md) as `${tagName}`.
+String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
+Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns.
 
 #### release > title-template (Optional)
 
 Type: `string`  
-Default: `"${tagName}"`
+Default: [`DEFAULT_RELEASE_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release title, using with string patterns like `${tagName}`.
+String template for release title, using with string patterns like `{{ tagName }}`.
 
 #### release > body-template (Optional)
 
 Type: `string`  
-Default: `"${changelogContent}"`
+Default: [`DEFAULT_RELEASE_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release body, using with string patterns like `${changelogContent}`.
+String template for release body, using with string patterns like `{{ changelogRelease }}`.
 
 ## Type Definitions
 

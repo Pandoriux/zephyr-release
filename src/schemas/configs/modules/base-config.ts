@@ -19,7 +19,7 @@ export const BaseConfigSchema = v.object({
     v.optional(TimeZoneSchema, "UTC"),
     v.metadata({
       description:
-        "IANA timezone used to display times, available in string templates as ${timeZone}.\n" +
+        "IANA timezone used to display times, available in string templates as {{ timeZone }}.\n" +
         'Default: "UTC"',
     }),
   ),
@@ -38,9 +38,8 @@ export const BaseConfigSchema = v.object({
     ),
     v.metadata({
       description:
-        "Custom string patterns to use in templates. The key is the pattern, available as '{{<key>}}' while " +
-        "the resolved value is the key value.\n" +
-        "Normally, these should be set dynamically through config override.",
+        "Custom string patterns to use in templates. The key is the pattern, available as '{{ <key> }}' while " +
+        "the resolved value is the key value.",
     }),
   ),
 

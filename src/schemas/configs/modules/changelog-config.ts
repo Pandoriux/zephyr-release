@@ -30,7 +30,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content.\n" +
+          "String template for changelog file header, using with string patterns like {{ version }}. Placed above any changelog content.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE)}`,
       }),
     ),
@@ -45,7 +45,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content.",
+          "String template for changelog file footer, using with string patterns like {{ version }}. Placed below any changelog content.",
       }),
     ),
     fileFooterTemplatePath: v.pipe(
@@ -86,7 +86,7 @@ export const ChangelogConfigSchema = v.pipe(
           "String template for each entries in the changelog release sections, using with fixed base and version string patterns. " +
           "Additionally, you can use a special set of dynamic patterns which are:\n" +
           "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\n" +
-          "About special patterns: [link-to-insert]" +
+          "About special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE)
           }`,
