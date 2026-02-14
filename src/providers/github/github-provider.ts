@@ -25,6 +25,7 @@ import {
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import { githubManageConcurrency } from "./concurrency.ts";
 import {
+  githubCreateTagOrThrow,
   githubGetCompareTagUrl,
   githubGetCompareTagUrlFromCurrentToLatest,
   githubGetLatestReleaseTagOrThrow,
@@ -222,6 +223,10 @@ export function createGitHubProvider(): PlatformProvider {
     getLatestReleaseTagOrThrow: async () => {
       const { octokit } = ensureProviderContextOrThrow();
       return await githubGetLatestReleaseTagOrThrow(octokit);
+    },
+    createTagOrThrow: async (tagName: string, commitHash: string) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubCreateTagOrThrow(octokit, tagName, commitHash);
     },
 
     exportOutputs: githubExportOutputs,

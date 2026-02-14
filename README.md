@@ -13,7 +13,7 @@
 
 ## Getting Started
 
-First, you will need a config file, below is a minial working one:
+First, you will need a config file, below is a minimal working one:
 
 ```json
 {
@@ -75,7 +75,7 @@ jobs:
 
 <br/>
 
-**See more examples[links].**
+**See more examples:** <https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples>
 
 ## How It Work
 
@@ -96,7 +96,7 @@ If a single PR contains multiple features or fixes that need individual entries,
 Example:
 
 ```text
-feat(ci): handle multiple changes
+feat: add multiple changes
 
 this is PR commit body
 
@@ -109,9 +109,9 @@ docs: update API documentation
 END_OVERRIDE_CHANGES
 ```
 
-### 2. The Preparation
+### 2. The Proposal
 
-Once a change is detected, Zephyr Release automatically creates (or updates) a **"Release Preparation" Pull Request**.
+Once a change is detected, Zephyr Release automatically creates (or updates) a **"Release Proposal" Pull Request**.
 
 - **Version Calculation**: It calculates the next [Semantic Version](https://semver.org/) based on your commit history.
 - **File Updates**: It updates the version in the files defined in your `version-files` configuration (e.g., `deno.json`).
@@ -120,7 +120,7 @@ Once a change is detected, Zephyr Release automatically creates (or updates) a *
 
 ### 3. The Release
 
-When you are ready to ship, simply **merge** the "Release Preparation" PR. Zephyr Release detects that this specific "prepare" commit has landed in your default branch and will:
+When you are ready to ship, simply **merge** the "Release Proposal" PR. Zephyr Release detects that this specific "propose" commit has landed in your default branch and will:
 
 - **Create a Git Tag**: Automatically tags the repository with the new version number.
 - **Publish Release Notes**: Generates and publishes the final release.

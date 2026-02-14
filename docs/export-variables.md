@@ -11,9 +11,9 @@ In GitHub: using [`@actions/core`](https://github.com/actions/toolkit/tree/main/
   - [Zephyr Release operation variables](#zephyr-release-operation-variables)
 - [Variable availability stages](#variable-availability-stages)
   - [Base (available at all time)](#base-available-at-all-time)
-  - [Prepare (when target is "prepare")](#prepare-when-target-is-prepare)
-    - [Pre Prepare](#pre-prepare)
-    - [Post Prepare](#post-prepare)
+  - [Propose (when target is "propose")](#propose-when-target-is-propose)
+    - [Pre Propose](#pre-propose)
+    - [Post Propose](#post-propose)
 
 ## Summary
 
@@ -79,10 +79,10 @@ Zephyr Release additional operation-scoped variables. These variables are not im
 - **workingBranchHash:** Working branch HEAD commit hash  
   Export: `zr-working-branch-hash`; Env: `ZR_WORKING_BRANCH_HASH`
 
-- **target:** "prepare" when create/update pull request, "release" when create tag and publish release  
+- **target:** "propose" when create/update pull request, "release" when create tag and publish release  
   Export: `zr-target`; Env: `ZR_TARGET`
 
-- **job:** "create-pr" or "update-pr" when **target** is "prepare", "create-release" when **target** is "release"  
+- **job:** "create-pr" or "update-pr" when **target** is "propose", "create-release" when **target** is "release"  
   Export: `zr-job`; Env: `ZR_JOB`
 
 <br/>
@@ -105,8 +105,8 @@ Zephyr Release additional operation-scoped variables. These variables are not im
   **Addtionally**, this value will be updated for each stages. For example, the patternContext exposed at `command-hook > pre` might be differ compared to the patternContext exposed at `pull-request > command-hook > pre`  
   Export: `zr-pattern-context`; Env: `ZR_PATTERN_CONTEXT`
 
-- **pullRequestNumber:** Pull request number. For "prepare" target (create/update PR), it is the PR number we are working with. For "release" target, it is the PR number we just merged into. Will be undefined if PR not found  
-  **Addtionally**, this value will be updated for each stages. For example, when there is no PR open for "prepare" target yet, the "create-pr" job will create the PR, and re-update the number later on; ([`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional))  
+- **pullRequestNumber:** Pull request number. For "propose" target (create/update PR), it is the PR number we are working with. For "release" target, it is the PR number we just merged into. Will be undefined if PR not found  
+  **Addtionally**, this value will be updated for each stages. For example, when there is no PR open for "propose" target yet, the "create-pr" job will create the PR, and re-update the number later on; ([`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional))  
   Export: `zr-pull-request-number`; Env: `ZR_PULL_REQUEST_NUMBER`
 
 ## Variable availability stages
@@ -139,9 +139,9 @@ These variables are available starting from the first [`command-hook > pre`](./c
 - **patternContext**
 - **pullRequestNumber**
 
-### Prepare (when target is "prepare")
+### Propose (when target is "propose")
 
-#### Pre Prepare
+#### Pre Propose
 
 These variables are available starting from the first [`pull-request > command-hook > pre`](./config-options.md#pull--command-hook-optional) command runs.
 
@@ -149,7 +149,7 @@ These variables are available starting from the first [`pull-request > command-h
 - **currentVersion**
 - **nextVersion**
 
-#### Post Prepare
+#### Post Propose
 
 These variables are available starting from the first [`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional) command runs.
 

@@ -90,6 +90,7 @@ export interface PlatformProvider {
   ) => Promise<void>;
 
   getLatestReleaseTagOrThrow: () => Promise<string | undefined>;
+  createTagOrThrow: (tagName: string, commitHash: string) => Promise<void>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

@@ -1,3 +1,7 @@
+import type {
+  OperationJob,
+  OperationTarget,
+} from "../constants/operation-variables.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
 export interface BaseOperationVariables
@@ -17,8 +21,8 @@ export interface BaseOperationVariables
   workingBranchRef: string;
   workingBranchHash: string;
 
-  target: "prepare" | "release";
-  job: "create-pr" | "update-pr" | "create-release";
+  target: OperationTarget;
+  job: OperationJob;
 }
 
 export interface DynamicOperationVariables {
@@ -26,13 +30,13 @@ export interface DynamicOperationVariables {
   pullRequestNumber: number | undefined;
 }
 
-export interface PrePrepareOperationVariables {
+export interface PreProposeOperationVariables {
   resolvedCommitEntries: string;
 
   currentVersion: string;
   nextVersion: string;
 }
 
-export interface PostPrepareOperationVariables {
+export interface PostProposeOperationVariables {
   committedFilePaths: string;
 }

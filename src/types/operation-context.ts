@@ -16,6 +16,6 @@ export interface ProviderOperationTriggerContext {
 }
 
 export interface OperationTriggerContext {
-  latestTriggerCommit: { commit: Commit; treeHash: string };
-  triggerCommits: Commit[];
+  latestTriggerCommit: { parsedCommit: Commit; treeHash: string };
+  parsedTriggerCommits: Commit[];
 }

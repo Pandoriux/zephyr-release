@@ -2,8 +2,8 @@ import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type {
   BaseOperationVariables,
   DynamicOperationVariables,
-  PostPrepareOperationVariables,
-  PrePrepareOperationVariables,
+  PostProposeOperationVariables,
+  PreProposeOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
@@ -42,7 +42,7 @@ export async function exportBaseOperationVariables(
   const { rawInputs, inputs } = inputsResult;
   const { rawConfig, config } = configResult;
 
-  const resolvedTarget = prForCommit ? "release" : "prepare";
+  const resolvedTarget = prForCommit ? "release" : "propose";
   const resolvedJob = resolvedTarget === "release"
     ? "create-release"
     : prFromBranch
@@ -61,9 +61,11 @@ export async function exportBaseOperationVariables(
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
     parsedTriggerCommit: JSON.stringify(
-      operationContext.latestTriggerCommit.commit,
+      operationContext.latestTriggerCommit.parsedCommit,
     ),
-    parsedTriggerCommitList: JSON.stringify(operationContext.triggerCommits),
+    parsedTriggerCommitList: JSON.stringify(
+      operationContext.parsedTriggerCommits,
+    ),
 
     workingBranchName: workingBranchResult.name,
     workingBranchRef: workingBranchResult.ref,
@@ -72,7 +74,7 @@ export async function exportBaseOperationVariables(
     target: resolvedTarget,
     job: resolvedJob,
 
-    pullRequestNumber: resolvedTarget === "prepare"
+    pullRequestNumber: resolvedTarget === "propose"
       ? prFromBranch?.number
       : prForCommit?.number,
     patternContext: await stringifyCurrentPatternContext(),
@@ -92,7 +94,7 @@ export async function exportBaseOperationVariables(
   });
 }
 
-export async function exportPrePrepareOperationVariables(
+export async function exportPreProposeOperationVariables(
   provider: PlatformProvider,
   resolvedCommitEntries: ResolvedCommit[],
   nextVersionResult: NextVersionResult,
@@ -105,12 +107,12 @@ export async function exportPrePrepareOperationVariables(
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PrePrepareOperationVariables
+    & PreProposeOperationVariables
     & Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Pre prepare operation variables to export (internal key name):",
+      "Pre propose operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();
@@ -122,7 +124,7 @@ export async function exportPrePrepareOperationVariables(
   });
 }
 
-export async function exportPostPrepareOperationVariables(
+export async function exportPostProposeOperationVariables(
   provider: PlatformProvider,
   prNumber: number,
   changesData: Map<string, string>,
@@ -133,12 +135,12 @@ export async function exportPostPrepareOperationVariables(
     pullRequestNumber: prNumber,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PostPrepareOperationVariables
+    & PostProposeOperationVariables
     & DynamicOperationVariables;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Post prepare operation variables to export (internal key name):",
+      "Post propose operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();

@@ -97,3 +97,11 @@ export async function githubGetLatestReleaseTagOrThrow(
     throw error;
   }
 }
+
+export async function githubCreateTagOrThrow(
+  octokit: OctokitClient,
+  tagName: string,
+  commitHash: string,
+): Promise<void> {
+  // const res = octokit.rest.creat;
+}

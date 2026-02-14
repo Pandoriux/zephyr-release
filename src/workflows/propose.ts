@@ -17,14 +17,14 @@ import {
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
 import {
-  exportPostPrepareOperationVariables,
-  exportPrePrepareOperationVariables,
+  exportPostProposeOperationVariables,
+  exportPreProposeOperationVariables,
 } from "../tasks/export-variables.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
 
-interface PrepareWorkflowOptions {
+interface ProposeWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
   associatedPrFromBranch: ProviderPullRequest | undefined;
   operationContext: OperationTriggerContext;
@@ -32,9 +32,9 @@ interface PrepareWorkflowOptions {
   config: ConfigOutput;
 }
 
-export async function prepareWorkflow(
+export async function proposeWorkflow(
   provider: PlatformProvider,
-  ops: PrepareWorkflowOptions,
+  ops: ProposeWorkflowOptions,
 ) {
   const {
     workingBranchResult,
@@ -72,13 +72,13 @@ export async function prepareWorkflow(
     "Finished: Create fixed version string pattern context",
   );
 
-  logger.debugStepStart("Starting: Export pre prepare operation variables");
-  await exportPrePrepareOperationVariables(
+  logger.debugStepStart("Starting: Export pre propose operation variables");
+  await exportPreProposeOperationVariables(
     provider,
     resolvedCommitsResult.entries,
     nextVersionResult,
   );
-  logger.debugStepFinish("Finished: Export pre prepare operation variables");
+  logger.debugStepFinish("Finished: Export pre propose operation variables");
 
   logger.stepStart("Starting: Execute pull request pre commands");
   const preResult = await runCommandsOrThrow(
@@ -153,9 +153,9 @@ export async function prepareWorkflow(
   await addLabelsToPullRequestOrThrow(provider, prNumber, config);
   logger.stepFinish("Finished: Add labels to pull request");
 
-  logger.debugStepStart("Starting: Export post prepare operation variables");
-  await exportPostPrepareOperationVariables(provider, prNumber, changesData);
-  logger.debugStepFinish("Finished: Export post prepare operation variables");
+  logger.debugStepStart("Starting: Export post propose operation variables");
+  await exportPostProposeOperationVariables(provider, prNumber, changesData);
+  logger.debugStepFinish("Finished: Export post propose operation variables");
 
   logger.stepStart("Starting: Execute pull request post commands");
   const postResult = await runCommandsOrThrow(
