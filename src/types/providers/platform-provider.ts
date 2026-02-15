@@ -36,7 +36,7 @@ export interface PlatformProvider {
 
   manageConcurrency: () => Promise<ProviderConcurrencyResult>;
 
-  getTextFileOrThrow: (filePath: string) => Promise<string>;
+  getTextFileOrThrow: (filePath: string, ref?: string) => Promise<string>;
 
   ensureBranchExistOrThrow: (
     branchName: string,

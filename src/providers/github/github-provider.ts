@@ -92,9 +92,9 @@ export function createGitHubProvider(): PlatformProvider {
       return await githubManageConcurrency(octokit);
     },
 
-    getTextFileOrThrow: async (filePath: string) => {
+    getTextFileOrThrow: async (filePath: string, ref?: string) => {
       const { octokit } = ensureProviderContextOrThrow();
-      return await githubGetTextFileOrThrow(octokit, filePath);
+      return await githubGetTextFileOrThrow(octokit, filePath, ref);
     },
 
     ensureBranchExistOrThrow: async (

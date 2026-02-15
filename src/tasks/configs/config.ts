@@ -15,6 +15,7 @@ import { transformObjKeyToCamelCase } from "../../utils/transformers/object.ts";
 
 type ResolveConfigInputsParams = Pick<
   InputsOutput,
+  | "triggerCommitHash"
   | "configPath"
   | "configFormat"
   | "configOverride"
@@ -31,6 +32,7 @@ export async function resolveConfigOrThrow(
   inputs: ResolveConfigInputsParams,
 ): Promise<ResolveConfigResult> {
   const {
+    triggerCommitHash,
     configPath,
     configFormat,
     configOverride,
@@ -45,6 +47,7 @@ export async function resolveConfigOrThrow(
   if (configPath) {
     const configText = await getTextFileOrThrow("remote", configPath, {
       provider,
+      ref: triggerCommitHash,
     });
 
     const parsedResult = parseConfigOrThrow(

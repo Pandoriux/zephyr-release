@@ -10,7 +10,7 @@ import { taskLogger } from "../logger.ts";
 
 type GetPreviousVersionInputsParams = Pick<
   InputsOutput,
-  "workspacePath" | "sourceMode"
+  "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
 type GetPreviousVersionConfigParams = Pick<
@@ -23,7 +23,7 @@ export async function getPreviousVersion(
   inputs: GetPreviousVersionInputsParams,
   config: GetPreviousVersionConfigParams,
 ): Promise<SemVer | undefined> {
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles } = config;
 
   taskLogger.info("Getting previous version from primary version files...");
@@ -33,6 +33,7 @@ export async function getPreviousVersion(
     sourceMode,
     provider,
     workspacePath,
+    triggerCommitHash,
   );
 
   if (!primaryVersion) {

@@ -60,6 +60,7 @@ export async function getVersionStringFromVersionFile(
   sourceMode: InputsOutput["sourceMode"],
   provider: PlatformProvider,
   workspacePath: string,
+  triggerCommitHash: string,
 ): Promise<string | null | undefined> {
   const fileSourceMode = getVersionFileSourceMode(
     versionFile.path,
@@ -69,7 +70,7 @@ export async function getVersionStringFromVersionFile(
   const fileContent = await getTextFileOrThrow(
     fileSourceMode,
     versionFile.path,
-    { workspace: workspacePath, provider },
+    { workspace: workspacePath, provider, ref: triggerCommitHash },
   );
 
   const parsedResult = parseVersionFileOrThrow(
@@ -103,6 +104,7 @@ export async function prepareVersionFilesToCommit(
   sourceMode: InputsOutput["sourceMode"],
   workspacePath: string,
   nextVersion: string,
+  triggerCommitHash: string,
 ): Promise<[string, string][]> {
   const vfChangesData: [string, string][] = [];
 
@@ -113,6 +115,7 @@ export async function prepareVersionFilesToCommit(
       {
         provider,
         workspace: workspacePath,
+        ref: triggerCommitHash,
       },
     );
 

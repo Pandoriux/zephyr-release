@@ -87,7 +87,10 @@ interface CreatePullRequestContentConfigParams {
 
 export async function createPullRequestContent(
   provider: PlatformProvider,
-  inputs: Pick<InputsOutput, "sourceMode" | "workspacePath">,
+  inputs: Pick<
+    InputsOutput,
+    "triggerCommitHash" | "sourceMode" | "workspacePath"
+  >,
   config: CreatePullRequestContentConfigParams,
 ): Promise<string> {
   const {
@@ -98,14 +101,14 @@ export async function createPullRequestContent(
     footerTemplate,
     footerTemplatePath,
   } = config.pullRequest;
-  const { sourceMode, workspacePath } = inputs;
+  const { triggerCommitHash, sourceMode, workspacePath } = inputs;
 
   let prHeader: string;
   if (headerTemplatePath) {
     const prHeaderTemplate = await getTextFileOrThrow(
       sourceMode.prHeaderTemplatePath ?? sourceMode.sourceMode,
       headerTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     prHeader = await resolveStringTemplateOrThrow(prHeaderTemplate);
   } else {
@@ -120,7 +123,7 @@ export async function createPullRequestContent(
     const prBodyTemplate = await getTextFileOrThrow(
       sourceMode.prBodyTemplatePath ?? sourceMode.sourceMode,
       bodyTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     prBody = await resolveStringTemplateOrThrow(prBodyTemplate);
   } else {
@@ -134,7 +137,7 @@ export async function createPullRequestContent(
     const prFooterTemplate = await getTextFileOrThrow(
       sourceMode.prFooterTemplatePath ?? sourceMode.sourceMode,
       footerTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     prFooter = await resolveStringTemplateOrThrow(prFooterTemplate);
   } else {
@@ -167,7 +170,7 @@ export async function createOrUpdatePullRequestOrThrow(
   },
   inputs: Pick<
     InputsOutput,
-    "workspacePath" | "sourceMode"
+    "triggerCommitHash" | "workspacePath" | "sourceMode"
   >,
   config: CreateOrUpdatePullRequestConfigParams,
 ): Promise<number> {
