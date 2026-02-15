@@ -7,7 +7,7 @@ import {
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
 import fg from "fast-glob";
 import { taskLogger } from "./logger.ts";
-import { prepareVersionFilesToCommit } from "./version-file.ts";
+import { prepareVersionFilesToCommit } from "./version-files/version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";

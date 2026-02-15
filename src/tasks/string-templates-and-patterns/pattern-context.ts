@@ -89,6 +89,17 @@ export async function createFixedVersionStringPatternContext(
   tagTemplate: string,
 ) {
   const versionContext = {
+    previousVersion: previousVersion ? format(previousVersion) : undefined,
+    previousVersionCore: previousVersion
+      ? `${previousVersion.major}.${previousVersion.minor}.${previousVersion.patch}`
+      : undefined,
+    previousVersionPre: previousVersion?.prerelease?.length
+      ? previousVersion.prerelease.join(".")
+      : undefined,
+    previousVersionBld: previousVersion?.build?.length
+      ? previousVersion.build.join(".")
+      : undefined,
+
     version: format(version),
     versionCore: `${version.major}.${version.minor}.${version.patch}`,
     versionPre: version.prerelease?.length

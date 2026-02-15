@@ -5,7 +5,7 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import {
   getPrimaryVersionFile,
   getVersionStringFromVersionFile,
-} from "../version-file.ts";
+} from "../version-files/version-file.ts";
 import { taskLogger } from "../logger.ts";
 
 type GetPreviousVersionInputsParams = Pick<

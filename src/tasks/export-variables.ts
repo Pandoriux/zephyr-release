@@ -15,7 +15,7 @@ import { jsonValueNormalizer } from "../utils/transformers/json.ts";
 import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
-import type { ResolveConfigResult } from "./config.ts";
+import type { ResolveConfigResult } from "./configs/config.ts";
 import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
 import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";

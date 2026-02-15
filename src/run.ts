@@ -2,7 +2,7 @@ import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
-import { resolveConfigOrThrow } from "./tasks/config.ts";
+import { resolveConfigOrThrow } from "./tasks/configs/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
 import { createFixedBaseStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import {

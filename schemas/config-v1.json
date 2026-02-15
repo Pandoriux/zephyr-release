@@ -8,7 +8,7 @@
     "time-zone": {
       "$ref": "#/$defs/time-zone",
       "default": "UTC",
-      "description": "IANA timezone used to display times, available in string templates as ${timeZone}.\nDefault: \"UTC\""
+      "description": "IANA timezone used to display times, available in string templates as {{ timeZone }}.\nDefault: \"UTC\""
     },
     "command-hook": {
       "type": "object",
@@ -232,7 +232,7 @@
         "minLength": 1
       },
       "additionalProperties": {},
-      "description": "Custom string patterns to use in templates. The key is the pattern, available as '{{<key>}}' while the resolved value is the key value.\nNormally, these should be set dynamically through config override."
+      "description": "Custom string patterns to use in templates. The key is the pattern, available as '{{ <key> }}' while the resolved value is the key value."
     },
     "initial-version": {
       "type": "string",
@@ -952,7 +952,7 @@
         "file-header-template": {
           "type": "string",
           "default": "# Changelog\n\n<br/>\n",
-          "description": "String template for changelog file header, using with string patterns like ${version}. Placed above any changelog content.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
+          "description": "String template for changelog file header, using with string patterns like {{ version }}. Placed above any changelog content.\nDefault: \"# Changelog\\n\\n<br/>\\n\""
         },
         "file-header-template-path": {
           "type": "string",
@@ -961,7 +961,7 @@
         },
         "file-footer-template": {
           "type": "string",
-          "description": "String template for changelog file footer, using with string patterns like ${version}. Placed below any changelog content."
+          "description": "String template for changelog file footer, using with string patterns like {{ version }}. Placed below any changelog content."
         },
         "file-footer-template-path": {
           "type": "string",
@@ -1251,7 +1251,7 @@
           "type": "string",
           "minLength": 1,
           "default": "release/zephyr-release",
-          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: all fixed base string patterns.\nDefault: \"release/zephyr-release\""
+          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: fixed base string patterns.\nDefault: \"release/zephyr-release\""
         },
         "label": {
           "type": "object",
@@ -1391,7 +1391,7 @@
           "type": "string",
           "minLength": 1,
           "default": "chore: release v{{ version }}",
-          "description": "String template for pull request title, using with string patterns like ${version}.\nDefault: \"chore: release v{{ version }}\""
+          "description": "String template for pull request title, using with string patterns like {{ version }}.\nDefault: \"chore: release v{{ version }}\""
         },
         "title-template-path": {
           "type": "string",
@@ -1420,8 +1420,8 @@
         },
         "body-template": {
           "type": "string",
-          "default": "{{ changelogContent }}",
-          "description": "String template for pull request body, using with string patterns like ${changelogContent}.\nDefault: \"{{ changelogContent }}\""
+          "default": "{{ changelogRelease }}",
+          "description": "String template for pull request body, using with string patterns like {{ changelogRelease }}.\nDefault: \"{{ changelogRelease }}\""
         },
         "body-template-path": {
           "type": "string",
@@ -1449,12 +1449,7 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable tag and release.\nDefault: true"
-        },
-        "skip-release": {
-          "type": "boolean",
-          "default": false,
-          "description": "If enabled, only the tag will be created, no release will be made.\nDefault: false"
+          "description": "Enable/disable tag and release operation.\nDefault: true"
         },
         "command-hook": {
           "type": "object",
@@ -1671,6 +1666,11 @@
           "required": [],
           "description": "Pre/post command lists to run around the release operation. Each command runs from the repository root."
         },
+        "skip-release-note": {
+          "type": "boolean",
+          "default": false,
+          "description": "If enabled, only the tag will be created, no release note will be made.\nDefault: false"
+        },
         "prerelease": {
           "type": "boolean",
           "default": false,
@@ -1694,8 +1694,8 @@
         },
         "body-template": {
           "type": "string",
-          "default": "{{ changelogContent }}",
-          "description": "String template for release body, using with string patterns like ${changelogContent}.\nDefault: \"{{ changelogContent }}\""
+          "default": "{{ changelogRelease }}",
+          "description": "String template for release body, using with string patterns like {{ changelogRelease }}.\nDefault: \"{{ changelogRelease }}\""
         }
       },
       "required": [],
