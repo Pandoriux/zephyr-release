@@ -108,7 +108,7 @@ export async function run(provider: PlatformProvider) {
   // Main operation workflow
   if (!associatedPrForCommit) {
     logger.stepStart(
-      "Workflow: Create/Update release proposal pull request",
+      "Start Workflow: Create/Update release proposal pull request",
     );
     await proposeWorkflow(provider, {
       workingBranchResult,
@@ -118,8 +118,14 @@ export async function run(provider: PlatformProvider) {
       config,
     });
   } else {
-    logger.stepStart("Workflow: Create tag and release");
-    await releaseWorkflow(provider, { operationContext, inputs, config });
+    if (config.release.enabled) {
+      logger.stepStart("Start Workflow: Create tag and release");
+      await releaseWorkflow(provider, { operationContext, inputs, config });
+    } else {
+      logger.stepSkip(
+        "Skip Workflow: Create tag and release (disabled in config)",
+      );
+    }
   }
 
   logger.stepStart("Starting: Execute base post commands");

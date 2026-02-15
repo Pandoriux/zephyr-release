@@ -12,13 +12,18 @@ import {
   toExportOutputKey,
 } from "../utils/transformers/case.ts";
 import { jsonValueNormalizer } from "../utils/transformers/json.ts";
+import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
-import type { NextVersionResult } from "./calculate-next-version/next-version.ts";
 import type { ResolvedCommit } from "./commit.ts";
 import type { ResolveConfigResult } from "./config.ts";
 import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
 import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
+import {
+  OperationJob,
+  OperationJobs,
+  OperationTargets,
+} from "../constants/operation-variables.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
@@ -42,12 +47,30 @@ export async function exportBaseOperationVariables(
   const { rawInputs, inputs } = inputsResult;
   const { rawConfig, config } = configResult;
 
-  const resolvedTarget = prForCommit ? "release" : "propose";
-  const resolvedJob = resolvedTarget === "release"
-    ? "create-release"
-    : prFromBranch
-    ? "update-pr"
-    : "create-pr";
+  const resolvedTarget = prForCommit
+    ? OperationTargets.release
+    : OperationTargets.propose;
+
+  const resolvedJobs: OperationJob[] = [];
+  switch (resolvedTarget) {
+    case "propose":
+      // when add autorelease in the future, we wont push it it, TODO handle that
+      if (prFromBranch) {
+        resolvedJobs.push(OperationJobs.updatePr);
+      } else {
+        resolvedJobs.push(OperationJobs.createPr);
+      }
+
+      break;
+    case "release":
+      resolvedJobs.push(OperationJobs.createTag);
+
+      if (!config.release.skipReleaseNote) {
+        resolvedJobs.push(OperationJobs.createReleaseNote);
+      }
+
+      break;
+  }
 
   const { token: _t, sourceMode: _sm, ...excludedInputs } = inputs;
 
@@ -72,7 +95,7 @@ export async function exportBaseOperationVariables(
     workingBranchHash: workingBranchResult.object.sha,
 
     target: resolvedTarget,
-    job: resolvedJob,
+    jobs: JSON.stringify(resolvedJobs),
 
     pullRequestNumber: resolvedTarget === "propose"
       ? prFromBranch?.number
@@ -97,13 +120,14 @@ export async function exportBaseOperationVariables(
 export async function exportPreProposeOperationVariables(
   provider: PlatformProvider,
   resolvedCommitEntries: ResolvedCommit[],
-  nextVersionResult: NextVersionResult,
+  previousVersion: SemVer | undefined,
+  nextVersion: SemVer,
 ) {
   const prepareExportObject = {
     resolvedCommitEntries: JSON.stringify(resolvedCommitEntries),
 
-    currentVersion: nextVersionResult.currentVerStr,
-    nextVersion: nextVersionResult.nextVerStr,
+    previousVersion: previousVersion ? format(previousVersion) : "",
+    version: format(nextVersion),
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies

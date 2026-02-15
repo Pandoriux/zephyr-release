@@ -12,16 +12,8 @@ export const ReleaseConfigSchema = v.pipe(
     enabled: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "Enable/disable tag and release.\n" +
+        description: "Enable/disable tag and release operation.\n" +
           "Default: true",
-      }),
-    ),
-    skipRelease: v.pipe(
-      v.optional(v.boolean(), false),
-      v.metadata({
-        description:
-          "If enabled, only the tag will be created, no release will be made.\n" +
-          "Default: false",
       }),
     ),
     commandHook: v.pipe(
@@ -29,6 +21,15 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Pre/post command lists to run around the release operation. Each command runs from the repository root.",
+      }),
+    ),
+    
+    skipReleaseNote: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description:
+          "If enabled, only the tag will be created, no release note will be made.\n" +
+          "Default: false",
       }),
     ),
 

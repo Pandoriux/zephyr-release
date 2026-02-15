@@ -42,10 +42,17 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 #### Version
 
-- `{{ version }}`: The full semantic version (SemVer) number
-- `{{ versionCore }}`: The core part of the semantic version (major.minor.patch)
-- `{{ versionPre }}`: The prerelease identifier of the semantic version
-- `{{ versionBld }}`: The build metadata of the semantic version
+- `{{ previousVersion }}`: The previous full semantic version (SemVer)
+- `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
+- `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
+- `{{ previousVersionBld }}`: The previous build metadata of the semantic version
+
+<br/>
+
+- `{{ version }}`: The calculated next full semantic version (SemVer)
+- `{{ versionCore }}`: The calculated next core part of the semantic version (major.minor.patch)
+- `{{ versionPre }}`: The calculated next prerelease identifier of the semantic version
+- `{{ versionBld }}`: The calculated next build metadata of the semantic version
 
 <br/>
 

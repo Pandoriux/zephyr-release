@@ -22,7 +22,8 @@ export interface BaseOperationVariables
   workingBranchHash: string;
 
   target: OperationTarget;
-  job: OperationJob;
+  /** Stringify OperationJobs[] */
+  jobs: string;
 }
 
 export interface DynamicOperationVariables {
@@ -33,8 +34,8 @@ export interface DynamicOperationVariables {
 export interface PreProposeOperationVariables {
   resolvedCommitEntries: string;
 
-  currentVersion: string;
-  nextVersion: string;
+  previousVersion: string;
+  version: string;
 }
 
 export interface PostProposeOperationVariables {

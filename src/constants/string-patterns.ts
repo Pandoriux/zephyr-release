@@ -25,6 +25,12 @@ export type FixedBaseStringPattern =
   typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
 
 const FixedVersionStringPatterns = {
+  // Previous version components
+  previousVersion: "previousVersion",
+  previousVersionCore: "previousVersionCore",
+  previousVersionPrerelease: "previousVersionPre",
+  previousVersionBuild: "previousVersionBld",
+
   // Version components
   version: "version",
   versionCore: "versionCore",

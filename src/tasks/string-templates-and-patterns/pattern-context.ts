@@ -12,7 +12,7 @@ import type {
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
 import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
 import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
-import { GenerateChangelogReleaseResult } from "../changelog.ts";
+import type { GenerateChangelogReleaseResult } from "../changelog.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -85,6 +85,7 @@ export async function createFixedBaseStringPatternContext(
 
 export async function createFixedVersionStringPatternContext(
   version: SemVer,
+  previousVersion: SemVer | undefined,
   tagTemplate: string,
 ) {
   const versionContext = {

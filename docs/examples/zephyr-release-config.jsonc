@@ -182,7 +182,7 @@
 
   "release": {
     "enabled": true,
-    "skip-release": false,
+    "skip-release-note": false,
 
     // Ex: Run commands before and after release creation
     "command-hook": {

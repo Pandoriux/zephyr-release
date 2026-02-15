@@ -1,9 +1,5 @@
 import { canParse, format, parse, type SemVer } from "@std/semver";
 import type { Commit } from "conventional-commits-parser";
-import {
-  getPrimaryVersionFile,
-  getVersionStringFromVersionFile,
-} from "../version-file.ts";
 import type { ResolvedCommitsResult } from "../commit.ts";
 import { taskLogger } from "../logger.ts";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
@@ -22,54 +18,29 @@ type CalculateNextVersionConfigParams = Pick<
   ConfigOutput,
   | "timeZone"
   | "initialVersion"
-  | "versionFiles"
   | "commitTypes"
   | "allowReleaseAs"
   | "bumpStrategy"
 >;
 
-export interface NextVersionResult {
-  nextVerStr: string;
-  nextVerSemVer: SemVer;
-  currentVerStr: string;
-}
-
-export async function calculateNextVersion(
-  provider: PlatformProvider,
+export function calculateNextVersion(
   resolvedCommitsResult: ResolvedCommitsResult,
-  inputs: CalculateNextVersionInputsParams,
   config: CalculateNextVersionConfigParams,
-): Promise<NextVersionResult> {
+  previousVersion: SemVer | undefined,
+): SemVer {
   const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
-  const { workspacePath, sourceMode } = inputs;
   const {
     timeZone,
     initialVersion,
-    versionFiles,
     commitTypes,
     allowReleaseAs,
     bumpStrategy,
   } = config;
 
-  taskLogger.info("Getting current version from primary version files...");
-  const primaryVersionFile = getPrimaryVersionFile(versionFiles);
-  const primaryVersion = await getVersionStringFromVersionFile(
-    primaryVersionFile,
-    sourceMode,
-    provider,
-    workspacePath,
+  taskLogger.info(
+    "Checking if there is release-as trigger (manual version set)...",
   );
-
-  const currentVersion = primaryVersion ? primaryVersion : initialVersion;
-  if (!canParse(currentVersion)) {
-    throw new Error(
-      `Current version '${currentVersion}' from is not a valid semver object`,
-    );
-  }
-
-  taskLogger.info("Checking if there is release-as trigger...");
   const manualReleaseAsVersion = resolveManualReleaseAsVersion(
-    currentVersion,
     resolvedTriggerCommit,
     commitTypes,
     allowReleaseAs,
@@ -78,17 +49,35 @@ export async function calculateNextVersion(
     return manualReleaseAsVersion;
   }
 
-  taskLogger.info(`Current version got from version file is ${currentVersion}`);
-  const currentSemVer = parse(currentVersion);
+  // No previous version, return initial version
+  if (!previousVersion) {
+    taskLogger.info(
+      `No previous version found, using initial version: ${initialVersion}`,
+    );
 
+    if (!canParse(initialVersion)) {
+      throw new Error(
+        `Initial version '${initialVersion}' is not a valid semver object`,
+      );
+    }
+
+    return parse(initialVersion);
+  }
+
+  // Previous version exists, calculate the next version
+  taskLogger.info(
+    `Previous version got from version file is ${previousVersion}`,
+  );
+
+  // Calculate next version from previous version
   const nextCoreSemVer = calculateNextCoreSemVer(
-    currentSemVer,
+    previousVersion,
     entries,
     bumpStrategy,
   );
 
   const nextExtensionSemVer = calculateNextExtensionsSemVer(
-    currentSemVer,
+    previousVersion,
     nextCoreSemVer,
     bumpStrategy,
     timeZone,
@@ -104,19 +93,14 @@ export async function calculateNextVersion(
   const finalVersion = format(finalSemVer);
   taskLogger.info(`Final calculated next version: ${finalVersion}`);
 
-  return {
-    nextVerStr: finalVersion,
-    nextVerSemVer: finalSemVer,
-    currentVerStr: currentVersion,
-  };
+  return finalSemVer;
 }
 
 function resolveManualReleaseAsVersion(
-  currentVersionStr: string,
   triggerCommit: Commit,
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
   allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
-): NextVersionResult | undefined {
+): SemVer | undefined {
   const releaseAsNote = triggerCommit.notes.find((n) =>
     n.title.toLowerCase() === "release as" ||
     n.title.toLowerCase() === "release-as"
@@ -140,13 +124,7 @@ function resolveManualReleaseAsVersion(
     return undefined;
   }
 
-  const semver = parse(releaseAsNote.text);
-
-  return {
-    nextVerStr: format(semver),
-    nextVerSemVer: semver,
-    currentVerStr: currentVersionStr,
-  };
+  return parse(releaseAsNote.text);
 }
 
 /**

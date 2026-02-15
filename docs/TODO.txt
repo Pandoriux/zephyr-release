@@ -34,3 +34,21 @@ readme
   }
 }
 ```
+
+add a commit stop/depth hash in config, in case user first using the script, and dont want to scan 1000+ commit
+
+---> exportBaseOperationVariables()
+const resolvedJobs: OperationJob[] = [];
+  switch (resolvedTarget) {
+    case "propose":
+      // when add autorelease in the future, we wont push it it, TODO handle that
+      if (prFromBranch) {
+        resolvedJobs.push(OperationJobs.updatePr);
+      } else {
+        resolvedJobs.push(OperationJobs.createPr);
+      }
+      break;
+    case "release":
+
+      break;
+  }

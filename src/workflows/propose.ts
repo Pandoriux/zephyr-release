@@ -9,7 +9,9 @@ import {
 } from "../tasks/commit.ts";
 import { createOrUpdatePullRequestOrThrow } from "../tasks/pull-request.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import { calculateNextVersion } from "../tasks/calculate-next-version/next-version.ts";
+import { format } from "@std/semver";
+import { calculateNextVersion } from "../tasks/calculate-next-version/calculate-version.ts";
+import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -44,6 +46,10 @@ export async function proposeWorkflow(
     config,
   } = ops;
 
+  logger.stepStart("Starting: Get previous version");
+  const previousVersion = await getPreviousVersion(provider, inputs, config);
+  logger.stepFinish("Finished: Get previous version");
+
   logger.stepStart("Starting: Resolve commits from trigger to last release");
   const resolvedCommitsResult = await resolveCommitsFromTriggerToLastRelease(
     provider,
@@ -53,11 +59,10 @@ export async function proposeWorkflow(
   logger.stepFinish("Finished: Resolve commits from trigger to last release");
 
   logger.stepStart("Starting: Calculate next version");
-  const nextVersionResult = await calculateNextVersion(
-    provider,
+  const nextVersion = calculateNextVersion(
     resolvedCommitsResult,
-    inputs,
     config,
+    previousVersion,
   );
   logger.stepFinish("Finished: Calculate next version");
 
@@ -65,7 +70,8 @@ export async function proposeWorkflow(
     "Starting: Create fixed version string pattern context",
   );
   createFixedVersionStringPatternContext(
-    nextVersionResult.nextVerSemVer,
+    nextVersion,
+    previousVersion,
     config.release.tagNameTemplate,
   );
   logger.debugStepFinish(
@@ -76,7 +82,8 @@ export async function proposeWorkflow(
   await exportPreProposeOperationVariables(
     provider,
     resolvedCommitsResult.entries,
-    nextVersionResult,
+    previousVersion,
+    nextVersion,
   );
   logger.debugStepFinish("Finished: Export pre propose operation variables");
 
@@ -117,7 +124,7 @@ export async function proposeWorkflow(
     config,
     {
       changelogRelease: changelogReleaseResult.release,
-      nextVersion: nextVersionResult.nextVerStr,
+      nextVersion: format(nextVersion),
     },
   );
   logger.stepFinish("Finished: Prepare and collect changes data to commit");

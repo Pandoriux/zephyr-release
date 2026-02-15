@@ -65,8 +65,8 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
-    - [release \> skip-release (Optional)](#release--skip-release-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
+    - [release \> skip-release-note (Optional)](#release--skip-release-note-optional)
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
@@ -476,7 +476,7 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`command-hook`](#release--command-hook-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`title-template`](#release--title-template-optional), [`body-template`](#release--body-template-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`skip-release-note`](#release--skip-release-note-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`title-template`](#release--title-template-optional), [`body-template`](#release--body-template-optional)
 
 Configuration specific to tags and releases.
 
@@ -485,20 +485,20 @@ Configuration specific to tags and releases.
 Type: `boolean`  
 Default: `true`
 
-Enable/disable tag and release.
-
-#### release > skip-release (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-If enabled, only the tag will be created, no release will be made.
+Enable/disable tag and release operation.
 
 #### release > command-hook (Optional)
 
 Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the release operation. Each command runs from the repository root.
+
+#### release > skip-release-note (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, only the tag will be created, no release note will be made.
 
 #### release > draft (Optional)
 
