@@ -6,6 +6,6 @@ export const CHANGELOG_MARKERS = {
 } as const;
 
 export const PR_MARKERS = {
-  bodyStart: "<!-- PR-BODY-START -->",
-  bodyEnd: "<!-- PR-BODY-END -->",
+  bodyStart: "<!-- PR-CHANGELOG-RELEASE-START -->",
+  bodyEnd: "<!-- PR-CHANGELOG-RELEASE-END -->",
 } as const;

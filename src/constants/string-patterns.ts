@@ -24,13 +24,20 @@ export const FixedBaseStringPatterns = {
 export type FixedBaseStringPattern =
   typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
 
-const FixedVersionStringPatterns = {
+const FixedPreviousVersionStringPatterns = {
   // Previous version components
   previousVersion: "previousVersion",
   previousVersionCore: "previousVersionCore",
   previousVersionPrerelease: "previousVersionPre",
   previousVersionBuild: "previousVersionBld",
+};
 
+export type FixedPreviousVersionStringPattern =
+  typeof FixedPreviousVersionStringPatterns[
+    keyof typeof FixedPreviousVersionStringPatterns
+  ];
+
+const FixedVersionStringPatterns = {
   // Version components
   version: "version",
   versionCore: "versionCore",
@@ -41,8 +48,9 @@ const FixedVersionStringPatterns = {
   tagName: "tagName",
 } as const;
 
-export type FixedVersionStringPattern =
-  typeof FixedVersionStringPatterns[keyof typeof FixedVersionStringPatterns];
+export type FixedVersionStringPattern = typeof FixedVersionStringPatterns[
+  keyof typeof FixedVersionStringPatterns
+];
 
 const DynamicChangelogStringPatterns = {
   changelogRelease: "changelogRelease",

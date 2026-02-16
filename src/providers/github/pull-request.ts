@@ -8,6 +8,8 @@ const RawPullRequestNodeSchema = v.object({
   headRefName: v.string(),
   baseRefName: v.string(),
   state: v.string(),
+  title: v.string(),
+  body: v.string(),
   labels: v.object({
     nodes: v.array(
       v.object({
@@ -69,6 +71,8 @@ export async function githubFindUniquePullRequestForCommitOrThrow(
                 headRefName
                 baseRefName
                 state
+                title
+                body
                 labels(first: 100) {
                   nodes {
                     name
@@ -121,6 +125,8 @@ export async function githubFindUniquePullRequestForCommitOrThrow(
           number: pr.number,
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
+          title: pr.title,
+          body: pr.body,
         };
       }
     }
@@ -150,6 +156,8 @@ export async function githubFindUniquePullRequestFromBranchOrThrow(
             headRefName
             baseRefName
             state
+            title
+            body
             labels(first: 100) {
               nodes {
                 name
@@ -193,6 +201,8 @@ export async function githubFindUniquePullRequestFromBranchOrThrow(
           number: pr.number,
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
+          title: pr.title,
+          body: pr.body,
         };
       }
     }
@@ -221,6 +231,8 @@ export async function githubCreatePullRequestOrThrow(
     number: res.data.number,
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
+    title: res.data.title,
+    body: res.data.body || "",
   };
 }
 
@@ -242,5 +254,7 @@ export async function githubUpdatePullRequestOrThrow(
     number: res.data.number,
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
-  }
+    title: res.data.title,
+    body: res.data.body || "",
+  };
 }

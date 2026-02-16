@@ -52,6 +52,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for pull request title, using with string patterns like {{ version }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_TEMPLATE)}`,
       }),
     ),
@@ -72,6 +73,7 @@ export const PullRequestConfigSchema = v.pipe(
         description:
           "String template for pull request header, using with string patterns like {{ version }}. If an array is provided, " +
           "one will be randomly chosen.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
       }),
     ),
@@ -87,6 +89,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for pull request body, using with string patterns like {{ changelogRelease }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_TEMPLATE)}`,
       }),
     ),
@@ -102,6 +105,7 @@ export const PullRequestConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for pull request footer, using with string patterns.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE)}`,
       }),
     ),

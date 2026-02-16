@@ -1,10 +1,9 @@
-export const OperationTargets = {
+export const OperationKinds = {
   propose: "propose",
   release: "release",
 } as const;
 
-export type OperationTarget =
-  typeof OperationTargets[keyof typeof OperationTargets];
+export type OperationKind = typeof OperationKinds[keyof typeof OperationKinds];
 
 export const OperationJobs = {
   createPr: "create-pr",

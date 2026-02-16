@@ -1,3 +1,4 @@
+import { canParse, parse, type SemVer } from "@std/semver";
 import { taskLogger } from "../logger.ts";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { VersionFileOutput } from "../../schemas/configs/modules/components/version-file.ts";
@@ -55,13 +56,13 @@ export function getPrimaryVersionFile(
   return primaryFile;
 }
 
-export async function getVersionStringFromVersionFile(
+export async function getVersionSemVerFromVersionFile(
   versionFile: VersionFileOutput,
   sourceMode: InputsOutput["sourceMode"],
   provider: PlatformProvider,
   workspacePath: string,
   triggerCommitHash: string,
-): Promise<string | null | undefined> {
+): Promise<SemVer | undefined> {
   const fileSourceMode = getVersionFileSourceMode(
     versionFile.path,
     sourceMode,
@@ -91,11 +92,17 @@ export async function getVersionStringFromVersionFile(
     );
   }
 
-  return extractVersionStringOrThrow(
+  const versionString = extractVersionStringOrThrow(
     parsedResult.parsedContent,
     extractor,
     versionFile.selector,
   );
+
+  if (!versionString || !canParse(versionString)) {
+    return undefined;
+  }
+
+  return parse(versionString);
 }
 
 export async function prepareVersionFilesToCommit(

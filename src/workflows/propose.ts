@@ -14,6 +14,7 @@ import { calculateNextVersion } from "../tasks/calculate-next-version/calculate-
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
   createDynamicChangelogStringPatternContext,
+  createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
@@ -67,11 +68,11 @@ export async function proposeWorkflow(
   logger.stepFinish("Finished: Calculate next version");
 
   logger.debugStepStart(
-    "Starting: Create fixed version string pattern context",
+    "Starting: Create fixed version and previous version string pattern context",
   );
-  createFixedVersionStringPatternContext(
+  createFixedPreviousVersionStringPatternContext(previousVersion);
+  await createFixedVersionStringPatternContext(
     nextVersion,
-    previousVersion,
     config.release.tagNameTemplate,
   );
   logger.debugStepFinish(
@@ -112,7 +113,10 @@ export async function proposeWorkflow(
   logger.debugStepStart(
     "Starting: Create dynamic changelog string pattern context",
   );
-  createDynamicChangelogStringPatternContext(changelogReleaseResult);
+  createDynamicChangelogStringPatternContext(
+    changelogReleaseResult.release,
+    changelogReleaseResult.releaseBody,
+  );
   logger.debugStepFinish(
     "Finished: Create dynamic changelog string pattern context",
   );

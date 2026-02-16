@@ -54,7 +54,7 @@ export const ReleaseConfigSchema = v.pipe(
         description:
           "String template for tag name, using with string patterns like {{ version }}. Available in string templates as " +
           "{{ tagName }}.\n" +
-          "Allowed patterns to use are: fixed base and fixed version string patterns.\n" +
+          "Allowed patterns to use are: fixed base and fixed version string patterns and dynamic patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
       }),
     ),
@@ -64,6 +64,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for release title, using with string patterns like {{ tagName }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_TEMPLATE)}`,
       }),
     ),
@@ -72,6 +73,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for release body, using with string patterns like {{ changelogRelease }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_TEMPLATE)}`,
       }),
     ),

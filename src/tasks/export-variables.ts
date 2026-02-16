@@ -4,6 +4,7 @@ import type {
   DynamicOperationVariables,
   PostProposeOperationVariables,
   PreProposeOperationVariables,
+  PreReleaseOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
@@ -20,9 +21,9 @@ import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
 import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 import {
-  OperationJob,
+  type OperationJob,
   OperationJobs,
-  OperationTargets,
+  OperationKinds,
 } from "../constants/operation-variables.ts";
 
 export async function exportBaseOperationVariables(
@@ -48,8 +49,8 @@ export async function exportBaseOperationVariables(
   const { rawConfig, config } = configResult;
 
   const resolvedTarget = prForCommit
-    ? OperationTargets.release
-    : OperationTargets.propose;
+    ? OperationKinds.release
+    : OperationKinds.propose;
 
   const resolvedJobs: OperationJob[] = [];
   switch (resolvedTarget) {
@@ -94,7 +95,7 @@ export async function exportBaseOperationVariables(
     workingBranchRef: workingBranchResult.ref,
     workingBranchHash: workingBranchResult.object.sha,
 
-    target: resolvedTarget,
+    operation: resolvedTarget,
     jobs: JSON.stringify(resolvedJobs),
 
     pullRequestNumber: resolvedTarget === "propose"
@@ -165,6 +166,34 @@ export async function exportPostProposeOperationVariables(
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
       "Post propose operation variables to export (internal key name):",
+    );
+    dLogger.info(JSON.stringify(prepareExportObject, null, 2));
+    dLogger.endGroup();
+  });
+
+  Object.entries(prepareExportObject).forEach(([k, v]) => {
+    provider.exportOutputs(toExportOutputKey(k), v);
+    provider.exportEnvVars(toExportEnvVarKey(k), v);
+  });
+}
+
+export async function exportPreReleaseOperationVariables(
+  provider: PlatformProvider,
+  prNumber: number,
+  version: SemVer,
+) {
+  const prepareExportObject = {
+    version: format(version),
+
+    pullRequestNumber: prNumber,
+    patternContext: await stringifyCurrentPatternContext(),
+  } satisfies
+    & PreReleaseOperationVariables
+    & DynamicOperationVariables;
+
+  taskLogger.debugWrap((dLogger) => {
+    dLogger.startGroup(
+      "Pre release operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();

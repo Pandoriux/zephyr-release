@@ -277,7 +277,8 @@ Path to the file where the generated changelog will be written to, relative to t
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.
+String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-header-template-path (Optional)
 
@@ -289,7 +290,8 @@ Path to text file containing changelog file header. Overrides `file-header-templ
 
 Type: `string`
 
-String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.
+String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-footer-template-path (Optional)
 
@@ -302,7 +304,8 @@ Path to text file containing changelog file footer. Overrides `file-footer-templ
 Type: `string`  
 Default: `"## {{ tagName | md_link_compare_tag_from_current_to_latest }} ({{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->"`
 
-String template for header of a changelog release, using with string patterns like `{{ version }}`.
+String template for header of a changelog release, using with string patterns like `{{ version }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > release-header-template-path (Optional)
 
@@ -315,7 +318,9 @@ Path to text file containing changelog release header. Overrides `release-header
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:
+String template for each entries in the changelog release sections, using with fixed base and version string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
+Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
 
 - `{{ hash }}`: string
 - `{{ type }}`: string
@@ -342,7 +347,8 @@ Heading of a changelog release BREAKING section.
 
 Type: `string`
 
-Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`
+Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
 #### changelog > release-breaking-section-entry-template-path (Optional)
 
@@ -354,7 +360,8 @@ Path to text file containing changelog release breaking section entry template. 
 
 Type: `string`
 
-String template for footer of a changelog release, using with string patterns.
+String template for footer of a changelog release, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > release-footer-template-path (Optional)
 
@@ -426,7 +433,8 @@ Additional labels to attach to pull requests, managed and supplied by you. Unlik
 Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request title, using with string patterns like `{{ version }}`.
+String template for pull request title, using with string patterns like `{{ version }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > title-template-path (Optional)
 
@@ -439,7 +447,8 @@ Path to text file containing pull request title template. Overrides `title-templ
 Type: `string | string[]`  
 Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.
+String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > header-template-path (Optional)
 
@@ -452,7 +461,8 @@ Path to text file containing pull request header template. Overrides `header-tem
 Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request body, using with string patterns like `{{ changelogRelease }}`.
+String template for pull request body, using with string patterns like `{{ changelogRelease }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > body-template-path (Optional)
 
@@ -465,7 +475,8 @@ Path to text file containing pull request body template. Overrides `body-templat
 Type: `string`  
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
-String template for pull request footer, using with string patterns.
+String template for pull request footer, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > footer-template-path (Optional)
 
@@ -520,21 +531,23 @@ Type: `string`
 Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
-Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns.
+Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
 #### release > title-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_RELEASE_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release title, using with string patterns like `{{ tagName }}`.
+String template for release title, using with string patterns like `{{ tagName }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### release > body-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_RELEASE_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release body, using with string patterns like `{{ changelogRelease }}`.
+String template for release body, using with string patterns like `{{ changelogRelease }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 ## Type Definitions
 

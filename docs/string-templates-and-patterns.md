@@ -40,14 +40,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 - `{{ timestamp }}`: Timestamp, always UTC
 - `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` — date/time components
 
-#### Version
-
-- `{{ previousVersion }}`: The previous full semantic version (SemVer)
-- `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
-- `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
-- `{{ previousVersionBld }}`: The previous build metadata of the semantic version
-
-<br/>
+#### Version (and tag)
 
 - `{{ version }}`: The calculated next full semantic version (SemVer)
 - `{{ versionCore }}`: The calculated next core part of the semantic version (major.minor.patch)
@@ -58,6 +51,15 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 - `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#release--tag-name-template-optional))
 
+#### Previous Version
+
+- `{{ previousVersion }}`: The previous full semantic version (SemVer)
+- `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
+- `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
+- `{{ previousVersionBld }}`: The previous build metadata of the semantic version
+
+> Only available in "propose" operation. Can be undefined if the project has no version yet (calculated next version is initial version)
+
 ### Dynamic String Patterns
 
 These string patterns are resolved dynamically at runtime and may change each time they are used.
@@ -65,8 +67,24 @@ These string patterns are resolved dynamically at runtime and may change each ti
 #### Changelog
 
 - `{{ changelogRelease }}`: In `propose` operation (managing pull request), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body + release footer. In `release` operation (create tag and publish release), the value is the **pull request body** (this means any edits made to the pull request body will also be included)
--
+
 - `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)).
+
+### Special String Patterns
+
+These are special patterns that are only available to certain templates. Make sure to check the template description to see which templates explicitly support these patterns.
+
+#### Commit/Changelog Entries
+
+Usage: [release-section-entry-template](./config-options.md#changelog--release-section-entry-template-optional)
+
+- `{{ hash }}`: string
+- `{{ type }}`: string
+- `{{ scope }}`: string
+- `{{ desc }}`: string
+- `{{ body }}`: string
+- `{{ footer }}`: string
+- `{{ isBreaking }}`: boolean
 
 ## Transformers
 

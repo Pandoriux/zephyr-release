@@ -120,7 +120,12 @@ export async function run(provider: PlatformProvider) {
   } else {
     if (config.release.enabled) {
       logger.stepStart("Start Workflow: Create tag and release");
-      await releaseWorkflow(provider, { operationContext, inputs, config });
+      await releaseWorkflow(provider, {
+        operationContext,
+        associatedPrForCommit,
+        inputs,
+        config,
+      });
     } else {
       logger.stepSkip(
         "Skip Workflow: Create tag and release (disabled in config)",

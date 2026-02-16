@@ -210,3 +210,28 @@ export async function createOrUpdatePullRequestOrThrow(
 
   return prNumber;
 }
+
+export function extractChangelogFromPr(
+  mergedPr: ProviderPullRequest,
+): string | undefined {
+  const changelogReleaseStartIndex = mergedPr.body.indexOf(
+    PR_MARKERS.bodyStart,
+  );
+  const changelogReleaseEndIndex = mergedPr.body.lastIndexOf(
+    PR_MARKERS.bodyEnd,
+  );
+
+  if (changelogReleaseStartIndex === -1 || changelogReleaseEndIndex === -1) {
+    return undefined;
+  }
+
+  const changelogRelease = mergedPr.body.substring(
+    changelogReleaseStartIndex + PR_MARKERS.bodyStart.length,
+    changelogReleaseEndIndex,
+  ).trim();
+  taskLogger.info(
+    "Extracted changelog release from merged PR body: " + changelogRelease,
+  );
+
+  return changelogRelease;
+}
