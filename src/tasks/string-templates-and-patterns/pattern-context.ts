@@ -7,12 +7,12 @@ import { startTime } from "../../main.ts";
 import type {
   DynamicChangelogStringPattern,
   FixedBaseStringPattern,
+  FixedPreviousVersionStringPattern,
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
 import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
 import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
-import { GenerateChangelogReleaseResult } from "../changelog.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -83,6 +83,31 @@ export async function createFixedBaseStringPatternContext(
   );
 }
 
+export function createFixedPreviousVersionStringPatternContext(
+  previousVersion?: SemVer,
+) {
+  if (!previousVersion) return;
+
+  const versionContext = {
+    previousVersion: format(previousVersion),
+    previousVersionCore:
+      `${previousVersion.major}.${previousVersion.minor}.${previousVersion.patch}`,
+    previousVersionPre: previousVersion?.prerelease?.length
+      ? previousVersion.prerelease.join(".")
+      : undefined,
+    previousVersionBld: previousVersion?.build?.length
+      ? previousVersion.build.join(".")
+      : undefined,
+  } satisfies Record<FixedPreviousVersionStringPattern, string | undefined>;
+
+  Object.assign(STRING_PATTERN_CONTEXT, versionContext);
+
+  taskLogger.debug(
+    "Fixed previous version string pattern context: " +
+      JSON.stringify(versionContext, null, 2),
+  );
+}
+
 export async function createFixedVersionStringPatternContext(
   version: SemVer,
   tagTemplate: string,
@@ -114,12 +139,13 @@ export async function createFixedVersionStringPatternContext(
 }
 
 export function createDynamicChangelogStringPatternContext(
-  changelogResult: GenerateChangelogReleaseResult,
+  changelogRelease?: string,
+  changelogReleaseBody?: string,
 ) {
   const context = {
-    changelogRelease: changelogResult.release,
-    changelogReleaseBody: changelogResult.releaseBody,
-  } satisfies Record<DynamicChangelogStringPattern, string>;
+    changelogRelease,
+    changelogReleaseBody,
+  } satisfies Record<DynamicChangelogStringPattern, string | undefined>;
 
   Object.assign(STRING_PATTERN_CONTEXT, context);
 

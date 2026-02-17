@@ -2,7 +2,7 @@ import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
-import { resolveConfigOrThrow } from "./tasks/config.ts";
+import { resolveConfigOrThrow } from "./tasks/configs/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
 import { createFixedBaseStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import {
@@ -10,7 +10,7 @@ import {
   findPullRequestFromBranchOrThrow,
 } from "./tasks/pull-request.ts";
 import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
-import { prepareWorkflow } from "./workflows/prepare.ts";
+import { proposeWorkflow } from "./workflows/propose.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
 import { manageConcurrencyOrExit } from "./tasks/concurrency.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
@@ -105,9 +105,12 @@ export async function run(provider: PlatformProvider) {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
   }
 
+  // Main operation workflow
   if (!associatedPrForCommit) {
-    logger.stepStart("Workflow: Prepare release with pull request");
-    await prepareWorkflow(provider, {
+    logger.stepStart(
+      "Start Workflow: Create/Update release proposal pull request",
+    );
+    await proposeWorkflow(provider, {
       workingBranchResult,
       associatedPrFromBranch,
       operationContext,
@@ -115,10 +118,26 @@ export async function run(provider: PlatformProvider) {
       config,
     });
   } else {
-    logger.stepStart("Workflow: Release finalize");
-    await releaseWorkflow(provider);
+    if (config.release.enabled) {
+      logger.stepStart("Start Workflow: Create tag and release");
+      await releaseWorkflow(provider, {
+        operationContext,
+        associatedPrForCommit,
+        inputs,
+        config,
+      });
+    } else {
+      logger.stepSkip(
+        "Skip Workflow: Create tag and release (disabled in config)",
+      );
+    }
   }
 
   logger.stepStart("Starting: Execute base post commands");
-  // post cmds.... todo
+  const postResult = await runCommandsOrThrow(config.commandHook, "post");
+  if (postResult) {
+    logger.stepFinish(`Finished: Execute base post commands. ${postResult}`);
+  } else {
+    logger.stepSkip("Skipped: Execute base post commands (empty)");
+  }
 }

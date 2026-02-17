@@ -65,13 +65,18 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
     - [release \> enabled (Optional)](#release--enabled-optional)
-    - [release \> skip-release (Optional)](#release--skip-release-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
+    - [release \> skip-release-note (Optional)](#release--skip-release-note-optional)
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
+    - [release \> tag-message-template (Optional)](#release--tag-message-template-optional)
+    - [release \> tag-message-template-path (Optional)](#release--tag-message-template-path-optional)
+    - [release \> tagger (Optional)](#release--tagger-optional)
     - [release \> title-template (Optional)](#release--title-template-optional)
+    - [release \> title-template-path (Optional)](#release--title-template-path-optional)
     - [release \> body-template (Optional)](#release--body-template-optional)
+    - [release \> body-template-path (Optional)](#release--body-template-path-optional)
 - [Type Definitions](#type-definitions)
   - [CommandHook](#commandhook)
   - [Command](#command)
@@ -80,6 +85,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [BumpRuleExtension](#bumpruleextension)
   - [SemverExtension](#semverextension)
   - [Label](#label)
+  - [Tagger](#tagger)
   
 ## Options
 
@@ -277,7 +283,8 @@ Path to the file where the generated changelog will be written to, relative to t
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.
+String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-header-template-path (Optional)
 
@@ -289,7 +296,8 @@ Path to text file containing changelog file header. Overrides `file-header-templ
 
 Type: `string`
 
-String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.
+String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-footer-template-path (Optional)
 
@@ -302,7 +310,8 @@ Path to text file containing changelog file footer. Overrides `file-footer-templ
 Type: `string`  
 Default: `"## {{ tagName | md_link_compare_tag_from_current_to_latest }} ({{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->"`
 
-String template for header of a changelog release, using with string patterns like `{{ version }}`.
+String template for header of a changelog release, using with string patterns like `{{ version }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > release-header-template-path (Optional)
 
@@ -315,7 +324,9 @@ Path to text file containing changelog release header. Overrides `release-header
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for each entries in the changelog release sections, using with fixed base and version string patterns. Additionally, you can use a special set of dynamic patterns which are:
+String template for each entries in the changelog release sections, using with fixed base and version string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
+Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
 
 - `{{ hash }}`: string
 - `{{ type }}`: string
@@ -342,7 +353,8 @@ Heading of a changelog release BREAKING section.
 
 Type: `string`
 
-Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`
+Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
 #### changelog > release-breaking-section-entry-template-path (Optional)
 
@@ -354,7 +366,8 @@ Path to text file containing changelog release breaking section entry template. 
 
 Type: `string`
 
-String template for footer of a changelog release, using with string patterns.
+String template for footer of a changelog release, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > release-footer-template-path (Optional)
 
@@ -388,6 +401,8 @@ Type: [`CommandHook`](#commandhook)
 Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
 
 #### pull... > branch-name-template (Optional)
 
@@ -426,7 +441,8 @@ Additional labels to attach to pull requests, managed and supplied by you. Unlik
 Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request title, using with string patterns like `{{ version }}`.
+String template for pull request title, using with string patterns like `{{ version }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > title-template-path (Optional)
 
@@ -439,7 +455,8 @@ Path to text file containing pull request title template. Overrides `title-templ
 Type: `string | string[]`  
 Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.
+String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > header-template-path (Optional)
 
@@ -452,7 +469,8 @@ Path to text file containing pull request header template. Overrides `header-tem
 Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request body, using with string patterns like `{{ changelogRelease }}`.
+String template for pull request body, using with string patterns like `{{ changelogRelease }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > body-template-path (Optional)
 
@@ -465,7 +483,8 @@ Path to text file containing pull request body template. Overrides `body-templat
 Type: `string`  
 Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
 
-String template for pull request footer, using with string patterns.
+String template for pull request footer, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > footer-template-path (Optional)
 
@@ -476,7 +495,7 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`skip-release`](#release--skip-release-optional), [`command-hook`](#release--command-hook-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`title-template`](#release--title-template-optional), [`body-template`](#release--body-template-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`skip-release-note`](#release--skip-release-note-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
 
 Configuration specific to tags and releases.
 
@@ -485,20 +504,24 @@ Configuration specific to tags and releases.
 Type: `boolean`  
 Default: `true`
 
-Enable/disable tag and release.
-
-#### release > skip-release (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-If enabled, only the tag will be created, no release will be made.
+Enable/disable tag and release operation.
 
 #### release > command-hook (Optional)
 
 Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the release operation. Each command runs from the repository root.
+
+List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
+
+#### release > skip-release-note (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, only the tag will be created, no release note will be made.
 
 #### release > draft (Optional)
 
@@ -520,21 +543,57 @@ Type: `string`
 Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
-Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns.
+Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
+
+#### release > tag-message-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_TAG_MESSAGE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for the Git annotated tag message.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### release > tag-message-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing Git annotated tag message template. Overrides `tag-message-template` when both are provided.
+
+#### release > tagger (Optional)
+
+Type: [`Tagger`](#tagger)
+
+Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior.
+
+See [`Tagger`](#tagger) for the type definition.
 
 #### release > title-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_RELEASE_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release title, using with string patterns like `{{ tagName }}`.
+String template for release title, using with string patterns like `{{ tagName }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### release > title-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing release title template. Overrides `title-template` when both are provided.
 
 #### release > body-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_RELEASE_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for release body, using with string patterns like `{{ changelogRelease }}`.
+String template for release body, using with string patterns like `{{ changelogRelease }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### release > body-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing release body template. Overrides `body-template` when both are provided.
 
 ## Type Definitions
 
@@ -637,3 +696,18 @@ Type: `object`
 - `name` (Required): Label name.
 - `description` (Optional): Label description.
 - `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`
+
+### Tagger
+
+Type: `object`  
+**Properties:**
+
+- `name` (Required): The name of the tag creator.
+- `email` (Required): The email of the tag creator.
+- `date` (Optional): Override the Git tag timestamp.  
+  Can be one of these options:
+  - `"current_time"`: The moment the operation creates the tag.
+  - `"commit_date"`: The Git committer date.
+  - `"author_date"`: The Git author date.
+  - Or a specific ISO 8601 date string.  
+  If omitted, defaults to the platform native behavior (recommended).

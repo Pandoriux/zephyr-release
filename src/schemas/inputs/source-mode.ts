@@ -21,10 +21,15 @@ export const SourceModeSchema = v.object({
   changelogReleaseBreakingSectionEntryTemplatePath: v.optional(v.enum(SourceModeOptions)),
   changelogReleaseFooterTemplatePath: v.optional(v.enum(SourceModeOptions)),
 
+
   prTitleTemplatePath: v.optional(v.enum(SourceModeOptions)),
   prHeaderTemplatePath: v.optional(v.enum(SourceModeOptions)),
   prBodyTemplatePath: v.optional(v.enum(SourceModeOptions)),
   prFooterTemplatePath: v.optional(v.enum(SourceModeOptions)),
+
+  releaseTagMessageTemplatePath: v.optional(v.enum(SourceModeOptions)),
+  releaseTitleTemplatePath: v.optional(v.enum(SourceModeOptions)),
+  releaseBodyTemplatePath: v.optional(v.enum(SourceModeOptions)),
 });
 
 type _SourceModeInput = v.InferInput<typeof SourceModeSchema>;

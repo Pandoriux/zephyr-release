@@ -21,10 +21,12 @@ import {
   githubCompareCommitsOrThrow,
   githubCreateCommitOnBranchOrThrow,
   githubFindCommitsFromGivenToPreviousTaggedOrThrow,
+  githubGetCommitOrThrow,
 } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import { githubManageConcurrency } from "./concurrency.ts";
 import {
+  githubCreateTagOrThrow,
   githubGetCompareTagUrl,
   githubGetCompareTagUrlFromCurrentToLatest,
   githubGetLatestReleaseTagOrThrow,
@@ -33,6 +35,7 @@ import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
+import type { TaggerRequest } from "../../types/tag.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -91,9 +94,9 @@ export function createGitHubProvider(): PlatformProvider {
       return await githubManageConcurrency(octokit);
     },
 
-    getTextFileOrThrow: async (filePath: string) => {
+    getTextFileOrThrow: async (filePath: string, ref?: string) => {
       const { octokit } = ensureProviderContextOrThrow();
-      return await githubGetTextFileOrThrow(octokit, filePath);
+      return await githubGetTextFileOrThrow(octokit, filePath, ref);
     },
 
     ensureBranchExistOrThrow: async (
@@ -155,6 +158,10 @@ export function createGitHubProvider(): PlatformProvider {
         base,
         head,
       );
+    },
+    getCommit: async (hash: string) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubGetCommitOrThrow(octokit, hash);
     },
     createCommitOnBranchOrThrow: async (
       triggerCommitHash: string,
@@ -222,6 +229,21 @@ export function createGitHubProvider(): PlatformProvider {
     getLatestReleaseTagOrThrow: async () => {
       const { octokit } = ensureProviderContextOrThrow();
       return await githubGetLatestReleaseTagOrThrow(octokit);
+    },
+    createTagOrThrow: async (
+      tagName: string,
+      commitHash: string,
+      message: string,
+      tagger?: TaggerRequest,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubCreateTagOrThrow(
+        octokit,
+        tagName,
+        commitHash,
+        message,
+        tagger,
+      );
     },
 
     exportOutputs: githubExportOutputs,

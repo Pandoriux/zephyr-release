@@ -5,11 +5,13 @@ import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 export async function githubGetTextFileOrThrow(
   octokit: OctokitClient,
   filePath: string,
+  ref?: string,
 ): Promise<string> {
   const res = await octokit.rest.repos.getContent({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
     path: filePath,
+    ref,
   });
 
   const data = res.data;

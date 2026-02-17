@@ -7,7 +7,7 @@ import {
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
 import fg from "fast-glob";
 import { taskLogger } from "./logger.ts";
-import { prepareVersionFilesToCommit } from "./version-file.ts";
+import { prepareVersionFilesToCommit } from "./version-files/version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
@@ -189,7 +189,7 @@ function extractBlock(
 
 type PrepareChangesInputsParams = Pick<
   InputsOutput,
-  "workspacePath" | "sourceMode"
+  "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
 type PrepareChangesConfigParams =
@@ -215,7 +215,7 @@ export async function prepareChangesToCommit(
   config: PrepareChangesConfigParams,
   newData: { changelogRelease: string; nextVersion: string },
 ): Promise<Map<string, string>> {
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles, localFilesToCommit, changelog } = config;
   const { writeToFile, path } = changelog;
   const { changelogRelease, nextVersion } = newData;
@@ -230,6 +230,7 @@ export async function prepareChangesToCommit(
       sourceMode,
       workspacePath,
       changelogRelease,
+      triggerCommitHash,
     );
     changesData.set(normalize(path), clContent);
   } else taskLogger.info("Changelog write to file config is off. Skipping...");
@@ -243,6 +244,7 @@ export async function prepareChangesToCommit(
     sourceMode,
     workspacePath,
     nextVersion,
+    triggerCommitHash,
   );
   for (const [vfPath, vfContent] of vfChangesData) {
     changesData.set(normalize(vfPath), vfContent);

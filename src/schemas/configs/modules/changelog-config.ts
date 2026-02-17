@@ -12,8 +12,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and string " +
-          "templates.\n" +
+          "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, " +
+          "releases and string templates.\n" +
           "Default: true",
       }),
     ),
@@ -31,6 +31,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for changelog file header, using with string patterns like {{ version }}. Placed above any changelog content.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE)}`,
       }),
     ),
@@ -45,7 +46,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for changelog file footer, using with string patterns like {{ version }}. Placed below any changelog content.",
+          "String template for changelog file footer, using with string patterns like {{ version }}. Placed below any changelog content.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
       }),
     ),
     fileFooterTemplatePath: v.pipe(
@@ -64,6 +66,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for header of a changelog release, using with string patterns like {{ version }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE)
           }`,
@@ -84,9 +87,10 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "String template for each entries in the changelog release sections, using with fixed base and version string patterns. " +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           "Additionally, you can use a special set of dynamic patterns which are:\n" +
           "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\n" +
-          "About special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional" +
+          "About special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional\n" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE)
           }`,
@@ -110,7 +114,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Basically the same as `releaseSectionEntryTemplate`, but for breaking changes specifically. If not provided, falls back " +
-          "to `releaseSectionEntryTemplate`",
+          "to `releaseSectionEntryTemplate`.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
       }),
     ),
     releaseBreakingSectionEntryTemplatePath: v.pipe(
@@ -124,7 +129,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for footer of a changelog release, using with string patterns.",
+          "String template for footer of a changelog release, using with string patterns.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
       }),
     ),
     releaseFooterTemplatePath: v.pipe(

@@ -1,27 +1,3 @@
- 
-
-    contentEntryTemplate: v.pipe(
-      v.optional(
-        v.pipe(v.string(), v.trim(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_ENTRY_PATTERN,
-      ),
-      v.metadata({
-        description:
-          "String template for each entries in the changelog content body, using with fixed base and version string patterns.\n" +
-          "Additionally, you can use a special set of patterns which is ${type}, ${scope}, ${desc}, ${body}, ${footer}, " +
-          "${hash}, ${hash7}.\n" +
-          "About special patterns: [link-to-insert]" +
-          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_ENTRY_PATTERN)}`,
-      }),
-
-
-
-Zephyr Release engine options
-
-```typescript
-"to be insert"
-```
-
 
 commandHook: v.pipe(
     v.optional(CommandHookSchema),
@@ -36,3 +12,33 @@ commandHook: v.pipe(
 SYNC docs cua SourceModeSchema
 
 REFACTOR version-files.ts trong cả đống utils, logic này không nên ở utils, suy nghĩ nên hợp luôn với parser của config.ts không
+
+readme
+```json
+{
+  "$schema": "../../schemas/config-v1.json",
+
+  "version-files": {
+    "path": "deno.json",
+    "selector": "$.version"
+  }
+}
+```
+
+add a commit stop/depth hash in config, in case user first using the script, and dont want to scan 1000+ commit
+
+---> exportBaseOperationVariables()
+const resolvedJobs: OperationJob[] = [];
+  switch (resolvedTarget) {
+    case "propose":
+      // when add autorelease in the future, we wont push it it, TODO handle that
+      if (prFromBranch) {
+        resolvedJobs.push(OperationJobs.updatePr);
+      } else {
+        resolvedJobs.push(OperationJobs.createPr);
+      }
+      break;
+    case "release":
+
+      break;
+  }

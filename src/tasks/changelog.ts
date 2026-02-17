@@ -11,7 +11,7 @@ import { CHANGELOG_MARKERS } from "../constants/markers.ts";
 
 type GenerateChangelogReleaseInputsParams = Pick<
   InputsOutput,
-  "workspacePath" | "sourceMode"
+  "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
 type GenerateChangelogReleaseConfigParams =
@@ -44,7 +44,7 @@ export async function generateChangelogReleaseContent(
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
 ): Promise<GenerateChangelogReleaseResult> {
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const {
     // commitTypes,
     changelog: {
@@ -67,7 +67,7 @@ export async function generateChangelogReleaseContent(
     const headerTemplate = await getTextFileOrThrow(
       sourceMode.changelogReleaseHeaderTemplatePath ?? sourceMode.sourceMode,
       releaseHeaderTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     releaseHeader = await resolveStringTemplateOrThrow(headerTemplate);
   } else {
@@ -81,7 +81,7 @@ export async function generateChangelogReleaseContent(
     const footerTemplate = await getTextFileOrThrow(
       sourceMode.changelogReleaseFooterTemplatePath ?? sourceMode.sourceMode,
       releaseFooterTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     releaseFooter = await resolveStringTemplateOrThrow(footerTemplate);
   } else if (releaseFooterTemplate) {
@@ -95,7 +95,7 @@ export async function generateChangelogReleaseContent(
     releaseBody = await getTextFileOrThrow(
       sourceMode.changelogReleaseBodyOverridePath ?? sourceMode.sourceMode,
       releaseBodyOverridePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
   } else if (releaseBodyOverride) {
     releaseBody = releaseBodyOverride;
@@ -130,7 +130,7 @@ async function generateReleaseBody(
       releaseBreakingSectionEntryTemplatePath,
     },
   } = config;
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
 
   // Section -> Commits
   const sectionGroups = new Map<string, string[]>();
@@ -157,7 +157,7 @@ async function generateReleaseBody(
     ? await getTextFileOrThrow(
       sourceMode.changelogReleaseSectionEntryTemplatePath ?? sourceMode.sourceMode,
       releaseSectionEntryTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     )
     : releaseSectionEntryTemplate;
 
@@ -165,7 +165,7 @@ async function generateReleaseBody(
     ? await getTextFileOrThrow(
       sourceMode.changelogReleaseBreakingSectionEntryTemplatePath ?? sourceMode.sourceMode,
       releaseBreakingSectionEntryTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     )
     : releaseBreakingSectionEntryTemplate;
 
@@ -246,6 +246,7 @@ export async function prepareChangelogFileToCommit(
   sourceMode: InputsOutput["sourceMode"],
   workspacePath: string,
   releaseContent: string,
+  triggerCommitHash: string,
 ): Promise<string> {
   const {
     path,
@@ -262,7 +263,7 @@ export async function prepareChangelogFileToCommit(
   const currentFileContent = await getTextFileOrThrow(
     changelogSourceMode,
     path,
-    { provider, workspace: workspacePath },
+    { provider, workspace: workspacePath, ref: triggerCommitHash },
   );
 
   let header: string;
@@ -270,7 +271,7 @@ export async function prepareChangelogFileToCommit(
     const headerTemplate = await getTextFileOrThrow(
       sourceMode.changelogFileHeaderTemplatePath ?? sourceMode.sourceMode,
       fileHeaderTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     header = await resolveStringTemplateOrThrow(headerTemplate);
   } else header = await resolveStringTemplateOrThrow(fileHeaderTemplate);
@@ -280,7 +281,7 @@ export async function prepareChangelogFileToCommit(
     const footerTemplate = await getTextFileOrThrow(
       sourceMode.changelogFileFooterTemplatePath ?? sourceMode.sourceMode,
       fileFooterTemplatePath,
-      { provider, workspace: workspacePath },
+      { provider, workspace: workspacePath, ref: triggerCommitHash },
     );
     footer = await resolveStringTemplateOrThrow(footerTemplate);
   } else if (fileFooterTemplate) {

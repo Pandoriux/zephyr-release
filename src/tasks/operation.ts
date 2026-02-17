@@ -30,10 +30,10 @@ export async function validateCurrentOperationCtxOrExit(
 
   const parsedOperationContext = {
     latestTriggerCommit: {
-      commit: parsedLatestTriggerCommit,
+      parsedCommit: parsedLatestTriggerCommit,
       treeHash: operationContext.latestTriggerCommit.treeHash,
     },
-    triggerCommits: parsedTriggerCommits,
+    parsedTriggerCommits: parsedTriggerCommits,
   } satisfies OperationTriggerContext;
 
   if (
@@ -44,7 +44,10 @@ export async function validateCurrentOperationCtxOrExit(
     // If our concurrency check found that we interrupted a previous run (or one failed),
     // we assume there is "Unfinished Business" and force a run.
     // This saves us the 2 API calls below.
-    if (concurrencyResult.isLatestExecution && concurrencyResult.hasIncompleteHistory) {
+    if (
+      concurrencyResult.isLatestExecution &&
+      concurrencyResult.hasIncompleteHistory
+    ) {
       return parsedOperationContext;
     }
 

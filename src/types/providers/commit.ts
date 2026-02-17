@@ -9,6 +9,11 @@ export interface ProviderCommit {
   message: string;
 }
 
+export interface ProviderCommitDetails extends ProviderCommit {
+  author: { name: string; email: string; date: Date };
+  committer: { name: string; email: string; date: Date };
+}
+
 export interface ProviderWorkingCommit {
   workingCommitHash: string;
   workingTreeHash: string;
