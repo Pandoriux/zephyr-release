@@ -22,7 +22,8 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
         description:
-          "Pre/post command lists to run around the release operation. Each command runs from the repository root.",
+          "Pre/post command lists to run around the release operation. Each command runs from the repository root.\n" +
+          "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
       }),
     ),
 

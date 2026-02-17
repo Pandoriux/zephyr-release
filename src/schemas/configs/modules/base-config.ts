@@ -28,7 +28,7 @@ export const BaseConfigSchema = v.object({
     v.metadata({
       description:
         "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
-        "Available variables that cmds can use: [link-insert-later]",
+        "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
     }),
   ),
 

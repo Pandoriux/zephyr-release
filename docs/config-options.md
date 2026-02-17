@@ -402,6 +402,8 @@ Pre/post command lists to run around the pull request operation. Each command ru
 
 List of exposed env variables: see [Export operation variables](./export-variables.md).
 
+See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
+
 #### pull... > branch-name-template (Optional)
 
 Type: `string`  
@@ -509,6 +511,10 @@ Enable/disable tag and release operation.
 Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the release operation. Each command runs from the repository root.
+
+List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
 
 #### release > skip-release-note (Optional)
 

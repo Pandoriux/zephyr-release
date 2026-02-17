@@ -1,14 +1,4 @@
 
-
-
-
-Zephyr Release engine options
-
-```typescript
-"to be insert"
-```
-
-
 commandHook: v.pipe(
     v.optional(CommandHookSchema),
     v.metadata({
