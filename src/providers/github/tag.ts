@@ -7,6 +7,8 @@ import {
 import type { OctokitClient } from "./octokit.ts";
 import { isGitHubErrorResponse } from "./utils/error-validations.ts";
 import { joinUrlSegments } from "../../utils/transformers/url.ts";
+import type { TaggerRequest } from "../../types/tag.ts";
+import type { ProviderTag } from "../../types/providers/tag.ts";
 
 export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
   let compareSegment = tag1 + "..." + tag2;
@@ -102,6 +104,28 @@ export async function githubCreateTagOrThrow(
   octokit: OctokitClient,
   tagName: string,
   commitHash: string,
-): Promise<void> {
-  // const res = octokit.rest.creat;
+  message: string,
+  tagger?: TaggerRequest,
+): Promise<ProviderTag> {
+  const owner = githubGetNamespace();
+  const repo = githubGetRepositoryName();
+
+  const tagRes = await octokit.rest.git.createTag({
+    owner: owner,
+    repo: repo,
+    tag: tagName,
+    message: message,
+    object: commitHash,
+    type: "commit",
+    tagger: tagger,
+  });
+
+  await octokit.rest.git.createRef({
+    owner: owner,
+    repo: repo,
+    ref: "refs/tags/" + tagName,
+    sha: tagRes.data.sha,
+  });
+
+  return { name: tagName, hash: tagRes.data.sha, targetHash: commitHash };
 }

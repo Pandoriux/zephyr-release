@@ -31,3 +31,5 @@ export const DEFAULT_TAG_NAME_TEMPLATE = liquid`v{{ version }}`;
 export const DEFAULT_RELEASE_TITLE_TEMPLATE = liquid`{{ tagName }}`;
 
 export const DEFAULT_RELEASE_BODY_TEMPLATE = liquid`{{ changelogRelease }}`;
+
+export const DEFAULT_TAG_MESSAGE_TEMPLATE = liquid`Release {{ version }}`;

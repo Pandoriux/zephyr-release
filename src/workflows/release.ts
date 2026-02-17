@@ -91,7 +91,7 @@ export async function releaseWorkflow(
   }
 
   logger.stepStart("Starting: Create tag");
-  const createdTag = await createTagOrThrow(provider, inputs.triggerCommitHash);
+  const createdTag = await createTagOrThrow(provider, inputs, config);
   logger.stepFinish("Finished: Create tag");
 
   // create release note

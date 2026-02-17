@@ -88,4 +88,10 @@ Example: `{"source-mode": "local", "version-files": "local", "changelog": "remot
 - `pr-body-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request body template file](./config-options.md#pull--body-template-path-optional) is read from the local filesystem or remote repository.
 - `pr-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request footer template file](./config-options.md#pull--footer-template-path-optional) is read from the local filesystem or remote repository.
 
+<br/>
+
+- `release-tag-message-template-path`: Either `"local"` or `"remote"`. Controls whether the [release tag message template file](./config-options.md#release--tag-message-template-path-optional) is read from the local filesystem or remote repository.
+- `release-title-template-path`: Either `"local"` or `"remote"`. Controls whether the [release title template file](./config-options.md#release--title-template-path-optional) is read from the local filesystem or remote repository.
+- `release-body-template-path`: Either `"local"` or `"remote"`. Controls whether the [release body template file](./config-options.md#release--body-template-path-optional) is read from the local filesystem or remote repository.
+
 > **Important:** If `source-mode` is set to `local` (globally or for a specific operation), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.

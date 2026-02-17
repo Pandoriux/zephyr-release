@@ -5,6 +5,7 @@ import type { ProviderLabel } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
 import type {
   ProviderCommit,
+  ProviderCommitDetails,
   ProviderCompareCommits,
   ProviderWorkingCommit,
 } from "./commit.ts";
@@ -12,6 +13,8 @@ import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { ProviderOperationTriggerContext } from "../operation-context.ts";
+import type { ProviderTag } from "./tag.ts";
+import type { TaggerRequest } from "../tag.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
@@ -63,6 +66,7 @@ export interface PlatformProvider {
     base: string,
     head: string,
   ) => Promise<ProviderCompareCommits>;
+  getCommit: (hash: string) => Promise<ProviderCommitDetails>;
   createCommitOnBranchOrThrow: (
     triggerCommitHash: string,
     baseTreeHash: string,
@@ -90,7 +94,12 @@ export interface PlatformProvider {
   ) => Promise<void>;
 
   getLatestReleaseTagOrThrow: () => Promise<string | undefined>;
-  createTagOrThrow: (tagName: string, commitHash: string) => Promise<void>;
+  createTagOrThrow: (
+    tagName: string,
+    commitHash: string,
+    message: string,
+    tagger?: TaggerRequest,
+  ) => Promise<ProviderTag>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

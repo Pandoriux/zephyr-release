@@ -3,9 +3,11 @@ import { CommandHookSchema } from "./components/command-hook.ts";
 import {
   DEFAULT_RELEASE_BODY_TEMPLATE,
   DEFAULT_RELEASE_TITLE_TEMPLATE,
+  DEFAULT_TAG_MESSAGE_TEMPLATE,
   DEFAULT_TAG_NAME_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
+import { TaggerSchema } from "./components/tagger.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
@@ -23,7 +25,7 @@ export const ReleaseConfigSchema = v.pipe(
           "Pre/post command lists to run around the release operation. Each command runs from the repository root.",
       }),
     ),
-    
+
     skipReleaseNote: v.pipe(
       v.optional(v.boolean(), false),
       v.metadata({
@@ -58,6 +60,28 @@ export const ReleaseConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
       }),
     ),
+    tagMessageTemplate: v.pipe(
+      v.optional(v.string(), DEFAULT_TAG_MESSAGE_TEMPLATE),
+      v.metadata({
+        description: "String template for the Git annotated tag message.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
+          `Default: ${JSON.stringify(DEFAULT_TAG_MESSAGE_TEMPLATE)}`,
+      }),
+    ),
+    tagMessageTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing Git annotated tag message template. Overrides `tagMessageTemplate` when both are provided.",
+      }),
+    ),
+    tagger: v.pipe(
+      v.optional(TaggerSchema),
+      v.metadata({
+        description:
+          "Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior.",
+      }),
+    ),
 
     titleTemplate: v.pipe(
       v.optional(v.string(), DEFAULT_RELEASE_TITLE_TEMPLATE),
@@ -66,6 +90,13 @@ export const ReleaseConfigSchema = v.pipe(
           "String template for release title, using with string patterns like {{ tagName }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_TEMPLATE)}`,
+      }),
+    ),
+    titleTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing release title template. Overrides `titleTemplate` when both are provided.",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -77,6 +108,13 @@ export const ReleaseConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_TEMPLATE)}`,
       }),
     ),
+    bodyTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.",
+      }),
+    ),
   }),
   v.metadata({
     description: "Configuration specific to tags and releases.",
@@ -84,4 +122,4 @@ export const ReleaseConfigSchema = v.pipe(
 );
 
 type _ReleaseConfigInput = v.InferInput<typeof ReleaseConfigSchema>;
-type _ReleaseConfigOutput = v.InferOutput<typeof ReleaseConfigSchema>;
+export type ReleaseConfigOutput = v.InferOutput<typeof ReleaseConfigSchema>;
