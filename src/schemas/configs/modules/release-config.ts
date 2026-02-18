@@ -8,6 +8,7 @@ import {
 } from "../../../constants/defaults/string-templates.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import { TaggerSchema } from "./components/tagger.ts";
+import { TagTypeOptions } from "../../../constants/release-tag-options.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
@@ -59,6 +60,14 @@ export const ReleaseConfigSchema = v.pipe(
           "{{ tagName }}.\n" +
           "Allowed patterns to use are: fixed base and fixed version string patterns and dynamic patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
+      }),
+    ),
+    tagType: v.pipe(
+      v.optional(v.enum(TagTypeOptions), TagTypeOptions.annotated),
+      v.metadata({
+        description:
+          "The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.\n" +
+          `Default: ${JSON.stringify(TagTypeOptions.annotated)}`,
       }),
     ),
     tagMessageTemplate: v.pipe(

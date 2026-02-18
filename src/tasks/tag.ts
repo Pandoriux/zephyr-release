@@ -1,10 +1,10 @@
-import { TaggerDateOptions } from "../constants/tagger-date-options.ts";
+import { getTextFileOrThrow } from "./file.ts";
+import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { TaggerDateOptions } from "../constants/release-tag-options.ts";
 import type { ReleaseConfigOutput } from "../schemas/configs/modules/release-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import { TaggerRequest } from "../types/tag.ts";
-import { getTextFileOrThrow } from "./file.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import type { TaggerRequest } from "../types/tag.ts";
 
 type CreateTagInputsParams = Pick<
   InputsOutput,
@@ -15,6 +15,7 @@ interface CreateTagConfigParams {
   release: Pick<
     ReleaseConfigOutput,
     | "tagNameTemplate"
+    | "tagType"
     | "tagMessageTemplate"
     | "tagMessageTemplatePath"
     | "tagger"
@@ -27,13 +28,13 @@ export async function createTagOrThrow(
   config: CreateTagConfigParams,
 ) {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
-  const { release } = config;
   const {
     tagNameTemplate,
+    tagType,
     tagMessageTemplate,
     tagMessageTemplatePath,
     tagger,
-  } = release;
+  } = config.release;
 
   let tagMessage: string | undefined;
   if (tagMessageTemplatePath) {
@@ -82,6 +83,7 @@ export async function createTagOrThrow(
   return await provider.createTagOrThrow(
     await resolveStringTemplateOrThrow(tagNameTemplate),
     triggerCommitHash,
+    tagType,
     tagMessage,
     taggerData,
   );
