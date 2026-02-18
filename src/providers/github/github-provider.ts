@@ -36,6 +36,7 @@ import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
+import { TagTypeOption } from "../../constants/release-tag-options.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -233,6 +234,7 @@ export function createGitHubProvider(): PlatformProvider {
     createTagOrThrow: async (
       tagName: string,
       commitHash: string,
+      tagType: TagTypeOption,
       message: string,
       tagger?: TaggerRequest,
     ) => {
@@ -241,6 +243,7 @@ export function createGitHubProvider(): PlatformProvider {
         octokit,
         tagName,
         commitHash,
+        tagType,
         message,
         tagger,
       );

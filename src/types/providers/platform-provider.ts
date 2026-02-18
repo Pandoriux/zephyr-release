@@ -15,6 +15,7 @@ import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { ProviderOperationTriggerContext } from "../operation-context.ts";
 import type { ProviderTag } from "./tag.ts";
 import type { TaggerRequest } from "../tag.ts";
+import type { TagTypeOption } from "../../constants/release-tag-options.ts";
 
 export interface PlatformProvider {
   platform: "github" | ""; // gitlab? local?
@@ -97,6 +98,7 @@ export interface PlatformProvider {
   createTagOrThrow: (
     tagName: string,
     commitHash: string,
+    tagType: TagTypeOption,
     message: string,
     tagger?: TaggerRequest,
   ) => Promise<ProviderTag>;

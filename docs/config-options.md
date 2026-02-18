@@ -70,6 +70,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
+    - [release \> tag-type (Optional)](#release--tag-type-optional)
     - [release \> tag-message-template (Optional)](#release--tag-message-template-optional)
     - [release \> tag-message-template-path (Optional)](#release--tag-message-template-path-optional)
     - [release \> tagger (Optional)](#release--tagger-optional)
@@ -495,7 +496,7 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`skip-release-note`](#release--skip-release-note-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`skip-release-note`](#release--skip-release-note-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
 
 Configuration specific to tags and releases.
 
@@ -544,6 +545,13 @@ Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-template
 
 String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
 Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
+
+#### release > tag-type (Optional)
+
+Type: `"annotated" | "lightweight"`  
+Default: `"annotated"`
+
+The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.
 
 #### release > tag-message-template (Optional)
 

@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 import { trimNonEmptyStringSchema } from "../../../string.ts";
-import { TaggerDateOptions } from "../../../../constants/tagger-date-options.ts";
+import { TaggerDateOptions } from "../../../../constants/release-tag-options.ts";
 
 export const TaggerSchema = v.object({
   name: v.pipe(
