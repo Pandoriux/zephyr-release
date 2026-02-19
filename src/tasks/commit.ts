@@ -26,7 +26,10 @@ type ResolveCommitsInputsParams = Pick<
   "triggerCommitHash"
 >;
 
-type ResolveCommitsConfigParams = Pick<ConfigOutput, "commitTypes">;
+type ResolveCommitsConfigParams = Pick<
+  ConfigOutput,
+  "commitTypes" | "stopResolvingCommitAt"
+>;
 
 export type ResolvedCommit = CommitBase & {
   hash: string;
@@ -55,10 +58,11 @@ export async function resolveCommitsFromTriggerToLastRelease(
   config: ResolveCommitsConfigParams,
 ): Promise<ResolvedCommitsResult> {
   const { triggerCommitHash } = inputs;
-  const { commitTypes } = config;
+  const { commitTypes, stopResolvingCommitAt } = config;
 
   const rawCommits = await provider.findCommitsFromGivenToPreviousTaggedOrThrow(
     triggerCommitHash,
+    stopResolvingCommitAt,
   );
 
   taskLogger.debugWrap((dLogger) => {

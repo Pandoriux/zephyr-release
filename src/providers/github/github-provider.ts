@@ -144,11 +144,15 @@ export function createGitHubProvider(): PlatformProvider {
       );
     },
 
-    findCommitsFromGivenToPreviousTaggedOrThrow: async (commitHash: string) => {
+    findCommitsFromGivenToPreviousTaggedOrThrow: async (
+      commitHash: string,
+      stopResolvingCommitAt?: number | string,
+    ) => {
       const { octokit } = ensureProviderContextOrThrow();
       return await githubFindCommitsFromGivenToPreviousTaggedOrThrow(
         octokit,
         commitHash,
+        stopResolvingCommitAt,
       );
     },
     compareCommitsOrThrow: async (

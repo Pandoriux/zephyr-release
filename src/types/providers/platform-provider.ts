@@ -63,6 +63,7 @@ export interface PlatformProvider {
 
   findCommitsFromGivenToPreviousTaggedOrThrow: (
     commitHash: string,
+    stopResolvingCommitAt?: number | string,
   ) => Promise<ProviderCommit[]>;
   compareCommitsOrThrow: (
     base: string,
