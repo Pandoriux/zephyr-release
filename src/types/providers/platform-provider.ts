@@ -1,6 +1,7 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import type { ProviderBranch } from "./branch.ts";
 import type { ProviderConcurrencyResult } from "./concurrency.ts";
+import type { ProviderRelease, ProviderReleaseOptions } from "./release.ts";
 import type { ProviderLabel } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
 import type {
@@ -102,6 +103,13 @@ export interface PlatformProvider {
     message: string,
     tagger?: TaggerRequest,
   ) => Promise<ProviderTag>;
+
+  createReleaseOrThrow: (
+    tagName: string,
+    title: string,
+    body: string,
+    options: ProviderReleaseOptions,
+  ) => Promise<ProviderRelease>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

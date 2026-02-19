@@ -71,7 +71,7 @@ export async function getVersionSemVerFromVersionFile(
   const fileContent = await getTextFileOrThrow(
     fileSourceMode,
     versionFile.path,
-    { workspace: workspacePath, provider, ref: triggerCommitHash },
+    { workspacePath: workspacePath, provider, ref: triggerCommitHash },
   );
 
   const parsedResult = parseVersionFileOrThrow(
@@ -121,7 +121,7 @@ export async function prepareVersionFilesToCommit(
       vf.path,
       {
         provider,
-        workspace: workspacePath,
+        workspacePath: workspacePath,
         ref: triggerCommitHash,
       },
     );

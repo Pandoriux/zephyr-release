@@ -108,7 +108,7 @@ export async function createPullRequestContent(
     const prHeaderTemplate = await getTextFileOrThrow(
       sourceMode.prHeaderTemplatePath ?? sourceMode.sourceMode,
       headerTemplatePath,
-      { provider, workspace: workspacePath, ref: triggerCommitHash },
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
     prHeader = await resolveStringTemplateOrThrow(prHeaderTemplate);
   } else {
@@ -123,7 +123,7 @@ export async function createPullRequestContent(
     const prBodyTemplate = await getTextFileOrThrow(
       sourceMode.prBodyTemplatePath ?? sourceMode.sourceMode,
       bodyTemplatePath,
-      { provider, workspace: workspacePath, ref: triggerCommitHash },
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
     prBody = await resolveStringTemplateOrThrow(prBodyTemplate);
   } else {
@@ -137,7 +137,7 @@ export async function createPullRequestContent(
     const prFooterTemplate = await getTextFileOrThrow(
       sourceMode.prFooterTemplatePath ?? sourceMode.sourceMode,
       footerTemplatePath,
-      { provider, workspace: workspacePath, ref: triggerCommitHash },
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
     prFooter = await resolveStringTemplateOrThrow(prFooterTemplate);
   } else {

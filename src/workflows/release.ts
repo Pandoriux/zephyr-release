@@ -1,9 +1,13 @@
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
-import { exportPreReleaseOperationVariables } from "../tasks/export-variables.ts";
+import {
+  exportPostReleaseOperationVariables,
+  exportPreReleaseOperationVariables,
+} from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromPr } from "../tasks/pull-request.ts";
+import { createRelease } from "../tasks/release-note.ts";
 import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -16,6 +20,7 @@ import {
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import { ProviderRelease } from "../types/providers/release.ts";
 
 interface ReleaseWorkflowOptions {
   operationContext: OperationTriggerContext;
@@ -94,9 +99,25 @@ export async function releaseWorkflow(
   const createdTag = await createTagOrThrow(provider, inputs, config);
   logger.stepFinish("Finished: Create tag");
 
-  // create release note
+  logger.stepStart("Starting: Create release");
+  let createdReleaseNote: ProviderRelease | undefined;
+  if (!config.release.skipReleaseNote) {
+    createdReleaseNote = await createRelease(provider, inputs, config);
+    logger.stepFinish("Finished: Create release");
+  } else {
+    logger.stepSkip(
+      "Skipped: Create release (config skip release note is true)",
+    );
+  }
 
-  // export tag? release note?
+  logger.debugStepStart("Starting: Export post release operation variables");
+  await exportPostReleaseOperationVariables(
+    provider,
+    createdTag.hash,
+    createdReleaseNote?.id,
+    createdReleaseNote?.uploadUrl,
+  );
+  logger.debugStepFinish("Finished: Export post release operation variables");
 
   logger.stepStart("Starting: Execute release post commands");
   const postResult = await runCommandsOrThrow(

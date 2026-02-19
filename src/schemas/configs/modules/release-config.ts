@@ -12,43 +12,12 @@ import { TagTypeOptions } from "../../../constants/release-tag-options.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
-    enabled: v.pipe(
-      v.optional(v.boolean(), true),
-      v.metadata({
-        description: "Enable/disable tag and release operation.\n" +
-          "Default: true",
-      }),
-    ),
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
         description:
           "Pre/post command lists to run around the release operation. Each command runs from the repository root.\n" +
           "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
-      }),
-    ),
-
-    skipReleaseNote: v.pipe(
-      v.optional(v.boolean(), false),
-      v.metadata({
-        description:
-          "If enabled, only the tag will be created, no release note will be made.\n" +
-          "Default: false",
-      }),
-    ),
-
-    prerelease: v.pipe(
-      v.optional(v.boolean(), false),
-      v.metadata({
-        description: "If enabled, the release will be marked as prerelease.\n" +
-          "Default: false",
-      }),
-    ),
-    draft: v.pipe(
-      v.optional(v.boolean(), false),
-      v.metadata({
-        description: "If enabled, the release will be created as draft.\n" +
-          "Default: false",
       }),
     ),
 
@@ -90,6 +59,36 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior.",
+      }),
+    ),
+
+    skipReleaseNote: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description:
+          "If enabled, only the tag will be created, no release note will be made.\n" +
+          "Default: false",
+      }),
+    ),
+    prerelease: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description: "If enabled, the release will be marked as prerelease.\n" +
+          "Default: false",
+      }),
+    ),
+    draft: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description: "If enabled, the release will be created as draft.\n" +
+          "Default: false",
+      }),
+    ),
+    setLatest: v.pipe(
+      v.optional(v.boolean(), true),
+      v.metadata({
+        description: "If enabled, the release will be set as the latest release.\n" +
+          "Default: true",
       }),
     ),
 

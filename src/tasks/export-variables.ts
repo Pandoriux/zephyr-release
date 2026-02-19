@@ -3,6 +3,7 @@ import type {
   BaseOperationVariables,
   DynamicOperationVariables,
   PostProposeOperationVariables,
+  PostReleaseOperationVariables,
   PreProposeOperationVariables,
   PreReleaseOperationVariables,
 } from "../types/operation-variables.ts";
@@ -194,6 +195,36 @@ export async function exportPreReleaseOperationVariables(
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
       "Pre release operation variables to export (internal key name):",
+    );
+    dLogger.info(JSON.stringify(prepareExportObject, null, 2));
+    dLogger.endGroup();
+  });
+
+  Object.entries(prepareExportObject).forEach(([k, v]) => {
+    provider.exportOutputs(toExportOutputKey(k), v);
+    provider.exportEnvVars(toExportEnvVarKey(k), v);
+  });
+}
+
+export async function exportPostReleaseOperationVariables(
+  provider: PlatformProvider,
+  tagHash: string,
+  releaseId?: string | number,
+  releaseUploadUrl?: string,
+) {
+  const prepareExportObject = {
+    tagHash,
+    releaseId,
+    releaseUploadUrl,
+
+    patternContext: await stringifyCurrentPatternContext(),
+  } satisfies
+    & PostReleaseOperationVariables
+    & Pick<DynamicOperationVariables, "patternContext">;
+
+  taskLogger.debugWrap((dLogger) => {
+    dLogger.startGroup(
+      "Post release operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();

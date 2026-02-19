@@ -290,7 +290,7 @@ export async function prepareChangesToCommit(
       if (changesData.has(normalizedPath)) continue;
 
       const fileContent = await getTextFileOrThrow("local", normalizedPath, {
-        workspace: workspacePath,
+        workspacePath: workspacePath,
       });
       changesData.set(normalizedPath, fileContent);
     }
