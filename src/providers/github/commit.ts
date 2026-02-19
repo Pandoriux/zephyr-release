@@ -25,6 +25,7 @@ const RawCommitNodeSchema = v.object({
 export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
   octokit: OctokitClient,
   commitHash: string,
+  stopResolvingCommitAt?: number | string,
 ): Promise<ProviderCommit[]> {
   const collectedCommits: ProviderCommit[] = [];
 
@@ -79,7 +80,6 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
             } is already tagged (${tagName}).`,
           );
         }
-
         return collectedCommits;
       }
 
@@ -89,6 +89,24 @@ export async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
         body: commit.messageBody,
         message: commit.message,
       });
+
+      if (stopResolvingCommitAt) {
+        // Check number limit
+        if (
+          typeof stopResolvingCommitAt === "number" &&
+          collectedCommits.length === stopResolvingCommitAt
+        ) {
+          return collectedCommits;
+        }
+
+        // Check hash boundary
+        if (
+          typeof stopResolvingCommitAt === "string" &&
+          commit.oid === stopResolvingCommitAt
+        ) {
+          return collectedCommits;
+        }
+      }
     }
   }
 

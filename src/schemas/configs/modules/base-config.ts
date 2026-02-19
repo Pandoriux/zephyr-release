@@ -105,6 +105,15 @@ export const BaseConfigSchema = v.object({
         }`,
     }),
   ),
+  stopResolvingCommitAt: v.pipe(
+    v.optional(v.union([v.number(), trimNonEmptyStringSchema])),
+    v.metadata({
+      description:
+        "Defines the boundary for resolving Git commit history. Can be a number or a string.\n" +
+        "- Number: The maximum amount of commits to resolve (e.g., 50).\n" +
+        "- String: The specific Git commit hash to stop at.",
+    }),
+  ),
 
   allowReleaseAs: v.pipe(
     v.optional(

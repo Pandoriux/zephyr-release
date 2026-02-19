@@ -23,6 +23,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
     - [commit... \> hidden (Optional)](#commit--hidden-optional)
+  - [stop-resolving-commit-at (Optional)](#stop-resolving-commit-at-optional)
   - [allow-release-as (Optional)](#allow-release-as-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
@@ -179,6 +180,15 @@ Type: `boolean`
 Default: `false`
 
 Exclude this commit type from changelog generation (does not affect version bump calculation).
+
+### stop-resolving-commit-at (Optional)
+
+Type: `number | string`
+
+Defines the boundary for resolving Git commit history. Can be a number or a string.
+
+- **Number**: The maximum amount of commits to resolve (e.g., `50`).
+- **String**: The specific Git commit hash to stop at (e.g., `"abc123def456"`).
 
 ### allow-release-as (Optional)
 
