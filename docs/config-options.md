@@ -64,16 +64,16 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
     - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
-    - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
-    - [release \> skip-release-note (Optional)](#release--skip-release-note-optional)
-    - [release \> draft (Optional)](#release--draft-optional)
-    - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
     - [release \> tag-type (Optional)](#release--tag-type-optional)
     - [release \> tag-message-template (Optional)](#release--tag-message-template-optional)
     - [release \> tag-message-template-path (Optional)](#release--tag-message-template-path-optional)
     - [release \> tagger (Optional)](#release--tagger-optional)
+    - [release \> skip-release-note (Optional)](#release--skip-release-note-optional)
+    - [release \> prerelease (Optional)](#release--prerelease-optional)
+    - [release \> draft (Optional)](#release--draft-optional)
+    - [release \> set-latest (Optional)](#release--set-latest-optional)
     - [release \> title-template (Optional)](#release--title-template-optional)
     - [release \> title-template-path (Optional)](#release--title-template-path-optional)
     - [release \> body-template (Optional)](#release--body-template-optional)
@@ -496,16 +496,9 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`skip-release-note`](#release--skip-release-note-optional), [`draft`](#release--draft-optional), [`prerelease`](#release--prerelease-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
+**Properties:** [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
 
 Configuration specific to tags and releases.
-
-#### release > enabled (Optional)
-
-Type: `boolean`  
-Default: `true`
-
-Enable/disable tag and release operation.
 
 #### release > command-hook (Optional)
 
@@ -516,27 +509,6 @@ Pre/post command lists to run around the release operation. Each command runs fr
 List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
-
-#### release > skip-release-note (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-If enabled, only the tag will be created, no release note will be made.
-
-#### release > draft (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-If enabled, the release will be created as draft.
-
-#### release > prerelease (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-If enabled, the release will be marked as prerelease.
 
 #### release > tag-name-template (Optional)
 
@@ -574,6 +546,34 @@ Type: [`Tagger`](#tagger)
 Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior.
 
 See [`Tagger`](#tagger) for the type definition.
+
+#### release > skip-release-note (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, only the tag will be created, no release note will be made.
+
+#### release > prerelease (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, the release will be marked as prerelease.
+
+#### release > draft (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, the release will be created as draft.
+
+#### release > set-latest (Optional)
+
+Type: `boolean`  
+Default: `true`
+
+If enabled, the release will be set as the latest release.
 
 #### release > title-template (Optional)
 

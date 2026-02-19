@@ -41,7 +41,7 @@ export async function createTagOrThrow(
     const msgTemplate = await getTextFileOrThrow(
       sourceMode.releaseTagMessageTemplatePath ?? sourceMode.sourceMode,
       tagMessageTemplatePath,
-      { provider, workspace: workspacePath, ref: triggerCommitHash },
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
     tagMessage = await resolveStringTemplateOrThrow(msgTemplate);
   } else {

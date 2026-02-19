@@ -120,3 +120,14 @@ These variables are available starting from the first [`pull-request > command-h
   Export: zr-next-version; Env: ZR_NEXT_VERSION
 
 #### Post Release
+
+These variables are available starting from the first [`release > command-hook > post`](./config-options.md#release--command-hook-optional) command runs.
+
+- **tagHash:** Git tag hash created for the release  
+  Export: zr-tag-hash; Env: ZR_TAG_HASH
+
+- **releaseId:** Platform-specific release identifier (for example, GitHub release ID). May be empty if no release was created (for example, when `skipReleaseNote` is enabled or the platform does not support releases)  
+  Export: zr-release-id; Env: ZR_RELEASE_ID
+
+- **releaseUploadUrl:** Platform-specific upload URL for release assets (for example, GitHub release upload URL). May be empty if not supported or no release was created  
+  Export: zr-release-upload-url; Env: ZR_RELEASE_UPLOAD_URL

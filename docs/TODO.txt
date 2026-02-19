@@ -42,3 +42,5 @@ const resolvedJobs: OperationJob[] = [];
 
       break;
   }
+
+support dynamic config override on runtime?

@@ -14,18 +14,18 @@ export async function getTextFileOrThrow(
 export async function getTextFileOrThrow(
   source: typeof SourceModeOptions.local,
   path: string,
-  options: { workspace: string },
+  options: { workspacePath: string },
 ): Promise<string>;
 export async function getTextFileOrThrow(
   source: SourceModeOption,
   path: string,
-  options: { provider: PlatformProvider; workspace: string; ref?: string },
+  options: { provider: PlatformProvider; workspacePath: string; ref?: string },
 ): Promise<string>;
 
 export async function getTextFileOrThrow(
   source: SourceModeOption,
   path: string,
-  opts: { provider?: PlatformProvider; workspace?: string; ref?: string },
+  opts: { provider?: PlatformProvider; workspacePath?: string; ref?: string },
 ): Promise<string> {
   switch (source) {
     case "remote": {
@@ -36,11 +36,11 @@ export async function getTextFileOrThrow(
     }
 
     case "local": {
-      if (!opts.workspace) {
+      if (!opts.workspacePath) {
         throw new Error("Workspace is required for local source.");
       }
 
-      const safePath = resolveSafeFilePath(opts.workspace, path);
+      const safePath = resolveSafeFilePath(opts.workspacePath, path);
       if (!safePath) {
         throw new Error(
           `Permission Denied: Path ${path} is outside the repository.`,

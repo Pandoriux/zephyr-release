@@ -31,6 +31,10 @@ export type OperationVariables =
 
     committedFilePaths: string;
 
+    tagHash: string;
+    releaseId?: string | number;
+    releaseUploadUrl?: string;
+
     // Dynamic operation variables
     patternContext: string;
     pullRequestNumber: number | undefined;
@@ -70,4 +74,9 @@ export type PostProposeOperationVariables = Pick<
 export type PreReleaseOperationVariables = Pick<
   OperationVariables,
   "version"
+>;
+
+export type PostReleaseOperationVariables = Pick<
+  OperationVariables,
+  "tagHash" | "releaseId" | "releaseUploadUrl"
 >;

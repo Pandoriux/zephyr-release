@@ -37,6 +37,8 @@ import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
 import { TagTypeOption } from "../../constants/release-tag-options.ts";
+import { githubCreateReleaseOrThrow } from "./release.ts";
+import { ProviderReleaseOptions } from "../../types/providers/release.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -246,6 +248,22 @@ export function createGitHubProvider(): PlatformProvider {
         tagType,
         message,
         tagger,
+      );
+    },
+
+    createReleaseOrThrow: async (
+      tagName: string,
+      title: string,
+      body: string,
+      options: ProviderReleaseOptions,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubCreateReleaseOrThrow(
+        octokit,
+        tagName,
+        title,
+        body,
+        options,
       );
     },
 
