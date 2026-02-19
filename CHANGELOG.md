@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/Pandoriux/zephyr-release/compare/v0.4.0...v0.5.0) (2026-02-19)
+
+### Features
+
+- add create tag ([#14](https://github.com/Pandoriux/zephyr-release/issues/14)) ([2af4bdb](https://github.com/Pandoriux/zephyr-release/commit/2af4bdbeaf40c55364bbf5408dc65136a28aa870))
+- add lightweight tag support ([#15](https://github.com/Pandoriux/zephyr-release/issues/15)) ([3d065f5](https://github.com/Pandoriux/zephyr-release/commit/3d065f5f888a4381a9062cd290045c5a7f9c2abd))
+- create release ([#16](https://github.com/Pandoriux/zephyr-release/issues/16)) ([fb945ad](https://github.com/Pandoriux/zephyr-release/commit/fb945ad610cccf0e9675e5fbe8f2585fb1ffd6cd))
+
+### Bug Fixes
+
+- prevent skipped releases when killing concurrent workflows ([#13](https://github.com/Pandoriux/zephyr-release/issues/13)) ([abc4363](https://github.com/Pandoriux/zephyr-release/commit/abc4363e839a7d8d548e2962a7c02607b94787d1))
+
 ## [0.4.0](https://github.com/Pandoriux/zephyr-release/compare/v0.3.0...v0.4.0) (2026-02-10)
 
 ### Features
