@@ -7,7 +7,7 @@ import {
 } from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromPr } from "../tasks/pull-request.ts";
-import { createReleaseNote } from "../tasks/release-note.ts";
+import { createRelease } from "../tasks/release-note.ts";
 import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -102,7 +102,7 @@ export async function releaseWorkflow(
   logger.stepStart("Starting: Create release");
   let createdReleaseNote: ProviderRelease | undefined;
   if (!config.release.skipReleaseNote) {
-    createdReleaseNote = await createReleaseNote(provider, inputs, config);
+    createdReleaseNote = await createRelease(provider, inputs, config);
     logger.stepFinish("Finished: Create release");
   } else {
     logger.stepSkip(

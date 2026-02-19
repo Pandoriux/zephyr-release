@@ -1,17 +1,5 @@
 
-commandHook: v.pipe(
-    v.optional(CommandHookSchema),
-    v.metadata({
-      description:
-        "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
-        "Available variables that cmds can use: [link-insert-later]",
-    }),
-  ),
-  VÀ TẤT CẢ CMD HOOK TƯƠNG TỰ
 
-SYNC docs cua SourceModeSchema
-
-REFACTOR version-files.ts trong cả đống utils, logic này không nên ở utils, suy nghĩ nên hợp luôn với parser của config.ts không
 
 readme
 ```json

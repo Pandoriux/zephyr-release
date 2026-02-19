@@ -24,7 +24,7 @@ interface CreateReleaseConfigParams {
   >;
 }
 
-export async function createReleaseNote(
+export async function createRelease(
   provider: PlatformProvider,
   inputs: CreateReleaseInputsParams,
   config: CreateReleaseConfigParams,
