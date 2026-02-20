@@ -58,40 +58,71 @@ Defines the data execution strategy and source of truth for the operation.
 
 - **`remote`**: Optimized for performance. Operations are performed via remote API calls. This mode does not require a local checkout of the repository.
 - **`local`**: Operations are performed on the runner's filesystem. This mode is required if your workflow involves local file modifications (e.g., via `command-hook`).
-- **`object`**: A JSON object allowing for granular control over which specific parts of the operation use the local filesystem versus the remote API.
+- **`object`**: A JSON object allowing for granular control over which specific file paths use the local filesystem versus the remote API.
 
-**Granular Configuration:**
-When providing a JSON object, you can specify the mode for individual operations. Operations not explicitly defined in the object will inherit the global default, which is `remote`. To make `local` the default instead, include `{"source-mode": "local", ...}` and override specific keys as needed.
+**Object Structure:**
 
-Example: `{"source-mode": "local", "version-files": "local", "changelog": "remote"}`
+When providing a JSON object, use the following structure:
 
-**Supported Keys:**
+```json
+{
+  "mode": "remote",
+  "overrides": {
+    "<path>": "local or remote"
+  }
+}
+```
 
-- `version-files`: Either `"local"` or `"remote"`, or an **object** with keys as version file path strings and values as `"local"` or `"remote"`. Any file paths not listed fall back to the default `source-mode` value.  
-  More about version file config in [config-options.md](./config-options.md#version-files-required)
+- **`mode`**: Global default mode for all operations. Either `"remote"` or `"local"`. Defaults to `"remote"` when omitted.
+- **`overrides`**: An optional map of **file paths** to `"local"` or `"remote"`.
+  - **Key**: An exact file path string, as used in your config (for example, `CHANGELOG.md`, `.github/zephyr-release-config.jsonc`, `templates/pr-title.md`, `deno.json`).
+  - **Value**: Either `"local"` or `"remote"`.
 
-<br/>
+At runtime, Zephyr Release resolves the source mode for any file it needs by looking up:
 
-- `changelog-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file](./config-options.md#changelog--path-optional) is read from the local filesystem or remote repository.
-- `changelog-release-body-override-path`: Either `"local"` or `"remote"`. Controls whether the [changelog content body override file](./config-options.md#changelog--release-body-override-path-optional) is read from the local filesystem or remote repository.
-- `changelog-file-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file header template file](./config-options.md#changelog--file-header-template-path-optional) is read from the local filesystem or remote repository.
-- `changelog-file-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog file footer template file](./config-options.md#changelog--file-footer-template-path-optional) is read from the local filesystem or remote repository.
-- `changelog-release-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release header template file](./config-options.md#changelog--release-header-template-path-optional) is read from the local filesystem or remote repository.
-- `changelog-release-section-entry-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release section entry template file](./config-options.md#changelog--release-section-entry-template-path-optional) is read from the local filesystem or remote repository.
-- `changelog-release-breaking-section-entry-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release breaking section entry template file](./config-options.md#changelog--release-breaking-section-entry-template-path-optional) is read from the local filesystem or remote repository.
-- `changelog-release-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [changelog release footer template file](./config-options.md#changelog--release-footer-template-path-optional) is read from the local filesystem or remote repository.
+```text
+sourceMode.overrides[<path>] ?? sourceMode.mode
+```
 
-<br/>
+This means:
 
-- `pr-title-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request title template file](./config-options.md#pull--title-template-path-optional) is read from the local filesystem or remote repository.
-- `pr-header-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request header template file](./config-options.md#pull--header-template-path-optional) is read from the local filesystem or remote repository.
-- `pr-body-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request body template file](./config-options.md#pull--body-template-path-optional) is read from the local filesystem or remote repository.
-- `pr-footer-template-path`: Either `"local"` or `"remote"`. Controls whether the [pull request footer template file](./config-options.md#pull--footer-template-path-optional) is read from the local filesystem or remote repository.
+- If an override exists for a given path, its value is used.
+- If no override exists, the global `mode` is used instead.
 
-<br/>
+**Examples:**
 
-- `release-tag-message-template-path`: Either `"local"` or `"remote"`. Controls whether the [release tag message template file](./config-options.md#release--tag-message-template-path-optional) is read from the local filesystem or remote repository.
-- `release-title-template-path`: Either `"local"` or `"remote"`. Controls whether the [release title template file](./config-options.md#release--title-template-path-optional) is read from the local filesystem or remote repository.
-- `release-body-template-path`: Either `"local"` or `"remote"`. Controls whether the [release body template file](./config-options.md#release--body-template-path-optional) is read from the local filesystem or remote repository.
+Use remote API for everything except the changelog file, which should be read from disk:
 
-> **Important:** If `source-mode` is set to `local` (globally or for a specific operation), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.
+```json
+{
+  "mode": "remote",
+  "overrides": {
+    "CHANGELOG.md": "local"
+  }
+}
+```
+
+Use local filesystem for everything, but read a specific template file from the remote repository:
+
+```json
+{
+  "mode": "local",
+  "overrides": {
+    "templates/release-title.md": "remote"
+  }
+}
+```
+
+Tie version file resolution to a specific file path (matching your [`version-files`](./config-options.md#version-files-required) config):
+
+```json
+{
+  "mode": "remote",
+  "overrides": {
+    "deno.json": "local"
+  }
+}
+```
+
+> [!Important]
+> If `source-mode` is set to `local` (globally or for a specific path override), a valid local workspace must exist. If required files are missing from the disk, the operation will fail with an error to prevent state mismatch between the local environment and the remote provider.

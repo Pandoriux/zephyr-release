@@ -1,18 +1,6 @@
 
 
 
-readme
-```json
-{
-  "$schema": "../../schemas/config-v1.json",
-
-  "version-files": {
-    "path": "deno.json",
-    "selector": "$.version"
-  }
-}
-```
-
 ---> exportBaseOperationVariables()
 const resolvedJobs: OperationJob[] = [];
   switch (resolvedTarget) {

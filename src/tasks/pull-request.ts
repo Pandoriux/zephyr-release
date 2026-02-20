@@ -106,7 +106,7 @@ export async function createPullRequestContent(
   let prHeader: string;
   if (headerTemplatePath) {
     const prHeaderTemplate = await getTextFileOrThrow(
-      sourceMode.prHeaderTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
       headerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -121,7 +121,7 @@ export async function createPullRequestContent(
   let prBody: string;
   if (bodyTemplatePath) {
     const prBodyTemplate = await getTextFileOrThrow(
-      sourceMode.prBodyTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -135,7 +135,7 @@ export async function createPullRequestContent(
   let prFooter: string;
   if (footerTemplatePath) {
     const prFooterTemplate = await getTextFileOrThrow(
-      sourceMode.prFooterTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
       footerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );

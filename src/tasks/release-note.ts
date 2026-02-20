@@ -44,7 +44,7 @@ export async function createRelease(
   let releaseNoteTitle: string | undefined;
   if (titleTemplatePath) {
     const releaseTitleTemplate = await getTextFileOrThrow(
-      sourceMode.releaseTitleTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[titleTemplatePath] ?? sourceMode.mode,
       titleTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
@@ -56,7 +56,7 @@ export async function createRelease(
   let releaseNoteBody: string | undefined;
   if (bodyTemplatePath) {
     const releaseBodyTemplate = await getTextFileOrThrow(
-      sourceMode.releaseBodyTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
