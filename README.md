@@ -30,13 +30,16 @@ First, you will need a config file, below is a minimal working one:
 
 ```json
 {
-  "$schema": "../../schemas/config-v1.json",
+  // or *.camel.json / *.snake.json
+  "$schema": "https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/v1/config-v1.kebab.json",
 
+  // you need at least 1 primary version file, this is your "source of truth" version
   "version-files": {
     "path": "deno.json",
     "selector": "$.version"
   }
 }
+
 ```
 
 > for full list of options, see [config-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md)
@@ -57,18 +60,19 @@ jobs:
     
     # Permissions are only needed if you use default GITHUB_TOKEN
     # For a PAT or GitHub App token, permissions are set by you on creation
-    permissions:
-      contents: write       
-      pull-requests: write 
-      actions: write
+    # permissions:
+    #   contents: write       
+    #   pull-requests: write 
+    #   issues: write
+    #   actions: write
 
     steps:
       # Optional checkout
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      # - name: Checkout Code
+      #   uses: actions/checkout@v4
 
       - name: Run Zephyr Release
-        uses: owner/repo@v1
+        uses: Pandoriux/zephyr-release@v1
         with:
           token: ${{ secrets.CUSTOM_TOKEN }} # Omit this line to use the default GITHUB_TOKEN
           config-path: ".github/zephyr-release-config.jsonc"
@@ -80,7 +84,8 @@ jobs:
               "name": "Override name"
             }
           
-          # See docs for all available source-mode options: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
+          # See docs for all available source-mode options: 
+          # https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
 ```
 

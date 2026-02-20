@@ -4,7 +4,6 @@ import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { VersionFileOutput } from "../../schemas/configs/modules/components/version-file.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import type { SourceModeOption } from "../../constants/source-mode-options.ts";
 import { getTextFileOrThrow } from "../file.ts";
 import {
   parseVersionFileOrThrow,
@@ -16,28 +15,6 @@ import {
 } from "./vf-extractor.ts";
 import { updateVersionInStructuredFile } from "./vf-transformer.ts";
 import { parseRegExpFromSelector } from "../../utils/parsers/regex.ts";
-
-function getVersionFileSourceMode(
-  filePath: string,
-  sourceMode: InputsOutput["sourceMode"],
-): SourceModeOption {
-  const baseMode = sourceMode.sourceMode;
-
-  if (!sourceMode.versionFiles) {
-    return baseMode;
-  }
-
-  if (typeof sourceMode.versionFiles === "string") {
-    return sourceMode.versionFiles;
-  }
-
-  const fileSpecificMode = sourceMode.versionFiles[filePath];
-  if (fileSpecificMode) {
-    return fileSpecificMode;
-  }
-
-  return baseMode;
-}
 
 export function getPrimaryVersionFile(
   versionFiles: ConfigOutput["versionFiles"],
@@ -63,13 +40,8 @@ export async function getVersionSemVerFromVersionFile(
   workspacePath: string,
   triggerCommitHash: string,
 ): Promise<SemVer | undefined> {
-  const fileSourceMode = getVersionFileSourceMode(
-    versionFile.path,
-    sourceMode,
-  );
-
   const fileContent = await getTextFileOrThrow(
-    fileSourceMode,
+    sourceMode.overrides?.[versionFile.path] ?? sourceMode.mode,
     versionFile.path,
     { workspacePath: workspacePath, provider, ref: triggerCommitHash },
   );
@@ -117,7 +89,7 @@ export async function prepareVersionFilesToCommit(
 
   for (const vf of versionFiles) {
     const fileContent = await getTextFileOrThrow(
-      getVersionFileSourceMode(vf.path, sourceMode),
+      sourceMode.overrides?.[vf.path] ?? sourceMode.mode,
       vf.path,
       {
         provider,

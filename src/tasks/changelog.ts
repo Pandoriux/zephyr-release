@@ -65,7 +65,7 @@ export async function generateChangelogReleaseContent(
   let releaseHeader: string;
   if (releaseHeaderTemplatePath) {
     const headerTemplate = await getTextFileOrThrow(
-      sourceMode.changelogReleaseHeaderTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[releaseHeaderTemplatePath] ?? sourceMode.mode,
       releaseHeaderTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -79,7 +79,7 @@ export async function generateChangelogReleaseContent(
   let releaseFooter: string | undefined;
   if (releaseFooterTemplatePath) {
     const footerTemplate = await getTextFileOrThrow(
-      sourceMode.changelogReleaseFooterTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[releaseFooterTemplatePath] ?? sourceMode.mode,
       releaseFooterTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -93,7 +93,7 @@ export async function generateChangelogReleaseContent(
   let releaseBody: string;
   if (releaseBodyOverridePath) {
     releaseBody = await getTextFileOrThrow(
-      sourceMode.changelogReleaseBodyOverridePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[releaseBodyOverridePath] ?? sourceMode.mode,
       releaseBodyOverridePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -155,8 +155,8 @@ async function generateReleaseBody(
 
   const sectionEntryTemplate = releaseSectionEntryTemplatePath
     ? await getTextFileOrThrow(
-      sourceMode.changelogReleaseSectionEntryTemplatePath ??
-        sourceMode.sourceMode,
+      sourceMode.overrides?.[releaseSectionEntryTemplatePath] ??
+        sourceMode.mode,
       releaseSectionEntryTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     )
@@ -164,8 +164,8 @@ async function generateReleaseBody(
 
   const breakingSectionEntryTemplate = releaseBreakingSectionEntryTemplatePath
     ? await getTextFileOrThrow(
-      sourceMode.changelogReleaseBreakingSectionEntryTemplatePath ??
-        sourceMode.sourceMode,
+      sourceMode.overrides?.[releaseBreakingSectionEntryTemplatePath] ??
+        sourceMode.mode,
       releaseBreakingSectionEntryTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     )
@@ -258,9 +258,7 @@ export async function prepareChangelogFileToCommit(
     fileFooterTemplatePath,
   } = changelogConfig;
 
-  const changelogSourceMode = sourceMode.changelogPath
-    ? sourceMode.changelogPath
-    : sourceMode.sourceMode;
+  const changelogSourceMode = sourceMode.overrides?.[path] ?? sourceMode.mode;
 
   const currentFileContent = await getTextFileOrThrow(
     changelogSourceMode,
@@ -271,7 +269,7 @@ export async function prepareChangelogFileToCommit(
   let header: string;
   if (fileHeaderTemplatePath) {
     const headerTemplate = await getTextFileOrThrow(
-      sourceMode.changelogFileHeaderTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[fileHeaderTemplatePath] ?? sourceMode.mode,
       fileHeaderTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
@@ -281,7 +279,7 @@ export async function prepareChangelogFileToCommit(
   let footer: string | undefined;
   if (fileFooterTemplatePath) {
     const footerTemplate = await getTextFileOrThrow(
-      sourceMode.changelogFileFooterTemplatePath ?? sourceMode.sourceMode,
+      sourceMode.overrides?.[fileFooterTemplatePath] ?? sourceMode.mode,
       fileFooterTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );

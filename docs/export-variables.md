@@ -42,7 +42,7 @@ These variables are available starting from the first [`command-hook > pre`](./c
 - **sourceMode:** Source mode string from inputs, preserved as-is (JSON stringified)  
   Export: zr-source-mode-str; Env: ZR_SOURCE_MODE_STR
 
-- **internalSourceMode:** Internally resolved source mode object (JSON stringified), with keys converted to camelCase and values normalized. See: [source-mode.ts](../src/schemas/inputs/source-mode.ts)  
+- **internalSourceMode:** Internally resolved source mode object (JSON stringified). The object has the shape `{ mode: "remote" | "local", overrides?: Record<string, "remote" | "local"> }`, where `overrides` is a map of file paths to mode values. See [source mode docs](./input-options.md#source-mode-optional).  
   Export: zr-internal-source-mode; Env: ZR_INTERNAL_SOURCE_MODE
 
 <br>

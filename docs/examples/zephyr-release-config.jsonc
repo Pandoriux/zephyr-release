@@ -1,5 +1,5 @@
 {
-  "$schema": "../../schemas/config-v1.json",
+  "$schema": "../../schemas/v1/config-v1.kebab.json",
 
   "name": "project name",
   "time-zone": "UTC",

@@ -11,18 +11,19 @@ jobs:
     
     # Permissions are only needed if you use default GITHUB_TOKEN
     # For a PAT or GitHub App token, permissions are set by you on creation
-    permissions:
-      contents: write       
-      pull-requests: write 
-      actions: write
+    # permissions:
+    #   contents: write       
+    #   pull-requests: write 
+    #   issues: write
+    #   actions: write
 
     steps:
       # Optional checkout
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      # - name: Checkout Code
+      #   uses: actions/checkout@v4
 
       - name: Run Zephyr Release
-        uses: owner/repo@v1
+        uses: Pandoriux/zephyr-release@v1
         with:
           token: ${{ secrets.CUSTOM_TOKEN }} # Omit this line to use the default GITHUB_TOKEN
           config-path: ".github/zephyr-release-config.jsonc"
@@ -34,5 +35,6 @@ jobs:
               "name": "Override name"
             }
           
-          # See docs for all available source-mode options: [link]
+          # See docs for all available source-mode options: 
+          # https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
