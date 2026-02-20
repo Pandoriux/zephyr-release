@@ -11,6 +11,19 @@
 
 *Hugely inspired by [`googleapis/release-please`](https://github.com/googleapis/release-please) [`googleapis/release-please-action`](https://github.com/googleapis/release-please-action).*
 
+## Key Features
+
+### Adaptable Configuration
+
+Zephyr Release is designed to fit naturally into your project, no matter what language or ecosystem you use.
+
+- **Multiple File Formats:** We support **JSON** (including JSONC and JSON5), **YAML**, and **TOML**. You can pick the format that feels most at home in your repository.
+- **Flexible Casing:** You don't have to change your coding style to use this tool. We provide dedicated JSON schemas for different naming conventions:
+  - Using Python or Rust? Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
+  - Prefer web standards? Use the [kebab-case schema](./schemas/v1/config-v1.kebab.json) or [camelCase schema](./schemas/v1/config-v1.camel.json).
+
+> Currently, we only offer standardized schemas for JSON. If you have ideas on how to implement strict schema validation for YAML or TOML, we would love to hear your suggestions in the issues!
+
 ## Getting Started
 
 First, you will need a config file, below is a minimal working one:
