@@ -1,5 +1,6 @@
 import type { OctokitClient } from "./octokit.ts";
 import type {
+  ProviderAssetParams,
   ProviderRelease,
   ProviderReleaseOptions,
 } from "../../types/providers/release.ts";
@@ -30,4 +31,27 @@ export async function githubCreateReleaseOrThrow(
     url: res.data.html_url,
     uploadUrl: res.data.upload_url,
   };
+}
+
+export async function githubAttachReleaseAssetOrThrow(
+  octokit: OctokitClient,
+  releaseId: string,
+  asset: ProviderAssetParams,
+) {
+  const fileStream = asset.createDataStream();
+
+  await octokit.request(
+    "POST /repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}",
+    {
+      owner: githubGetNamespace(),
+      repo: githubGetRepositoryName(),
+      release_id: releaseId,
+      name: asset.name,
+      data: fileStream,
+      headers: {
+        "content-type": asset.contentType,
+        "content-length": asset.bytes.toString(),
+      },
+    },
+  );
 }

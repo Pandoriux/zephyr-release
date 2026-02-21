@@ -37,8 +37,14 @@ import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
 import { TagTypeOption } from "../../constants/release-tag-options.ts";
-import { githubCreateReleaseOrThrow } from "./release.ts";
-import { ProviderReleaseOptions } from "../../types/providers/release.ts";
+import {
+  githubAttachReleaseAssetOrThrow,
+  githubCreateReleaseOrThrow,
+} from "./release.ts";
+import {
+  ProviderAssetParams,
+  ProviderReleaseOptions,
+} from "../../types/providers/release.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -268,6 +274,17 @@ export function createGitHubProvider(): PlatformProvider {
         title,
         body,
         options,
+      );
+    },
+    attachReleaseAssetOrThrow: async (
+      releaseId: string,
+      asset: ProviderAssetParams,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubAttachReleaseAssetOrThrow(
+        octokit,
+        releaseId,
+        asset,
       );
     },
 

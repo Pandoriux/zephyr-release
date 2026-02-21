@@ -79,6 +79,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> title-template-path (Optional)](#release--title-template-path-optional)
     - [release \> body-template (Optional)](#release--body-template-optional)
     - [release \> body-template-path (Optional)](#release--body-template-path-optional)
+    - [release \> assets (Optional)](#release--assets-optional)
 - [Type Definitions](#type-definitions)
   - [CommandHook](#commandhook)
   - [Command](#command)
@@ -506,7 +507,7 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional)
+**Properties:** [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
 
 Configuration specific to tags and releases.
 
@@ -612,6 +613,12 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing release body template. Overrides `body-template` when both are provided.
+
+#### release > assets (Optional)
+
+Type: `string | string[]`
+
+List of local asset path(s) to attach to the release. Accepts a single string or an array of strings. Paths are relative to the repository root.
 
 ## Type Definitions
 

@@ -87,7 +87,8 @@ export const ReleaseConfigSchema = v.pipe(
     setLatest: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "If enabled, the release will be set as the latest release.\n" +
+        description:
+          "If enabled, the release will be set as the latest release.\n" +
           "Default: true",
       }),
     ),
@@ -122,6 +123,22 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.",
+      }),
+    ),
+
+    assets: v.pipe(
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) return Array.isArray(input) ? input : [input];
+        return input;
+      }),
+      v.metadata({
+        description: "List of local asset path(s) to attach to the release.",
       }),
     ),
   }),
