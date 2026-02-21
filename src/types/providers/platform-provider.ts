@@ -1,7 +1,11 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import type { ProviderBranch } from "./branch.ts";
 import type { ProviderConcurrencyResult } from "./concurrency.ts";
-import type { ProviderRelease, ProviderReleaseOptions } from "./release.ts";
+import type {
+  ProviderAssetParams,
+  ProviderRelease,
+  ProviderReleaseOptions,
+} from "./release.ts";
 import type { ProviderLabel } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
 import type {
@@ -111,6 +115,10 @@ export interface PlatformProvider {
     body: string,
     options: ProviderReleaseOptions,
   ) => Promise<ProviderRelease>;
+  attachReleaseAssetOrThrow: (
+    releaseId: string,
+    asset: ProviderAssetParams,
+  ) => Promise<void>;
 
   exportOutputs: (k: string, v: string | number | null | undefined) => void;
   exportEnvVars: (k: string, v: string | number | null | undefined) => void;

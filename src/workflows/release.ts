@@ -7,7 +7,7 @@ import {
 } from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromPr } from "../tasks/pull-request.ts";
-import { createRelease } from "../tasks/release-note.ts";
+import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -20,7 +20,7 @@ import {
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
-import { ProviderRelease } from "../types/providers/release.ts";
+import type { ProviderRelease } from "../types/providers/release.ts";
 
 interface ReleaseWorkflowOptions {
   operationContext: OperationTriggerContext;
@@ -107,6 +107,20 @@ export async function releaseWorkflow(
   } else {
     logger.stepSkip(
       "Skipped: Create release (config skip release note is true)",
+    );
+  }
+
+  logger.stepStart("Starting: Attach release assets");
+  if (createdReleaseNote?.id && config.release.assets) {
+    await attachReleaseAssets(
+      provider,
+      createdReleaseNote.id,
+      config.release.assets,
+    );
+    logger.stepFinish("Finished: Attach release assets");
+  } else {
+    logger.stepSkip(
+      "Skipped: Attach release assets (no assets to attach or config skip release note is true)",
     );
   }
 

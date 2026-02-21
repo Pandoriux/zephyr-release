@@ -1,9 +1,14 @@
+import fsPromises from "node:fs/promises";
+import fs from "node:fs";
+import { contentType } from "@std/media-types";
+import { extname } from "@std/path";
 import type { ReleaseConfigOutput } from "../schemas/configs/modules/release-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { getTextFileOrThrow } from "./file.ts";
 import { taskLogger } from "./logger.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { basename } from "@std/path";
 
 type CreateReleaseInputsParams = Pick<
   InputsOutput,
@@ -74,4 +79,64 @@ export async function createRelease(
   taskLogger.info(`Release created: ${createdRelease.url}`);
 
   return createdRelease;
+}
+
+export async function attachReleaseAssets(
+  provider: PlatformProvider,
+  releaseId: string | number,
+  assetPaths: string[],
+) {
+  const MAX_CONCURRENT_UPLOADS = 5;
+
+  taskLogger.info(
+    `Preparing to attach ${assetPaths.length} assets (${MAX_CONCURRENT_UPLOADS} concurrent uploads allowed)...`,
+  );
+
+  // Pre-fetch sizes without reading files into memory
+  const uploadTargets = await Promise.all(
+    assetPaths.map(async (path) => {
+      const fileStat = await fsPromises.stat(path);
+      if (!fileStat.isFile()) {
+        taskLogger.info(`Skipping ${path}: Not a file`);
+        return null;
+      }
+
+      return {
+        filePath: path,
+        fileName: basename(path),
+        sizeBytes: fileStat.size,
+      };
+    }),
+  );
+
+  const uploadQueue = uploadTargets.filter(Boolean);
+
+  // Define queue task
+  async function processQueueTask() {
+    while (uploadQueue.length > 0) {
+      const target = uploadQueue.shift();
+      if (!target) break;
+
+      const sizeMb = (target.sizeBytes / 1024 / 1024).toFixed(2);
+      taskLogger.info(`↑ Uploading: ${target.fileName} (${sizeMb} MB)`);
+
+      await provider.attachReleaseAssetOrThrow(
+        releaseId.toString(),
+        {
+          name: target.fileName,
+          bytes: target.sizeBytes,
+          contentType: contentType(extname(target.filePath)) ??
+            "application/octet-stream",
+          createDataStream: () => fs.createReadStream(target.filePath),
+        },
+      );
+    }
+  }
+
+  // Spawn concurrentUploads and wait for them to finish
+  const concurrentUploads = Array.from(
+    { length: MAX_CONCURRENT_UPLOADS },
+    processQueueTask,
+  );
+  await Promise.all(concurrentUploads);
 }

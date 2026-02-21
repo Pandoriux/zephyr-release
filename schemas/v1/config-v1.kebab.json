@@ -1458,6 +1458,11 @@
     "release": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable tag and release.\nDefault: true"
+        },
         "command-hook": {
           "type": "object",
           "properties": {
@@ -1767,6 +1772,22 @@
           "type": "string",
           "minLength": 1,
           "description": "Path to text file containing release body template. Overrides `body-template` when both are provided."
+        },
+        "assets": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          ]
         }
       },
       "required": [],
