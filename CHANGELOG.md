@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0](https://github.com/Pandoriux/zephyr-release/compare/v0.5.0...v0.6.0) (2026-02-22)
+
+### Features
+
+- add multi cases support for config ([#18](https://github.com/Pandoriux/zephyr-release/issues/18)) ([c6aad3e](https://github.com/Pandoriux/zephyr-release/commit/c6aad3e2d3d579c4575f1d5f8396d255378c0878))
+- add resolve commit limit support ([#17](https://github.com/Pandoriux/zephyr-release/issues/17)) ([a5f72d0](https://github.com/Pandoriux/zephyr-release/commit/a5f72d0d4139e0be79af3db35003921994314129))
+- add upload release assets ([#20](https://github.com/Pandoriux/zephyr-release/issues/20)) ([433bd0b](https://github.com/Pandoriux/zephyr-release/commit/433bd0b61c594a66cc087d8eecf5149193f2d572))
+- change inputs source mode keys from fixed to dynamic ([#19](https://github.com/Pandoriux/zephyr-release/issues/19)) ([b2d894c](https://github.com/Pandoriux/zephyr-release/commit/b2d894c3f99fe3d3e2573f4d4aac3095d9cc9d59))
+
 ## [0.5.0](https://github.com/Pandoriux/zephyr-release/compare/v0.4.0...v0.5.0) (2026-02-19)
 
 ### Features
