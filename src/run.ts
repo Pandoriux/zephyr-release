@@ -12,7 +12,6 @@ import {
 import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
 import { proposeWorkflow } from "./workflows/propose.ts";
 import { releaseWorkflow } from "./workflows/release.ts";
-import { manageConcurrencyOrExit } from "./tasks/concurrency.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
@@ -28,19 +27,14 @@ export async function run(provider: PlatformProvider) {
   setupOperation(provider, inputs);
   logger.stepFinish("Finished: Set up operation");
 
-  logger.stepStart("Starting: Manage concurrency");
-  const concurrencyResult = await manageConcurrencyOrExit(provider);
-  logger.stepFinish("Finished: Manage concurrency");
-
   logger.stepStart("Starting: Resolve config from file and override");
   const configResult = await resolveConfigOrThrow(provider, inputs);
   const { config } = configResult;
   logger.stepFinish("Finished: Resolve config from file and override");
 
   logger.stepStart("Starting: Parse and validate current operation context");
-  const operationContext = await validateCurrentOperationCtxOrExit(
+  const operationContext = validateCurrentOperationCtxOrExit(
     provider,
-    concurrencyResult,
     config.commitTypes,
   );
   logger.stepFinish("Finished: Parse and validate current operation context");

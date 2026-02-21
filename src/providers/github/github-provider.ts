@@ -24,7 +24,6 @@ import {
   githubGetCommitOrThrow,
 } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
-import { githubManageConcurrency } from "./concurrency.ts";
 import {
   githubCreateTagOrThrow,
   githubGetCompareTagUrl,
@@ -96,11 +95,6 @@ export function createGitHubProvider(): PlatformProvider {
         currentTag,
         skip,
       );
-    },
-
-    manageConcurrency: async () => {
-      const { octokit } = ensureProviderContextOrThrow();
-      return await githubManageConcurrency(octokit);
     },
 
     getTextFileOrThrow: async (filePath: string, ref?: string) => {
