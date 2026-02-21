@@ -65,6 +65,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
     - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
+    - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
     - [release \> tag-type (Optional)](#release--tag-type-optional)
@@ -507,9 +508,16 @@ Path to text file containing pull request footer template. Overrides `footer-tem
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
+**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
 
 Configuration specific to tags and releases.
+
+#### release > enabled (Optional)
+
+Type: `boolean`  
+Default: `true`
+
+Enable/disable tag and release. Useful if for any reason, you want to use Zephyr Release only for the pull request proposal.
 
 #### release > command-hook (Optional)
 

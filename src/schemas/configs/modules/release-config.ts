@@ -12,6 +12,13 @@ import { TagTypeOptions } from "../../../constants/release-tag-options.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
+    enabled: v.pipe(
+      v.optional(v.boolean(), true),
+      v.metadata({
+        description: "Enable/disable tag and release.\n" +
+          "Default: true",
+      }),
+    ),
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
