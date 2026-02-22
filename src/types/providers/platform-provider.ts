@@ -1,6 +1,5 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import type { ProviderBranch } from "./branch.ts";
-import type { ProviderConcurrencyResult } from "./concurrency.ts";
 import type {
   ProviderAssetParams,
   ProviderRelease,
@@ -42,8 +41,6 @@ export interface PlatformProvider {
     currentTag: string,
     skip?: number,
   ) => Promise<string>;
-
-  manageConcurrency: () => Promise<ProviderConcurrencyResult>;
 
   getTextFileOrThrow: (filePath: string, ref?: string) => Promise<string>;
 

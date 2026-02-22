@@ -26,7 +26,9 @@ Zephyr Release is designed to fit naturally into your project, no matter what la
 
 ## Getting Started
 
-First, you will need a config file, below is a minimal working one:
+### First, a config file
+
+below is a minimal working one
 
 ```json
 {
@@ -42,9 +44,11 @@ First, you will need a config file, below is a minimal working one:
 
 ```
 
-> for full list of options, see [config-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md)
+> *for full list of options, see [config-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md)*
 
-Second, you need an input file. For github, it is your `.github/workflows/zephyr-release.yml`:
+### Second, an input file
+
+For github, it is your `.github/workflows/zephyr-release.yml`
 
 ```yaml
 name: Zephyr Release
@@ -53,6 +57,14 @@ on:
   push:
     branches:
       - main # Or your default branch
+
+# !IMPORTANT: Prevents parallel runs and forces them into a safe queue.
+concurrency:
+  # The group name can be anything, but combining these two variables is best practice:
+  # github.workflow: The name of this workflow (e.g., "Zephyr Release").
+  # github.ref: The branch ref. Ensures pushes to different branches (e.g., 'main' vs 'dev') don't block each other.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   zephyr-release:
@@ -89,11 +101,16 @@ jobs:
           source-mode: "local"
 ```
 
-> for full list of options, see [inputs-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md)
+> *for full list of options, see [inputs-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md)*
+
+### ⚠️ Crucial: Managing Concurrency
+
+Because Zephyr Release resolves history up to the specific trigger commit to manage proposal PRs and tags/releases, running multiple workflows at the same time can lead to collisions or race conditions.  
+To prevent this, you must handle **parallel runs (concurrency)** by putting workflows into a queue so they run one-at-a-time (as shown above)
 
 <br/>
 
-**See more examples:** <https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples>
+**More examples:** <https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples>
 
 ## How It Work
 

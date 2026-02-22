@@ -3,13 +3,11 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
-import type { ProviderConcurrencyResult } from "../types/providers/concurrency.ts";
 
-export async function validateCurrentOperationCtxOrExit(
+export function validateCurrentOperationCtxOrExit(
   provider: PlatformProvider,
-  concurrencyResult: ProviderConcurrencyResult,
   allowedCommitTypes: ConfigOutput["commitTypes"],
-): Promise<OperationTriggerContext> {
+): OperationTriggerContext {
   const operationContext = provider.getOperationTriggerContextOrThrow();
 
   if (!operationContext.latestTriggerCommit) {
@@ -41,35 +39,6 @@ export async function validateCurrentOperationCtxOrExit(
       allowedTypes.has(parsedLatestTriggerCommit.type)) ||
       parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type)))
   ) {
-    // If our concurrency check found that we interrupted a previous run (or one failed),
-    // we assume there is "Unfinished Business" and force a run.
-    // This saves us the 2 API calls below.
-    if (
-      concurrencyResult.isLatestExecution &&
-      concurrencyResult.hasIncompleteHistory
-    ) {
-      return parsedOperationContext;
-    }
-
-    // recheck for missed allowed commits
-    const latestTagName = await provider.getLatestReleaseTagOrThrow();
-    if (!latestTagName) return parsedOperationContext;
-
-    const compareCommits = await provider.compareCommitsOrThrow(
-      latestTagName,
-      operationContext.latestTriggerCommit.hash,
-    );
-
-    if (compareCommits.totalCommits > 250) {
-      return parsedOperationContext;
-    }
-
-    const hasValidCommit = compareCommits.commits.some((c) => {
-      const parsed = commitParser.parse(c.message);
-      return parsed.type && allowedTypes.has(parsed.type);
-    });
-    if (hasValidCommit) return parsedOperationContext;
-
     throw new SafeExit("No commits with an allowed type found");
   }
 
