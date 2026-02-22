@@ -5,6 +5,14 @@ on:
     branches:
       - main # Or your default branch
 
+# !IMPORTANT: Prevents parallel runs and forces them into a safe queue.
+concurrency:
+  # The group name can be anything, but combining these two variables is best practice:
+  # github.workflow: The name of this workflow (e.g., "Zephyr Release").
+  # github.ref: The branch ref. Ensures pushes to different branches (e.g., 'main' vs 'dev') don't block each other.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   zephyr-release:
     runs-on: ubuntu-latest
