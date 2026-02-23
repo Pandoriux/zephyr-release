@@ -61,7 +61,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.",
+          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     headerTemplate: v.pipe(
@@ -77,7 +78,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.",
+          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -93,7 +95,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.",
+          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     footerTemplate: v.pipe(
@@ -109,7 +112,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.",
+          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
   }),
