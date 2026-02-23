@@ -58,7 +58,8 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing Git annotated tag message template. Overrides `tagMessageTemplate` when both are provided.",
+          "Path to text file containing Git annotated tag message template. Overrides `tagMessageTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     tagger: v.pipe(
@@ -113,7 +114,8 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing release title template. Overrides `titleTemplate` when both are provided.",
+          "Path to text file containing release title template. Overrides `titleTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -129,7 +131,8 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.",
+          "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
 

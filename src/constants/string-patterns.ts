@@ -63,6 +63,7 @@ export type DynamicChangelogStringPattern =
   ];
 
 const ChangelogReleaseEntryPatterns = {
+  commit: "commit",
   hash: "hash",
   type: "type",
   scope: "scope",

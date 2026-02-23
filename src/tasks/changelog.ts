@@ -223,6 +223,7 @@ function createCommitExtraPatterns(
   commit: ResolvedCommit,
 ): Record<ChangelogReleaseEntryPattern, unknown> {
   return {
+    commit,
     hash: commit.hash,
     type: commit.type,
     scope: commit.scope,

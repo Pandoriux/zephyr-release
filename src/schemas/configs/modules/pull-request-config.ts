@@ -61,19 +61,15 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.",
+          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     headerTemplate: v.pipe(
-      v.optional(
-        v.union([v.string(), v.pipe(v.array(v.string()), v.nonEmpty())]),
-        DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
-      ),
-      v.transform((input) => Array.isArray(input) ? input : [input]),
+      v.optional(v.string(), DEFAULT_PULL_REQUEST_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request header, using with string patterns like {{ version }}. If an array is provided, " +
-          "one will be randomly chosen.\n" +
+          "String template for pull request header, using with string patterns like {{ version }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
       }),
@@ -82,7 +78,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.",
+          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     bodyTemplate: v.pipe(
@@ -98,7 +95,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.",
+          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     footerTemplate: v.pipe(
@@ -114,7 +112,8 @@ export const PullRequestConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.",
+          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
   }),

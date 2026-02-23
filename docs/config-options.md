@@ -291,6 +291,8 @@ Default: `"CHANGELOG.md"`
 
 Path to the file where the generated changelog will be written to, relative to the project root.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### changelog > file-header-template (Optional)
 
 Type: `string`  
@@ -305,6 +307,8 @@ Type: `string`
 
 Path to text file containing changelog file header. Overrides `file-header-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### changelog > file-footer-template (Optional)
 
 Type: `string`
@@ -317,6 +321,8 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing changelog file footer. Overrides `file-footer-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### changelog > release-header-template (Optional)
 
@@ -332,6 +338,8 @@ Type: `string`
 
 Path to text file containing changelog release header. Overrides `release-header-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### changelog > release-section-entry-template (Optional)
 
 Type: `string`  
@@ -341,6 +349,7 @@ String template for each entries in the changelog release sections, using with f
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
 Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
 
+- `{{ commit }}`: The full parsed and resolved commit object. See [ResolvedCommit](../src/tasks/commit.ts#L34-L41) for the structure
 - `{{ hash }}`: string
 - `{{ type }}`: string
 - `{{ scope }}`: string
@@ -354,6 +363,8 @@ Additionally, you can use a special set of [dynamic patterns](./string-templates
 Type: `string`
 
 Path to text file containing changelog release section entry template. Overrides `release-section-entry-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### changelog > release-breaking-section-heading (Optional)
 
@@ -375,6 +386,8 @@ Type: `string`
 
 Path to text file containing changelog release breaking section entry template. Overrides `release-breaking-section-entry-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### changelog > release-footer-template (Optional)
 
 Type: `string`
@@ -388,6 +401,8 @@ Type: `string`
 
 Path to text file containing changelog release footer. Overrides `release-footer-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### changelog > release-body-override (Optional)
 
 Type: `string`
@@ -399,6 +414,8 @@ User-provided changelog release body, available in string templates as `{{ chang
 Type: `string`
 
 Path to text file containing changelog release body override, will take precedence over `release-body-override`.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 ### pull-request (Optional)
 
@@ -463,12 +480,14 @@ Type: `string`
 
 Path to text file containing pull request title template. Overrides `title-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### pull... > header-template (Optional)
 
-Type: `string | string[]`  
+Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.  
+String template for pull request header, using with string patterns like `{{ version }}`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > header-template-path (Optional)
@@ -476,6 +495,8 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing pull request header template. Overrides `header-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### pull... > body-template (Optional)
 
@@ -491,6 +512,8 @@ Type: `string`
 
 Path to text file containing pull request body template. Overrides `body-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### pull... > footer-template (Optional)
 
 Type: `string`  
@@ -504,6 +527,8 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 ### release (Optional)
 
@@ -558,6 +583,8 @@ Type: `string`
 
 Path to text file containing Git annotated tag message template. Overrides `tag-message-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### release > tagger (Optional)
 
 Type: [`Tagger`](#tagger)
@@ -608,6 +635,8 @@ Type: `string`
 
 Path to text file containing release title template. Overrides `title-template` when both are provided.
 
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### release > body-template (Optional)
 
 Type: `string`  
@@ -621,6 +650,8 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing release body template. Overrides `body-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### release > assets (Optional)
 
@@ -661,7 +692,7 @@ A command can be specified as either a string or an object.
 Type: `object`  
 **Properties:**
 
-- `path` (Required): Path to the version file, relative to the project root.
+- `path` (Required): Path to the version file, relative to the project root. To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 - `format` (Optional): Defines the file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`, `txt`. Default: `"auto"`
 - `extractor` (Optional): Defines how the version should be located inside the parsed output. Allowed values: `auto`, `json-path`, `regex`. Default: `"auto"`
 - `selector` (Required): The lookup used by the chosen extractor. For `json-path`, this is the JSON path string; for `regex`, supply the pattern.

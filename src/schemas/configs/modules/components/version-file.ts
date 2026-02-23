@@ -7,7 +7,9 @@ export const VersionFileSchema = v.object({
   path: v.pipe(
     trimNonEmptyStringSchema,
     v.metadata({
-      description: "Path to the version file, relative to the project root.",
+      description:
+        "Path to the version file, relative to the project root.\n" +
+        "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
     }),
   ),
   format: v.pipe(

@@ -78,6 +78,7 @@ These are special patterns that are only available to certain templates. Make su
 
 Usage: [release-section-entry-template](./config-options.md#changelog--release-section-entry-template-optional)
 
+- `{{ commit }}`: The full parsed and resolved commit object. See [ResolvedCommit](../src/tasks/commit.ts#L34-L41) for the structure
 - `{{ hash }}`: string
 - `{{ type }}`: string
 - `{{ scope }}`: string
@@ -94,15 +95,22 @@ Usage: `{{ <value> | <transformers>: <arg1>, <arg2>, ...  }}`
 
 ### Zephyr Release Transformers
 
-Our custom transformers.
+Custom transformers.
 
-- `md_link_compare_tag: tag1, tag2`: Wraps the current text in a markdown link that compares `tag1` with `tag2`
+- `wrap_compare_tag: tag1, tag2`: Wraps the current text in a markdown link that compares `tag1` with `tag2`
   - tag1: `string`
   - tag2: `string`
+  - Usage: `{{ text | wrap_compare_tag: tag1, tag2 }}`
 
-- `md_link_compare_tag_from_current_to_latest: skip`: Wraps the current text in a markdown link comparing the current tag to the latest tag.  
-  - skip (optional): `positive integer`, `DEFAULT: 0`  
-  how many tags back from the latest tag to compare against (`0` = latest tag, `1` = tag before the latest, etc.)
+- `wrap_compare_latest_tag: currentTag, skip`: Wraps the current text in a markdown link comparing the current given tag to the latest tag
+  - currentTag: `string`
+  - skip (optional): `number` (positive integer), `DEFAULT: 0`  
+    how many tags back from the latest tag to compare against (`0` = latest tag, `1` = tag before the latest, etc.)
+  - Usage: `{{ text | wrap_compare_latest_tag: currentTag, skip }}` or `{{ text | wrap_compare_latest_tag: currentTag }}`
+
+- `format_commit_references: commit`: Formats the current text to find references (like #12) and transforms them into markdown links using the provided commit context. Usually used for [entry template](./config-options.md#changelog--release-section-entry-template-optional)
+  - commit: [`ResolvedCommit`](../src/tasks/commit.ts#L34-L41) or [`an object with shape { references: { prefix: string, issue: string }[] }`](../src/tasks/string-templates-and-patterns/transformers.ts)
+  - Usage: `{{ text | parse_references: commit }}`
 
 ### LiquidJS built-in Transformers
 

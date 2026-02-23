@@ -36,6 +36,7 @@ export interface PlatformProvider {
   getReferencePathPart: () => string;
   getOperationTriggerContextOrThrow: () => ProviderOperationTriggerContext;
 
+  getReferenceUrl: (ref: string) => string;
   getCompareTagUrl: (tag1: string, tag2: string) => string;
   getCompareTagUrlFromCurrentToLatest: (
     currentTag: string,

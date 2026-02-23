@@ -44,6 +44,7 @@ import {
   ProviderAssetParams,
   ProviderReleaseOptions,
 } from "../../types/providers/release.ts";
+import { githubGetReferenceUrl } from "./reference.ts";
 
 export function createGitHubProvider(): PlatformProvider {
   // Private state variables held in the closure
@@ -83,8 +84,8 @@ export function createGitHubProvider(): PlatformProvider {
     getReferencePathPart: githubGetReferencePathPart,
     getOperationTriggerContextOrThrow: githubGetOperationTriggerContextOrThrow,
 
+    getReferenceUrl: githubGetReferenceUrl,
     getCompareTagUrl: githubGetCompareTagUrl,
-
     getCompareTagUrlFromCurrentToLatest: (
       currentTag: string,
       skip?: number,

@@ -3,7 +3,7 @@ import { CommitParser, type ParserOptions } from "conventional-commits-parser";
 // 1. Our Test Commits
 const commitMsgs = [
   // 4. Breaking change WITHOUT a scope (Tests the '!' capture group alone)
-  "feat!: drop support for internet explorer",
+  "feat!: drop support for internet explorer (# 200)",
 
   // 5. Multiple Footers (Tests issue reference parsing + BREAKING CHANGE)
   `fix(security): resolve buffer overflow
@@ -50,17 +50,17 @@ const githubResults = commitMsgs.map((msg) => githubParser.parse(msg));
 
 // --- Output Results ---
 
-// console.log("=== DEFAULT PARSER RESULTS ===");
-// defaultResults.forEach((c, i) => {
-//   console.log(`Commit ${i + 1}:`, JSON.stringify(c, null, 2));
-// });
+console.log("=== DEFAULT PARSER RESULTS ===");
+defaultResults.forEach((c, i) => {
+  console.log(`Commit ${i + 1}:`, JSON.stringify(c, null, 2));
+});
 
 // console.log("\n=== GITHUB OPTIMIZED RESULTS ===");
 // githubResults.forEach((c, i) => {
 //   console.log(`Commit ${i + 1}:`, JSON.stringify(c, null, 2));
 // });
 
-console.log("\n=== OFFICIAL RESULTS ===");
-officialResult.forEach((c, i) => {
-  console.log(`Commit ${i + 1}:`, JSON.stringify(c, null, 2));
-});
+// console.log("\n=== OFFICIAL RESULTS ===");
+// officialResult.forEach((c, i) => {
+//   console.log(`Commit ${i + 1}:`, JSON.stringify(c, null, 2));
+// });
