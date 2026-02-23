@@ -153,7 +153,9 @@ See [`VersionFile`](#versionfile) for the type definition.
 
 Type: `string | string[]`
 
-Additional local files to include in the commit when creating a pull request. Accepts `"ALL"` option or an array of paths/globs. Paths are relative to the repo root.
+Additional local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+
+To include all files, you can use a glob pattern such as `"**/*"`.
 
 ### commit-types (Optional)
 
