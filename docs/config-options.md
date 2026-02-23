@@ -341,6 +341,7 @@ String template for each entries in the changelog release sections, using with f
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
 Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
 
+- `{{ commit }}`: The full parsed and resolved commit object. See [ResolvedCommit](../src/tasks/commit.ts#L34-L41) for the structure
 - `{{ hash }}`: string
 - `{{ type }}`: string
 - `{{ scope }}`: string

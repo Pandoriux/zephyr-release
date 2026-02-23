@@ -31,6 +31,85 @@ type ResolveCommitsConfigParams = Pick<
   "commitTypes" | "stopResolvingCommitAt"
 >;
 
+/**
+ * Parsed and resolved commit object with additional fields.
+ *
+ * @example
+ * Commit message:
+ * ```text
+ * feat(api)!: add new authentication endpoint (#800)
+ *
+ * Implement OAuth2 authentication with JWT token support.
+ *
+ * BREAKING CHANGE: The old /auth/login endpoint is deprecated. Use /auth/oauth2 instead.
+ *
+ * Fixes #123
+ * Closes #456
+ * Refs #789
+ *
+ * Co-authored-by: John Doe <john@example.com>
+ * ```
+ *
+ * Parsed result:
+ * ```json
+ * {
+ *   "merge": null,
+ *   "revert": null,
+ *   "header": "feat(api)!: add new authentication endpoint (#800)",
+ *   "body": "Implement OAuth2 authentication with JWT token support.",
+ *   "footer": "BREAKING CHANGE: The old /auth/login endpoint is deprecated. Use /auth/oauth2 instead.\n\nFixes #123\nCloses #456\nRefs #789\n\nCo-authored-by: John Doe <john@example.com>",
+ *   "notes": [
+ *     {
+ *       "title": "BREAKING CHANGE",
+ *       "text": "The old /auth/login endpoint is deprecated. Use /auth/oauth2 instead."
+ *     }
+ *   ],
+ *   "mentions": [
+ *     "example"
+ *   ],
+ *   "references": [
+ *     {
+ *       "raw": "feat(api)!: add new authentication endpoint (#800",
+ *       "action": null,
+ *       "owner": null,
+ *       "repository": null,
+ *       "prefix": "#",
+ *       "issue": "800"
+ *     },
+ *     {
+ *       "raw": "#123",
+ *       "action": "Fixes",
+ *       "owner": null,
+ *       "repository": null,
+ *       "prefix": "#",
+ *       "issue": "123"
+ *     },
+ *     {
+ *       "raw": "#456",
+ *       "action": "Closes",
+ *       "owner": null,
+ *       "repository": null,
+ *       "prefix": "#",
+ *       "issue": "456"
+ *     },
+ *     {
+ *       "raw": "Refs #789",
+ *       "action": null,
+ *       "owner": null,
+ *       "repository": null,
+ *       "prefix": "#",
+ *       "issue": "789"
+ *     }
+ *   ],
+ *   "type": "feat",
+ *   "scope": "api",
+ *   "breaking": "!",
+ *   "subject": "add new authentication endpoint (#800)",
+ *   "hash": "abc123def456",
+ *   "isBreaking": true
+ * }
+ * ```
+ */
 export type ResolvedCommit = CommitBase & {
   hash: string;
   type: string;
