@@ -6,7 +6,6 @@ import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
-import { sample } from "@std/collections";
 import { PR_MARKERS } from "../constants/markers.ts";
 
 type FindPrForCommitInputsParams = Pick<
@@ -112,10 +111,7 @@ export async function createPullRequestContent(
     );
     prHeader = await resolveStringTemplateOrThrow(prHeaderTemplate);
   } else {
-    const prHeaderTemplate = sample(headerTemplate);
-    if (!prHeaderTemplate) throw new Error("No header template available");
-
-    prHeader = await resolveStringTemplateOrThrow(prHeaderTemplate);
+    prHeader = await resolveStringTemplateOrThrow(headerTemplate);
   }
 
   let prBody: string;

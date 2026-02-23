@@ -466,10 +466,10 @@ Path to text file containing pull request title template. Overrides `title-templ
 
 #### pull... > header-template (Optional)
 
-Type: `string | string[]`  
+Type: `string`  
 Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like `{{ version }}`. If an array is provided, it will randomly choose one from it.  
+String template for pull request header, using with string patterns like `{{ version }}`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### pull... > header-template-path (Optional)

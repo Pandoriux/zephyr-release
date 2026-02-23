@@ -65,15 +65,10 @@ export const PullRequestConfigSchema = v.pipe(
       }),
     ),
     headerTemplate: v.pipe(
-      v.optional(
-        v.union([v.string(), v.pipe(v.array(v.string()), v.nonEmpty())]),
-        DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
-      ),
-      v.transform((input) => Array.isArray(input) ? input : [input]),
+      v.optional(v.string(), DEFAULT_PULL_REQUEST_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request header, using with string patterns like {{ version }}. If an array is provided, " +
-          "one will be randomly chosen.\n" +
+          "String template for pull request header, using with string patterns like {{ version }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
       }),
