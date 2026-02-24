@@ -3,63 +3,109 @@ import type { OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import { isGitHubErrorResponse } from "./utils/error-validations.ts";
 import { taskLogger } from "../../tasks/logger.ts";
-import type { ProviderLabel } from "../../types/providers/label.ts";
+import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 
 export async function githubAddLabelsToPullRequestOrThrow(
   octokit: OctokitClient,
   prNumber: number,
-  requiredLabels: ProviderLabel[],
-  optionalLabels?: string[],
+  labelOptions: ProviderLabelOptions,
 ) {
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 
-  try {
-    await octokit.rest.issues.addLabels({
-      owner,
-      repo,
-      issue_number: prNumber,
-      labels: [...requiredLabels.map((l) => l.name), ...(optionalLabels ?? [])],
-    });
-  } catch (error) {
-    if (!isGitHubErrorResponse(error) || error.status !== 422) {
-      // Other errors...
-      throw error;
-    }
+  if (labelOptions.labels.length === 0) {
+    return;
+  }
 
-    // Labels might be missing
-    taskLogger.debug(
-      "Failed to add labels (status 422). Ensuring labels exist and retrying once...",
-    );
+  if (labelOptions.createIfMissing === false) {
+    const initialLabels = labelOptions.labels;
 
-    // Last attempt
-    const existingLabelNames = await _githubGetAllLabelNames(octokit);
-    const newLabelsToAdd = [...existingLabelNames];
-
-    for (const label of requiredLabels) {
-      if (existingLabelNames.has(label.name)) continue;
-
-      const ghColor = label.color?.startsWith("#")
-        ? label.color.slice(1)
-        : label.color;
-
-      await octokit.rest.issues.createLabel({
+    try {
+      await octokit.rest.issues.addLabels({
         owner,
         repo,
-        name: label.name,
-        color: ghColor,
-        description: label.description,
+        issue_number: prNumber,
+        labels: initialLabels,
       });
+    } catch (error) {
+      if (!isGitHubErrorResponse(error) || error.status !== 422) {
+        // Other errors...
+        throw error;
+      }
 
-      newLabelsToAdd.push(label.name);
+      // Labels might be missing: fall back to only existing labels
+      taskLogger.debug(
+        "Failed to add labels (status 422). Retrying with only existing labels...",
+      );
+
+      const existingLabelNames = await _githubGetAllLabelNames(octokit);
+      const labelsToAdd = initialLabels.filter((name: string) =>
+        existingLabelNames.has(name)
+      );
+
+      if (labelsToAdd.length === 0) {
+        return;
+      }
+
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: prNumber,
+        labels: labelsToAdd,
+      });
     }
+  } else {
+    const requiredLabels = labelOptions.labels;
 
-    await octokit.rest.issues.addLabels({
-      owner,
-      repo,
-      issue_number: prNumber,
-      labels: newLabelsToAdd,
-    });
+    try {
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: prNumber,
+        labels: requiredLabels.map((l) => l.name),
+      });
+    } catch (error) {
+      if (!isGitHubErrorResponse(error) || error.status !== 422) {
+        // Other errors...
+        throw error;
+      }
+
+      // Labels might be missing: ensure they exist then retry once
+      taskLogger.debug(
+        "Failed to add labels (status 422). Ensuring labels exist and retrying once...",
+      );
+
+      const existingLabelNames = await _githubGetAllLabelNames(octokit);
+      const labelsToAdd: string[] = [];
+
+      for (const label of requiredLabels) {
+        if (existingLabelNames.has(label.name)) {
+          labelsToAdd.push(label.name);
+          continue;
+        }
+
+        const ghColor = label.color?.startsWith("#")
+          ? label.color.slice(1)
+          : label.color;
+
+        await octokit.rest.issues.createLabel({
+          owner,
+          repo,
+          name: label.name,
+          color: ghColor,
+          description: label.description,
+        });
+
+        labelsToAdd.push(label.name);
+      }
+
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: prNumber,
+        labels: labelsToAdd,
+      });
+    }
   }
 }
 
@@ -115,4 +161,17 @@ async function _githubGetAllLabelNames(
   }
 
   return labelNames;
+}
+
+export async function githubRemoveLabelFromPullRequestOrThrow(
+  octokit: OctokitClient,
+  prNumber: number,
+  label: string,
+) {
+  await octokit.rest.issues.removeLabel({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    issue_number: prNumber,
+    name: label,
+  });
 }

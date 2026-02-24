@@ -3,3 +3,13 @@ export interface ProviderLabel {
   color?: string;
   description?: string;
 }
+
+export type ProviderLabelOptions =
+  | {
+      createIfMissing: false;
+      labels: string[];
+    }
+  | {
+      createIfMissing: true;
+      labels: ProviderLabel[];
+    };

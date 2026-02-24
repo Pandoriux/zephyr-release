@@ -55,7 +55,12 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
     - [pull... \> label (Optional)](#pull--label-optional)
+      - [pull... \> label \> on-create (Optional)](#pull--label--on-create-optional)
+      - [pull... \> label \> on-close (Optional)](#pull--label--on-close-optional)
     - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
+      - [pull... \> additional-label \> on-create-add (Optional)](#pull--additional-label--on-create-add-optional)
+      - [pull... \> additional-label \> on-close-add (Optional)](#pull--additional-label--on-close-add-optional)
+      - [pull... \> additional-label \> on-close-remove (Optional)](#pull--additional-label--on-close-remove-optional)
     - [pull... \> title-template (Optional)](#pull--title-template-optional)
     - [pull... \> title-template-path (Optional)](#pull--title-template-path-optional)
     - [pull... \> header-template (Optional)](#pull--header-template-optional)
@@ -153,7 +158,7 @@ See [`VersionFile`](#versionfile) for the type definition.
 
 Type: `string | string[]`
 
-Additional local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+Additional changed local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
 
 To include all files, you can use a glob pattern such as `"**/*"`.
 
@@ -451,22 +456,45 @@ Default: `{}`
 
 Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These labels should not be manually added or removed.
 
-**Properties:**
+##### pull... > label > on-create (Optional)
 
-- `onCreate` (Optional): Label to add when pull request is created. Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "release: pending", description: "The pull request is pending release.", color: "FBCA04" }`
-- `onClose` (Optional): Label to add when pull request is closed and release operation has completed (replaces `onCreate` label). Can be a `string` (label name) or a [`Label`](#label) object. Default: `{ name: "release: released", description: "The pull request is closed and the release has completed.", color: "0E8A16" }`
+Type: `string | Label`  
+Default: [`DEFAULT_LABEL_ON_CREATE`](../src/constants/defaults/label.ts)
+
+Label to add when pull request is created.
+
+##### pull... > label > on-close (Optional)
+
+Type: `string | Label`  
+Default: [`DEFAULT_LABEL_ON_CLOSE`](../src/constants/defaults/label.ts)
+
+Label to add when pull request is closed and release operation has completed (replaces `on-create` label).
 
 #### pull... > additional-label (Optional)
 
 Type: `object`  
+Default: `{}`
 
 Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
 
-**Properties:**
+##### pull... > additional-label > on-create-add (Optional)
 
-- `onCreateAdd` (Optional): Additional labels to add when pull request is created. Can be a `string` (label name) or an array of `string` (label names).
-- `onCloseAdd` (Optional): Additional labels to add when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names).
-- `onCloseRemove` (Optional): Additional labels to remove when pull request is closed and release operation has completed. Can be a `string` (label name) or an array of `string` (label names). Use `"allOnCreate"` to remove all labels added in `onCreateAdd`.
+Type: `string | string[]`
+
+Additional labels to add when pull request is created.
+
+##### pull... > additional-label > on-close-add (Optional)
+
+Type: `string | string[]`
+
+Additional labels to add when pull request is closed and release operation has completed.
+
+##### pull... > additional-label > on-close-remove (Optional)
+
+Type: `string | string[]`
+
+Additional labels to remove when pull request is closed and release operation has completed.  
+To remove all labels added in `on-create-add`, include the special value `"<ALL_ON_CREATE_ADD>"`.
 
 #### pull... > title-template (Optional)
 

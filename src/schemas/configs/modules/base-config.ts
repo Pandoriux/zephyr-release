@@ -82,7 +82,7 @@ export const BaseConfigSchema = v.object({
     }),
     v.metadata({
       description:
-        "Additional local files to include in the commit. Accepts a path or an array of paths/globs. " +
+        "Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. " +
         'Paths are relative to the repo root. To include all files, use a glob such as "**/*".',
       examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
     }),

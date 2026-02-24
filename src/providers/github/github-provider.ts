@@ -33,14 +33,18 @@ import {
 import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
-import { githubAddLabelsToPullRequestOrThrow } from "./label.ts";
+import {
+  githubAddLabelsToPullRequestOrThrow,
+  githubRemoveLabelFromPullRequestOrThrow,
+} from "./label.ts";
+import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
-import { TagTypeOption } from "../../constants/release-tag-options.ts";
+import type { TagTypeOption } from "../../constants/release-tag-options.ts";
 import {
   githubAttachReleaseAssetOrThrow,
   githubCreateReleaseOrThrow,
 } from "./release.ts";
-import {
+import type {
   ProviderAssetParams,
   ProviderReleaseOptions,
 } from "../../types/providers/release.ts";
@@ -222,15 +226,24 @@ export function createGitHubProvider(): PlatformProvider {
 
     addLabelsToPullRequestOrThrow: async (
       prNumber: number,
-      labels: { name: string; color?: string; description?: string }[],
-      optionalLabel?: string[],
+      labelOptions: ProviderLabelOptions,
     ) => {
       const { octokit } = ensureProviderContextOrThrow();
       return await githubAddLabelsToPullRequestOrThrow(
         octokit,
         prNumber,
-        labels,
-        optionalLabel,
+        labelOptions,
+      );
+    },
+    removeLabelFromPullRequestOrThrow: async (
+      prNumber: number,
+      label: string,
+    ) => {
+      const { octokit } = ensureProviderContextOrThrow();
+      return await githubRemoveLabelFromPullRequestOrThrow(
+        octokit,
+        prNumber,
+        label,
       );
     },
 
