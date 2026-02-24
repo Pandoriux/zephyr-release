@@ -115,22 +115,22 @@ export const BaseConfigSchema = v.object({
     }),
   ),
 
-  allowReleaseAs: v.pipe(
+  allowedReleaseAsCommitTypes: v.pipe(
     v.optional(
       v.union([
         trimNonEmptyStringSchema,
         v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
       ]),
-      "ALL",
+      "<ALL>",
     ),
     v.transform((input) => Array.isArray(input) ? input : [input]),
     v.metadata({
       description:
         "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
-        'Use "ALL" to accept any commit type; use "BASE" to use the list defined in `commitTypes`. You can combine "BASE" with other types (for example: ["BASE","docs"]).\n' +
+        'Use "<ALL>" to accept any commit type; use "<COMMIT_TYPES>" to use the list defined in `commitTypes`. You can combine "<COMMIT_TYPES>" with other types (for example: ["<COMMIT_TYPES>","docs"]).\n' +
         "About 'release-as': https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version \n" +
-        'Default: "ALL"',
-      examples: [["BASE", "chore", "ci", "cd"]],
+        'Default: "<ALL>"',
+      examples: ["<COMMIT_TYPES>", ["<COMMIT_TYPES>", "chore", "ci", "cd"]],
     }),
   ),
 });

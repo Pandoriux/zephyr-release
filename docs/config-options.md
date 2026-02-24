@@ -24,7 +24,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [commit... \> section (Optional)](#commit--section-optional)
     - [commit... \> hidden (Optional)](#commit--hidden-optional)
   - [stop-resolving-commit-at (Optional)](#stop-resolving-commit-at-optional)
-  - [allow-release-as (Optional)](#allow-release-as-optional)
+  - [allowed-release-as-commit-types (Optional)](#allowed-release-as-commit-types-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump... \> major (Optional)](#bump--major-optional)
     - [bump... \> minor (Optional)](#bump--minor-optional)
@@ -194,19 +194,19 @@ Defines the boundary for resolving Git commit history. Can be a number or a stri
 - **Number**: The maximum amount of commits to resolve (e.g., `50`).
 - **String**: The specific Git commit hash to stop at (e.g., `"abc123def456"`).
 
-### allow-release-as (Optional)
+### allowed-release-as-commit-types (Optional)
 
 Type: `string | string[]`  
-Default: `"ALL"`
+Default: `"<ALL>"`
 
 List of commit type(s) allowed to trigger `release-as`. Accepts a single string or an array of strings.
 
 **Special values:**
 
-- `"ALL"`: Accepts any commit type (default behavior)
-- `"BASE"`: Uses the list of commit types defined in [`commit-types`](#commit-types-optional)
+- `"<ALL>"`: Accepts any commit type (default behavior)
+- `"<COMMIT_TYPES>"`: Uses the list of commit types defined in [`commit-types`](#commit-types-optional)
 
-You can combine `"BASE"` with other commit types. For example: `["BASE", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
+You can combine `"<COMMIT_TYPES>"` with other commit types. For example: `["<COMMIT_TYPES>", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
 
 About `release-as`: <https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version>
 
@@ -772,8 +772,8 @@ Type: `object`
 - `email` (Required): The email of the tag creator.
 - `date` (Optional): Override the Git tag timestamp.  
   Can be one of these options:
-  - `"current_time"`: The moment the operation creates the tag.
-  - `"commit_date"`: The Git committer date.
-  - `"author_date"`: The Git author date.
+  - `"now"`: The moment the operation creates the tag.
+  - `"commit-date"`: The Git committer date.
+  - `"author-date"`: The Git author date.
   - Or a specific ISO 8601 date string.  
   If omitted, defaults to the platform native behavior (recommended).

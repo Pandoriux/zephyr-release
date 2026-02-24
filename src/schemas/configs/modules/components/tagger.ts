@@ -19,13 +19,14 @@ export const TaggerSchema = v.object({
     v.metadata({
       description: "Override the Git tag timestamp.\n" +
         "Can be one of these options:\n" +
-        "- 'current_time': The moment the operation creates the tag.\n" +
-        "- 'commit_date': The Git committer date.\n" +
-        "- 'author_date': The Git author date.\n" +
-        "Or a specific ISO 8601 date string.\n" +
+        "- 'now': The moment the operation creates the tag.\n" +
+        "- 'commit-date': The Git committer date.\n" +
+        "- 'author-date': The Git author date.\n" +
+        "- Or a specific ISO 8601 date string.\n" +
         "If omitted, defaults to the platform native behavior (recommended).",
       examples: [
-        TaggerDateOptions.currentTime,
+        "2025-10-01T17:00:49Z",
+        TaggerDateOptions.now,
         TaggerDateOptions.commitDate,
         TaggerDateOptions.authorDate,
       ],

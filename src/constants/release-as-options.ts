@@ -1,4 +1,4 @@
 export const AllowReleaseAsOptions = {
-  all: "ALL",
-  base: "BASE",
+  all: "<ALL>",
+  commitTypes: "<COMMIT_TYPES>",
 } as const;
