@@ -44,7 +44,7 @@ below is a minimal working one
 
 ```
 
-> *for full list of options, see [config-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md)*
+> *for full list of options, see [config-options.md](./docs/config-options.md)*
 
 ### Second, an input file
 
@@ -101,7 +101,7 @@ jobs:
           source-mode: "local"
 ```
 
-> *for full list of options, see [inputs-options.md](https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md)*
+> *for full list of options, see [inputs-options.md](./docs/input-options.md)*
 
 ### ⚠️ Crucial: Managing Concurrency
 
@@ -110,7 +110,7 @@ To prevent this, you must handle **parallel runs (concurrency)** by putting work
 
 <br/>
 
-**More examples:** <https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples>
+**More examples:** [examples](./docs/examples/)
 
 ## How It Work
 
@@ -179,4 +179,4 @@ release-as: 2.0.0
 ### Important things to know
 
 - **Only the current commit works:** Zephyr Release only looks for this footer in the **specific commit** that triggers the release. If you had a "release-as" footer in an old commit from last week, it will be ignored.
-- **Permissions:** By default, any commit can use this. However, you can change the [`allowReleaseAs`](https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#allow-release-as-optional) setting in your config if you only want certain commit types (like `feat`) to be allowed to force a version.
+- **Permissions:** By default, any commit can use this. However, you can change the [`allowed-release-as-commit-types`](./docs/config-options.md#allowed-release-as-commit-types-optional) setting in your config if you only want certain commit types (like `feat`) to be allowed to force a version.
