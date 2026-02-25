@@ -5,6 +5,7 @@ import {
   exportPostReleaseOperationVariables,
   exportPreReleaseOperationVariables,
 } from "../tasks/export-variables.ts";
+import { updateMergedPullRequestLabelsOrThrow } from "../tasks/label.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromPr } from "../tasks/pull-request.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
@@ -123,6 +124,14 @@ export async function releaseWorkflow(
       "Skipped: Attach release assets (no assets to attach or config skip release note is true)",
     );
   }
+
+  logger.stepStart("Starting: Update merged pull request labels");
+  await updateMergedPullRequestLabelsOrThrow(
+    provider,
+    associatedPrForCommit.number,
+    config,
+  );
+  logger.stepFinish("Finished: Update merged pull request labels");
 
   logger.debugStepStart("Starting: Export post release operation variables");
   await exportPostReleaseOperationVariables(

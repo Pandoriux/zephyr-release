@@ -1,3 +1,3 @@
 export const AdditionalLabelOnCloseRemoveOptions = {
-  allOnCreate: "allOnCreate",
+  allOnCreateAdd: "<ALL_ON_CREATE_ADD>",
 } as const;

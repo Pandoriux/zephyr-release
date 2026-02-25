@@ -5,7 +5,7 @@ import {
   CommitParser,
 } from "conventional-commits-parser";
 import { filterRevertedCommitsSync } from "conventional-commits-filter";
-import fg from "fast-glob";
+import picomatch from "picomatch";
 import { taskLogger } from "./logger.ts";
 import { prepareVersionFilesToCommit } from "./version-files/version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
@@ -15,7 +15,6 @@ import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
 import type { ProviderCommit } from "../types/providers/commit.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import { prepareChangelogFileToCommit } from "./changelog.ts";
-import { localFilesToCommitOptions } from "../constants/local-files-to-commit-options.ts";
 import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
@@ -305,7 +304,7 @@ export async function prepareChangesToCommit(
 
   const changesData = new Map<string, string>();
 
-  taskLogger.info("Collecting channgelog data to commit...");
+  taskLogger.info("Collecting changelog data to commit...");
   if (writeToFile) {
     const clContent = await prepareChangelogFileToCommit(
       provider,
@@ -316,7 +315,9 @@ export async function prepareChangesToCommit(
       triggerCommitHash,
     );
     changesData.set(normalize(path), clContent);
-  } else taskLogger.info("Changelog write to file config is off. Skipping...");
+  } else {
+    taskLogger.info("Changelog config write to file is off. Skipping...");
+  }
 
   taskLogger.info(
     `Collecting version files data to commit (${versionFiles.length} files)...`,
@@ -334,35 +335,57 @@ export async function prepareChangesToCommit(
   }
 
   if (localFilesToCommit) {
-    let targetLocalFiles: string[] = [];
-
     taskLogger.info(
-      `Collecting local files data to commit (${localFilesToCommit.length} files)...`,
+      `Collecting local files data to commit using globs (${localFilesToCommit.length} globs)...`,
     );
-    if (localFilesToCommit.includes(localFilesToCommitOptions.all)) {
-      try {
-        const output = execSync("git status --porcelain", {
-          cwd: workspacePath,
-          encoding: "utf-8",
-        });
 
-        targetLocalFiles = output
-          .split("\n")
-          .filter((line) => line.trim().length > 0)
-          .map((line) => line.slice(3).trim()); // Removes the status code " M "
-      } catch (error) {
-        throw new Error("Error while executing 'git status --porcelain'", {
-          cause: error,
-        });
-      }
-    } else {
-      targetLocalFiles = await fg(localFilesToCommit, {
+    const allChangedFiles: string[] = [];
+
+    try {
+      const output = execSync("git status --porcelain", {
         cwd: workspacePath,
-        dot: true, // Users might want to commit .config files
-        onlyFiles: true,
-        absolute: false, // We want relative paths for the manifest keys
+        encoding: "utf-8",
+      });
+
+      const lines = output.split("\n").filter((line) => line.trim().length > 0);
+
+      for (const line of lines) {
+        const status = line.slice(0, 2);
+
+        // Skip deleted files. If a file is deleted (e.g., ' D', 'D ', 'DD'),
+        // we cannot read its content from disk via getTextFileOrThrow.
+        if (status.includes("D")) {
+          continue;
+        }
+
+        let filePathPart = line.slice(3).trim();
+
+        // Handle renames (e.g., 'R  "old file.ts" -> "new file.ts"')
+        if (filePathPart.includes(" -> ")) {
+          const parts = filePathPart.split(" -> ");
+          filePathPart = parts[parts.length - 1] ?? "";
+        }
+
+        // Handle quotes wrapping files with spaces (e.g., '"my file.ts"')
+        if (filePathPart.startsWith('"') && filePathPart.endsWith('"')) {
+          filePathPart = filePathPart.slice(1, -1);
+          // Unescape any inner quotes Git might have escaped
+          filePathPart = filePathPart.replace(/\\"/g, '"');
+        }
+
+        if (filePathPart.length > 0) {
+          allChangedFiles.push(filePathPart);
+        }
+      }
+    } catch (error) {
+      throw new Error("Error while executing 'git status --porcelain'", {
+        cause: error,
       });
     }
+
+    // Match the strictly parsed git files against the user's globs
+    const isMatch = picomatch(localFilesToCommit, { dot: true });
+    const targetLocalFiles = allChangedFiles.filter((file) => isMatch(file));
 
     for (const filePath of targetLocalFiles) {
       const normalizedPath = normalize(filePath);

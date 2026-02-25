@@ -6,9 +6,9 @@ export const TagTypeOptions = {
 export type TagTypeOption = typeof TagTypeOptions[keyof typeof TagTypeOptions];
 
 export const TaggerDateOptions = {
-  currentTime: "current_time",
-  commitDate: "commit_date",
-  authorDate: "author_date",
+  now: "now",
+  commitDate: "commit-date",
+  authorDate: "author-date",
 } as const;
 
 type _TaggerDateOption =

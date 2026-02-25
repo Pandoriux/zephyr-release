@@ -9,6 +9,8 @@ import { getTextFileOrThrow } from "./file.ts";
 import { taskLogger } from "./logger.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import { basename } from "@std/path";
+import { consumeAsyncIterable } from "../utils/async.ts";
+import { pooledMap } from "@std/async";
 
 type CreateReleaseInputsParams = Pick<
   InputsOutput,
@@ -109,14 +111,12 @@ export async function attachReleaseAssets(
     }),
   );
 
-  const uploadQueue = uploadTargets.filter(Boolean);
+  const filteredUploadTargets = uploadTargets.filter((
+    t,
+  ): t is NonNullable<typeof t> => Boolean(t));
 
-  // Define queue task
-  async function processQueueTask() {
-    while (uploadQueue.length > 0) {
-      const target = uploadQueue.shift();
-      if (!target) break;
-
+  await consumeAsyncIterable(
+    pooledMap(MAX_CONCURRENT_UPLOADS, filteredUploadTargets, async (target) => {
       const sizeMb = (target.sizeBytes / 1024 / 1024).toFixed(2);
       taskLogger.info(`↑ Uploading: ${target.fileName} (${sizeMb} MB)`);
 
@@ -130,13 +130,6 @@ export async function attachReleaseAssets(
           createDataStream: () => fs.createReadStream(target.filePath),
         },
       );
-    }
-  }
-
-  // Spawn concurrentUploads and wait for them to finish
-  const concurrentUploads = Array.from(
-    { length: MAX_CONCURRENT_UPLOADS },
-    processQueueTask,
+    }),
   );
-  await Promise.all(concurrentUploads);
 }

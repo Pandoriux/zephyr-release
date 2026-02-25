@@ -53,7 +53,7 @@ export async function createTagOrThrow(
     let taggerDate: string | undefined;
     if (tagger.date) {
       switch (tagger.date) {
-        case TaggerDateOptions.currentTime:
+        case TaggerDateOptions.now:
           taggerDate = new Date().toISOString();
           break;
         case TaggerDateOptions.commitDate: {

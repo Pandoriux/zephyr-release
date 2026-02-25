@@ -5,7 +5,7 @@ import type {
   ProviderRelease,
   ProviderReleaseOptions,
 } from "./release.ts";
-import type { ProviderLabel } from "./label.ts";
+import type { ProviderLabelOptions } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
 import type {
   ProviderCommit,
@@ -94,8 +94,11 @@ export interface PlatformProvider {
 
   addLabelsToPullRequestOrThrow: (
     prNumber: number,
-    labels: ProviderLabel[],
-    optionalLabels?: string[],
+    labelOptions: ProviderLabelOptions,
+  ) => Promise<void>;
+  removeLabelFromPullRequestOrThrow: (
+    prNumber: number,
+    label: string,
   ) => Promise<void>;
 
   getLatestReleaseTagOrThrow: () => Promise<string | undefined>;

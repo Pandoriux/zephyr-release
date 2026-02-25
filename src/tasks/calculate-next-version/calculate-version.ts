@@ -33,7 +33,7 @@ export function calculateNextVersion(
     timeZone,
     initialVersion,
     commitTypes,
-    allowReleaseAs,
+    allowedReleaseAsCommitTypes: allowReleaseAs,
     bumpStrategy,
   } = config;
 
@@ -99,7 +99,8 @@ export function calculateNextVersion(
 function resolveManualReleaseAsVersion(
   triggerCommit: Commit,
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
-  allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
+  allowReleaseAs:
+    CalculateNextVersionConfigParams["allowedReleaseAsCommitTypes"],
 ): SemVer | undefined {
   const releaseAsNote = triggerCommit.notes.find((n) =>
     n.title.toLowerCase() === "release as" ||
@@ -132,7 +133,8 @@ function resolveManualReleaseAsVersion(
  */
 function isReleaseAsAllowed(
   type: string | null | undefined,
-  allowReleaseAs: CalculateNextVersionConfigParams["allowReleaseAs"],
+  allowReleaseAs:
+    CalculateNextVersionConfigParams["allowedReleaseAsCommitTypes"],
   commitTypes: CalculateNextVersionConfigParams["commitTypes"],
 ): boolean {
   if (allowReleaseAs.includes(AllowReleaseAsOptions.all)) return true;
@@ -143,7 +145,7 @@ function isReleaseAsAllowed(
 
   if (allowReleaseAs.includes(currentType)) return true;
 
-  if (allowReleaseAs.includes(AllowReleaseAsOptions.base)) {
+  if (allowReleaseAs.includes(AllowReleaseAsOptions.commitTypes)) {
     return commitTypes.some((ct) => ct.type === currentType);
   }
 
