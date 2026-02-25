@@ -12,6 +12,7 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
 import { parseConfigOrThrow } from "./config-parser.ts";
 import { transformObjKeyToCamelCase } from "../../utils/transformers/object.ts";
+import type { RuntimeConfigOverrideOutput } from "../../schemas/configs/modules/components/runtime-config-override.ts";
 
 type ResolveConfigInputsParams = Pick<
   InputsOutput,
@@ -22,15 +23,15 @@ type ResolveConfigInputsParams = Pick<
   | "configOverrideFormat"
 >;
 
-export interface ResolveConfigResult {
-  rawConfig: unknown;
+export interface ResolvedConfigContext {
+  rawConfig: object;
   config: ConfigOutput;
 }
 
 export async function resolveConfigOrThrow(
   provider: PlatformProvider,
   inputs: ResolveConfigInputsParams,
-): Promise<ResolveConfigResult> {
+): Promise<ResolvedConfigContext> {
   const {
     triggerCommitHash,
     configPath,
@@ -39,9 +40,13 @@ export async function resolveConfigOrThrow(
     configOverrideFormat,
   } = inputs;
 
-  let parsedConfigFile: unknown;
-  let parsedConfigOverride: unknown;
-  let rawFinalConfig: unknown;
+  let rawParsedConfigFile: object | undefined;
+  let rawParsedConfigOverride: object | undefined;
+  let rawParsedFinalConfig: object | undefined;
+
+  let parsedConfigFile: object | undefined;
+  let parsedConfigOverride: object | undefined;
+  let parsedFinalConfig: object | undefined;
 
   taskLogger.info("Reading config file from path...");
   if (configPath) {
@@ -55,7 +60,9 @@ export async function resolveConfigOrThrow(
       configFormat,
       configPath,
     );
-    parsedConfigFile = parsedResult.parsedConfig;
+
+    rawParsedConfigFile = parsedResult.parsedConfig;
+    parsedConfigFile = transformObjKeyToCamelCase(parsedResult.parsedConfig);
 
     taskLogger.info(
       `Config file parsed successfully (${parsedResult.resolvedFormatResult})`,
@@ -75,7 +82,11 @@ export async function resolveConfigOrThrow(
       configOverride,
       configOverrideFormat,
     );
-    parsedConfigOverride = parsedResult.parsedConfig;
+
+    rawParsedConfigOverride = parsedResult.parsedConfig;
+    parsedConfigOverride = transformObjKeyToCamelCase(
+      parsedResult.parsedConfig,
+    );
 
     taskLogger.info(
       `Config override parsed successfully (${parsedResult.resolvedFormatResult})`,
@@ -92,41 +103,56 @@ export async function resolveConfigOrThrow(
   }
 
   taskLogger.info("Resolving final config...");
-  if (parsedConfigFile && parsedConfigOverride) {
+  if (
+    rawParsedConfigFile && rawParsedConfigOverride &&
+    parsedConfigFile && parsedConfigOverride
+  ) {
     taskLogger.info("Both config file and config override exist, merging...");
-    rawFinalConfig = deepMerge(parsedConfigFile, parsedConfigOverride, {
-      arrays: "replace",
-    });
-  } else if (parsedConfigFile) {
+    rawParsedFinalConfig = deepMerge(
+      rawParsedConfigFile,
+      rawParsedConfigOverride,
+      { arrays: "replace" },
+    );
+    parsedFinalConfig = deepMerge(
+      parsedConfigFile,
+      parsedConfigOverride,
+      { arrays: "replace" },
+    );
+  } else if (rawParsedConfigFile && parsedConfigFile) {
     taskLogger.info("Only config file exist, use config file as final config");
-    rawFinalConfig = parsedConfigFile;
-  } else if (parsedConfigOverride) {
+    rawParsedFinalConfig = rawParsedConfigFile;
+    parsedFinalConfig = parsedConfigFile;
+  } else if (rawParsedConfigOverride && parsedConfigOverride) {
     taskLogger.info(
       "Only config override exist, use config override as final config",
     );
-    rawFinalConfig = parsedConfigOverride;
+    rawParsedFinalConfig = rawParsedConfigOverride;
+    parsedFinalConfig = parsedConfigOverride;
   } else {
     throw new Error(
       "No config provided: neither config file nor override was found",
     );
   }
 
-  const parsedFinalConfigResult = v.safeParse(
+  const resolvedFinalConfigResult = v.safeParse(
     ConfigSchema,
-    transformObjKeyToCamelCase(rawFinalConfig),
+    parsedFinalConfig,
   );
-  if (!parsedFinalConfigResult.success) {
+  if (!resolvedFinalConfigResult.success) {
     throw new Error(
       `\`${resolveConfigOrThrow.name}\` failed!` +
-        formatValibotIssues(parsedFinalConfigResult.issues),
+        formatValibotIssues(resolvedFinalConfigResult.issues),
     );
   }
 
   taskLogger.startGroup("Resolved config:");
   taskLogger.info(
-    JSON.stringify(parsedFinalConfigResult.output, jsonValueNormalizer, 2),
+    JSON.stringify(resolvedFinalConfigResult.output, jsonValueNormalizer, 2),
   );
   taskLogger.endGroup();
 
-  return { rawConfig: rawFinalConfig, config: parsedFinalConfigResult.output };
+  return {
+    rawConfig: rawParsedFinalConfig,
+    config: resolvedFinalConfigResult.output,
+  };
 }

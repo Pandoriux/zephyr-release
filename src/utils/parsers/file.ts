@@ -10,6 +10,15 @@ import type { FileFormat } from "../../constants/file-formats.ts";
 export type StructuredFileFormat = Extract<FileFormat, "json" | "jsonc" | "json5" | "yaml" | "toml">;
 
 /**
+ * Type guard to check if a file format is structured (not plain txt).
+ */
+export function isStructuredFileFormat(
+  format: FileFormat,
+): format is StructuredFileFormat {
+  return format !== "txt";
+}
+
+/**
  * Format map for detecting file format from extension
  */
 export type FileFormatMap<T extends string> = Record<string, T | undefined>;
@@ -34,8 +43,8 @@ export function detectFileFormatFromPath<T extends string>(
  */
 export function parseFileStringOrThrow(
   fileContent: string,
-  format: FileFormat,
-): unknown {
+  format: StructuredFileFormat,
+): object {
   switch (format) {
     case "json":
     case "jsonc":
@@ -47,8 +56,5 @@ export function parseFileStringOrThrow(
 
     case "toml":
       return parseToml(fileContent);
-
-    case "txt":
-      return fileContent;
   }
 }

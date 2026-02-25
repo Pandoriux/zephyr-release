@@ -5,7 +5,7 @@ import { isPlainObject, isPlainObjectOrArray } from "../validations/object.ts";
 export function transformObjKeyToKebabCase(
   obj: unknown,
   mutate: boolean = false,
-): unknown {
+): object {
   if (!isPlainObjectOrArray(obj)) {
     throw new Error(
       `'${transformObjKeyToKebabCase.name}' error: expected a plain object or array input`,
@@ -29,7 +29,7 @@ export function transformObjKeyToKebabCase(
 export function transformObjKeyToCamelCase(
   obj: unknown,
   mutate: boolean = false,
-): unknown {
+): object {
   if (!isPlainObjectOrArray(obj)) {
     throw new Error(
       `'${transformObjKeyToCamelCase.name}' error: expected a plain object or array input`,
