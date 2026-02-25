@@ -19,7 +19,7 @@ type CalculateNextVersionConfigParams = Pick<
   | "timeZone"
   | "initialVersion"
   | "commitTypes"
-  | "allowReleaseAs"
+  | "allowedReleaseAsCommitTypes"
   | "bumpStrategy"
 >;
 
@@ -33,7 +33,7 @@ export function calculateNextVersion(
     timeZone,
     initialVersion,
     commitTypes,
-    allowedReleaseAsCommitTypes: allowReleaseAs,
+    allowedReleaseAsCommitTypes,
     bumpStrategy,
   } = config;
 
@@ -43,7 +43,7 @@ export function calculateNextVersion(
   const manualReleaseAsVersion = resolveManualReleaseAsVersion(
     resolvedTriggerCommit,
     commitTypes,
-    allowReleaseAs,
+    allowedReleaseAsCommitTypes,
   );
   if (manualReleaseAsVersion) {
     return manualReleaseAsVersion;
