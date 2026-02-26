@@ -30,7 +30,7 @@ import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
 interface ProposeWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
   associatedPrFromBranch: ProviderPullRequest | undefined;
-  operationContext: OperationTriggerContext;
+  triggerContext: OperationTriggerContext;
   inputs: InputsOutput;
   config: ConfigOutput;
 }
@@ -42,7 +42,7 @@ export async function proposeWorkflow(
   const {
     workingBranchResult,
     associatedPrFromBranch,
-    operationContext,
+    triggerContext,
     inputs,
     config,
   } = ops;
@@ -136,7 +136,7 @@ export async function proposeWorkflow(
   logger.stepStart("Starting: Commit changes");
   const _commitResult = await commitChangesToBranch(provider, {
     triggerCommitHash: inputs.triggerCommitHash,
-    baseTreeHash: operationContext.latestTriggerCommit.treeHash,
+    baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
     changesToCommit: changesData,
     workingBranchName: workingBranchResult.name,
   }, {

@@ -24,7 +24,7 @@ import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
 
 interface ReleaseWorkflowOptions {
-  operationContext: OperationTriggerContext;
+  triggerContext: OperationTriggerContext;
   associatedPrForCommit: ProviderPullRequest;
   inputs: InputsOutput;
   config: ConfigOutput;
@@ -34,7 +34,12 @@ export async function releaseWorkflow(
   provider: PlatformProvider,
   ops: ReleaseWorkflowOptions,
 ) {
-  const { operationContext, associatedPrForCommit, inputs, config } = ops;
+  const {
+    triggerContext,
+    associatedPrForCommit,
+    inputs,
+    config,
+  } = ops;
 
   logger.stepStart("Starting: Extract changelog from pull request body");
   const prChangelogRelease = extractChangelogFromPr(associatedPrForCommit);

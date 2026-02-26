@@ -15,7 +15,7 @@ import { releaseWorkflow } from "./workflows/release.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
-import { validateCurrentOperationCtxOrExit } from "./tasks/operation.ts";
+import { validateCurrentOperationTriggerCtxOrExit } from "./tasks/operation.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -32,12 +32,12 @@ export async function run(provider: PlatformProvider) {
   const { config } = configResult;
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  logger.stepStart("Starting: Parse and validate current operation context");
-  const operationContext = validateCurrentOperationCtxOrExit(
+  logger.stepStart("Starting: Parse and validate current trigger context");
+  const triggerContext = validateCurrentOperationTriggerCtxOrExit(
     provider,
     config.commitTypes,
   );
-  logger.stepFinish("Finished: Parse and validate current operation context");
+  logger.stepFinish("Finished: Parse and validate current trigger context");
 
   logger.stepStart("Starting: Register transformers to template engine");
   registerTransformersToTemplateEngine(provider);
@@ -82,7 +82,7 @@ export async function run(provider: PlatformProvider) {
 
   logger.debugStepStart("Starting: Export base operation variables");
   await exportBaseOperationVariables(provider, {
-    operationContext,
+    triggerContext,
     workingBranchResult,
     prForCommit: associatedPrForCommit,
     prFromBranch: associatedPrFromBranch,
@@ -107,7 +107,7 @@ export async function run(provider: PlatformProvider) {
     await proposeWorkflow(provider, {
       workingBranchResult,
       associatedPrFromBranch,
-      operationContext,
+      triggerContext,
       inputs,
       config,
     });
@@ -115,7 +115,7 @@ export async function run(provider: PlatformProvider) {
     if (config.release.enabled) {
       logger.stepStart("Start Workflow: Create tag and release");
       await releaseWorkflow(provider, {
-        operationContext,
+        triggerContext,
         associatedPrForCommit,
         inputs,
         config,

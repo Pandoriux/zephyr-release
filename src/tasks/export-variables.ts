@@ -30,7 +30,7 @@ import {
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
   options: {
-    operationContext: OperationTriggerContext;
+    triggerContext: OperationTriggerContext;
     workingBranchResult: WorkingBranchResult;
     prForCommit: ProviderPullRequest | undefined;
     prFromBranch: ProviderPullRequest | undefined;
@@ -39,7 +39,7 @@ export async function exportBaseOperationVariables(
   },
 ) {
   const {
-    operationContext,
+    triggerContext,
     workingBranchResult,
     prForCommit,
     prFromBranch,
@@ -86,10 +86,10 @@ export async function exportBaseOperationVariables(
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
     parsedTriggerCommit: JSON.stringify(
-      operationContext.latestTriggerCommit.parsedCommit,
+      triggerContext.latestTriggerCommit.parsedCommit,
     ),
     parsedTriggerCommitList: JSON.stringify(
-      operationContext.parsedTriggerCommits,
+      triggerContext.parsedTriggerCommits,
     ),
 
     workingBranchName: workingBranchResult.name,
