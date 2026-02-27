@@ -17,29 +17,26 @@ import {
   getPrimaryVersionFile,
   getVersionSemVerFromVersionFile,
 } from "../tasks/version-files/version-file.ts";
-import type {
-  OperationRunContext,
-  OperationTriggerContext,
-} from "../types/operation-context.ts";
+import type { OperationRunContext } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
 
 interface ReleaseWorkflowOptions {
-  triggerContext: OperationTriggerContext;
   associatedPrForCommit: ProviderPullRequest;
-  runCtx: OperationRunContext;
+  currentRunCtx: OperationRunContext;
 }
 
 export async function releaseWorkflow(
   provider: PlatformProvider,
   opts: ReleaseWorkflowOptions,
-) {
-  const {
-    triggerContext,
-    associatedPrForCommit,
-    runCtx,
-  } = opts;
+): Promise<OperationRunContext> {
+  const { associatedPrForCommit, currentRunCtx } = opts;
+
+  /**
+   * Release-specific operation run context.
+   */
+  let runCtx: OperationRunContext = currentRunCtx;
 
   logger.stepStart("Starting: Extract changelog from pull request body");
   const prChangelogRelease = extractChangelogFromPr(associatedPrForCommit);
@@ -111,8 +108,11 @@ export async function releaseWorkflow(
       runCtx.inputs.workspacePath,
     );
   if (_releasePreRuntimeConfigResult) {
-    runCtx.rawConfig = _releasePreRuntimeConfigResult.rawResolvedRuntime;
-    runCtx.config = _releasePreRuntimeConfigResult.resolvedRuntime;
+    runCtx = {
+      ...runCtx,
+      rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _releasePreRuntimeConfigResult.resolvedRuntime,
+    };
     logger.stepFinish(
       "Finished: Resolve runtime config override (release pre commands)",
     );
@@ -199,8 +199,11 @@ export async function releaseWorkflow(
       runCtx.inputs.workspacePath,
     );
   if (_releasePostRuntimeConfigResult) {
-    runCtx.rawConfig = _releasePostRuntimeConfigResult.rawResolvedRuntime;
-    runCtx.config = _releasePostRuntimeConfigResult.resolvedRuntime;
+    runCtx = {
+      ...runCtx,
+      rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
+      config: _releasePostRuntimeConfigResult.resolvedRuntime,
+    };
     logger.stepFinish(
       "Finished: Resolve runtime config override (release post commands)",
     );
@@ -209,4 +212,6 @@ export async function releaseWorkflow(
       "Skipped: Resolve runtime config override (release post commands)",
     );
   }
+
+  return runCtx;
 }

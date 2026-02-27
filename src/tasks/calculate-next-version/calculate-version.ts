@@ -4,15 +4,8 @@ import type { ResolvedCommitsResult } from "../commit.ts";
 import { taskLogger } from "../logger.ts";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import { AllowReleaseAsOptions } from "../../constants/release-as-options.ts";
-import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import { calculateNextCoreSemVer } from "./core-calculations.ts";
 import { calculateNextExtensionsSemVer } from "./extension-calculations.ts";
-
-type CalculateNextVersionInputsParams = Pick<
-  InputsOutput,
-  "workspacePath" | "sourceMode"
->;
 
 type CalculateNextVersionConfigParams = Pick<
   ConfigOutput,

@@ -33,19 +33,24 @@ interface ProposeWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
   associatedPrFromBranch: ProviderPullRequest | undefined;
   triggerContext: OperationTriggerContext;
-  runCtx: OperationRunContext;
+  currentRunCtx: OperationRunContext;
 }
 
 export async function proposeWorkflow(
   provider: PlatformProvider,
   opts: ProposeWorkflowOptions,
-) {
+): Promise<OperationRunContext> {
   const {
     workingBranchResult,
     associatedPrFromBranch,
     triggerContext,
-    runCtx,
+    currentRunCtx,
   } = opts;
+
+  /**
+   * Propose-specific operation run context.
+   */
+  let runCtx: OperationRunContext = currentRunCtx;
 
   logger.stepStart("Starting: Get previous version");
   const previousVersion = await getPreviousVersion(
@@ -108,15 +113,17 @@ export async function proposeWorkflow(
   logger.stepStart(
     "Starting: Resolve runtime config override (pull request pre commands)",
   );
-  const _prPreRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
-      runCtx.rawConfig,
-      runCtx.config,
-      runCtx.inputs.workspacePath,
-    );
+  const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
+    runCtx.rawConfig,
+    runCtx.config,
+    runCtx.inputs.workspacePath,
+  );
   if (_prPreRuntimeConfigResult) {
-    runCtx.rawConfig = _prPreRuntimeConfigResult.rawResolvedRuntime;
-    runCtx.config = _prPreRuntimeConfigResult.resolvedRuntime;
+    runCtx = {
+      ...runCtx,
+      rawConfig: _prPreRuntimeConfigResult.rawResolvedRuntime,
+      config: _prPreRuntimeConfigResult.resolvedRuntime,
+    };
     logger.stepFinish(
       "Finished: Resolve runtime config override (pull request pre commands)",
     );
@@ -209,15 +216,17 @@ export async function proposeWorkflow(
   logger.stepStart(
     "Starting: Resolve runtime config override (pull request post commands)",
   );
-  const _prPostRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
-      runCtx.rawConfig,
-      runCtx.config,
-      runCtx.inputs.workspacePath,
-    );
+  const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
+    runCtx.rawConfig,
+    runCtx.config,
+    runCtx.inputs.workspacePath,
+  );
   if (_prPostRuntimeConfigResult) {
-    runCtx.rawConfig = _prPostRuntimeConfigResult.rawResolvedRuntime;
-    runCtx.config = _prPostRuntimeConfigResult.resolvedRuntime;
+    runCtx = {
+      ...runCtx,
+      rawConfig: _prPostRuntimeConfigResult.rawResolvedRuntime,
+      config: _prPostRuntimeConfigResult.resolvedRuntime,
+    };
     logger.stepFinish(
       "Finished: Resolve runtime config override (pull request post commands)",
     );
@@ -226,4 +235,6 @@ export async function proposeWorkflow(
       "Skipped: Resolve runtime config override (pull request post commands)",
     );
   }
+
+  return runCtx;
 }

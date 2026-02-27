@@ -73,8 +73,8 @@ jobs:
     # Permissions are only needed if you use default GITHUB_TOKEN
     # For a PAT or GitHub App token, permissions are set by you on creation
     # permissions:
-    #   contents: write       
-    #   pull-requests: write 
+    #   contents: write
+    #   pull-requests: write
     #   issues: write
     #   actions: write
 
@@ -96,7 +96,7 @@ jobs:
               "name": "Override name"
             }
           
-          # See docs for all available source-mode options: 
+          # See docs for all available source-mode options:
           # https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
 ```

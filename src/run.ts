@@ -20,79 +20,30 @@ import { registerTransformersToTemplateEngine } from "./tasks/string-templates-a
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
 import { validateCurrentOperationTriggerCtxOrExit } from "./tasks/operation.ts";
 import type { OperationRunContext } from "./types/operation-context.ts";
-import type { ProviderInputs } from "./types/providers/inputs.ts";
-import type { InputsOutput } from "./schemas/inputs/inputs.ts";
-import type { ConfigOutput } from "./schemas/configs/config.ts";
-
-function generateOperationRunContext(): OperationRunContext {
-  let _rawInputs: ProviderInputs | undefined;
-  let _inputs: InputsOutput | undefined;
-  let _rawConfig: object | undefined;
-  let _config: ConfigOutput | undefined;
-
-  return {
-    get rawInputs() {
-      if (_rawInputs === undefined) {
-        throw new Error("Raw inputs have not been initialized");
-      }
-      return _rawInputs;
-    },
-    set rawInputs(value: ProviderInputs) {
-      _rawInputs = value;
-    },
-
-    get inputs() {
-      if (_inputs === undefined) {
-        throw new Error("Inputs have not been initialized");
-      }
-      return _inputs;
-    },
-    set inputs(value: InputsOutput) {
-      _inputs = value;
-    },
-
-    get rawConfig() {
-      if (_rawConfig === undefined) {
-        throw new Error("Raw config has not been initialized");
-      }
-      return _rawConfig;
-    },
-    set rawConfig(value: object) {
-      _rawConfig = value;
-    },
-
-    get config() {
-      if (_config === undefined) {
-        throw new Error("Config has not been initialized");
-      }
-      return _config;
-    },
-    set config(value: ConfigOutput) {
-      _config = value;
-    },
-  };
-}
 
 export async function run(provider: PlatformProvider) {
-  logger.debugStepStart("Starting: Generate operation run context");
-  const runCtx = generateOperationRunContext();
-  logger.debugStepFinish("Finished: Generate operation run context");
-
   logger.stepStart("Starting: Get operation inputs");
-  const _inputsResult = getInputsOrThrow(provider);
-  runCtx.rawInputs = _inputsResult.rawInputs;
-  runCtx.inputs = _inputsResult.inputs;
+  const inputsResult = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get operation inputs");
 
   logger.stepStart("Starting: Set up operation");
-  setupOperation(provider, runCtx.inputs);
+  setupOperation(provider, inputsResult.inputs);
   logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Resolve config from file and override");
-  const _configResult = await resolveConfigOrThrow(provider, runCtx.inputs);
-  runCtx.rawConfig = _configResult.rawConfig;
-  runCtx.config = _configResult.config;
+  const configResult = await resolveConfigOrThrow(
+    provider,
+    inputsResult.inputs,
+  );
   logger.stepFinish("Finished: Resolve config from file and override");
+
+  // Init Run Context //
+  let runCtx: OperationRunContext = {
+    rawInputs: inputsResult.rawInputs,
+    inputs: inputsResult.inputs,
+    rawConfig: configResult.rawConfig,
+    config: configResult.config,
+  };
 
   logger.stepStart("Starting: Parse and validate current trigger context");
   const triggerContext = validateCurrentOperationTriggerCtxOrExit(
@@ -172,8 +123,11 @@ export async function run(provider: PlatformProvider) {
     runCtx.inputs.workspacePath,
   );
   if (_basePreRuntimeConfigResult) {
-    runCtx.rawConfig = _basePreRuntimeConfigResult.rawResolvedRuntime;
-    runCtx.config = _basePreRuntimeConfigResult.resolvedRuntime;
+    runCtx = {
+      ...runCtx,
+      rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _basePreRuntimeConfigResult.resolvedRuntime,
+    };
     logger.stepFinish(
       "Finished: Resolve runtime config override (base pre commands)",
     );
@@ -188,20 +142,22 @@ export async function run(provider: PlatformProvider) {
     logger.info(
       "Start Workflow: Create/Update release proposal pull request",
     );
-    await proposeWorkflow(provider, {
-      workingBranchResult,
-      associatedPrFromBranch,
-      triggerContext,
-      runCtx,
-    });
+    runCtx = await proposeWorkflow(
+      provider,
+      {
+        workingBranchResult,
+        associatedPrFromBranch,
+        triggerContext,
+        currentRunCtx: runCtx,
+      },
+    );
   } else {
     if (runCtx.config.release.enabled) {
       logger.info("Start Workflow: Create tag and release");
-      await releaseWorkflow(provider, {
-        triggerContext,
-        associatedPrForCommit,
-        runCtx,
-      });
+      runCtx = await releaseWorkflow(
+        provider,
+        { associatedPrForCommit, currentRunCtx: runCtx },
+      );
     } else {
       logger.info(
         "Skip Workflow: Create tag and release (disabled in config)",
