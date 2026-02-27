@@ -7,7 +7,7 @@ import { transformObjKeyToCamelCase } from "../utils/transformers/object.ts";
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import { SourceModeOptions } from "../constants/source-mode-options.ts";
 
-export interface GetInputsResult {
+interface GetInputsResult {
   rawInputs: ProviderInputs;
   inputs: InputsOutput;
 }

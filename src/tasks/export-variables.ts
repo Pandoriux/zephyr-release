@@ -17,8 +17,6 @@ import { jsonValueNormalizer } from "../utils/transformers/json.ts";
 import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
-import type { ResolveConfigResult } from "./configs/config.ts";
-import type { GetInputsResult } from "./inputs.ts";
 import { taskLogger } from "./logger.ts";
 import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 import {
@@ -26,6 +24,9 @@ import {
   OperationJobs,
   OperationKinds,
 } from "../constants/operation-variables.ts";
+import type { ProviderInputs } from "../types/providers/inputs.ts";
+import type { ConfigOutput } from "../schemas/configs/config.ts";
+import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
@@ -34,8 +35,10 @@ export async function exportBaseOperationVariables(
     workingBranchResult: WorkingBranchResult;
     prForCommit: ProviderPullRequest | undefined;
     prFromBranch: ProviderPullRequest | undefined;
-    inputsResult: GetInputsResult;
-    configResult: ResolveConfigResult;
+    rawInputs: ProviderInputs;
+    inputs: InputsOutput;
+    rawConfig: object;
+    config: ConfigOutput;
   },
 ) {
   const {
@@ -43,11 +46,11 @@ export async function exportBaseOperationVariables(
     workingBranchResult,
     prForCommit,
     prFromBranch,
-    inputsResult,
-    configResult,
+    rawInputs,
+    inputs,
+    rawConfig,
+    config,
   } = options;
-  const { rawInputs, inputs } = inputsResult;
-  const { rawConfig, config } = configResult;
 
   const resolvedTarget = prForCommit
     ? OperationKinds.release

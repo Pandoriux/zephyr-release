@@ -1,6 +1,5 @@
-import type { ConfigOutput } from "../schemas/configs/config.ts";
-import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
+import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
   exportPostReleaseOperationVariables,
   exportPreReleaseOperationVariables,
@@ -18,7 +17,10 @@ import {
   getPrimaryVersionFile,
   getVersionSemVerFromVersionFile,
 } from "../tasks/version-files/version-file.ts";
-import type { OperationTriggerContext } from "../types/operation-context.ts";
+import type {
+  OperationRunContext,
+  OperationTriggerContext,
+} from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
@@ -26,33 +28,31 @@ import type { ProviderRelease } from "../types/providers/release.ts";
 interface ReleaseWorkflowOptions {
   triggerContext: OperationTriggerContext;
   associatedPrForCommit: ProviderPullRequest;
-  inputs: InputsOutput;
-  config: ConfigOutput;
+  runCtx: OperationRunContext;
 }
 
 export async function releaseWorkflow(
   provider: PlatformProvider,
-  ops: ReleaseWorkflowOptions,
+  opts: ReleaseWorkflowOptions,
 ) {
   const {
     triggerContext,
     associatedPrForCommit,
-    inputs,
-    config,
-  } = ops;
+    runCtx,
+  } = opts;
 
   logger.stepStart("Starting: Extract changelog from pull request body");
   const prChangelogRelease = extractChangelogFromPr(associatedPrForCommit);
   logger.stepFinish("Finished: Extract changelog from pull request body");
 
   logger.stepStart("Starting: Extract version from primary version file");
-  const primaryVersionFile = getPrimaryVersionFile(config.versionFiles);
+  const primaryVersionFile = getPrimaryVersionFile(runCtx.config.versionFiles);
   const version = await getVersionSemVerFromVersionFile(
     primaryVersionFile,
-    inputs.sourceMode,
+    runCtx.inputs.sourceMode,
     provider,
-    inputs.workspacePath,
-    inputs.triggerCommitHash,
+    runCtx.inputs.workspacePath,
+    runCtx.inputs.triggerCommitHash,
   );
   if (!version) {
     throw new Error("Failed to extract version from primary version file");
@@ -66,7 +66,7 @@ export async function releaseWorkflow(
   );
   await createFixedVersionStringPatternContext(
     version,
-    config.release.tagNameTemplate,
+    runCtx.config.release.tagNameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -90,7 +90,7 @@ export async function releaseWorkflow(
 
   logger.stepStart("Starting: Execute release pre commands");
   const preResult = await runCommandsOrThrow(
-    config.release.commandHook,
+    runCtx.config.release.commandHook,
     "pre",
   );
   if (preResult) {
@@ -101,14 +101,43 @@ export async function releaseWorkflow(
     logger.stepSkip("Skipped: Execute release pre commands (empty)");
   }
 
+  logger.stepStart(
+    "Starting: Resolve runtime config override (release pre commands)",
+  );
+  const _releasePreRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runCtx.rawConfig,
+      runCtx.config,
+      runCtx.inputs.workspacePath,
+    );
+  if (_releasePreRuntimeConfigResult) {
+    runCtx.rawConfig = _releasePreRuntimeConfigResult.rawResolvedRuntime;
+    runCtx.config = _releasePreRuntimeConfigResult.resolvedRuntime;
+    logger.stepFinish(
+      "Finished: Resolve runtime config override (release pre commands)",
+    );
+  } else {
+    logger.stepSkip(
+      "Skipped: Resolve runtime config override (release pre commands)",
+    );
+  }
+
   logger.stepStart("Starting: Create tag");
-  const createdTag = await createTagOrThrow(provider, inputs, config);
+  const createdTag = await createTagOrThrow(
+    provider,
+    runCtx.inputs,
+    runCtx.config,
+  );
   logger.stepFinish("Finished: Create tag");
 
   logger.stepStart("Starting: Create release");
   let createdReleaseNote: ProviderRelease | undefined;
-  if (!config.release.skipReleaseNote) {
-    createdReleaseNote = await createRelease(provider, inputs, config);
+  if (!runCtx.config.release.skipReleaseNote) {
+    createdReleaseNote = await createRelease(
+      provider,
+      runCtx.inputs,
+      runCtx.config,
+    );
     logger.stepFinish("Finished: Create release");
   } else {
     logger.stepSkip(
@@ -117,11 +146,11 @@ export async function releaseWorkflow(
   }
 
   logger.stepStart("Starting: Attach release assets");
-  if (createdReleaseNote?.id && config.release.assets) {
+  if (createdReleaseNote?.id && runCtx.config.release.assets) {
     await attachReleaseAssets(
       provider,
       createdReleaseNote.id,
-      config.release.assets,
+      runCtx.config.release.assets,
     );
     logger.stepFinish("Finished: Attach release assets");
   } else {
@@ -134,7 +163,7 @@ export async function releaseWorkflow(
   await updateMergedPullRequestLabelsOrThrow(
     provider,
     associatedPrForCommit.number,
-    config,
+    runCtx.config,
   );
   logger.stepFinish("Finished: Update merged pull request labels");
 
@@ -149,7 +178,7 @@ export async function releaseWorkflow(
 
   logger.stepStart("Starting: Execute release post commands");
   const postResult = await runCommandsOrThrow(
-    config.release.commandHook,
+    runCtx.config.release.commandHook,
     "post",
   );
   if (postResult) {
@@ -158,5 +187,26 @@ export async function releaseWorkflow(
     );
   } else {
     logger.stepSkip("Skipped: Execute release post commands (empty)");
+  }
+
+  logger.stepStart(
+    "Starting: Resolve runtime config override (release post commands)",
+  );
+  const _releasePostRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runCtx.rawConfig,
+      runCtx.config,
+      runCtx.inputs.workspacePath,
+    );
+  if (_releasePostRuntimeConfigResult) {
+    runCtx.rawConfig = _releasePostRuntimeConfigResult.rawResolvedRuntime;
+    runCtx.config = _releasePostRuntimeConfigResult.resolvedRuntime;
+    logger.stepFinish(
+      "Finished: Resolve runtime config override (release post commands)",
+    );
+  } else {
+    logger.stepSkip(
+      "Skipped: Resolve runtime config override (release post commands)",
+    );
   }
 }

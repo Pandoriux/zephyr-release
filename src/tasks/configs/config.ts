@@ -12,7 +12,6 @@ import type { PlatformProvider } from "../../types/providers/platform-provider.t
 import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
 import { parseConfigOrThrow } from "./config-parser.ts";
 import { transformObjKeyToCamelCase } from "../../utils/transformers/object.ts";
-import type { RuntimeConfigOverrideOutput } from "../../schemas/configs/modules/components/runtime-config-override.ts";
 
 type ResolveConfigInputsParams = Pick<
   InputsOutput,
@@ -23,7 +22,7 @@ type ResolveConfigInputsParams = Pick<
   | "configOverrideFormat"
 >;
 
-export interface ResolvedConfigContext {
+interface ResolvedConfigContext {
   rawConfig: object;
   config: ConfigOutput;
 }
@@ -154,5 +153,73 @@ export async function resolveConfigOrThrow(
   return {
     rawConfig: rawParsedFinalConfig,
     config: resolvedFinalConfigResult.output,
+  };
+}
+
+export interface ResolvedRuntimeConfigResult {
+  rawResolvedRuntime: object;
+  resolvedRuntime: ConfigOutput;
+}
+
+export async function resolveRuntimeConfigOverrideOrThrow(
+  rawConfig: object,
+  config: ConfigOutput,
+  workspacePath: string,
+): Promise<ResolvedRuntimeConfigResult | undefined> {
+  const runtimeConfigOverride = config.runtimeConfigOverride;
+
+  if (!runtimeConfigOverride) return undefined;
+
+  const runtimeOverrideText = await getTextFileOrThrow(
+    "local",
+    runtimeConfigOverride.path,
+    { workspacePath },
+  );
+
+  if (!runtimeOverrideText.trim()) return undefined;
+
+  const parsedRawResult = parseConfigOrThrow(
+    runtimeOverrideText,
+    runtimeConfigOverride.format,
+    runtimeConfigOverride.path,
+  );
+
+  taskLogger.info(
+    `Runtime config override parsed successfully (${parsedRawResult.resolvedFormatResult})`,
+  );
+
+  taskLogger.info("Merging runtime override with current config...");
+  const rawFinalConfig = deepMerge(
+    rawConfig,
+    parsedRawResult.parsedConfig,
+    { arrays: "replace" },
+  );
+
+  const finalConfig = deepMerge(
+    config,
+    transformObjKeyToCamelCase(parsedRawResult.parsedConfig),
+    { arrays: "replace" },
+  );
+
+  const resolvedFinalConfigResult = v.safeParse(
+    ConfigSchema,
+    finalConfig,
+  );
+  if (!resolvedFinalConfigResult.success) {
+    throw new Error(
+      `\`${resolveConfigOrThrow.name}\` failed!` +
+        formatValibotIssues(resolvedFinalConfigResult.issues),
+    );
+  }
+
+  taskLogger.startGroup("Resolved runtime override config:");
+  taskLogger.info(
+    JSON.stringify(resolvedFinalConfigResult.output, jsonValueNormalizer, 2),
+  );
+  taskLogger.endGroup();
+
+  return {
+    rawResolvedRuntime: rawFinalConfig,
+    resolvedRuntime: resolvedFinalConfigResult.output,
   };
 }

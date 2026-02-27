@@ -47,12 +47,6 @@ These variables are available starting from the first [`command-hook > pre`](./c
 
 <br>
 
-- **config:** Resolved config object (config + override) taken directly from the user, preserved as-is (JSON stringified)  
-  Export: zr-config; Env: ZR_CONFIG
-
-- **internalConfig:** Internally resolved config object (config + override), with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). See: [config.ts](../src/schemas/configs/config.ts)  
-  Export: zr-internal-config; Env: ZR_INTERNAL_CONFIG
-
 - **parsedTriggerCommit:** Parsed commit object for the latest commit that triggered the operation (JSON stringified). [View the commit object structure](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser#usage)  
   Export: zr-trigger-commit; Env: ZR_TRIGGER_COMMIT
 
@@ -81,6 +75,14 @@ These variables are available starting from the first [`command-hook > pre`](./c
 ### Dynamic (available at all time)
 
 These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `pullRequestNumber`).
+
+- **config:** **Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-path-optional) is applied during execution, ensuring it always reflects the active configuration rules.  
+  Export: zr-config; Env: ZR_CONFIG
+
+- **internalConfig:** **Current** internally resolved config object, with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). This value also updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-path-optional) is applied during execution. For schema shape see: [config.ts](../src/schemas/configs/config.ts)  
+  Export: zr-internal-config; Env: ZR_INTERNAL_CONFIG
+
+<br>
 
 - **patternContext:** **Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts)  
   For example, the patternContext exposed at `command-hook > pre` might be differ compared to the patternContext exposed at `pull-request > command-hook > pre`  

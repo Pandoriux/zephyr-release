@@ -22,7 +22,9 @@ Zephyr Release is designed to fit naturally into your project, no matter what la
   - Using Python or Rust? Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
   - Prefer web standards? Use the [kebab-case schema](./schemas/v1/config-v1.kebab.json) or [camelCase schema](./schemas/v1/config-v1.camel.json).
 
-> Currently, we only offer standardized schemas for JSON. If you have ideas on how to implement strict schema validation for YAML or TOML, we would love to hear your suggestions in the issues!
+*Note that currently only JSON has standardized schemas. If you know of any standardized schemas for YAML or TOML, please open an issue!*
+
+- **Dynamic Config Overrides:** Need to change settings on the fly? You can inject configuration overrides directly from your CI/CD workflow or generate them at runtime using custom scripts.
 
 ## Getting Started
 
@@ -159,6 +161,15 @@ When you are ready to ship, simply **merge** the "Release Proposal" PR. Zephyr R
 
 - **Create a Git Tag**: Automatically tags the repository with the new version number.
 - **Publish Release Notes**: Generates and publishes the final release.
+
+## Dynamic Configuration Overrides
+
+Sometimes a static configuration file is not enough. For example, you might want to dynamically change the release notes based on the current branch or an external API. Zephyr Release gives you two ways to change your settings on the fly:
+
+**1. Workflow Input Override:** You can generate configuration data in an earlier step of your CI/CD workflow and pass it directly into the operation using the [`config-override`](./docs/input-options.md#config-override-optional) input. This is great if your workflow already knows what needs to change before Zephyr Release even starts.
+
+**2. Runtime File Override:** If you need to calculate settings *during* the release process itself, you can use [`runtime-config-override`](./docs/config-options.md#runtime-config-override-optional).
+By pairing it with various [`command-hook`](./docs/config-options.md#command-hook-optional) options, you can run a custom script that generates a temporary JSON file on the runner. Zephyr Release will automatically read this file and merge it into your configuration after every `command-hook` run.
 
 ## Force a Specific Version
 
