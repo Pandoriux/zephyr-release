@@ -15,16 +15,14 @@
 
 ### Adaptable Configuration
 
-Zephyr Release is designed to fit naturally into your project, no matter what language or ecosystem you use.
+Zephyr Release is designed to integrate seamlessly into any environment, providing both a natural fit for your codebase and the flexibility to adapt at runtime.
 
-- **Multiple File Formats:** We support **JSON** (including JSONC and JSON5), **YAML**, and **TOML**. You can pick the format that feels most at home in your repository.
-- **Flexible Casing:** You don't have to change your coding style to use this tool. We provide dedicated JSON schemas for different naming conventions:
-  - Using Python or Rust? Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
-  - Prefer web standards? Use the [kebab-case schema](./schemas/v1/config-v1.kebab.json) or [camelCase schema](./schemas/v1/config-v1.camel.json).
-
-*Note that currently only JSON has standardized schemas. If you know of any standardized schemas for YAML or TOML, please open an issue!*
-
-- **Dynamic Config Overrides:** Need to change settings on the fly? You can inject configuration overrides directly from your CI/CD workflow or generate them at runtime using custom scripts.
+- **Multiple File Formats:** ZR supports **JSON** (including JSONC and JSON5), **YAML**, and **TOML**. Pick the format that feels most at home in your repository.
+- **Flexible Casing:** You don't have to change your coding style to use this tool. ZR provides dedicated schemas for different naming conventions:
+  - **Using Python or Rust?** Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
+  - **Using JavaScript or C#?** Use the [camelCase schema](./schemas/v1/config-v1.camel.json).
+  - **Prefer an agnostic, readable style?** The [kebab-case schema](./schemas/v1/config-v1.kebab.json) is perfect for a clean, language-neutral look.
+- **Dynamic Config Overrides:** Need to change settings on the fly? You can inject configuration overrides directly from your CI/CD workflow or generate them at runtime using custom scripts. [Learn more about dynamic overrides](#dynamic-configuration-overrides).
 
 ## Getting Started
 
