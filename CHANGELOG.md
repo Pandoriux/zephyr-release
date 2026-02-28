@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.7.0](https://github.com/Pandoriux/zephyr-release/compare/v0.6.0...v0.7.0) (2026-02-28)
+
+### Features
+
+- add format commit ref transformer ([#22](https://github.com/Pandoriux/zephyr-release/issues/22)) ([284fe0f](https://github.com/Pandoriux/zephyr-release/commit/284fe0f9ff0219fcb2424953f23eaa376a7d550e))
+- add runtime config override support ([#24](https://github.com/Pandoriux/zephyr-release/issues/24)) ([13d8304](https://github.com/Pandoriux/zephyr-release/commit/13d8304834431f90b9735ff612a2fb1eb7360ef5))
+- add update PR labels after release ([#23](https://github.com/Pandoriux/zephyr-release/issues/23)) ([746d7eb](https://github.com/Pandoriux/zephyr-release/commit/746d7ebbd509c83bb87c9635f9929c27e1ebcf7d))
+- remove manage concurrency ([#21](https://github.com/Pandoriux/zephyr-release/issues/21)) ([ab96dc3](https://github.com/Pandoriux/zephyr-release/commit/ab96dc31c9c785c7322a254d5a6e0e1b833893d3))
+
 ## [0.6.0](https://github.com/Pandoriux/zephyr-release/compare/v0.5.0...v0.6.0) (2026-02-22)
 
 ### Features
