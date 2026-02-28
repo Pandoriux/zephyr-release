@@ -2,7 +2,10 @@ import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
 import { setupOperation } from "./tasks/setup.ts";
-import { resolveConfigOrThrow } from "./tasks/configs/config.ts";
+import {
+  resolveConfigOrThrow,
+  resolveRuntimeConfigOverrideOrThrow,
+} from "./tasks/configs/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
 import { createFixedBaseStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import {
@@ -15,51 +18,61 @@ import { releaseWorkflow } from "./workflows/release.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
-import { validateCurrentOperationCtxOrExit } from "./tasks/operation.ts";
+import { validateCurrentOperationTriggerCtxOrExit } from "./tasks/operation.ts";
+import type { OperationRunContext } from "./types/operation-context.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
   const inputsResult = getInputsOrThrow(provider);
-  const { inputs } = inputsResult;
   logger.stepFinish("Finished: Get operation inputs");
 
   logger.stepStart("Starting: Set up operation");
-  setupOperation(provider, inputs);
+  setupOperation(provider, inputsResult.inputs);
   logger.stepFinish("Finished: Set up operation");
 
   logger.stepStart("Starting: Resolve config from file and override");
-  const configResult = await resolveConfigOrThrow(provider, inputs);
-  const { config } = configResult;
+  const configResult = await resolveConfigOrThrow(
+    provider,
+    inputsResult.inputs,
+  );
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  logger.stepStart("Starting: Parse and validate current operation context");
-  const operationContext = validateCurrentOperationCtxOrExit(
+  // Init Run Context //
+  let runCtx: OperationRunContext = {
+    rawInputs: inputsResult.rawInputs,
+    inputs: inputsResult.inputs,
+    rawConfig: configResult.rawConfig,
+    config: configResult.config,
+  };
+
+  logger.stepStart("Starting: Parse and validate current trigger context");
+  const triggerContext = validateCurrentOperationTriggerCtxOrExit(
     provider,
-    config.commitTypes,
+    runCtx.config.commitTypes,
   );
-  logger.stepFinish("Finished: Parse and validate current operation context");
+  logger.stepFinish("Finished: Parse and validate current trigger context");
 
   logger.stepStart("Starting: Register transformers to template engine");
   registerTransformersToTemplateEngine(provider);
   logger.stepFinish("Finished: Register transformers to template engine");
 
   logger.debugStepStart("Starting: Create custom string pattern context");
-  createCustomStringPatternContext(config.customStringPatterns);
+  createCustomStringPatternContext(runCtx.config.customStringPatterns);
   logger.debugStepFinish("Finished: Create custom string pattern context");
 
   logger.debugStepStart("Starting: Create fixed base string pattern context");
   await createFixedBaseStringPatternContext(
     provider,
-    inputs.triggerBranchName,
-    config,
+    runCtx.inputs.triggerBranchName,
+    runCtx.config,
   );
   logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
   logger.stepStart("Starting: Ensure working branch is prepared");
   const workingBranchResult = await setupWorkingBranchOrThrow(
     provider,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   logger.stepFinish("Finished: Ensure working branch is prepared");
 
@@ -67,14 +80,14 @@ export async function run(provider: PlatformProvider) {
   const associatedPrForCommit = await findPullRequestForCommitOrThrow(
     provider,
     workingBranchResult.name,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
     provider,
     workingBranchResult.name,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   logger.stepFinish(
     "Finished: Get associated pull requests",
@@ -82,53 +95,81 @@ export async function run(provider: PlatformProvider) {
 
   logger.debugStepStart("Starting: Export base operation variables");
   await exportBaseOperationVariables(provider, {
-    operationContext,
+    triggerContext,
     workingBranchResult,
     prForCommit: associatedPrForCommit,
     prFromBranch: associatedPrFromBranch,
-    inputsResult,
-    configResult,
+    rawInputs: runCtx.rawInputs,
+    inputs: runCtx.inputs,
+    rawConfig: runCtx.rawConfig,
+    config: runCtx.config,
   });
   logger.debugStepFinish("Finished: Export base operation variables");
 
   logger.stepStart("Starting: Execute base pre commands");
-  const preResult = await runCommandsOrThrow(config.commandHook, "pre");
+  const preResult = await runCommandsOrThrow(runCtx.config.commandHook, "pre");
   if (preResult) {
     logger.stepFinish(`Finished: Execute base pre commands. ${preResult}`);
   } else {
     logger.stepSkip("Skipped: Execute base pre commands (empty)");
   }
 
+  logger.stepStart(
+    "Starting: Resolve runtime config override (base pre commands)",
+  );
+  const _basePreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
+    runCtx.rawConfig,
+    runCtx.config,
+    runCtx.inputs.workspacePath,
+  );
+  if (_basePreRuntimeConfigResult) {
+    runCtx = {
+      ...runCtx,
+      rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _basePreRuntimeConfigResult.resolvedRuntime,
+    };
+    logger.stepFinish(
+      "Finished: Resolve runtime config override (base pre commands)",
+    );
+  } else {
+    logger.stepSkip(
+      "Skipped: Resolve runtime config override (base pre commands)",
+    );
+  }
+
   // Main operation workflow
   if (!associatedPrForCommit) {
-    logger.stepStart(
+    logger.info(
       "Start Workflow: Create/Update release proposal pull request",
     );
-    await proposeWorkflow(provider, {
-      workingBranchResult,
-      associatedPrFromBranch,
-      operationContext,
-      inputs,
-      config,
-    });
+    runCtx = await proposeWorkflow(
+      provider,
+      {
+        workingBranchResult,
+        associatedPrFromBranch,
+        triggerContext,
+        currentRunCtx: runCtx,
+      },
+    );
   } else {
-    if (config.release.enabled) {
-      logger.stepStart("Start Workflow: Create tag and release");
-      await releaseWorkflow(provider, {
-        operationContext,
-        associatedPrForCommit,
-        inputs,
-        config,
-      });
+    if (runCtx.config.release.enabled) {
+      logger.info("Start Workflow: Create tag and release");
+      runCtx = await releaseWorkflow(
+        provider,
+        { associatedPrForCommit, currentRunCtx: runCtx },
+      );
     } else {
-      logger.stepSkip(
+      logger.info(
         "Skip Workflow: Create tag and release (disabled in config)",
       );
     }
   }
 
   logger.stepStart("Starting: Execute base post commands");
-  const postResult = await runCommandsOrThrow(config.commandHook, "post");
+  const postResult = await runCommandsOrThrow(
+    runCtx.config.commandHook,
+    "post",
+  );
   if (postResult) {
     logger.stepFinish(`Finished: Execute base post commands. ${postResult}`);
   } else {

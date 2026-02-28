@@ -4,7 +4,7 @@ import type { OperationTriggerContext } from "../types/operation-context.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 
-export function validateCurrentOperationCtxOrExit(
+export function validateCurrentOperationTriggerCtxOrExit(
   provider: PlatformProvider,
   allowedCommitTypes: ConfigOutput["commitTypes"],
 ): OperationTriggerContext {

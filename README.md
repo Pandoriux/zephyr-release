@@ -15,14 +15,14 @@
 
 ### Adaptable Configuration
 
-Zephyr Release is designed to fit naturally into your project, no matter what language or ecosystem you use.
+Zephyr Release is designed to integrate seamlessly into any environment, providing both a natural fit for your codebase and the flexibility to adapt at runtime.
 
-- **Multiple File Formats:** We support **JSON** (including JSONC and JSON5), **YAML**, and **TOML**. You can pick the format that feels most at home in your repository.
-- **Flexible Casing:** You don't have to change your coding style to use this tool. We provide dedicated JSON schemas for different naming conventions:
-  - Using Python or Rust? Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
-  - Prefer web standards? Use the [kebab-case schema](./schemas/v1/config-v1.kebab.json) or [camelCase schema](./schemas/v1/config-v1.camel.json).
-
-> Currently, we only offer standardized schemas for JSON. If you have ideas on how to implement strict schema validation for YAML or TOML, we would love to hear your suggestions in the issues!
+- **Multiple File Formats:** ZR supports **JSON** (including JSONC and JSON5), **YAML**, and **TOML**. Pick the format that feels most at home in your repository.
+- **Flexible Casing:** You don't have to change your coding style to use this tool. ZR provides dedicated schemas for different naming conventions:
+  - **Using Python or Rust?** Try the [snake_case schema](./schemas/v1/config-v1.snake.json).
+  - **Using JavaScript or C#?** Use the [camelCase schema](./schemas/v1/config-v1.camel.json).
+  - **Prefer an agnostic, readable style?** The [kebab-case schema](./schemas/v1/config-v1.kebab.json) is perfect for a clean, language-neutral look.
+- **Dynamic Config Overrides:** Need to change settings on the fly? You can inject configuration overrides directly from your CI/CD workflow or generate them at runtime using custom scripts. [Learn more about dynamic overrides](#dynamic-configuration-overrides).
 
 ## Getting Started
 
@@ -73,8 +73,8 @@ jobs:
     # Permissions are only needed if you use default GITHUB_TOKEN
     # For a PAT or GitHub App token, permissions are set by you on creation
     # permissions:
-    #   contents: write       
-    #   pull-requests: write 
+    #   contents: write
+    #   pull-requests: write
     #   issues: write
     #   actions: write
 
@@ -96,7 +96,7 @@ jobs:
               "name": "Override name"
             }
           
-          # See docs for all available source-mode options: 
+          # See docs for all available source-mode options:
           # https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
 ```
@@ -159,6 +159,15 @@ When you are ready to ship, simply **merge** the "Release Proposal" PR. Zephyr R
 
 - **Create a Git Tag**: Automatically tags the repository with the new version number.
 - **Publish Release Notes**: Generates and publishes the final release.
+
+## Dynamic Configuration Overrides
+
+Sometimes a static configuration file is not enough. For example, you might want to dynamically change the release notes based on the current branch or an external API. Zephyr Release gives you two ways to change your settings on the fly:
+
+**1. Workflow Input Override:** You can generate configuration data in an earlier step of your CI/CD workflow and pass it directly into the operation using the [`config-override`](./docs/input-options.md#config-override-optional) input. This is great if your workflow already knows what needs to change before Zephyr Release even starts.
+
+**2. Runtime File Override:** If you need to calculate settings *during* the release process itself, you can use [`runtime-config-override`](./docs/config-options.md#runtime-config-override-optional).
+By pairing it with various [`command-hook`](./docs/config-options.md#command-hook-optional) options, you can run a custom script that generates a temporary JSON file on the runner. Zephyr Release will automatically read this file and merge it into your configuration after every `command-hook` run.
 
 ## Force a Specific Version
 

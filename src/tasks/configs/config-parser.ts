@@ -26,7 +26,7 @@ export function getConfigFormatTrialOrder(
 }
 
 interface ParseConfigResult {
-  parsedConfig: unknown;
+  parsedConfig: object;
   resolvedFormatResult: string;
 }
 

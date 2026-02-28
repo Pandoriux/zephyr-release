@@ -15,8 +15,8 @@ import type {
 } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
+import type { ProviderOperationTriggerContext } from "./provider-operation-context.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
-import type { ProviderOperationTriggerContext } from "../operation-context.ts";
 import type { ProviderTag } from "./tag.ts";
 import type { TaggerRequest } from "../tag.ts";
 import type { TagTypeOption } from "../../constants/release-tag-options.ts";

@@ -1,5 +1,3 @@
-import type { ConfigOutput } from "../schemas/configs/config.ts";
-import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { WorkingBranchResult } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
 import {
@@ -19,50 +17,61 @@ import {
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommandsOrThrow } from "../tasks/command.ts";
+import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
   exportPostProposeOperationVariables,
   exportPreProposeOperationVariables,
 } from "../tasks/export-variables.ts";
-import type { OperationTriggerContext } from "../types/operation-context.ts";
+import type {
+  OperationRunContext,
+  OperationTriggerContext,
+} from "../types/operation-context.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
 
 interface ProposeWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
   associatedPrFromBranch: ProviderPullRequest | undefined;
-  operationContext: OperationTriggerContext;
-  inputs: InputsOutput;
-  config: ConfigOutput;
+  triggerContext: OperationTriggerContext;
+  currentRunCtx: OperationRunContext;
 }
 
 export async function proposeWorkflow(
   provider: PlatformProvider,
-  ops: ProposeWorkflowOptions,
-) {
+  opts: ProposeWorkflowOptions,
+): Promise<OperationRunContext> {
   const {
     workingBranchResult,
     associatedPrFromBranch,
-    operationContext,
-    inputs,
-    config,
-  } = ops;
+    triggerContext,
+    currentRunCtx,
+  } = opts;
+
+  /**
+   * Propose-specific operation run context.
+   */
+  let runCtx: OperationRunContext = currentRunCtx;
 
   logger.stepStart("Starting: Get previous version");
-  const previousVersion = await getPreviousVersion(provider, inputs, config);
+  const previousVersion = await getPreviousVersion(
+    provider,
+    runCtx.inputs,
+    runCtx.config,
+  );
   logger.stepFinish("Finished: Get previous version");
 
   logger.stepStart("Starting: Resolve commits from trigger to last release");
   const resolvedCommitsResult = await resolveCommitsFromTriggerToLastRelease(
     provider,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   logger.stepFinish("Finished: Resolve commits from trigger to last release");
 
   logger.stepStart("Starting: Calculate next version");
   const nextVersion = calculateNextVersion(
     resolvedCommitsResult,
-    config,
+    runCtx.config,
     previousVersion,
   );
   logger.stepFinish("Finished: Calculate next version");
@@ -73,7 +82,7 @@ export async function proposeWorkflow(
   createFixedPreviousVersionStringPatternContext(previousVersion);
   await createFixedVersionStringPatternContext(
     nextVersion,
-    config.release.tagNameTemplate,
+    runCtx.config.release.tagNameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -90,7 +99,7 @@ export async function proposeWorkflow(
 
   logger.stepStart("Starting: Execute pull request pre commands");
   const preResult = await runCommandsOrThrow(
-    config.pullRequest.commandHook,
+    runCtx.config.pullRequest.commandHook,
     "pre",
   );
   if (preResult) {
@@ -101,12 +110,35 @@ export async function proposeWorkflow(
     logger.stepSkip("Skipped: Execute pull request pre commands (empty)");
   }
 
+  logger.stepStart(
+    "Starting: Resolve runtime config override (pull request pre commands)",
+  );
+  const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
+    runCtx.rawConfig,
+    runCtx.config,
+    runCtx.inputs.workspacePath,
+  );
+  if (_prPreRuntimeConfigResult) {
+    runCtx = {
+      ...runCtx,
+      rawConfig: _prPreRuntimeConfigResult.rawResolvedRuntime,
+      config: _prPreRuntimeConfigResult.resolvedRuntime,
+    };
+    logger.stepFinish(
+      "Finished: Resolve runtime config override (pull request pre commands)",
+    );
+  } else {
+    logger.stepSkip(
+      "Skipped: Resolve runtime config override (pull request pre commands)",
+    );
+  }
+
   logger.stepStart("Starting: Generate changelog release content");
   const changelogReleaseResult = await generateChangelogReleaseContent(
     provider,
     resolvedCommitsResult.entries,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   logger.stepFinish("Finished: Generate changelog release content");
 
@@ -124,8 +156,8 @@ export async function proposeWorkflow(
   logger.stepStart("Starting: Prepare and collect changes data to commit");
   const changesData = await prepareChangesToCommit(
     provider,
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
     {
       changelogRelease: changelogReleaseResult.release,
       nextVersion: format(nextVersion),
@@ -135,14 +167,14 @@ export async function proposeWorkflow(
 
   logger.stepStart("Starting: Commit changes");
   const _commitResult = await commitChangesToBranch(provider, {
-    triggerCommitHash: inputs.triggerCommitHash,
-    baseTreeHash: operationContext.latestTriggerCommit.treeHash,
+    triggerCommitHash: runCtx.inputs.triggerCommitHash,
+    baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
     changesToCommit: changesData,
     workingBranchName: workingBranchResult.name,
   }, {
     pullRequest: {
-      titleTemplate: config.pullRequest.titleTemplate,
-      titleTemplatePath: config.pullRequest.titleTemplatePath,
+      titleTemplate: runCtx.config.pullRequest.titleTemplate,
+      titleTemplatePath: runCtx.config.pullRequest.titleTemplatePath,
     },
   });
   logger.stepFinish("Finished: Commit changes");
@@ -152,16 +184,16 @@ export async function proposeWorkflow(
     provider,
     {
       workingBranchName: workingBranchResult.name,
-      triggerBranchName: inputs.triggerBranchName,
+      triggerBranchName: runCtx.inputs.triggerBranchName,
       associatedPrFromBranch,
     },
-    inputs,
-    config,
+    runCtx.inputs,
+    runCtx.config,
   );
   logger.stepFinish("Finished: Create or update pull request");
 
   logger.stepStart("Starting: Add labels to pull request");
-  await addLabelsToPullRequestOrThrow(provider, prNumber, config);
+  await addLabelsToPullRequestOrThrow(provider, prNumber, runCtx.config);
   logger.stepFinish("Finished: Add labels to pull request");
 
   logger.debugStepStart("Starting: Export post propose operation variables");
@@ -170,7 +202,7 @@ export async function proposeWorkflow(
 
   logger.stepStart("Starting: Execute pull request post commands");
   const postResult = await runCommandsOrThrow(
-    config.pullRequest.commandHook,
+    runCtx.config.pullRequest.commandHook,
     "post",
   );
   if (postResult) {
@@ -180,4 +212,29 @@ export async function proposeWorkflow(
   } else {
     logger.stepSkip("Skipped: Execute pull request post commands (empty)");
   }
+
+  logger.stepStart(
+    "Starting: Resolve runtime config override (pull request post commands)",
+  );
+  const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
+    runCtx.rawConfig,
+    runCtx.config,
+    runCtx.inputs.workspacePath,
+  );
+  if (_prPostRuntimeConfigResult) {
+    runCtx = {
+      ...runCtx,
+      rawConfig: _prPostRuntimeConfigResult.rawResolvedRuntime,
+      config: _prPostRuntimeConfigResult.resolvedRuntime,
+    };
+    logger.stepFinish(
+      "Finished: Resolve runtime config override (pull request post commands)",
+    );
+  } else {
+    logger.stepSkip(
+      "Skipped: Resolve runtime config override (pull request post commands)",
+    );
+  }
+
+  return runCtx;
 }

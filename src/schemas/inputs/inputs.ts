@@ -24,10 +24,10 @@ export const InputsSchema = v.pipe(
     ),
 
     configPath: v.pipe(v.string(), v.trim()),
-    configFormat: v.enum(ConfigFileFormatsWithAuto),
+    configFormat: v.optional(v.enum(ConfigFileFormatsWithAuto), "auto"),
 
     configOverride: v.pipe(v.string(), v.trim()),
-    configOverrideFormat: v.enum(ConfigFileFormatsWithAuto),
+    configOverrideFormat: v.optional(v.enum(ConfigFileFormatsWithAuto), "auto"),
 
     sourceMode: v.pipe(
       v.union([v.enum(SourceModeOptions), SourceModeSchema]),
