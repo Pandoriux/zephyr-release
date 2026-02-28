@@ -4,7 +4,7 @@ import {
   githubGetNamespace,
   githubGetRepositoryName,
 } from "./repository.ts";
-import type { OctokitClient } from "./octokit.ts";
+import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { isGitHubErrorResponse } from "./utils/error-validations.ts";
 import { joinUrlSegments } from "../../utils/transformers/url.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
@@ -33,7 +33,7 @@ export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
   ).href;
 }
 
-export async function githubGetCompareTagUrlFromCurrentToLatest(
+async function githubGetCompareTagUrlFromCurrentToLatest(
   octokit: OctokitClient,
   currentTag: string,
   skip: number = 0,
@@ -81,7 +81,7 @@ export async function githubGetCompareTagUrlFromCurrentToLatest(
   ).href;
 }
 
-export async function githubGetLatestReleaseTagOrThrow(
+async function githubGetLatestReleaseTagOrThrow(
   octokit: OctokitClient,
 ): Promise<string | undefined> {
   try {
@@ -101,7 +101,7 @@ export async function githubGetLatestReleaseTagOrThrow(
   }
 }
 
-export async function githubCreateTagOrThrow(
+async function githubCreateTagOrThrow(
   octokit: OctokitClient,
   tagName: string,
   commitHash: string,
@@ -136,4 +136,37 @@ export async function githubCreateTagOrThrow(
   });
 
   return { name: tagName, hash: finalHash, targetHash: commitHash };
+}
+
+export function makeGithubGetCompareTagUrlFromCurrentToLatest(
+  getOctokit: GetOctokitFn,
+) {
+  return (currentTag: string, skip?: number) =>
+    githubGetCompareTagUrlFromCurrentToLatest(
+      getOctokit(),
+      currentTag,
+      skip,
+    );
+}
+
+export function makeGithubGetLatestReleaseTagOrThrow(getOctokit: GetOctokitFn) {
+  return () => githubGetLatestReleaseTagOrThrow(getOctokit());
+}
+
+export function makeGithubCreateTagOrThrow(getOctokit: GetOctokitFn) {
+  return (
+    tagName: string,
+    commitHash: string,
+    tagType: TagTypeOption,
+    message: string,
+    tagger?: TaggerRequest,
+  ) =>
+    githubCreateTagOrThrow(
+      getOctokit(),
+      tagName,
+      commitHash,
+      tagType,
+      message,
+      tagger,
+    );
 }

@@ -1,4 +1,4 @@
-import type { OctokitClient } from "./octokit.ts";
+import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import type {
   ProviderAssetParams,
   ProviderRelease,
@@ -6,7 +6,7 @@ import type {
 } from "../../types/providers/release.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
-export async function githubCreateReleaseOrThrow(
+async function githubCreateReleaseOrThrow(
   octokit: OctokitClient,
   tagName: string,
   title: string,
@@ -33,7 +33,7 @@ export async function githubCreateReleaseOrThrow(
   };
 }
 
-export async function githubAttachReleaseAssetOrThrow(
+async function githubAttachReleaseAssetOrThrow(
   octokit: OctokitClient,
   releaseId: string,
   asset: ProviderAssetParams,
@@ -54,4 +54,25 @@ export async function githubAttachReleaseAssetOrThrow(
       },
     },
   );
+}
+
+export function makeGithubCreateReleaseOrThrow(getOctokit: GetOctokitFn) {
+  return (
+    tagName: string,
+    title: string,
+    body: string,
+    options: ProviderReleaseOptions,
+  ) =>
+    githubCreateReleaseOrThrow(
+      getOctokit(),
+      tagName,
+      title,
+      body,
+      options,
+    );
+}
+
+export function makeGithubAttachReleaseAssetOrThrow(getOctokit: GetOctokitFn) {
+  return (releaseId: string, asset: ProviderAssetParams) =>
+    githubAttachReleaseAssetOrThrow(getOctokit(), releaseId, asset);
 }

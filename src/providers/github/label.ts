@@ -1,11 +1,11 @@
 import * as v from "@valibot/valibot";
-import type { OctokitClient } from "./octokit.ts";
+import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import { isGitHubErrorResponse } from "./utils/error-validations.ts";
 import { taskLogger } from "../../tasks/logger.ts";
 import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 
-export async function githubAddLabelsToPullRequestOrThrow(
+async function githubAddLabelsToPullRequestOrThrow(
   octokit: OctokitClient,
   prNumber: number,
   labelOptions: ProviderLabelOptions,
@@ -38,7 +38,7 @@ export async function githubAddLabelsToPullRequestOrThrow(
         "Failed to add labels (status 422). Retrying with only existing labels...",
       );
 
-      const existingLabelNames = await _githubGetAllLabelNames(octokit);
+      const existingLabelNames = await githubGetAllLabelNames(octokit);
       const labelsToAdd = initialLabels.filter((name: string) =>
         existingLabelNames.has(name)
       );
@@ -75,7 +75,7 @@ export async function githubAddLabelsToPullRequestOrThrow(
         "Failed to add labels (status 422). Ensuring labels exist and retrying once...",
       );
 
-      const existingLabelNames = await _githubGetAllLabelNames(octokit);
+      const existingLabelNames = await githubGetAllLabelNames(octokit);
       const labelsToAdd: string[] = [];
 
       for (const label of requiredLabels) {
@@ -123,7 +123,7 @@ const RawLabelsPageSchema = v.object({
   }),
 });
 
-async function _githubGetAllLabelNames(
+async function githubGetAllLabelNames(
   octokit: OctokitClient,
 ): Promise<Set<string>> {
   const labelNames = new Set<string>();
@@ -163,7 +163,7 @@ async function _githubGetAllLabelNames(
   return labelNames;
 }
 
-export async function githubRemoveLabelFromPullRequestOrThrow(
+async function githubRemoveLabelFromPullRequestOrThrow(
   octokit: OctokitClient,
   prNumber: number,
   label: string,
@@ -174,4 +174,18 @@ export async function githubRemoveLabelFromPullRequestOrThrow(
     issue_number: prNumber,
     name: label,
   });
+}
+
+export function makeGithubAddLabelsToPullRequestOrThrow(
+  getOctokit: GetOctokitFn,
+) {
+  return (prNumber: number, labelOptions: ProviderLabelOptions) =>
+    githubAddLabelsToPullRequestOrThrow(getOctokit(), prNumber, labelOptions);
+}
+
+export function makeGithubRemoveLabelFromPullRequestOrThrow(
+  getOctokit: GetOctokitFn,
+) {
+  return (prNumber: number, label: string) =>
+    githubRemoveLabelFromPullRequestOrThrow(getOctokit(), prNumber, label);
 }

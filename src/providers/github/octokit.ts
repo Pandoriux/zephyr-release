@@ -15,6 +15,7 @@ const OctokitInstance = Octokit.plugin(
 );
 
 export type OctokitClient = InstanceType<typeof OctokitInstance>;
+export type GetOctokitFn = () => OctokitClient;
 
 export function getOctokitClient(
   token: string,
