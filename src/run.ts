@@ -152,7 +152,7 @@ export async function run(provider: PlatformProvider) {
       },
     );
   } else {
-    if (runCtx.config.release.enabled) {
+    if (runCtx.config.release.createTag) {
       logger.info("Start Workflow: Create tag and release");
       runCtx = await releaseWorkflow(
         provider,

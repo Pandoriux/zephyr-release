@@ -9,16 +9,11 @@ import {
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import { TaggerSchema } from "./components/tagger.ts";
 import { TagTypeOptions } from "../../../constants/release-tag-options.ts";
+import { AutoStrategySchema } from "./components/auto-release-strategy.ts";
+import { DEFAULT_AUTO_RELEASE_STRATEGY } from "../../../constants/defaults/auto-release-strategy.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
-    enabled: v.pipe(
-      v.optional(v.boolean(), true),
-      v.metadata({
-        description: "Enable/disable tag and release.\n" +
-          "Default: true",
-      }),
-    ),
     commandHook: v.pipe(
       v.optional(CommandHookSchema),
       v.metadata({
@@ -28,6 +23,23 @@ export const ReleaseConfigSchema = v.pipe(
       }),
     ),
 
+    autoStrategy: v.pipe(
+      v.optional(AutoStrategySchema, DEFAULT_AUTO_RELEASE_STRATEGY),
+      v.metadata({
+        description:
+          'Strategy for triggering the release when base `mode` is set to "auto".\n' +
+          `Default: ${JSON.stringify(DEFAULT_AUTO_RELEASE_STRATEGY)}`,
+      }),
+    ),
+
+    createTag: v.pipe(
+      v.optional(v.boolean(), true),
+      v.metadata({
+        description:
+          "Enable/disable tag creation. If disabled, create release note will also be skipped.\n" +
+          "Default: true",
+      }),
+    ),
     tagNameTemplate: v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_TAG_NAME_TEMPLATE),
       v.metadata({
@@ -70,12 +82,11 @@ export const ReleaseConfigSchema = v.pipe(
       }),
     ),
 
-    skipReleaseNote: v.pipe(
-      v.optional(v.boolean(), false),
+    createReleaseNote: v.pipe(
+      v.optional(v.boolean(), true),
       v.metadata({
-        description:
-          "If enabled, only the tag will be created, no release note will be made.\n" +
-          "Default: false",
+        description: "Enable/disable release note creation.\n" +
+          "Default: true",
       }),
     ),
     prerelease: v.pipe(

@@ -128,7 +128,7 @@ These variables are available starting from the first [`release > command-hook >
 - **tagHash:** Git tag hash created for the release  
   Export: zr-tag-hash; Env: ZR_TAG_HASH
 
-- **releaseId:** Platform-specific release identifier (for example, GitHub release ID). May be empty if no release was created (for example, when `skipReleaseNote` is enabled or the platform does not support releases)  
+- **releaseId:** Platform-specific release identifier (for example, GitHub release ID). May be empty if no release was created (for example, when `createReleaseNote` is disabled or the platform does not support releases)  
   Export: zr-release-id; Env: ZR_RELEASE_ID
 
 - **releaseUploadUrl:** Platform-specific upload URL for release assets (for example, GitHub release upload URL). May be empty if not supported or no release was created  

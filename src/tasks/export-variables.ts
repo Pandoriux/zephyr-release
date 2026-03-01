@@ -52,26 +52,25 @@ export async function exportBaseOperationVariables(
     config,
   } = options;
 
-  const resolvedTarget = prForCommit
+  const operationTarget = prForCommit
     ? OperationKinds.release
     : OperationKinds.propose;
 
-  const resolvedJobs: OperationJob[] = [];
-  switch (resolvedTarget) {
+  const operationJobs: OperationJob[] = [];
+  switch (operationTarget) {
     case "propose":
-      // when add autorelease in the future, we wont push it it, TODO handle that
       if (prFromBranch) {
-        resolvedJobs.push(OperationJobs.updatePr);
+        operationJobs.push(OperationJobs.updatePr);
       } else {
-        resolvedJobs.push(OperationJobs.createPr);
+        operationJobs.push(OperationJobs.createPr);
       }
 
       break;
     case "release":
-      resolvedJobs.push(OperationJobs.createTag);
+      operationJobs.push(OperationJobs.createTag);
 
-      if (!config.release.skipReleaseNote) {
-        resolvedJobs.push(OperationJobs.createReleaseNote);
+      if (config.release.createReleaseNote) {
+        operationJobs.push(OperationJobs.createReleaseNote);
       }
 
       break;
@@ -99,10 +98,10 @@ export async function exportBaseOperationVariables(
     workingBranchRef: workingBranchResult.ref,
     workingBranchHash: workingBranchResult.object.sha,
 
-    operation: resolvedTarget,
-    jobs: JSON.stringify(resolvedJobs),
+    operation: operationTarget,
+    jobs: JSON.stringify(operationJobs),
 
-    pullRequestNumber: resolvedTarget === "propose"
+    pullRequestNumber: operationTarget === "propose"
       ? prFromBranch?.number
       : prForCommit?.number,
     patternContext: await stringifyCurrentPatternContext(),

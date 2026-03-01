@@ -132,7 +132,7 @@ export async function releaseWorkflow(
 
   logger.stepStart("Starting: Create release");
   let createdReleaseNote: ProviderRelease | undefined;
-  if (!runCtx.config.release.skipReleaseNote) {
+  if (runCtx.config.release.createReleaseNote) {
     createdReleaseNote = await createRelease(
       provider,
       runCtx.inputs,
@@ -141,7 +141,7 @@ export async function releaseWorkflow(
     logger.stepFinish("Finished: Create release");
   } else {
     logger.stepSkip(
-      "Skipped: Create release (config skip release note is true)",
+      "Skipped: Create release (config create release note is false)",
     );
   }
 
@@ -155,7 +155,7 @@ export async function releaseWorkflow(
     logger.stepFinish("Finished: Attach release assets");
   } else {
     logger.stepSkip(
-      "Skipped: Attach release assets (no assets to attach or config skip release note is true)",
+      "Skipped: Attach release assets (no assets to attach or config create release note is false)",
     );
   }
 

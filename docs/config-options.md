@@ -14,6 +14,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
 - [Options](#options)
   - [name (Optional)](#name-optional)
   - [time-zone (Optional)](#time-zone-optional)
+  - [mode (Optional)](#mode-optional)
   - [command-hook (Optional)](#command-hook-optional)
   - [runtime-config-override (Optional)](#runtime-config-override-optional)
   - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
@@ -71,14 +72,15 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
     - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
   - [release (Optional)](#release-optional)
-    - [release \> enabled (Optional)](#release--enabled-optional)
     - [release \> command-hook (Optional)](#release--command-hook-optional)
+    - [release \> auto-strategy (Optional)](#release--auto-strategy-optional)
+    - [release \> create-tag (Optional)](#release--create-tag-optional)
     - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
     - [release \> tag-type (Optional)](#release--tag-type-optional)
     - [release \> tag-message-template (Optional)](#release--tag-message-template-optional)
     - [release \> tag-message-template-path (Optional)](#release--tag-message-template-path-optional)
     - [release \> tagger (Optional)](#release--tagger-optional)
-    - [release \> skip-release-note (Optional)](#release--skip-release-note-optional)
+    - [release \> create-release-note (Optional)](#release--create-release-note-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> draft (Optional)](#release--draft-optional)
     - [release \> set-latest (Optional)](#release--set-latest-optional)
@@ -96,6 +98,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [BumpRuleExtension](#bumpruleextension)
   - [SemverExtension](#semverextension)
   - [Label](#label)
+  - [AutoStrategy](#autostrategy)
   - [Tagger](#tagger)
   
 ## Options
@@ -114,6 +117,18 @@ Default: `"UTC"`
 
 IANA time zone used to format and display times.  
 This value is also available for use in [string templates](./string-templates-and-patterns.md) as `{{ timeZone }}`.
+
+### mode (Optional)
+
+Type: `"proposal" | "auto"`  
+Default: `"proposal"`
+
+Defines the execution strategy.
+
+- **`"proposal"`**: Routes updates through a Pull Request. This is the default behavior where Zephyr Release creates or updates a PR with version bumps and changelog changes.
+- **`"auto"`**: Bypasses the PR and commits directly to the branch. When set to `"auto"`, the release operation will commit changes directly to the branch without creating a PR.
+
+If choosing `"auto"`, see [`release > auto-strategy`](#release--auto-strategy-optional) for configuring when releases are triggered.
 
 ### command-hook (Optional)
 
@@ -573,16 +588,9 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`enabled`](#release--enabled-optional), [`command-hook`](#release--command-hook-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`skip-release-note`](#release--skip-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
+**Properties:** [`command-hook`](#release--command-hook-optional), [`auto-strategy`](#release--auto-strategy-optional), [`create-tag`](#release--create-tag-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`create-release-note`](#release--create-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
 
 Configuration specific to tags and releases.
-
-#### release > enabled (Optional)
-
-Type: `boolean`  
-Default: `true`
-
-Enable/disable tag and release. Useful if for any reason, you want to use Zephyr Release only for the pull request proposal.
 
 #### release > command-hook (Optional)
 
@@ -593,6 +601,24 @@ Pre/post command lists to run around the release operation. Each command runs fr
 List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
+
+#### release > auto-strategy (Optional)
+
+Type: [`AutoStrategy`](#autostrategy)  
+Default: `{ type: "commit-types" }`
+
+Strategy for triggering the release when base [`mode`](#mode-optional) is set to `"auto"`.
+
+This property is only relevant when `mode` is set to `"auto"`. It defines the conditions under which a release will be automatically triggered and committed directly to the branch.
+
+See [`AutoStrategy`](#autostrategy) for the type definition.
+
+#### release > create-tag (Optional)
+
+Type: `boolean`  
+Default: `true`
+
+Enable/disable tag creation. If disabled, create release note will also be skipped.
 
 #### release > tag-name-template (Optional)
 
@@ -633,12 +659,12 @@ Custom identity and timestamp information for the Git tag. If omitted, defaults 
 
 See [`Tagger`](#tagger) for the type definition.
 
-#### release > skip-release-note (Optional)
+#### release > create-release-note (Optional)
 
 Type: `boolean`  
-Default: `false`
+Default: `true`
 
-If enabled, only the tag will be created, no release note will be made.
+Enable/disable release note creation.
 
 #### release > prerelease (Optional)
 
@@ -808,6 +834,26 @@ Type: `object`
 - `name` (Required): Label name.
 - `description` (Optional): Label description.
 - `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`
+
+### AutoStrategy
+
+A discriminated union based on the `type` field. Defines the strategy for automatically triggering releases when [`mode`](#mode-optional) is set to `"auto"`.
+
+**Type: `"commit-types"`** — Triggers a release automatically when the pushed commits contain specific allowed types.
+
+- `type` (Required): `"commit-types"`
+- `allowedTypes` (Optional): Allowed commit types that can trigger a release, must be chosen from the base [`commit-types`](#commit-types-optional). Accepts a single string or an array of strings. If omitted, all types in the base `commit-types` are allowed.
+
+**Type: `"commit-footer"`** — Triggers a release automatically when a specific token is found in the commit footers.
+
+- `type` (Required): `"commit-footer"`
+- `token` (Required): The conventional commit footer token to look for (e.g., `"Autorelease"`).
+- `value` (Optional): The specific value the footer token must have (e.g., `"true"`). If omitted, the strategy triggers as long as the token exists.
+
+**Type: `"flag"`** — Triggers a release based on a strict boolean flag. Ideal for dynamic configuration overrides and custom script evaluations.
+
+- `type` (Required): `"flag"`
+- `value` (Optional): A hardcoded boolean flag to explicitly force or skip the release trigger. Default: `false`
 
 ### Tagger
 

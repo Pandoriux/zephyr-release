@@ -8,6 +8,7 @@ import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import { RuntimeConfigOverrideSchema } from "./components/runtime-config-override.ts";
+import { ExecutionModes } from "../../../constants/base-execution-modes.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
@@ -22,6 +23,16 @@ export const BaseConfigSchema = v.object({
       description:
         "IANA timezone used to display times, available in string templates as {{ timeZone }}.\n" +
         'Default: "UTC"',
+    }),
+  ),
+  mode: v.pipe(
+    v.optional(v.enum(ExecutionModes), "proposal"),
+    v.metadata({
+      description:
+        'Defines the execution strategy. "proposal" routes updates through a Pull Request. ' +
+        '"auto" bypasses the PR and commits directly to the branch.\n' +
+        'If choosing "auto", see release `autoStrategy`.\n' +
+        'Default: "proposal"',
     }),
   ),
 

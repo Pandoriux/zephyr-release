@@ -8,24 +8,24 @@ import {
 } from "../../../../constants/semver-extension-options.ts";
 import { trimNonEmptyStringSchema } from "../../../string.ts";
 
-function SemverExtensionTypeSchema<T extends SemverExtensionType>(type: T) {
+function SemverExtensionTypeSchema<T extends SemverExtensionType>(
+  type: T,
+  description: string,
+) {
   return v.pipe(
     v.literal(type),
     v.metadata({
-      description:
-        "Specifies the type of pre-release/build identifier/metadata.\n" +
-        '"static": A stable label that should not change often. Examples: "alpha", "beta", "rc".\n' +
-        '"dynamic": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n' +
-        '"incremental": Integer value that auto-increments by 1.\n' +
-        '"timestamp": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n' +
-        '"date": A date string that changes over time.',
+      description,
     }),
   );
 }
 
 export const SemverExtensionSchema = v.variant("type", [
   v.object({
-    type: SemverExtensionTypeSchema("static"),
+    type: SemverExtensionTypeSchema(
+      "static",
+      "A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".",
+    ),
     value: v.pipe(
       trimNonEmptyStringSchema,
       v.metadata({
@@ -36,7 +36,10 @@ export const SemverExtensionSchema = v.variant("type", [
   }),
 
   v.object({
-    type: SemverExtensionTypeSchema("dynamic"),
+    type: SemverExtensionTypeSchema(
+      "dynamic",
+      "A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).",
+    ),
     value: v.pipe(
       v.optional(v.pipe(v.string(), v.trim())),
       v.metadata({
@@ -54,7 +57,10 @@ export const SemverExtensionSchema = v.variant("type", [
   }),
 
   v.object({
-    type: SemverExtensionTypeSchema("incremental"),
+    type: SemverExtensionTypeSchema(
+      "incremental",
+      "Integer value that auto-increments by 1.",
+    ),
     initialValue: v.pipe(
       v.optional(v.pipe(v.number(), v.safeInteger()), 0),
       v.metadata({
@@ -85,7 +91,10 @@ export const SemverExtensionSchema = v.variant("type", [
   }),
 
   v.object({
-    type: SemverExtensionTypeSchema("timestamp"),
+    type: SemverExtensionTypeSchema(
+      "timestamp",
+      "Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).",
+    ),
     unit: v.pipe(
       v.optional(v.enum(SemverExtensionTimestampUnitTypes), "ms"),
       v.metadata({
@@ -96,7 +105,10 @@ export const SemverExtensionSchema = v.variant("type", [
   }),
 
   v.object({
-    type: SemverExtensionTypeSchema("date"),
+    type: SemverExtensionTypeSchema(
+      "date",
+      "A date string that changes over time.",
+    ),
     format: v.pipe(
       v.optional(v.enum(SemverExtensionDateFormatTypes), "YYYYMMDD"),
       v.metadata({
