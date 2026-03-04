@@ -134,3 +134,10 @@ These variables are available starting from the first [`release > command-hook >
 
 - **releaseUploadUrl:** Platform-specific upload URL for release assets (for example, GitHub release upload URL). May be empty if not supported or no release was created  
   Export: zr-release-upload-url; Env: ZR_RELEASE_UPLOAD_URL
+
+### Final (available at the end)
+
+These variables are available for [`command-hook > post`](./config-options.md#command-hook-optional) command runs.
+
+- **outcome:** The final status of the operation. Possible values are "success" (completed successfully), "skipped" (exited intentionally and safely, e.g., no version bump required), or "failure" (stopped by an unexpected error)  
+  Export: zr-outcome; Env: ZR_OUTCOME

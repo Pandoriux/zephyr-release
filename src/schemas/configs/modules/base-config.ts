@@ -41,6 +41,8 @@ export const BaseConfigSchema = v.object({
     v.metadata({
       description:
         "Pre/post command lists to run around the main operation. Each command runs from the repository root.\n" +
+        "Post commands will always run regardless of operation outcome (success, skipped or failure). " +
+        "It is recommended to check the outcome export variable if your script should only run under specific conditions.\n" +
         "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
     }),
   ),

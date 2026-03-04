@@ -1,5 +1,8 @@
 import type { ExecutionMode } from "../constants/execution-modes.ts";
-import type { OperationKind } from "../constants/operation-variables.ts";
+import type {
+  OperationKind,
+  OperationOutcome,
+} from "../constants/operation-variables.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
 export type OperationVariables =
@@ -33,6 +36,8 @@ export type OperationVariables =
     tagHash: string;
     releaseId?: string | number;
     releaseUploadUrl?: string;
+
+    outcome: OperationOutcome;
 
     // Dynamic operation variables
     config: string;
@@ -84,3 +89,5 @@ export type PostReleaseOperationVariables = Pick<
   OperationVariables,
   "tagHash" | "releaseId" | "releaseUploadUrl"
 >;
+
+export type FinalOperationVariables = Pick<OperationVariables, "outcome">;

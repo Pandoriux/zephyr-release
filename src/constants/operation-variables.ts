@@ -15,3 +15,12 @@ export const OperationJobs = {
 } as const;
 
 export type OperationJob = typeof OperationJobs[keyof typeof OperationJobs];
+
+const OperationOutcomes = {
+  success: "success",
+  skipped: "skipped",
+  failure: "failure",
+} as const;
+
+export type OperationOutcome =
+  typeof OperationOutcomes[keyof typeof OperationOutcomes];

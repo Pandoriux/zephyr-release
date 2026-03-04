@@ -143,6 +143,8 @@ Type: [`CommandHook`](#commandhook)
 
 Pre/post command lists to run around the main operation. Each command runs from the repository root.
 
+Unlike `pre` commands, `post` commands are always executed regardless of the operation's final status, whether it was a success, skipped, or a failure. If your post script should only run under a specific condition, you should check the export environment variable within your script.
+
 List of exposed env variables: see [Export operation variables](./export-variables.md).
 
 See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.

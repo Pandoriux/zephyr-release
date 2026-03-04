@@ -2,6 +2,7 @@ import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type {
   BaseOperationVariables,
   DynamicOperationVariables,
+  FinalOperationVariables,
   PostProposeOperationVariables,
   PostReleaseOperationVariables,
   PreProposeOperationVariables,
@@ -24,6 +25,7 @@ import {
   OperationJobs,
   type OperationKind,
   OperationKinds,
+  type OperationOutcome,
 } from "../constants/operation-variables.ts";
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
@@ -260,6 +262,25 @@ export async function exportPostReleaseOperationVariables(
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();
   });
+
+  Object.entries(prepareExportObject).forEach(([k, v]) => {
+    provider.exportOutputs(toExportOutputKey(k), v);
+    provider.exportEnvVars(toExportEnvVarKey(k), v);
+  });
+}
+
+export function exportFinalOperationVariables(
+  provider: PlatformProvider,
+  outcome: OperationOutcome,
+) {
+  const prepareExportObject = {
+    outcome,
+  } satisfies FinalOperationVariables;
+
+  taskLogger.debug(
+    "Final operation variables to export:\n" +
+      JSON.stringify(prepareExportObject, null, 2),
+  );
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
     provider.exportOutputs(toExportOutputKey(k), v);
