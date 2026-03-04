@@ -27,7 +27,7 @@ interface ReleaseWorkflowOptions {
   currentRunCtx: OperationRunContext;
 }
 
-export async function releaseWorkflow(
+export async function reviewReleaseWorkflow(
   provider: PlatformProvider,
   opts: ReleaseWorkflowOptions,
 ): Promise<OperationRunContext> {

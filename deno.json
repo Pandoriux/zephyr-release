@@ -64,7 +64,8 @@
   "compilerOptions": {
     "lib": ["dom", "deno.ns"],
 
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true
   },
 
   "unstable": ["raw-imports"],

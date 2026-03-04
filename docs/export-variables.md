@@ -66,10 +66,11 @@ These variables are available starting from the first [`command-hook > pre`](./c
 
 <br>
 
-- **operation:** "propose" when create/update pull request, "release" when create tag and publish release  
+- **mode:** The execution mode. It is the same as the config [`mode`](./config-options.md#mode-optional) option and is included here for convenience  
+  Export: zr-mode; Env: ZR_MODE
+- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when create/update pull request, "release" when create tag and publish release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
   Export: zr-operation; Env: ZR_OPERATION
-
-- **jobs:** Stringified array of jobs; "create-pr" or "update-pr" when **operation** is "propose", "create-tag" and/or "create-release-note" when **operation** is "release"  
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release-note" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-tag" and/or "create-release-note" and/or "create-commit"  
   Export: zr-jobs; Env: ZR_JOBS
 
 ### Dynamic (available at all time)

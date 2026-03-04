@@ -22,6 +22,7 @@ import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/
 import {
   type OperationJob,
   OperationJobs,
+  type OperationKind,
   OperationKinds,
 } from "../constants/operation-variables.ts";
 import type { ProviderInputs } from "../types/providers/inputs.ts";
@@ -52,9 +53,20 @@ export async function exportBaseOperationVariables(
     config,
   } = options;
 
-  const operationTarget = prForCommit
-    ? OperationKinds.release
-    : OperationKinds.propose;
+  let operationTarget: OperationKind | undefined;
+  switch (config.mode) {
+    case "review":
+      operationTarget = prForCommit
+        ? OperationKinds.release
+        : OperationKinds.propose;
+
+      break;
+
+    case "auto":
+      operationTarget = OperationKinds.autorelease;
+
+      break;
+  }
 
   const operationJobs: OperationJob[] = [];
   switch (operationTarget) {
@@ -66,10 +78,26 @@ export async function exportBaseOperationVariables(
       }
 
       break;
-    case "release":
-      operationJobs.push(OperationJobs.createTag);
 
-      if (config.release.createReleaseNote) {
+    case "release":
+      if (config.release.createTag) {
+        operationJobs.push(OperationJobs.createTag);
+      }
+
+      if (config.release.createTag && config.release.createReleaseNote) {
+        operationJobs.push(OperationJobs.createReleaseNote);
+      }
+
+      break;
+
+    case "autorelease":
+      operationJobs.push(OperationJobs.createCommit);
+
+      if (config.release.createTag) {
+        operationJobs.push(OperationJobs.createTag);
+      }
+
+      if (config.release.createTag && config.release.createReleaseNote) {
         operationJobs.push(OperationJobs.createReleaseNote);
       }
 
@@ -84,9 +112,6 @@ export async function exportBaseOperationVariables(
     sourceMode: rawInputs.sourceMode ?? "",
     internalSourceMode: JSON.stringify(inputs.sourceMode),
 
-    config: JSON.stringify(rawConfig, jsonValueNormalizer),
-    internalConfig: JSON.stringify(config, jsonValueNormalizer),
-
     parsedTriggerCommit: JSON.stringify(
       triggerContext.latestTriggerCommit.parsedCommit,
     ),
@@ -98,8 +123,12 @@ export async function exportBaseOperationVariables(
     workingBranchRef: workingBranchResult.ref,
     workingBranchHash: workingBranchResult.object.sha,
 
+    mode: config.mode,
     operation: operationTarget,
     jobs: JSON.stringify(operationJobs),
+
+    config: JSON.stringify(rawConfig, jsonValueNormalizer),
+    internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
     pullRequestNumber: operationTarget === "propose"
       ? prFromBranch?.number
@@ -125,13 +154,13 @@ export async function exportPreProposeOperationVariables(
   provider: PlatformProvider,
   resolvedCommitEntries: ResolvedCommit[],
   previousVersion: SemVer | undefined,
-  nextVersion: SemVer,
+  version: SemVer,
 ) {
   const prepareExportObject = {
     resolvedCommitEntries: JSON.stringify(resolvedCommitEntries),
 
     previousVersion: previousVersion ? format(previousVersion) : "",
-    version: format(nextVersion),
+    version: format(version),
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
@@ -164,7 +193,7 @@ export async function exportPostProposeOperationVariables(
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
     & PostProposeOperationVariables
-    & DynamicOperationVariables;
+    & Pick<DynamicOperationVariables, "pullRequestNumber" | "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
@@ -192,7 +221,7 @@ export async function exportPreReleaseOperationVariables(
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
     & PreReleaseOperationVariables
-    & DynamicOperationVariables;
+    & Pick<DynamicOperationVariables, "patternContext" | "pullRequestNumber">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(

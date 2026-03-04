@@ -77,7 +77,8 @@ export interface PlatformProvider {
     baseTreeHash: string,
     changesToCommit: Map<string, string>,
     message: string,
-    workingBranchName: string,
+    targetBranchName: string,
+    force?: boolean,
   ) => Promise<ProviderWorkingCommit>;
 
   createPullRequestOrThrow: (

@@ -36,7 +36,7 @@ interface ProposeWorkflowOptions {
   currentRunCtx: OperationRunContext;
 }
 
-export async function proposeWorkflow(
+export async function reviewProposeWorkflow(
   provider: PlatformProvider,
   opts: ProposeWorkflowOptions,
 ): Promise<OperationRunContext> {
@@ -166,17 +166,18 @@ export async function proposeWorkflow(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const _commitResult = await commitChangesToBranch(provider, {
-    triggerCommitHash: runCtx.inputs.triggerCommitHash,
-    baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
-    changesToCommit: changesData,
-    workingBranchName: workingBranchResult.name,
-  }, {
-    pullRequest: {
-      titleTemplate: runCtx.config.pullRequest.titleTemplate,
-      titleTemplatePath: runCtx.config.pullRequest.titleTemplatePath,
+  const _commitResult = await commitChangesToBranch(
+    provider,
+    runCtx.inputs,
+    runCtx.config,
+    {
+      triggerCommitHash: runCtx.inputs.triggerCommitHash,
+      baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
+      changesToCommit: changesData,
+      targetBranchName: workingBranchResult.name,
+      force: true,
     },
-  });
+  );
   logger.stepFinish("Finished: Commit changes");
 
   logger.stepStart("Starting: Create or update pull request");

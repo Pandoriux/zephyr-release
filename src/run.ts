@@ -13,13 +13,14 @@ import {
   findPullRequestFromBranchOrThrow,
 } from "./tasks/pull-request.ts";
 import { exportBaseOperationVariables } from "./tasks/export-variables.ts";
-import { proposeWorkflow } from "./workflows/propose.ts";
-import { releaseWorkflow } from "./workflows/release.ts";
 import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
 import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
 import { validateCurrentOperationTriggerCtxOrExit } from "./tasks/operation.ts";
+import { reviewWorkflow } from "./workflows/review.ts";
 import type { OperationRunContext } from "./types/operation-context.ts";
+import type { ProviderPullRequest } from "./types/providers/pull-request.ts";
+import { autoWorkflow } from "./workflows/auto.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -49,6 +50,7 @@ export async function run(provider: PlatformProvider) {
   const triggerContext = validateCurrentOperationTriggerCtxOrExit(
     provider,
     runCtx.config.commitTypes,
+    runCtx.config.mode,
   );
   logger.stepFinish("Finished: Parse and validate current trigger context");
 
@@ -76,22 +78,26 @@ export async function run(provider: PlatformProvider) {
   );
   logger.stepFinish("Finished: Ensure working branch is prepared");
 
-  logger.stepStart("Starting: Get associated pull requests");
-  const associatedPrForCommit = await findPullRequestForCommitOrThrow(
-    provider,
-    workingBranchResult.name,
-    runCtx.inputs,
-    runCtx.config,
-  );
-  const associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
-    provider,
-    workingBranchResult.name,
-    runCtx.inputs,
-    runCtx.config,
-  );
-  logger.stepFinish(
-    "Finished: Get associated pull requests",
-  );
+  let associatedPrForCommit: ProviderPullRequest | undefined;
+  let associatedPrFromBranch: ProviderPullRequest | undefined;
+  if (runCtx.config.mode === "review") {
+    logger.stepStart("Starting: Get associated pull requests");
+    associatedPrForCommit = await findPullRequestForCommitOrThrow(
+      provider,
+      workingBranchResult.name,
+      runCtx.inputs,
+      runCtx.config,
+    );
+    associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
+      provider,
+      workingBranchResult.name,
+      runCtx.inputs,
+      runCtx.config,
+    );
+    logger.stepFinish(
+      "Finished: Get associated pull requests",
+    );
+  }
 
   logger.debugStepStart("Starting: Export base operation variables");
   await exportBaseOperationVariables(provider, {
@@ -137,32 +143,25 @@ export async function run(provider: PlatformProvider) {
     );
   }
 
-  // Main operation workflow
-  if (!associatedPrForCommit) {
-    logger.info(
-      "Start Workflow: Create/Update release proposal pull request",
-    );
-    runCtx = await proposeWorkflow(
-      provider,
-      {
-        workingBranchResult,
-        associatedPrFromBranch,
-        triggerContext,
-        currentRunCtx: runCtx,
-      },
-    );
+  // Main operation workflow //
+  if (runCtx.config.mode === "review") {
+    logger.info('Start "Review" Workflow');
+
+    runCtx = await reviewWorkflow(provider, runCtx, {
+      workingBranchResult,
+      associatedPrForCommit,
+      associatedPrFromBranch,
+      triggerContext,
+    });
   } else {
-    if (runCtx.config.release.createTag) {
-      logger.info("Start Workflow: Create tag and release");
-      runCtx = await releaseWorkflow(
-        provider,
-        { associatedPrForCommit, currentRunCtx: runCtx },
-      );
-    } else {
-      logger.info(
-        "Skip Workflow: Create tag and release (disabled in config)",
-      );
-    }
+    logger.info('Start "Auto" Workflow');
+
+    runCtx = await autoWorkflow(provider, runCtx, {
+      workingBranchResult,
+      associatedPrForCommit,
+      associatedPrFromBranch,
+      triggerContext,
+    });
   }
 
   logger.stepStart("Starting: Execute base post commands");

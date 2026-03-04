@@ -1,4 +1,4 @@
-
+run.ts nên catch error, nếu safe exit thì chạy nốt post base cmd như thường
 
 
 ---> exportBaseOperationVariables()

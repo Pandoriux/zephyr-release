@@ -1,3 +1,4 @@
+import type { ExecutionMode } from "../constants/execution-modes.ts";
 import type { OperationKind } from "../constants/operation-variables.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
@@ -9,9 +10,6 @@ export type OperationVariables =
     sourceMode: string;
     internalSourceMode: string;
 
-    config: string;
-    internalConfig: string;
-
     parsedTriggerCommit: string;
     parsedTriggerCommitList: string;
 
@@ -19,8 +17,9 @@ export type OperationVariables =
     workingBranchRef: string;
     workingBranchHash: string;
 
+    mode: ExecutionMode;
     operation: OperationKind;
-    /** Stringify OperationJobs[] */
+    /** Stringified OperationJobs[] */
     jobs: string;
 
     // versioning and changelog
@@ -36,6 +35,9 @@ export type OperationVariables =
     releaseUploadUrl?: string;
 
     // Dynamic operation variables
+    config: string;
+    internalConfig: string;
+
     patternContext: string;
     pullRequestNumber: number | undefined;
   };
@@ -45,20 +47,22 @@ export type BaseOperationVariables = Pick<
   | keyof Omit<InputsOutput, "token" | "sourceMode">
   | "sourceMode"
   | "internalSourceMode"
-  | "config"
-  | "internalConfig"
   | "parsedTriggerCommit"
   | "parsedTriggerCommitList"
   | "workingBranchName"
   | "workingBranchRef"
   | "workingBranchHash"
+  | "mode"
   | "operation"
   | "jobs"
 >;
 
 export type DynamicOperationVariables = Pick<
   OperationVariables,
-  "patternContext" | "pullRequestNumber"
+  | "config"
+  | "internalConfig"
+  | "patternContext"
+  | "pullRequestNumber"
 >;
 
 export type PreProposeOperationVariables = Pick<

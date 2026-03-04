@@ -20,7 +20,6 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
-  - [local-files-to-commit (Optional)](#local-files-to-commit-optional)
   - [commit-types (Optional)](#commit-types-optional)
     - [commit... \> type (Required)](#commit--type-required)
     - [commit... \> section (Optional)](#commit--section-optional)
@@ -53,6 +52,14 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-footer-template-path (Optional)](#changelog--release-footer-template-path-optional)
     - [changelog \> release-body-override (Optional)](#changelog--release-body-override-optional)
     - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
+  - [commit (Optional)](#commit-optional)
+    - [commit \> header-template (Optional)](#commit--header-template-optional)
+    - [commit \> header-template-path (Optional)](#commit--header-template-path-optional)
+    - [commit \> body-template (Optional)](#commit--body-template-optional)
+    - [commit \> body-template-path (Optional)](#commit--body-template-path-optional)
+    - [commit \> footer-template (Optional)](#commit--footer-template-optional)
+    - [commit \> footer-template-path (Optional)](#commit--footer-template-path-optional)
+    - [commit \> local-files-to-commit (Optional)](#commit--local-files-to-commit-optional)
   - [pull-request (Optional)](#pull-request-optional)
     - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
     - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
@@ -120,12 +127,12 @@ This value is also available for use in [string templates](./string-templates-an
 
 ### mode (Optional)
 
-Type: `"proposal" | "auto"`  
-Default: `"proposal"`
+Type: `"review" | "auto"`  
+Default: `"review"`
 
 Defines the execution strategy.
 
-- **`"proposal"`**: Routes updates through a Pull Request. This is the default behavior where Zephyr Release creates or updates a PR with version bumps and changelog changes.
+- **`"review"`**: Routes updates through a Pull Request. This is the default behavior where Zephyr Release creates or updates a PR with version bumps and changelog changes.
 - **`"auto"`**: Bypasses the PR and commits directly to the branch. When set to `"auto"`, the release operation will commit changes directly to the branch without creating a PR.
 
 If choosing `"auto"`, see [`release > auto-strategy`](#release--auto-strategy-optional) for configuring when releases are triggered.
@@ -178,14 +185,6 @@ When reading or bumping versions, the action uses the primary file's version to 
 Other version files (if any) are then synchronized to match the primary version.
 
 See [`VersionFile`](#versionfile) for the type definition.
-
-### local-files-to-commit (Optional)
-
-Type: `string | string[]`
-
-Additional changed local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
-
-To include all files, you can use a glob pattern such as `"**/*"`.
 
 ### commit-types (Optional)
 
@@ -448,6 +447,67 @@ Type: `string`
 Path to text file containing changelog release body override, will take precedence over `release-body-override`.
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+### commit (Optional)
+
+Type: `object`  
+**Properties:** [`header-template`](#commit--header-template-optional), [`header-template-path`](#commit--header-template-path-optional), [`body-template`](#commit--body-template-optional), [`body-template-path`](#commit--body-template-path-optional), [`footer-template`](#commit--footer-template-optional), [`footer-template-path`](#commit--footer-template-path-optional), [`local-files-to-commit`](#commit--local-files-to-commit-optional)
+
+Configuration specific to commits. These templates are used to build the commit message when Zephyr Release creates a commit.
+
+#### commit > header-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_COMMIT_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for commit header, using with string patterns like `{{ version }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### commit > header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing commit header template. Overrides `header-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### commit > body-template (Optional)
+
+Type: `string`
+
+String template for commit body, using with string patterns like `{{ changelogRelease }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### commit > body-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing commit body template. Overrides `body-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### commit > footer-template (Optional)
+
+Type: `string`
+
+String template for commit footer, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### commit > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing commit footer template. Overrides `footer-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### commit > local-files-to-commit (Optional)
+
+Type: `string | string[]`
+
+Additional changed local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+
+To include all files, you can use a glob pattern such as `"**/*"`.
 
 ### pull-request (Optional)
 

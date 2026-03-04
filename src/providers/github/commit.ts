@@ -144,7 +144,8 @@ async function githubCreateCommitOnBranchOrThrow(
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
     message: string;
-    workingBranchName: string;
+    targetBranchName: string;
+    force?: boolean;
   },
 ): Promise<ProviderWorkingCommit> {
   const {
@@ -152,7 +153,8 @@ async function githubCreateCommitOnBranchOrThrow(
     baseTreeHash,
     changesToCommit,
     message,
-    workingBranchName,
+    targetBranchName,
+    force,
   } = data;
 
   const owner = githubGetNamespace();
@@ -181,13 +183,14 @@ async function githubCreateCommitOnBranchOrThrow(
     parents: [triggerCommitHash],
   });
 
-  // We are effectively "overwriting" the branch history with this new timeline.
+  // If true (in review mode), we are effectively "overwriting" the branch history with this new timeline
+  // If false (in auto mode), throws error if there are newer commits
   await octokit.rest.git.updateRef({
     owner,
     repo,
-    ref: `heads/${workingBranchName}`,
+    ref: `heads/${targetBranchName}`,
     sha: createCommitRes.data.sha,
-    force: true,
+    force,
   });
 
   return {
@@ -252,14 +255,16 @@ export function makeGithubCreateCommitOnBranchOrThrow(
     baseTreeHash: string,
     changesToCommit: Map<string, string>,
     message: string,
-    workingBranchName: string,
+    targetBranchName: string,
+    force?: boolean,
   ) =>
     githubCreateCommitOnBranchOrThrow(getOctokit(), {
       triggerCommitHash,
       baseTreeHash,
       changesToCommit,
       message,
-      workingBranchName,
+      targetBranchName,
+      force,
     });
 }
 

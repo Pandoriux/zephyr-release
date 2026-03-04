@@ -4,6 +4,7 @@ import { BumpStrategyConfigSchema } from "./modules/bump-strategy-config.ts";
 import { PullRequestConfigSchema } from "./modules/pull-request-config.ts";
 import { ReleaseConfigSchema } from "./modules/release-config.ts";
 import { ChangelogConfigSchema } from "./modules/changelog-config.ts";
+import { CommitConfigSchema } from "./modules/commit-config.ts";
 
 export const ConfigSchema = v.pipe(
   v.object({
@@ -12,6 +13,8 @@ export const ConfigSchema = v.pipe(
     bumpStrategy: v.optional(BumpStrategyConfigSchema, {}),
 
     changelog: v.optional(ChangelogConfigSchema, {}),
+
+    commit: v.optional(CommitConfigSchema, {}),
 
     pullRequest: v.optional(PullRequestConfigSchema, {}),
 

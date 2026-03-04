@@ -1,13 +1,18 @@
-import * as v from "@valibot/valibot";
+import { ZoneId } from "@js-joda/core";
+import "@js-joda/timezone";
+import console from "node:console";
 
-const enu = {
-  foo: "foo",
-  bar: "bar",
-} as const;
+// 1. Get the full list
+const allZones = ZoneId.getAvailableZoneIds();
 
-const schema = v.object({
-  prop: v.union([v.string(), v.enum(enu)]),
-});
+// Get the array of all unique, canonical IANA time zone IDs
+const supportedTimeZones = Intl.supportedValuesOf("timeZone");
 
-type input = v.InferInput<typeof schema>;
-type output = v.InferOutput<typeof schema>;
+console.log(`Total supported time zones: ${supportedTimeZones.length}`);
+// console.log(supportedTimeZones);
+
+// const filteredAsia = supportedTimeZones.filter((tz) => tz.startsWith("Asia"));
+// console.log(filteredAsia);
+
+console.log(supportedTimeZones.includes("Asia/Ho_Chi_Minh"));
+console.log(allZones.includes("Asia/Ho_Chi_Minh"));

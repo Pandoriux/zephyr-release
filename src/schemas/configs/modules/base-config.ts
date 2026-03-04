@@ -8,7 +8,7 @@ import { DEFAULT_COMMIT_TYPES } from "../../../constants/defaults/commit.ts";
 import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import { RuntimeConfigOverrideSchema } from "./components/runtime-config-override.ts";
-import { ExecutionModes } from "../../../constants/base-execution-modes.ts";
+import { ExecutionModes } from "../../../constants/execution-modes.ts";
 
 export const BaseConfigSchema = v.object({
   name: v.pipe(
@@ -26,13 +26,13 @@ export const BaseConfigSchema = v.object({
     }),
   ),
   mode: v.pipe(
-    v.optional(v.enum(ExecutionModes), "proposal"),
+    v.optional(v.enum(ExecutionModes), "review"),
     v.metadata({
       description:
-        'Defines the execution strategy. "proposal" routes updates through a Pull Request. ' +
+        'Defines the execution strategy. "review" routes updates through a Pull Request. ' +
         '"auto" bypasses the PR and commits directly to the branch.\n' +
         'If choosing "auto", see release `autoStrategy`.\n' +
-        'Default: "proposal"',
+        'Default: "review"',
     }),
   ),
 
@@ -86,28 +86,6 @@ export const BaseConfigSchema = v.object({
         "primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, " +
         "the first file in the array will be used.\n" +
         "About primary file: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#version-files-required",
-    }),
-  ),
-
-  localFilesToCommit: v.pipe(
-    v.optional(
-      v.union([
-        trimNonEmptyStringSchema,
-        v.pipe(
-          v.array(trimNonEmptyStringSchema),
-          v.nonEmpty(),
-        ),
-      ]),
-    ),
-    v.transform((input) => {
-      if (input !== undefined) return Array.isArray(input) ? input : [input];
-      return input;
-    }),
-    v.metadata({
-      description:
-        "Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. " +
-        'Paths are relative to the repo root. To include all files, use a glob such as "**/*".',
-      examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
     }),
   ),
 
