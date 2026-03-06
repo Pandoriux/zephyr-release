@@ -35,7 +35,7 @@ export async function reviewWorkflow(
 
   if (!associatedPrForCommit) {
     logger.info(
-      "Review Workflow: Create/Update release proposal pull request",
+      "Review Workflow: Creating/Updating release proposal pull request...",
     );
     runCtx = await reviewProposeWorkflow(provider, {
       workingBranchResult,
@@ -44,7 +44,7 @@ export async function reviewWorkflow(
       currentRunCtx: runCtx,
     });
   } else if (runCtx.config.release.createTag) {
-    logger.info("Review Workflow: Create tag and release");
+    logger.info("Review Workflow: Creating tag and release...");
     runCtx = await reviewReleaseWorkflow(provider, {
       associatedPrForCommit,
       currentRunCtx: runCtx,

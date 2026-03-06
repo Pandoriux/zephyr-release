@@ -93,7 +93,7 @@ These variables are exposed continuously throughout the operation, and their val
   For example, when there is no PR open for "propose" operation yet, the initial value will be undefined. Then the "create-pr" job will create the PR, and re-update the number. The value can now be accessed in the next cmds like ([`pull-request > command-hook > post`](./config-options.md#pull--command-hook-optional))  
   Export: zr-pull-request-number; Env: ZR_PULL_REQUEST_NUMBER
 
-### Propose (when operation is "propose")
+### Review mode - Propose (when operation is "propose")
 
 #### Pre Propose
 
@@ -115,7 +115,7 @@ These variables are available starting from the first [`pull-request > command-h
 - **committedFilePaths:** Stringified array of file paths that have been committed  
   Export: zr-committed-file-paths; Env: ZR_COMMITTED_FILE_PATHS
 
-### Release (when operation is "release")
+### Review mode - Release (when operation is "release")
 
 #### Pre Release
 

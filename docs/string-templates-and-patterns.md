@@ -53,12 +53,12 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 #### Previous Version
 
+Only available in "auto" mode or "review" mode propose operation. Can be undefined if the project has no version yet (the calculated version is initial version)
+
 - `{{ previousVersion }}`: The previous full semantic version (SemVer)
 - `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
 - `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
 - `{{ previousVersionBld }}`: The previous build metadata of the semantic version
-
-> Only available in "propose" operation. Can be undefined if the project has no version yet (calculated next version is initial version)
 
 ### Dynamic String Patterns
 

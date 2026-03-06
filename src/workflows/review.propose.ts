@@ -76,6 +76,8 @@ export async function reviewProposeWorkflow(
   );
   logger.stepFinish("Finished: Calculate next version");
 
+  // TODO, if next version = prev, exit
+
   logger.debugStepStart(
     "Starting: Create fixed version and previous version string pattern context",
   );
