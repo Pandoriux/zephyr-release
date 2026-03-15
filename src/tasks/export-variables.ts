@@ -3,10 +3,10 @@ import type {
   BaseOperationVariables,
   DynamicOperationVariables,
   FinalOperationVariables,
-  PostProposeOperationVariables,
-  PostReleaseOperationVariables,
-  PreProposeOperationVariables,
-  PreReleaseOperationVariables,
+  PostPrepareOperationVariables,
+  PostPublishOperationVariables,
+  PrePrepareOperationVariables,
+  PrePublishOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
@@ -152,7 +152,7 @@ export async function exportBaseOperationVariables(
   });
 }
 
-export async function exportPreProposeOperationVariables(
+export async function exportPrePrepareOperationVariables(
   provider: PlatformProvider,
   resolvedCommitEntries: ResolvedCommit[],
   previousVersion: SemVer | undefined,
@@ -166,12 +166,12 @@ export async function exportPreProposeOperationVariables(
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PreProposeOperationVariables
+    & PrePrepareOperationVariables
     & Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Pre propose operation variables to export (internal key name):",
+      "Pre prepare operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();
@@ -183,7 +183,7 @@ export async function exportPreProposeOperationVariables(
   });
 }
 
-export async function exportPostProposeOperationVariables(
+export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
   prNumber: number,
   changesData: Map<string, string>,
@@ -194,12 +194,12 @@ export async function exportPostProposeOperationVariables(
     pullRequestNumber: prNumber,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PostProposeOperationVariables
+    & PostPrepareOperationVariables
     & Pick<DynamicOperationVariables, "pullRequestNumber" | "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Post propose operation variables to export (internal key name):",
+      "Post prepare operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();
@@ -211,7 +211,7 @@ export async function exportPostProposeOperationVariables(
   });
 }
 
-export async function exportPreReleaseOperationVariables(
+export async function exportPrePublishOperationVariables(
   provider: PlatformProvider,
   prNumber: number,
   version: SemVer,
@@ -222,12 +222,12 @@ export async function exportPreReleaseOperationVariables(
     pullRequestNumber: prNumber,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PreReleaseOperationVariables
+    & PrePublishOperationVariables
     & Pick<DynamicOperationVariables, "patternContext" | "pullRequestNumber">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Pre release operation variables to export (internal key name):",
+      "Pre publish operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();
@@ -239,7 +239,7 @@ export async function exportPreReleaseOperationVariables(
   });
 }
 
-export async function exportPostReleaseOperationVariables(
+export async function exportPostPublishOperationVariables(
   provider: PlatformProvider,
   tagHash: string,
   releaseId?: string | number,
@@ -252,12 +252,12 @@ export async function exportPostReleaseOperationVariables(
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
-    & PostReleaseOperationVariables
+    & PostPublishOperationVariables
     & Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
-      "Post release operation variables to export (internal key name):",
+      "Post publish operation variables to export (internal key name):",
     );
     dLogger.info(JSON.stringify(prepareExportObject, null, 2));
     dLogger.endGroup();

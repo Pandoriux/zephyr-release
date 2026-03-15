@@ -33,7 +33,7 @@ export const AutoStrategySchema = v.variant("type", [
       }),
       v.metadata({
         description:
-          "Allowed commit types that can trigger a release, must be chosen from the base `commitTypes`. If omitted, " +
+          "Allowed commit types (a string or array of strings) that can trigger a release, must be chosen from the base `commitTypes`. If omitted, " +
           "all types in the base `commitTypes` are allowed.",
       }),
     ),

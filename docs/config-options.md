@@ -11,13 +11,40 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
 
 ## Table of Content <!-- omit from toc -->
 
-- [Options](#options)
+- [Properties](#properties)
   - [name (Optional)](#name-optional)
   - [time-zone (Optional)](#time-zone-optional)
-  - [mode (Optional)](#mode-optional)
-  - [command-hook (Optional)](#command-hook-optional)
-  - [runtime-config-override (Optional)](#runtime-config-override-optional)
   - [custom-string-patterns (Optional)](#custom-string-patterns-optional)
+  - [mode (Optional)](#mode-optional)
+  - [review (Optional)](#review-optional)
+    - [review \> draft (Optional)](#review--draft-optional)
+    - [review \> working-branch-name-template (Optional)](#review--working-branch-name-template-optional)
+    - [review \> title-template (Optional)](#review--title-template-optional)
+    - [review \> title-template-path (Optional)](#review--title-template-path-optional)
+    - [review \> header-template (Optional)](#review--header-template-optional)
+    - [review \> header-template-path (Optional)](#review--header-template-path-optional)
+    - [review \> body-template (Optional)](#review--body-template-optional)
+    - [review \> body-template-path (Optional)](#review--body-template-path-optional)
+    - [review \> footer-template (Optional)](#review--footer-template-optional)
+    - [review \> footer-template-path (Optional)](#review--footer-template-path-optional)
+    - [review \> label (Optional)](#review--label-optional)
+      - [review \> label \> on-create (Optional)](#review--label--on-create-optional)
+      - [review \> label \> on-close (Optional)](#review--label--on-close-optional)
+    - [review \> additional-label (Optional)](#review--additional-label-optional)
+      - [review \> additional-label \> on-create-add (Optional)](#review--additional-label--on-create-add-optional)
+      - [review \> additional-label \> on-close-add (Optional)](#review--additional-label--on-close-add-optional)
+      - [review \> additional-label \> on-close-remove (Optional)](#review--additional-label--on-close-remove-optional)
+    - [review \> assignees (Optional)](#review--assignees-optional)
+    - [review \> reviewers (Optional)](#review--reviewers-optional)
+  - [auto (Optional)](#auto-optional)
+    - [auto \> trigger-strategy (Optional)](#auto--trigger-strategy-optional)
+  - [command-hooks (Optional)](#command-hooks-optional)
+    - [command-hooks \> base (Optional)](#command-hooks--base-optional)
+    - [command-hooks \> prepare (Optional)](#command-hooks--prepare-optional)
+    - [command-hooks \> publish (Optional)](#command-hooks--publish-optional)
+  - [runtime-config-override (Optional)](#runtime-config-override-optional)
+    - [runtime-config-override \> path (Required)](#runtime-config-override--path-required)
+    - [runtime-config-override \> format (Optional)](#runtime-config-override--format-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
   - [commit-types (Optional)](#commit-types-optional)
@@ -35,7 +62,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [bump... \> bump-minor-for-major-pre-stable (Optional)](#bump--bump-minor-for-major-pre-stable-optional)
     - [bump... \> bump-patch-for-minor-pre-stable (Optional)](#bump--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
-    - [changelog \> writeToFile (Optional)](#changelog--writetofile-optional)
+    - [changelog \> write-to-file (Optional)](#changelog--write-to-file-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> file-header-template (Optional)](#changelog--file-header-template-optional)
     - [changelog \> file-header-template-path (Optional)](#changelog--file-header-template-path-optional)
@@ -60,33 +87,17 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [commit \> footer-template (Optional)](#commit--footer-template-optional)
     - [commit \> footer-template-path (Optional)](#commit--footer-template-path-optional)
     - [commit \> local-files-to-commit (Optional)](#commit--local-files-to-commit-optional)
-  - [pull-request (Optional)](#pull-request-optional)
-    - [pull... \> command-hook (Optional)](#pull--command-hook-optional)
-    - [pull... \> branch-name-template (Optional)](#pull--branch-name-template-optional)
-    - [pull... \> label (Optional)](#pull--label-optional)
-      - [pull... \> label \> on-create (Optional)](#pull--label--on-create-optional)
-      - [pull... \> label \> on-close (Optional)](#pull--label--on-close-optional)
-    - [pull... \> additional-label (Optional)](#pull--additional-label-optional)
-      - [pull... \> additional-label \> on-create-add (Optional)](#pull--additional-label--on-create-add-optional)
-      - [pull... \> additional-label \> on-close-add (Optional)](#pull--additional-label--on-close-add-optional)
-      - [pull... \> additional-label \> on-close-remove (Optional)](#pull--additional-label--on-close-remove-optional)
-    - [pull... \> title-template (Optional)](#pull--title-template-optional)
-    - [pull... \> title-template-path (Optional)](#pull--title-template-path-optional)
-    - [pull... \> header-template (Optional)](#pull--header-template-optional)
-    - [pull... \> header-template-path (Optional)](#pull--header-template-path-optional)
-    - [pull... \> body-template (Optional)](#pull--body-template-optional)
-    - [pull... \> body-template-path (Optional)](#pull--body-template-path-optional)
-    - [pull... \> footer-template (Optional)](#pull--footer-template-optional)
-    - [pull... \> footer-template-path (Optional)](#pull--footer-template-path-optional)
+  - [tag (Optional)](#tag-optional)
+    - [tag \> create-tag (Optional)](#tag--create-tag-optional)
+    - [tag \> tag-name-template (Optional)](#tag--tag-name-template-optional)
+    - [tag \> tag-type (Optional)](#tag--tag-type-optional)
+    - [tag \> tag-message-template (Optional)](#tag--tag-message-template-optional)
+    - [tag \> tag-message-template-path (Optional)](#tag--tag-message-template-path-optional)
+    - [tag \> tagger (Optional)](#tag--tagger-optional)
+      - [tag \> tagger \> name (Required)](#tag--tagger--name-required)
+      - [tag \> tagger \> email (Required)](#tag--tagger--email-required)
+      - [tag \> tagger \> date (Optional)](#tag--tagger--date-optional)
   - [release (Optional)](#release-optional)
-    - [release \> command-hook (Optional)](#release--command-hook-optional)
-    - [release \> auto-strategy (Optional)](#release--auto-strategy-optional)
-    - [release \> create-tag (Optional)](#release--create-tag-optional)
-    - [release \> tag-name-template (Optional)](#release--tag-name-template-optional)
-    - [release \> tag-type (Optional)](#release--tag-type-optional)
-    - [release \> tag-message-template (Optional)](#release--tag-message-template-optional)
-    - [release \> tag-message-template-path (Optional)](#release--tag-message-template-path-optional)
-    - [release \> tagger (Optional)](#release--tagger-optional)
     - [release \> create-release-note (Optional)](#release--create-release-note-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
     - [release \> draft (Optional)](#release--draft-optional)
@@ -97,18 +108,16 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> body-template-path (Optional)](#release--body-template-path-optional)
     - [release \> assets (Optional)](#release--assets-optional)
 - [Type Definitions](#type-definitions)
+  - [Label](#label)
+  - [AutoStrategy](#autostrategy)
   - [CommandHook](#commandhook)
   - [Command](#command)
-  - [RuntimeConfigOverride](#runtimeconfigoverride)
   - [VersionFile](#versionfile)
   - [BumpRule](#bumprule)
   - [BumpRuleExtension](#bumpruleextension)
   - [SemverExtension](#semverextension)
-  - [Label](#label)
-  - [AutoStrategy](#autostrategy)
-  - [Tagger](#tagger)
   
-## Options
+## Properties
 
 ### name (Optional)
 
@@ -125,6 +134,14 @@ Default: `"UTC"`
 IANA time zone used to format and display times.  
 This value is also available for use in [string templates](./string-templates-and-patterns.md) as `{{ timeZone }}`.
 
+### custom-string-patterns (Optional)
+
+Type: `object` (record of string to string)
+
+Custom string patterns to use in templates. The key is the pattern name, available as `{{ <key> }}` in [string templates](./string-templates-and-patterns.md), while the resolved value is the key's value.
+
+**Notes:** If a custom pattern key name matches an existing built-in pattern name, the built-in pattern takes precedence and the custom value will be ignored.
+
 ### mode (Optional)
 
 Type: `"review" | "auto"`  
@@ -135,35 +152,214 @@ Defines the execution strategy.
 - **`"review"`**: Routes updates through a Pull Request. This is the default behavior where Zephyr Release creates or updates a PR with version bumps and changelog changes.
 - **`"auto"`**: Bypasses the PR and commits directly to the branch. When set to `"auto"`, the release operation will commit changes directly to the branch without creating a PR.
 
-If choosing `"auto"`, see [`release > auto-strategy`](#release--auto-strategy-optional) for configuring when releases are triggered.
+If choosing `"auto"`, see [`auto > trigger-strategy`](#auto--trigger-strategy-optional) for configuring when automated releases are triggered.
 
-### command-hook (Optional)
+### review (Optional)
+
+Type: `object`  
+**Properties:** [`draft`](#review--draft-optional), [`working-branch-name-template`](#review--working-branch-name-template-optional), [`title-template`](#review--title-template-optional), [`title-template-path`](#review--title-template-path-optional), [`header-template`](#review--header-template-optional), [`header-template-path`](#review--header-template-path-optional), [`body-template`](#review--body-template-optional), [`body-template-path`](#review--body-template-path-optional), [`footer-template`](#review--footer-template-optional), [`footer-template-path`](#review--footer-template-path-optional), [`label`](#review--label-optional), [`additional-label`](#review--additional-label-optional), [`assignees`](#review--assignees-optional), [`reviewers`](#review--reviewers-optional)
+
+Configuration specific to the `"review"` execution `mode`. Defines how release proposals (such as Pull Requests) are generated, formatted, and tracked.
+
+#### review > draft (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+If enabled, the proposal will be created as draft.
+
+#### review > working-branch-name-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_WORKING_BRANCH_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for branch name that Zephyr Release will use.  
+Allowed patterns to use are: fixed base string patterns.
+
+#### review > title-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for pull request title, using with string patterns like {{ version }}.  
+Allowed patterns to use are: all fixed and dynamic string patterns.
+
+#### review > title-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request title template. Overrides `title-template` when both are provided.  
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### review > header-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for pull request header, using with string patterns like {{ version }}.  
+Allowed patterns to use are: all fixed and dynamic string patterns.
+
+#### review > header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request header template. Overrides `header-template` when both are provided.  
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### review > body-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for pull request body, using with string patterns like {{ changelogRelease }}.  
+Allowed patterns to use are: all fixed and dynamic string patterns.
+
+#### review > body-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request body template. Overrides `body-template` when both are provided.  
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### review > footer-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for pull request footer, using with string patterns.  
+Allowed patterns to use are: all fixed and dynamic string patterns.
+
+#### review > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.  
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### review > label (Optional)
+
+Type: `object`  
+Default: `{}`
+
+Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These label should not be manually added or removed.
+
+##### review > label > on-create (Optional)
+
+Type: `string | Label`  
+Default: [`DEFAULT_LABEL_ON_CREATE`](../src/constants/defaults/label.ts)
+
+Label to add when pull request is created.
+
+##### review > label > on-close (Optional)
+
+Type: `string | Label`  
+Default: [`DEFAULT_LABEL_ON_CLOSE`](../src/constants/defaults/label.ts)
+
+Label to add when pull request is closed and release operation has completed (replaces `on-create` label).
+
+#### review > additional-label (Optional)
+
+Type: `object`  
+Default: `{}`
+
+Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
+
+##### review > additional-label > on-create-add (Optional)
+
+Type: `string | string[]`
+
+Additional labels to add when pull request is created.
+
+##### review > additional-label > on-close-add (Optional)
+
+Type: `string | string[]`
+
+Additional labels to add when pull request is closed and release operation has completed.
+
+##### review > additional-label > on-close-remove (Optional)
+
+Type: `string | string[]`
+
+Additional labels to remove when pull request is closed and release operation has completed. Use `"<ALL_ON_CREATE_ADD>"` to remove all labels added in `on-create-add`.
+
+#### review > assignees (Optional)
+
+Type: `string[]`
+
+A list of user identifiers to assign to the release proposal.  
+Use the platform's expected format (e.g., usernames).
+
+#### review > reviewers (Optional)
+
+Type: `string[]`
+
+A list of user or team identifiers requested to review the release proposal.  
+Use the platform's expected format (e.g., usernames or team slugs).
+
+### auto (Optional)
+
+Type: `object`  
+
+Configuration specific to the `"auto"` execution `mode`. Defines the conditions and strategies for bypassing proposals and committing releases directly.
+
+#### auto > trigger-strategy (Optional)
+
+Type: [`AutoStrategy`](#autostrategy)  
+Default: `{ type: "commit-types" }`
+
+Strategy that determines whether an automated release should be triggered when base [`mode`](#mode-optional) is set to `"auto"`.  
+Defines the conditions under which a release will be automatically triggered and committed directly to the branch.
+
+### command-hooks (Optional)
+
+Type: `object`  
+**Properties:** [`base`](#command-hooks--base-optional), [`prepare`](#command-hooks--prepare-optional), [`publish`](#command-hooks--publish-optional)
+
+Command hooks to run at different phases of the operation. Each command runs from the repository root.
+
+#### command-hooks > base (Optional)
 
 Type: [`CommandHook`](#commandhook)
 
-Pre/post command lists to run around the main operation. Each command runs from the repository root.
+Pre/post commands to run around the main operation. Each command runs from the repository root.  
+Post commands will always run regardless of operation outcome (success, skipped or failure). It is recommended to check the outcome export variable if your script should only run under specific conditions.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
 
-Unlike `pre` commands, `post` commands are always executed regardless of the operation's final status, whether it was a success, skipped, or a failure. If your post script should only run under a specific condition, you should check the export environment variable within your script.
+#### command-hooks > prepare (Optional)
 
-List of exposed env variables: see [Export operation variables](./export-variables.md).
+Type: [`CommandHook`](#commandhook)
 
-See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
+Pre/post commands to run around the pull request operation. Each command runs from the repository root.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
+
+#### command-hooks > publish (Optional)
+
+Type: [`CommandHook`](#commandhook)
+
+Pre/post commands to run around the release operation. Each command runs from the repository root.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
 
 ### runtime-config-override (Optional)
 
-Type: [`RuntimeConfigOverride`](#runtimeconfigoverride)
+Type: `object`  
+**Properties:** [`path`](#runtime-config-override--path-required), [`format`](#runtime-config-override--format-optional)
 
-A dynamic configuration file to deep-merge over the resolved config at runtime, typically generated by a [`command-hook`](#command-hook-optional) script.
+A dynamic configuration file to deep-merge over the resolved config at runtime, typically generated by a [`command-hooks`](#command-hooks-optional) script.
 
 This file is always read from the local filesystem. If the file does not exist or is empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error.
 
-### custom-string-patterns (Optional)
+#### runtime-config-override > path (Required)
 
-Type: `object` (record of string to string)
+Type: `string`
 
-Custom string patterns to use in templates. The key is the pattern name, available as `{{ <key> }}` in [string templates](./string-templates-and-patterns.md), while the resolved value is the key's value.
+Path to the runtime override config file, read from the local filesystem.
 
-**Notes:** If a custom pattern key name matches an existing built-in pattern name, the built-in pattern takes precedence and the custom value will be ignored.
+#### runtime-config-override > format (Optional)
+
+Type: `string`  
+Default: `"auto"`
+
+Config file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`.
 
 ### initial-version (Optional)
 
@@ -306,11 +502,11 @@ Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`writeToFile`](#changelog--writetofile-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
+**Properties:** [`write-to-file`](#changelog--write-to-file-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in string templates as `{{ changelogRelease }}` (release header + body) or `{{ changelogReleaseHeader }}` and `{{ changelogReleaseBody }}`.
 
-#### changelog > writeToFile (Optional)
+#### changelog > write-to-file (Optional)
 
 Type: `boolean`  
 Default: `true`
@@ -511,178 +707,21 @@ Additional changed local files to include in the commit when creating a pull req
 
 To include all files, you can use a glob pattern such as `"**/*"`.
 
-### pull-request (Optional)
+### tag (Optional)
 
 Type: `object`  
-**Properties:** [`command-hook`](#pull--command-hook-optional), [`branch-name-template`](#pull--branch-name-template-optional), [`label`](#pull--label-optional), [`additional-label`](#pull--additional-label-optional), [`title-template`](#pull--title-template-optional), [`title-template-path`](#pull--title-template-path-optional), [`header-template`](#pull--header-template-optional), [`header-template-path`](#pull--header-template-path-optional), [`body-template`](#pull--body-template-optional), [`body-template-path`](#pull--body-template-path-optional), [`footer-template`](#pull--footer-template-optional), [`footer-template-path`](#pull--footer-template-path-optional)
+**Properties:** [`create-tag`](#tag--create-tag-optional), [`tag-name-template`](#tag--tag-name-template-optional), [`tag-type`](#tag--tag-type-optional), [`tag-message-template`](#tag--tag-message-template-optional), [`tag-message-template-path`](#tag--tag-message-template-path-optional), [`tagger`](#tag--tagger-optional)
 
-An object containing configuration options that are specific to pull request operations. These settings will only apply when working with pull requests.
+Configuration specific to tags.
 
-#### pull... > command-hook (Optional)
-
-Type: [`CommandHook`](#commandhook)
-
-Pre/post command lists to run around the pull request operation. Each command runs from the repository root.
-
-List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
-
-#### pull... > branch-name-template (Optional)
-
-Type: `string`  
-Default: `"release/zephyr-release"`
-
-String template for branch name that Zephyr Release uses.  
-Allowed patterns to use are: [fixed base](./string-templates-and-patterns.md#base) string patterns.
-
-#### pull... > label (Optional)
-
-Type: `object`  
-Default: `{}`
-
-Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These labels should not be manually added or removed.
-
-##### pull... > label > on-create (Optional)
-
-Type: `string | Label`  
-Default: [`DEFAULT_LABEL_ON_CREATE`](../src/constants/defaults/label.ts)
-
-Label to add when pull request is created.
-
-##### pull... > label > on-close (Optional)
-
-Type: `string | Label`  
-Default: [`DEFAULT_LABEL_ON_CLOSE`](../src/constants/defaults/label.ts)
-
-Label to add when pull request is closed and release operation has completed (replaces `on-create` label).
-
-#### pull... > additional-label (Optional)
-
-Type: `object`  
-Default: `{}`
-
-Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
-
-##### pull... > additional-label > on-create-add (Optional)
-
-Type: `string | string[]`
-
-Additional labels to add when pull request is created.
-
-##### pull... > additional-label > on-close-add (Optional)
-
-Type: `string | string[]`
-
-Additional labels to add when pull request is closed and release operation has completed.
-
-##### pull... > additional-label > on-close-remove (Optional)
-
-Type: `string | string[]`
-
-Additional labels to remove when pull request is closed and release operation has completed.  
-To remove all labels added in `on-create-add`, include the special value `"<ALL_ON_CREATE_ADD>"`.
-
-#### pull... > title-template (Optional)
-
-Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
-
-String template for pull request title, using with string patterns like `{{ version }}`.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
-
-#### pull... > title-template-path (Optional)
-
-Type: `string`
-
-Path to text file containing pull request title template. Overrides `title-template` when both are provided.
-
-To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
-
-#### pull... > header-template (Optional)
-
-Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
-
-String template for pull request header, using with string patterns like `{{ version }}`.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
-
-#### pull... > header-template-path (Optional)
-
-Type: `string`
-
-Path to text file containing pull request header template. Overrides `header-template` when both are provided.
-
-To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
-
-#### pull... > body-template (Optional)
-
-Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
-
-String template for pull request body, using with string patterns like `{{ changelogRelease }}`.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
-
-#### pull... > body-template-path (Optional)
-
-Type: `string`
-
-Path to text file containing pull request body template. Overrides `body-template` when both are provided.
-
-To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
-
-#### pull... > footer-template (Optional)
-
-Type: `string`  
-Default: `"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)"`
-
-String template for pull request footer, using with string patterns.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
-
-#### pull... > footer-template-path (Optional)
-
-Type: `string`
-
-Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.
-
-To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
-
-### release (Optional)
-
-Type: `object`  
-**Properties:** [`command-hook`](#release--command-hook-optional), [`auto-strategy`](#release--auto-strategy-optional), [`create-tag`](#release--create-tag-optional), [`tag-name-template`](#release--tag-name-template-optional), [`tag-type`](#release--tag-type-optional), [`tag-message-template`](#release--tag-message-template-optional), [`tag-message-template-path`](#release--tag-message-template-path-optional), [`tagger`](#release--tagger-optional), [`create-release-note`](#release--create-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
-
-Configuration specific to tags and releases.
-
-#### release > command-hook (Optional)
-
-Type: [`CommandHook`](#commandhook)
-
-Pre/post command lists to run around the release operation. Each command runs from the repository root.
-
-List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-See [`CommandHook`](#commandhook) and [`Command`](#command) for the type definitions.
-
-#### release > auto-strategy (Optional)
-
-Type: [`AutoStrategy`](#autostrategy)  
-Default: `{ type: "commit-types" }`
-
-Strategy for triggering the release when base [`mode`](#mode-optional) is set to `"auto"`.
-
-This property is only relevant when `mode` is set to `"auto"`. It defines the conditions under which a release will be automatically triggered and committed directly to the branch.
-
-See [`AutoStrategy`](#autostrategy) for the type definition.
-
-#### release > create-tag (Optional)
+#### tag > create-tag (Optional)
 
 Type: `boolean`  
 Default: `true`
 
 Enable/disable tag creation. If disabled, create release note will also be skipped.
 
-#### release > tag-name-template (Optional)
+#### tag > tag-name-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
@@ -690,14 +729,14 @@ Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-template
 String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
 Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
-#### release > tag-type (Optional)
+#### tag > tag-type (Optional)
 
 Type: `"annotated" | "lightweight"`  
 Default: `"annotated"`
 
 The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.
 
-#### release > tag-message-template (Optional)
+#### tag > tag-message-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_TAG_MESSAGE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
@@ -705,21 +744,50 @@ Default: [`DEFAULT_TAG_MESSAGE_TEMPLATE`](../src/constants/defaults/string-templ
 String template for the Git annotated tag message.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
-#### release > tag-message-template-path (Optional)
+#### tag > tag-message-template-path (Optional)
 
 Type: `string`
 
 Path to text file containing Git annotated tag message template. Overrides `tag-message-template` when both are provided.
-
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
-#### release > tagger (Optional)
+#### tag > tagger (Optional)
 
-Type: [`Tagger`](#tagger)
+Type: `object`
 
 Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior.
 
-See [`Tagger`](#tagger) for the type definition.
+##### tag > tagger > name (Required)
+
+Type: `string`
+
+The name of the tag creator.
+
+##### tag > tagger > email (Required)
+
+Type: `string`
+
+The email of the tag creator.
+
+##### tag > tagger > date (Optional)
+
+Type: `string`
+
+Override the Git tag timestamp.  
+Can be one of these options:
+
+- `"now"`: The moment the operation creates the tag.
+- `"commit-date"`: The Git committer date.
+- `"author-date"`: The Git author date.
+- Or a specific ISO 8601 date string.  
+If omitted, defaults to the platform native behavior (recommended).
+
+### release (Optional)
+
+Type: `object`  
+**Properties:** [`create-release-note`](#release--create-release-note-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
+
+Configuration specific to releases.
 
 #### release > create-release-note (Optional)
 
@@ -789,13 +857,42 @@ List of local asset path(s) to attach to the release. Accepts a single string or
 
 ## Type Definitions
 
+### Label
+
+Type: `object`  
+**Properties:**
+
+- `name` (Required): Label name.
+- `description` (Optional): Label description.
+- `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`
+
+### AutoStrategy
+
+A discriminated union based on the `type` field. Defines the strategy for automatically triggering releases when [`mode`](#mode-optional) is set to `"auto"`.
+
+**Type: `"commit-types"`** — Triggers a release automatically when the pushed commits contain specific allowed types.
+
+- `type` (Required): `"commit-types"`
+- `allowed-types` (Optional): Allowed commit types (a string or array of strings) that can trigger a release, must be chosen from the base [`commit-types`](#commit-types-optional). If omitted, all types in the base `commit-types` are allowed.
+
+**Type: `"commit-footer"`** — Triggers a release automatically when a specific token is found in the commit footers.
+
+- `type` (Required): `"commit-footer"`
+- `token` (Required): The conventional commit footer token to look for (e.g., `"Autorelease"`).
+- `value` (Optional): The specific value the footer token must have (e.g., `"true"`). If omitted, the strategy triggers as long as the token exists.
+
+**Type: `"flag"`** — Triggers a release based on a strict boolean flag. Ideal for dynamic configuration overrides and custom script evaluations.
+
+- `type` (Required): `"flag"`
+- `value` (Optional): A hardcoded boolean flag to explicitly force or skip the release trigger. Default: `false`
+
 ### CommandHook
 
 Type: `object`  
 **Properties:**
 
 - `timeout` (Optional): Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended). Default: `60000` (1 min)
-- `continueOnError` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
+- `continue-on-error` (Optional): Base default behavior for all commands in `pre` and `post`, can be overridden per command. Default: `false`
 - `pre` (Optional): Commands to run before the operation.  
   Each command can be either a `string` or a [`Command`](#command) object.  
   List of exposed env variables: see [Export operation variables](./export-variables.md).
@@ -812,16 +909,8 @@ A command can be specified as either a string or an object.
 **When specified as an object, properties:**
 
 - `cmd` (Required): The command string to execute.
-- `timeout` (Optional): Timeout in milliseconds, use Infinity to never timeout (not recommended). Defaults to `commandHook` base `timeout` value.
-- `continueOnError` (Optional): Continue or stop the process on commands error. Defaults to `commandHook` base `continueOnError` value.
-
-### RuntimeConfigOverride
-
-Type: `object`  
-**Properties:**
-
-- `path` (Required): Path to the runtime override config file, read from the local filesystem.
-- `format` (Optional): Config file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`. Default: `"auto"`
+- `timeout` (Optional): Timeout in milliseconds, use Infinity to never timeout (not recommended). Defaults to `command-hook` base `timeout` value.
+- `continue-on-error` (Optional): Continue or stop the process on commands error. Defaults to `command-hook` base `continue-on-error` value.
 
 ### VersionFile
 
@@ -887,47 +976,3 @@ A discriminated union based on the `type` field. Specifies the type of pre-relea
 - `type` (Required): `"date"`
 - `format` (Optional): The date format. `"YYYYMMDD"` or `"YYYY-MM-DD"`. Default: `"YYYYMMDD"`
 - `time-zone` (Optional): The timezone to use for the date. If not specified, falls back to base [`time-zone`](#time-zone-optional).
-
-### Label
-
-Type: `object`  
-**Properties:**
-
-- `name` (Required): Label name.
-- `description` (Optional): Label description.
-- `color` (Optional): The hexadecimal color code for the label, in standard format with the leading #. Default: `"#ededed"`
-
-### AutoStrategy
-
-A discriminated union based on the `type` field. Defines the strategy for automatically triggering releases when [`mode`](#mode-optional) is set to `"auto"`.
-
-**Type: `"commit-types"`** — Triggers a release automatically when the pushed commits contain specific allowed types.
-
-- `type` (Required): `"commit-types"`
-- `allowedTypes` (Optional): Allowed commit types that can trigger a release, must be chosen from the base [`commit-types`](#commit-types-optional). Accepts a single string or an array of strings. If omitted, all types in the base `commit-types` are allowed.
-
-**Type: `"commit-footer"`** — Triggers a release automatically when a specific token is found in the commit footers.
-
-- `type` (Required): `"commit-footer"`
-- `token` (Required): The conventional commit footer token to look for (e.g., `"Autorelease"`).
-- `value` (Optional): The specific value the footer token must have (e.g., `"true"`). If omitted, the strategy triggers as long as the token exists.
-
-**Type: `"flag"`** — Triggers a release based on a strict boolean flag. Ideal for dynamic configuration overrides and custom script evaluations.
-
-- `type` (Required): `"flag"`
-- `value` (Optional): A hardcoded boolean flag to explicitly force or skip the release trigger. Default: `false`
-
-### Tagger
-
-Type: `object`  
-**Properties:**
-
-- `name` (Required): The name of the tag creator.
-- `email` (Required): The email of the tag creator.
-- `date` (Optional): Override the Git tag timestamp.  
-  Can be one of these options:
-  - `"now"`: The moment the operation creates the tag.
-  - `"commit-date"`: The Git committer date.
-  - `"author-date"`: The Git author date.
-  - Or a specific ISO 8601 date string.  
-  If omitted, defaults to the platform native behavior (recommended).

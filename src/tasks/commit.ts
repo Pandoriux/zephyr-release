@@ -18,7 +18,6 @@ import { prepareChangelogFileToCommit } from "./changelog.ts";
 import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
-import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
 import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
 
 type ResolveCommitsInputsParams = Pick<

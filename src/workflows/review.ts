@@ -1,59 +1,41 @@
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { logger } from "../tasks/logger.ts";
-import type {
-  OperationRunContext,
-  OperationTriggerContext,
-} from "../types/operation-context.ts";
-import type { WorkingBranchResult } from "../tasks/branch.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
-import { reviewProposeWorkflow } from "./review.propose.ts";
-import { reviewReleaseWorkflow } from "./review.release.ts";
+import type { OperationRunSettings } from "../types/operation-context.ts";
+import { executeReviewPreparePhase } from "./review.prepare.ts";
+import { executeReviewPublishPhase } from "./review.publish.ts";
+import type { BootstrapResult } from "./bootstrap.ts";
 
-interface ReviewWorkflowOptions {
-  workingBranchResult: WorkingBranchResult;
-  associatedPrForCommit: ProviderPullRequest | undefined;
-  associatedPrFromBranch: ProviderPullRequest | undefined;
-  triggerContext: OperationTriggerContext;
-}
-
-export async function reviewWorkflow(
+export async function executeReviewStrategy(
   provider: PlatformProvider,
-  currentRunCtx: OperationRunContext,
-  opts: ReviewWorkflowOptions,
-): Promise<OperationRunContext> {
-  const {
-    workingBranchResult,
-    associatedPrForCommit,
-    associatedPrFromBranch,
-    triggerContext,
-  } = opts;
-
+  currentRunSettings: OperationRunSettings,
+  bootstrapData: BootstrapResult,
+): Promise<OperationRunSettings> {
   /**
-   * Review operation run context.
+   * Review mode run settings.
    */
-  let runCtx: OperationRunContext = currentRunCtx;
+  let runSettings: OperationRunSettings = currentRunSettings;
 
-  if (!associatedPrForCommit) {
-    logger.info(
-      "Review Workflow: Creating/Updating release proposal pull request...",
+  if (!bootstrapData.associatedPrForCommit) {
+    logger.subHeader(
+      "Review mode execution: Creating/Updating release proposal pull request...",
     );
-    runCtx = await reviewProposeWorkflow(provider, {
-      workingBranchResult,
-      associatedPrFromBranch,
-      triggerContext,
-      currentRunCtx: runCtx,
-    });
-  } else if (runCtx.config.release.createTag) {
-    logger.info("Review Workflow: Creating tag and release...");
-    runCtx = await reviewReleaseWorkflow(provider, {
-      associatedPrForCommit,
-      currentRunCtx: runCtx,
-    });
+    runSettings = await executeReviewPreparePhase(
+      provider,
+      runSettings,
+      bootstrapData,
+    );
+  } else if (runSettings.config.release.createTag) {
+    logger.subHeader("Review mode execution: Creating tag and release...");
+    runSettings = await executeReviewPublishPhase(
+      provider,
+      runSettings,
+      bootstrapData.associatedPrForCommit,
+    );
   } else {
-    logger.info(
-      "Review Workflow: Skip create tag and release (disabled in config)",
+    logger.subHeader(
+      "Review mode execution: Skip create tag and release (disabled in config)",
     );
   }
 
-  return runCtx;
+  return runSettings;
 }

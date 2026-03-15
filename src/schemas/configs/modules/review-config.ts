@@ -1,50 +1,35 @@
 import * as v from "@valibot/valibot";
-import { CommandHookSchema } from "./components/command-hook.ts";
-import { CoreLabelSchema } from "./components/core-label.ts";
-import { AdditionalLabelSchema } from "./components/additional-label.ts";
+import { trimNonEmptyStringSchema } from "../../string.ts";
 import {
   DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
   DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
   DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
   DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
+  DEFAULT_WORKING_BRANCH_NAME_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
-import { trimNonEmptyStringSchema } from "../../string.ts";
+import { AdditionalLabelSchema } from "./components/additional-label.ts";
+import { CoreLabelSchema } from "./components/core-label.ts";
 
-export const PullRequestConfigSchema = v.pipe(
+export const ReviewConfigSchema = v.pipe(
   v.object({
-    commandHook: v.pipe(
-      v.optional(CommandHookSchema),
+    draft: v.pipe(
+      v.optional(v.boolean(), false),
       v.metadata({
-        description:
-          "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.\n" +
-          "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+        description: "If enabled, the proposal will be created as draft.\n" +
+          "Default: false",
       }),
     ),
 
-    branchNameTemplate: v.pipe(
-      v.optional(trimNonEmptyStringSchema, "release/zephyr-release"),
+    workingBranchNameTemplate: v.pipe(
+      v.optional(
+        trimNonEmptyStringSchema,
+        DEFAULT_WORKING_BRANCH_NAME_TEMPLATE,
+      ),
       v.metadata({
         description:
-          "String template for branch name that Zephyr Release uses.\n" +
+          "String template for branch name that Zephyr Release will use.\n" +
           "Allowed patterns to use are: fixed base string patterns.\n" +
-          'Default: "release/zephyr-release"',
-      }),
-    ),
-
-    label: v.pipe(
-      v.optional(CoreLabelSchema, {}),
-      v.metadata({
-        description:
-          "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. " +
-          "These label should not be manually added or removed.",
-      }),
-    ),
-    additionalLabel: v.pipe(
-      v.optional(AdditionalLabelSchema, {}),
-      v.metadata({
-        description:
-          "Additional labels to attach to pull requests, managed and supplied by you. " +
-          "Unlike the core label, these labels are not automatically created if missing.",
+          `Default: ${JSON.stringify(DEFAULT_WORKING_BRANCH_NAME_TEMPLATE)}`,
       }),
     ),
 
@@ -116,13 +101,47 @@ export const PullRequestConfigSchema = v.pipe(
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
+
+    label: v.pipe(
+      v.optional(CoreLabelSchema, {}),
+      v.metadata({
+        description:
+          "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. " +
+          "These label should not be manually added or removed.",
+      }),
+    ),
+    additionalLabel: v.pipe(
+      v.optional(AdditionalLabelSchema, {}),
+      v.metadata({
+        description:
+          "Additional labels to attach to pull requests, managed and supplied by you. " +
+          "Unlike the core label, these labels are not automatically created if missing.",
+      }),
+    ),
+
+    assignees: v.pipe(
+      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.metadata({
+        description:
+          "A list of user identifiers to assign to the release proposal.\n" +
+          "Use the platform's expected format (e.g., usernames).",
+      }),
+    ),
+    reviewers: v.pipe(
+      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.metadata({
+        description:
+          "A list of user or team identifiers requested to review the release proposal.\n" +
+          "Use the platform's expected format (e.g., usernames or team slugs).",
+      }),
+    ),
   }),
   v.metadata({
-    description: "Configuration specific to pull requests.",
+    description:
+      'Configuration specific to the "review" execution `mode`. Defines how release proposals (such as Pull Requests) ' +
+      "are generated, formatted, and tracked.",
   }),
 );
 
-type _PullRequestConfigInput = v.InferInput<typeof PullRequestConfigSchema>;
-export type PullRequestConfigOutput = v.InferOutput<
-  typeof PullRequestConfigSchema
->;
+type _ReviewConfigInput = v.InferInput<typeof ReviewConfigSchema>;
+type _ReviewConfigOutput = v.InferOutput<typeof ReviewConfigSchema>;

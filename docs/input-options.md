@@ -57,7 +57,7 @@ Default: `"remote"`
 Defines the data execution strategy and source of truth for the operation.
 
 - **`remote`**: Optimized for performance. Operations are performed via remote API calls. This mode does not require a local checkout of the repository.
-- **`local`**: Operations are performed on the runner's filesystem. This mode is required if your workflow involves local file modifications (e.g., via `command-hook`).
+- **`local`**: Operations are performed on the runner's filesystem. This mode is required if your workflow involves local file modifications (e.g., via [`command-hooks`](./config-options.md#command-hooks-optional)).
 - **`object`**: A JSON object allowing for granular control over which specific file paths use the local filesystem versus the remote API.
 
 **Object Structure:**

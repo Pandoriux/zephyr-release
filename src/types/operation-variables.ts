@@ -70,22 +70,22 @@ export type DynamicOperationVariables = Pick<
   | "pullRequestNumber"
 >;
 
-export type PreProposeOperationVariables = Pick<
+export type PrePrepareOperationVariables = Pick<
   OperationVariables,
   "resolvedCommitEntries" | "previousVersion" | "version"
 >;
 
-export type PostProposeOperationVariables = Pick<
+export type PostPrepareOperationVariables = Pick<
   OperationVariables,
   "committedFilePaths"
 >;
 
-export type PreReleaseOperationVariables = Pick<
+export type PrePublishOperationVariables = Pick<
   OperationVariables,
   "version"
 >;
 
-export type PostReleaseOperationVariables = Pick<
+export type PostPublishOperationVariables = Pick<
   OperationVariables,
   "tagHash" | "releaseId" | "releaseUploadUrl"
 >;

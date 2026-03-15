@@ -4,6 +4,19 @@ import type { OperationTriggerContext } from "../types/operation-context.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import { taskLogger } from "./logger.ts";
+import type { InputsOutput } from "../schemas/inputs/inputs.ts";
+import { initTomlEditJs } from "../libs/@rainbowatcher/toml-edit-js/initWasm.ts";
+
+export function initOperationRuntime(
+  provider: PlatformProvider,
+  inputs: InputsOutput,
+) {
+  taskLogger.info("Setting up provider context with inputs");
+  provider.setupProviderContext(inputs);
+
+  taskLogger.info("Initializing @rainbowatcher/toml-edit-js wasm module...");
+  initTomlEditJs();
+}
 
 export function validateCurrentOperationTriggerCtxOrExit(
   provider: PlatformProvider,

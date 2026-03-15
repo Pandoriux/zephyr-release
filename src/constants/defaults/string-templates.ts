@@ -1,6 +1,10 @@
 /** Fake fn just to get Liquid highlight from extension */
 const liquid = String.raw;
 
+// Review Proposal (PR)
+export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
+  "zephyr-release/{{ triggerBranchName }}";
+
 // Changelog
 export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
 

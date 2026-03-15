@@ -1,39 +1,30 @@
 import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputsOrThrow } from "./tasks/inputs.ts";
-import { setupOperation } from "./tasks/setup.ts";
 import {
   resolveConfigOrThrow,
   resolveRuntimeConfigOverrideOrThrow,
 } from "./tasks/configs/config.ts";
 import { runCommandsOrThrow } from "./tasks/command.ts";
-import { createFixedBaseStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
-import {
-  findPullRequestForCommitOrThrow,
-  findPullRequestFromBranchOrThrow,
-} from "./tasks/pull-request.ts";
 import {
   exportBaseOperationVariables,
   exportFinalOperationVariables,
 } from "./tasks/export-variables.ts";
-import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
-import { registerTransformersToTemplateEngine } from "./tasks/string-templates-and-patterns/transformers.ts";
-import { setupWorkingBranchOrThrow } from "./tasks/branch.ts";
-import { validateCurrentOperationTriggerCtxOrExit } from "./tasks/operation.ts";
-import { reviewWorkflow } from "./workflows/review.ts";
-import type { OperationRunContext } from "./types/operation-context.ts";
-import type { ProviderPullRequest } from "./types/providers/pull-request.ts";
-import { autoWorkflow } from "./workflows/auto.ts";
+import { initOperationRuntime } from "./tasks/operation.ts";
+import { executeReviewStrategy } from "./workflows/review.ts";
+import type { OperationRunSettings } from "./types/operation-context.ts";
+import { executeAutoStrategy } from "./workflows/auto.ts";
 import { SafeExit } from "./errors/safe-exit.ts";
+import { bootstrapOperation } from "./workflows/bootstrap.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
   const inputsResult = getInputsOrThrow(provider);
   logger.stepFinish("Finished: Get operation inputs");
 
-  logger.stepStart("Starting: Set up operation");
-  setupOperation(provider, inputsResult.inputs);
-  logger.stepFinish("Finished: Set up operation");
+  logger.stepStart("Starting: Initialize operation runtime");
+  initOperationRuntime(provider, inputsResult.inputs);
+  logger.stepFinish("Finished: Initialize operation runtime");
 
   logger.stepStart("Starting: Resolve config from file and override");
   const configResult = await resolveConfigOrThrow(
@@ -42,8 +33,8 @@ export async function run(provider: PlatformProvider) {
   );
   logger.stepFinish("Finished: Resolve config from file and override");
 
-  // Init Run Context //
-  let runCtx: OperationRunContext = {
+  // Init Run Settings //
+  let runSettings: OperationRunSettings = {
     rawInputs: inputsResult.rawInputs,
     inputs: inputsResult.inputs,
     rawConfig: configResult.rawConfig,
@@ -51,77 +42,29 @@ export async function run(provider: PlatformProvider) {
   };
 
   try {
-    logger.stepStart("Starting: Parse and validate current trigger context");
-    const triggerContext = validateCurrentOperationTriggerCtxOrExit(
+    logger.header("Start Bootstrap Operation");
+    const bootstrapData = await bootstrapOperation(
       provider,
-      runCtx.config.commitTypes,
-      runCtx.config.mode,
+      configResult,
+      inputsResult,
     );
-    logger.stepFinish("Finished: Parse and validate current trigger context");
-
-    logger.stepStart("Starting: Register transformers to template engine");
-    registerTransformersToTemplateEngine(provider);
-    logger.stepFinish("Finished: Register transformers to template engine");
-
-    logger.debugStepStart("Starting: Create custom string pattern context");
-    createCustomStringPatternContext(runCtx.config.customStringPatterns);
-    logger.debugStepFinish("Finished: Create custom string pattern context");
-
-    logger.debugStepStart("Starting: Create fixed base string pattern context");
-    await createFixedBaseStringPatternContext(
-      provider,
-      runCtx.inputs.triggerBranchName,
-      runCtx.config,
-    );
-    logger.debugStepFinish(
-      "Finished: Create fixed base string pattern context",
-    );
-
-    logger.stepStart("Starting: Ensure working branch is prepared");
-    const workingBranchResult = await setupWorkingBranchOrThrow(
-      provider,
-      runCtx.inputs,
-      runCtx.config,
-    );
-    logger.stepFinish("Finished: Ensure working branch is prepared");
-
-    let associatedPrForCommit: ProviderPullRequest | undefined;
-    let associatedPrFromBranch: ProviderPullRequest | undefined;
-    if (runCtx.config.mode === "review") {
-      logger.stepStart("Starting: Get associated pull requests");
-      associatedPrForCommit = await findPullRequestForCommitOrThrow(
-        provider,
-        workingBranchResult.name,
-        runCtx.inputs,
-        runCtx.config,
-      );
-      associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
-        provider,
-        workingBranchResult.name,
-        runCtx.inputs,
-        runCtx.config,
-      );
-      logger.stepFinish(
-        "Finished: Get associated pull requests",
-      );
-    }
 
     logger.debugStepStart("Starting: Export base operation variables");
     await exportBaseOperationVariables(provider, {
-      triggerContext,
-      workingBranchResult,
-      prForCommit: associatedPrForCommit,
-      prFromBranch: associatedPrFromBranch,
-      rawInputs: runCtx.rawInputs,
-      inputs: runCtx.inputs,
-      rawConfig: runCtx.rawConfig,
-      config: runCtx.config,
+      triggerContext: bootstrapData.triggerContext,
+      workingBranchResult: bootstrapData.workingBranchResult,
+      prForCommit: bootstrapData.associatedPrForCommit,
+      prFromBranch: bootstrapData.associatedPrFromBranch,
+      rawInputs: runSettings.rawInputs,
+      inputs: runSettings.inputs,
+      rawConfig: runSettings.rawConfig,
+      config: runSettings.config,
     });
     logger.debugStepFinish("Finished: Export base operation variables");
 
     logger.stepStart("Starting: Execute base pre commands");
     const preResult = await runCommandsOrThrow(
-      runCtx.config.commandHook,
+      runSettings.config.commandHooks.base,
       "pre",
     );
     if (preResult) {
@@ -135,13 +78,13 @@ export async function run(provider: PlatformProvider) {
     );
     const _basePreRuntimeConfigResult =
       await resolveRuntimeConfigOverrideOrThrow(
-        runCtx.rawConfig,
-        runCtx.config,
-        runCtx.inputs.workspacePath,
+        runSettings.rawConfig,
+        runSettings.config,
+        runSettings.inputs.workspacePath,
       );
     if (_basePreRuntimeConfigResult) {
-      runCtx = {
-        ...runCtx,
+      runSettings = {
+        ...runSettings,
         rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
         config: _basePreRuntimeConfigResult.resolvedRuntime,
       };
@@ -155,25 +98,13 @@ export async function run(provider: PlatformProvider) {
     }
 
     // Main operation workflow //
-    if (runCtx.config.mode === "review") {
-      logger.info("Start Review Workflow");
+    const strategies = {
+      review: executeReviewStrategy,
+      auto: executeAutoStrategy,
+    };
 
-      runCtx = await reviewWorkflow(provider, runCtx, {
-        workingBranchResult,
-        associatedPrForCommit,
-        associatedPrFromBranch,
-        triggerContext,
-      });
-    } else {
-      logger.info("Start Auto Workflow");
-
-      runCtx = await autoWorkflow(provider, runCtx, {
-        workingBranchResult,
-        associatedPrForCommit,
-        associatedPrFromBranch,
-        triggerContext,
-      });
-    }
+    const executeStrategy = strategies[runSettings.config.mode];
+    runSettings = await executeStrategy(provider, runSettings, bootstrapData);
 
     exportFinalOperationVariables(provider, "success");
   } catch (error) {
@@ -187,7 +118,7 @@ export async function run(provider: PlatformProvider) {
   } finally {
     logger.stepStart("Starting: Execute base post commands");
     const postResult = await runCommandsOrThrow(
-      runCtx.config.commandHook,
+      runSettings.config.commandHooks.base,
       "post",
     );
     if (postResult) {

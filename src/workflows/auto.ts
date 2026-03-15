@@ -1,7 +1,7 @@
 import type { WorkingBranchResult } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
 import type {
-  OperationRunContext,
+  OperationRunSettings,
   OperationTriggerContext,
 } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -14,9 +14,9 @@ interface AutoWorkflowOptions {
   triggerContext: OperationTriggerContext;
 }
 
-export async function autoWorkflow(
+export async function executeAutoStrategy(
   provider: PlatformProvider,
-  currentRunCtx: OperationRunContext,
+  currentRunSettings: OperationRunSettings,
   opts: AutoWorkflowOptions,
 ) {
   const {
@@ -27,11 +27,11 @@ export async function autoWorkflow(
   } = opts;
 
   /**
-   * Auto operation run context.
+   * Auto mode run settings.
    */
-  let runCtx: OperationRunContext = currentRunCtx;
+  let runSettings: OperationRunSettings = currentRunSettings;
 
-  logger.info("Auto Workflow: Creating commit...");
+  logger.subHeader("Auto mode execution: Creating commit...");
 
   // pseudo code below ////////////////////
 
@@ -59,5 +59,5 @@ export async function autoWorkflow(
 
   // then create tag? release? attach release?
 
-  return runCtx;
+  return runSettings;
 }

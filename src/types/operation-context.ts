@@ -8,7 +8,7 @@ export interface OperationTriggerContext {
   parsedTriggerCommits: Commit[];
 }
 
-export interface OperationRunContext {
+export interface OperationRunSettings {
   rawInputs: ProviderInputs;
   inputs: InputsOutput;
   rawConfig: object;
