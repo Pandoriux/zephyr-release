@@ -144,4 +144,4 @@ export const ReviewConfigSchema = v.pipe(
 );
 
 type _ReviewConfigInput = v.InferInput<typeof ReviewConfigSchema>;
-type _ReviewConfigOutput = v.InferOutput<typeof ReviewConfigSchema>;
+export type ReviewConfigOutput = v.InferOutput<typeof ReviewConfigSchema>;

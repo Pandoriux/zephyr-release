@@ -11,7 +11,7 @@ import type {
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
-import type { PullRequestConfigOutput } from "../../schemas/configs/modules/pull-request-config.ts";
+import type { ReviewConfigOutput } from "../../schemas/configs/modules/review-config.ts";
 import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
@@ -29,7 +29,7 @@ export function createCustomStringPatternContext(
 type CreateFixedStrPatCtxConfigParams =
   & Pick<ConfigOutput, "name" | "timeZone">
   & {
-    pullRequest: Pick<PullRequestConfigOutput, "branchNameTemplate">;
+    review: Pick<ReviewConfigOutput, "workingBranchNameTemplate">;
   };
 
 export async function createFixedBaseStringPatternContext(
@@ -37,7 +37,8 @@ export async function createFixedBaseStringPatternContext(
   triggerBranchName: string,
   config: CreateFixedStrPatCtxConfigParams,
 ): Promise<void> {
-  const { name, timeZone, pullRequest: { branchNameTemplate } } = config;
+  const { name, timeZone } = config;
+  const { workingBranchNameTemplate } = config.review;
 
   const targetZoneId = ZoneId.of(timeZone);
   const zonedDateTime = nativeJs(startTime, targetZoneId);
@@ -72,7 +73,9 @@ export async function createFixedBaseStringPatternContext(
   Object.assign(STRING_PATTERN_CONTEXT, context);
 
   const workingBranchContext = {
-    workingBranchName: await resolveStringTemplateOrThrow(branchNameTemplate),
+    workingBranchName: await resolveStringTemplateOrThrow(
+      workingBranchNameTemplate,
+    ),
   } satisfies Pick<Record<FixedBaseStringPattern, string>, "workingBranchName">;
 
   Object.assign(STRING_PATTERN_CONTEXT, workingBranchContext);

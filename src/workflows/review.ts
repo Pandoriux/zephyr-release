@@ -24,7 +24,7 @@ export async function executeReviewStrategy(
       runSettings,
       bootstrapData,
     );
-  } else if (runSettings.config.release.createTag) {
+  } else if (runSettings.config.tag.createTag) {
     logger.subHeader("Review mode execution: Creating tag and release...");
     runSettings = await executeReviewPublishPhase(
       provider,

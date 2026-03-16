@@ -66,6 +66,15 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Calculate next version");
 
   // TODO, if next version = prev, exit
+  // logger.stepStart(
+  //   "Starting: Compare calculated next version with previous version",
+  // );
+  // if (previousVersion) {
+
+  // }
+  // logger.stepFinish(
+  //   "Finished: Compare calculated next version with previous version",
+  // );
 
   logger.debugStepStart(
     "Starting: Create fixed version and previous version string pattern context",
@@ -73,7 +82,7 @@ export async function executeReviewPreparePhase(
   createFixedPreviousVersionStringPatternContext(previousVersion);
   await createFixedVersionStringPatternContext(
     nextVersion,
-    runSettings.config.release.tagNameTemplate,
+    runSettings.config.tag.tagNameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",

@@ -65,4 +65,4 @@ export const TagConfigSchema = v.pipe(
 );
 
 type _TagConfigInput = v.InferInput<typeof TagConfigSchema>;
-type _TagConfigOutput = v.InferOutput<typeof TagConfigSchema>;
+export type TagConfigOutput = v.InferOutput<typeof TagConfigSchema>;

@@ -59,7 +59,7 @@ export async function executeReviewPublishPhase(
   );
   await createFixedVersionStringPatternContext(
     version,
-    runSettings.config.release.tagNameTemplate,
+    runSettings.config.tag.tagNameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",

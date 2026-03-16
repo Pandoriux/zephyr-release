@@ -1,12 +1,12 @@
 import { pooledMap } from "@std/async";
 import { AdditionalLabelOnCloseRemoveOptions } from "../constants/additional-label-options.ts";
-import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
+import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { taskLogger } from "./logger.ts";
 import { consumeAsyncIterable } from "../utils/async.ts";
 
 interface AddLabelsToPrConfigParams {
-  pullRequest: Pick<PullRequestConfigOutput, "label" | "additionalLabel">;
+  review: Pick<ReviewConfigOutput, "label" | "additionalLabel">;
 }
 
 export async function addLabelsToPullRequestOrThrow(
@@ -14,7 +14,7 @@ export async function addLabelsToPullRequestOrThrow(
   prNumber: number,
   config: AddLabelsToPrConfigParams,
 ) {
-  const { label, additionalLabel } = config.pullRequest;
+  const { label, additionalLabel } = config.review;
 
   taskLogger.info("Adding core labels...");
   await provider.addLabelsToPullRequestOrThrow(prNumber, {
@@ -39,7 +39,7 @@ export async function updateMergedPullRequestLabelsOrThrow(
   prNumber: number,
   config: UpdateMergedPrLabelsConfigParams,
 ) {
-  const { label, additionalLabel } = config.pullRequest;
+  const { label, additionalLabel } = config.review;
 
   taskLogger.info("Updating core labels on merged pull request...");
   await provider.removeLabelFromPullRequestOrThrow(

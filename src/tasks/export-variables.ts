@@ -82,11 +82,11 @@ export async function exportBaseOperationVariables(
       break;
 
     case "release":
-      if (config.release.createTag) {
+      if (config.tag.createTag) {
         operationJobs.push(OperationJobs.createTag);
       }
 
-      if (config.release.createTag && config.release.createReleaseNote) {
+      if (config.tag.createTag && config.release.createReleaseNote) {
         operationJobs.push(OperationJobs.createReleaseNote);
       }
 
@@ -95,11 +95,11 @@ export async function exportBaseOperationVariables(
     case "autorelease":
       operationJobs.push(OperationJobs.createCommit);
 
-      if (config.release.createTag) {
+      if (config.tag.createTag) {
         operationJobs.push(OperationJobs.createTag);
       }
 
-      if (config.release.createTag && config.release.createReleaseNote) {
+      if (config.tag.createTag && config.release.createReleaseNote) {
         operationJobs.push(OperationJobs.createReleaseNote);
       }
 

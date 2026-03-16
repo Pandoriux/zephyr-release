@@ -1,7 +1,7 @@
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import { TaggerDateOptions } from "../constants/release-tag-options.ts";
-import type { ReleaseConfigOutput } from "../schemas/configs/modules/release-config.ts";
+import type { TagConfigOutput } from "../schemas/configs/modules/tag-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { TaggerRequest } from "../types/tag.ts";
@@ -12,8 +12,8 @@ type CreateTagInputsParams = Pick<
 >;
 
 interface CreateTagConfigParams {
-  release: Pick<
-    ReleaseConfigOutput,
+  tag: Pick<
+    TagConfigOutput,
     | "tagNameTemplate"
     | "tagType"
     | "tagMessageTemplate"
@@ -34,7 +34,7 @@ export async function createTagOrThrow(
     tagMessageTemplate,
     tagMessageTemplatePath,
     tagger,
-  } = config.release;
+  } = config.tag;
 
   let tagMessage: string | undefined;
   if (tagMessageTemplatePath) {
