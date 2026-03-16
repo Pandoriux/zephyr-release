@@ -6,6 +6,7 @@ import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import { AllowReleaseAsOptions } from "../../constants/release-as-options.ts";
 import { calculateNextCoreSemVer } from "./core-calculations.ts";
 import { calculateNextExtensionsSemVer } from "./extension-calculations.ts";
+import { SafeExit } from "../../errors/safe-exit.ts";
 
 type CalculateNextVersionConfigParams = Pick<
   ConfigOutput,
@@ -143,4 +144,30 @@ function isReleaseAsAllowed(
   }
 
   return false;
+}
+
+export function compareVersionToPreviousVersionOrExit(
+  version: SemVer,
+  previousVersion: SemVer | undefined,
+) {
+  if (!previousVersion) {
+    taskLogger.info(
+      "Previous version is undefined; calculated next version is considered valid",
+    );
+    return;
+  }
+
+  const versionStr = format(version);
+  const previousVersionStr = format(previousVersion);
+
+  if (versionStr === previousVersionStr) {
+    throw new SafeExit(
+      `Calculated next version (${versionStr}) is unchanged compared to previous version (${previousVersionStr})`,
+    );
+  } else {
+    taskLogger.info(
+      `Calculated next version (${versionStr}) is different from previous version (${previousVersionStr}). Proceeding...`,
+    );
+    return;
+  }
 }
