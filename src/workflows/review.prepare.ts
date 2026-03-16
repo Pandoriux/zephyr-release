@@ -7,7 +7,10 @@ import {
 import { createOrUpdatePullRequestOrThrow } from "../tasks/pull-request.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { format } from "@std/semver";
-import { calculateNextVersion } from "../tasks/calculate-next-version/calculate-version.ts";
+import {
+  calculateNextVersion,
+  compareVersionToPreviousVersionOrExit,
+} from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
   createDynamicChangelogStringPatternContext,
@@ -65,16 +68,16 @@ export async function executeReviewPreparePhase(
   );
   logger.stepFinish("Finished: Calculate next version");
 
-  // TODO, if next version = prev, exit
-  // logger.stepStart(
-  //   "Starting: Compare calculated next version with previous version",
-  // );
-  // if (previousVersion) {
-
-  // }
-  // logger.stepFinish(
-  //   "Finished: Compare calculated next version with previous version",
-  // );
+  logger.stepStart(
+    "Starting: Compare calculated next version with previous version",
+  );
+  compareVersionToPreviousVersionOrExit(
+    nextVersion,
+    previousVersion,
+  );
+  logger.stepFinish(
+    "Finished: Compare calculated next version with previous version",
+  );
 
   logger.debugStepStart(
     "Starting: Create fixed version and previous version string pattern context",
