@@ -2,6 +2,7 @@ import fsPromises from "node:fs/promises";
 import fs from "node:fs";
 import { contentType } from "@std/media-types";
 import { extname } from "@std/path";
+import type { TagConfigOutput } from "../schemas/configs/modules/tag-config.ts";
 import type { ReleaseConfigOutput } from "../schemas/configs/modules/release-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -18,9 +19,9 @@ type CreateReleaseInputsParams = Pick<
 >;
 
 interface CreateReleaseConfigParams {
+  tag: Pick<TagConfigOutput, "tagNameTemplate">;
   release: Pick<
     ReleaseConfigOutput,
-    | "tagNameTemplate"
     | "prerelease"
     | "draft"
     | "setLatest"
@@ -37,8 +38,8 @@ export async function createRelease(
   config: CreateReleaseConfigParams,
 ) {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const { tagNameTemplate } = config.tag;
   const {
-    tagNameTemplate,
     prerelease,
     draft,
     setLatest,

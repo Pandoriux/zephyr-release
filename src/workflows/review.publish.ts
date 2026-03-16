@@ -1,8 +1,8 @@
 import { runCommandsOrThrow } from "../tasks/command.ts";
 import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
-  exportPostReleaseOperationVariables,
-  exportPreReleaseOperationVariables,
+  exportPostPublishOperationVariables,
+  exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
 import { updateMergedPullRequestLabelsOrThrow } from "../tasks/label.ts";
 import { logger } from "../tasks/logger.ts";
@@ -17,39 +17,35 @@ import {
   getPrimaryVersionFile,
   getVersionSemVerFromVersionFile,
 } from "../tasks/version-files/version-file.ts";
-import type { OperationRunContext } from "../types/operation-context.ts";
+import type { OperationRunSettings } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
 
-interface ReleaseWorkflowOptions {
-  associatedPrForCommit: ProviderPullRequest;
-  currentRunCtx: OperationRunContext;
-}
-
-export async function releaseWorkflow(
+export async function executeReviewPublishPhase(
   provider: PlatformProvider,
-  opts: ReleaseWorkflowOptions,
-): Promise<OperationRunContext> {
-  const { associatedPrForCommit, currentRunCtx } = opts;
-
+  currentRunSettings: OperationRunSettings,
+  associatedPrForCommit: ProviderPullRequest,
+): Promise<OperationRunSettings> {
   /**
-   * Release-specific operation run context.
+   * Publish phase run settings.
    */
-  let runCtx: OperationRunContext = currentRunCtx;
+  let runSettings: OperationRunSettings = currentRunSettings;
 
   logger.stepStart("Starting: Extract changelog from pull request body");
   const prChangelogRelease = extractChangelogFromPr(associatedPrForCommit);
   logger.stepFinish("Finished: Extract changelog from pull request body");
 
   logger.stepStart("Starting: Extract version from primary version file");
-  const primaryVersionFile = getPrimaryVersionFile(runCtx.config.versionFiles);
+  const primaryVersionFile = getPrimaryVersionFile(
+    runSettings.config.versionFiles,
+  );
   const version = await getVersionSemVerFromVersionFile(
     primaryVersionFile,
-    runCtx.inputs.sourceMode,
+    runSettings.inputs.sourceMode,
     provider,
-    runCtx.inputs.workspacePath,
-    runCtx.inputs.triggerCommitHash,
+    runSettings.inputs.workspacePath,
+    runSettings.inputs.triggerCommitHash,
   );
   if (!version) {
     throw new Error("Failed to extract version from primary version file");
@@ -63,7 +59,7 @@ export async function releaseWorkflow(
   );
   await createFixedVersionStringPatternContext(
     version,
-    runCtx.config.release.tagNameTemplate,
+    runSettings.config.tag.tagNameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -77,17 +73,17 @@ export async function releaseWorkflow(
     "Finished: Create dynamic changelog string pattern contextt",
   );
 
-  logger.debugStepStart("Starting: Export pre release operation variables");
-  await exportPreReleaseOperationVariables(
+  logger.debugStepStart("Starting: Export pre publish operation variables");
+  await exportPrePublishOperationVariables(
     provider,
     associatedPrForCommit.number,
     version,
   );
-  logger.debugStepFinish("Finished: Export pre release operation variables");
+  logger.debugStepFinish("Finished: Export pre publish operation variables");
 
   logger.stepStart("Starting: Execute release pre commands");
   const preResult = await runCommandsOrThrow(
-    runCtx.config.release.commandHook,
+    runSettings.config.commandHooks.publish,
     "pre",
   );
   if (preResult) {
@@ -103,13 +99,13 @@ export async function releaseWorkflow(
   );
   const _releasePreRuntimeConfigResult =
     await resolveRuntimeConfigOverrideOrThrow(
-      runCtx.rawConfig,
-      runCtx.config,
-      runCtx.inputs.workspacePath,
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
     );
   if (_releasePreRuntimeConfigResult) {
-    runCtx = {
-      ...runCtx,
+    runSettings = {
+      ...runSettings,
       rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePreRuntimeConfigResult.resolvedRuntime,
     };
@@ -125,37 +121,37 @@ export async function releaseWorkflow(
   logger.stepStart("Starting: Create tag");
   const createdTag = await createTagOrThrow(
     provider,
-    runCtx.inputs,
-    runCtx.config,
+    runSettings.inputs,
+    runSettings.config,
   );
   logger.stepFinish("Finished: Create tag");
 
   logger.stepStart("Starting: Create release");
   let createdReleaseNote: ProviderRelease | undefined;
-  if (!runCtx.config.release.skipReleaseNote) {
+  if (runSettings.config.release.createReleaseNote) {
     createdReleaseNote = await createRelease(
       provider,
-      runCtx.inputs,
-      runCtx.config,
+      runSettings.inputs,
+      runSettings.config,
     );
     logger.stepFinish("Finished: Create release");
   } else {
     logger.stepSkip(
-      "Skipped: Create release (config skip release note is true)",
+      "Skipped: Create release (config create release note is false)",
     );
   }
 
   logger.stepStart("Starting: Attach release assets");
-  if (createdReleaseNote?.id && runCtx.config.release.assets) {
+  if (createdReleaseNote?.id && runSettings.config.release.assets) {
     await attachReleaseAssets(
       provider,
       createdReleaseNote.id,
-      runCtx.config.release.assets,
+      runSettings.config.release.assets,
     );
     logger.stepFinish("Finished: Attach release assets");
   } else {
     logger.stepSkip(
-      "Skipped: Attach release assets (no assets to attach or config skip release note is true)",
+      "Skipped: Attach release assets (no assets to attach or config create release note is false)",
     );
   }
 
@@ -163,22 +159,22 @@ export async function releaseWorkflow(
   await updateMergedPullRequestLabelsOrThrow(
     provider,
     associatedPrForCommit.number,
-    runCtx.config,
+    runSettings.config,
   );
   logger.stepFinish("Finished: Update merged pull request labels");
 
-  logger.debugStepStart("Starting: Export post release operation variables");
-  await exportPostReleaseOperationVariables(
+  logger.debugStepStart("Starting: Export post publish operation variables");
+  await exportPostPublishOperationVariables(
     provider,
     createdTag.hash,
     createdReleaseNote?.id,
     createdReleaseNote?.uploadUrl,
   );
-  logger.debugStepFinish("Finished: Export post release operation variables");
+  logger.debugStepFinish("Finished: Export post publish operation variables");
 
   logger.stepStart("Starting: Execute release post commands");
   const postResult = await runCommandsOrThrow(
-    runCtx.config.release.commandHook,
+    runSettings.config.commandHooks.publish,
     "post",
   );
   if (postResult) {
@@ -194,13 +190,13 @@ export async function releaseWorkflow(
   );
   const _releasePostRuntimeConfigResult =
     await resolveRuntimeConfigOverrideOrThrow(
-      runCtx.rawConfig,
-      runCtx.config,
-      runCtx.inputs.workspacePath,
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
     );
   if (_releasePostRuntimeConfigResult) {
-    runCtx = {
-      ...runCtx,
+    runSettings = {
+      ...runSettings,
       rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePostRuntimeConfigResult.resolvedRuntime,
     };
@@ -213,5 +209,5 @@ export async function releaseWorkflow(
     );
   }
 
-  return runCtx;
+  return runSettings;
 }

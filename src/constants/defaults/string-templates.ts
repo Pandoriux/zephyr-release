@@ -1,6 +1,10 @@
 /** Fake fn just to get Liquid highlight from extension */
 const liquid = String.raw;
 
+// Review Proposal (PR)
+export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
+  "zephyr-release/{{ triggerBranchName }}";
+
 // Changelog
 export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
 
@@ -11,6 +15,10 @@ export const DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE =
 export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
   liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} [{{ hash | slice: 0, 7 }}](
   {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})`;
+
+// Commit
+export const DEFAULT_COMMIT_HEADER_TEMPLATE =
+  liquid`chore: release v{{ version }}`;
 
 // Pull request
 export const DEFAULT_PULL_REQUEST_TITLE_TEMPLATE =

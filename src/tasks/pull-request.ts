@@ -3,7 +3,7 @@ import type { CoreLabelOutput } from "../schemas/configs/modules/components/core
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
-import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
+import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import { PR_MARKERS } from "../constants/markers.ts";
@@ -14,7 +14,7 @@ type FindPrForCommitInputsParams = Pick<
 >;
 
 interface PullRequestBranchAndLabelConfigParams {
-  pullRequest: {
+  review: {
     label: { onCreate: CoreLabelOutput["onCreate"] };
   };
 }
@@ -27,9 +27,9 @@ export async function findPullRequestForCommitOrThrow(
 ): Promise<ProviderPullRequest | undefined> {
   const { triggerCommitHash, triggerBranchName } = inputs;
 
-  const label = typeof config.pullRequest.label.onCreate === "string"
-    ? config.pullRequest.label.onCreate
-    : config.pullRequest.label.onCreate.name;
+  const label = typeof config.review.label.onCreate === "string"
+    ? config.review.label.onCreate
+    : config.review.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestForCommitOrThrow(
     triggerCommitHash,
@@ -54,9 +54,9 @@ export async function findPullRequestFromBranchOrThrow(
 ): Promise<ProviderPullRequest | undefined> {
   const { triggerBranchName } = inputs;
 
-  const label = typeof config.pullRequest.label.onCreate === "string"
-    ? config.pullRequest.label.onCreate
-    : config.pullRequest.label.onCreate.name;
+  const label = typeof config.review.label.onCreate === "string"
+    ? config.review.label.onCreate
+    : config.review.label.onCreate.name;
 
   const foundPr = await provider.findUniquePullRequestFromBranchOrThrow(
     workingBranchName,
@@ -73,8 +73,8 @@ export async function findPullRequestFromBranchOrThrow(
 }
 
 interface CreatePullRequestContentConfigParams {
-  pullRequest: Pick<
-    PullRequestConfigOutput,
+  review: Pick<
+    ReviewConfigOutput,
     | "headerTemplate"
     | "headerTemplatePath"
     | "bodyTemplate"
@@ -99,7 +99,7 @@ export async function createPullRequestContent(
     bodyTemplatePath,
     footerTemplate,
     footerTemplatePath,
-  } = config.pullRequest;
+  } = config.review;
   const { triggerCommitHash, sourceMode, workspacePath } = inputs;
 
   let prHeader: string;
@@ -144,8 +144,8 @@ export async function createPullRequestContent(
 }
 
 interface CreateOrUpdatePullRequestConfigParams {
-  pullRequest: Pick<
-    PullRequestConfigOutput,
+  review: Pick<
+    ReviewConfigOutput,
     | "titleTemplate"
     | "titleTemplatePath"
     | "headerTemplate"
@@ -175,7 +175,7 @@ export async function createOrUpdatePullRequestOrThrow(
     triggerBranchName,
     associatedPrFromBranch,
   } = options;
-  const { titleTemplate } = config.pullRequest;
+  const { titleTemplate } = config.review;
 
   const prTitle = await resolveStringTemplateOrThrow(titleTemplate);
   const prContent = await createPullRequestContent(

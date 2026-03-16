@@ -1,4 +1,8 @@
-import type { OperationKind } from "../constants/operation-variables.ts";
+import type { ExecutionMode } from "../constants/execution-modes.ts";
+import type {
+  OperationKind,
+  OperationOutcome,
+} from "../constants/operation-variables.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 
 export type OperationVariables =
@@ -9,9 +13,6 @@ export type OperationVariables =
     sourceMode: string;
     internalSourceMode: string;
 
-    config: string;
-    internalConfig: string;
-
     parsedTriggerCommit: string;
     parsedTriggerCommitList: string;
 
@@ -19,8 +20,9 @@ export type OperationVariables =
     workingBranchRef: string;
     workingBranchHash: string;
 
+    mode: ExecutionMode;
     operation: OperationKind;
-    /** Stringify OperationJobs[] */
+    /** Stringified OperationJobs[] */
     jobs: string;
 
     // versioning and changelog
@@ -35,7 +37,12 @@ export type OperationVariables =
     releaseId?: string | number;
     releaseUploadUrl?: string;
 
+    outcome: OperationOutcome;
+
     // Dynamic operation variables
+    config: string;
+    internalConfig: string;
+
     patternContext: string;
     pullRequestNumber: number | undefined;
   };
@@ -45,38 +52,42 @@ export type BaseOperationVariables = Pick<
   | keyof Omit<InputsOutput, "token" | "sourceMode">
   | "sourceMode"
   | "internalSourceMode"
-  | "config"
-  | "internalConfig"
   | "parsedTriggerCommit"
   | "parsedTriggerCommitList"
   | "workingBranchName"
   | "workingBranchRef"
   | "workingBranchHash"
+  | "mode"
   | "operation"
   | "jobs"
 >;
 
 export type DynamicOperationVariables = Pick<
   OperationVariables,
-  "patternContext" | "pullRequestNumber"
+  | "config"
+  | "internalConfig"
+  | "patternContext"
+  | "pullRequestNumber"
 >;
 
-export type PreProposeOperationVariables = Pick<
+export type PrePrepareOperationVariables = Pick<
   OperationVariables,
   "resolvedCommitEntries" | "previousVersion" | "version"
 >;
 
-export type PostProposeOperationVariables = Pick<
+export type PostPrepareOperationVariables = Pick<
   OperationVariables,
   "committedFilePaths"
 >;
 
-export type PreReleaseOperationVariables = Pick<
+export type PrePublishOperationVariables = Pick<
   OperationVariables,
   "version"
 >;
 
-export type PostReleaseOperationVariables = Pick<
+export type PostPublishOperationVariables = Pick<
   OperationVariables,
   "tagHash" | "releaseId" | "releaseUploadUrl"
 >;
+
+export type FinalOperationVariables = Pick<OperationVariables, "outcome">;

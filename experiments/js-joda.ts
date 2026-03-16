@@ -1,5 +1,5 @@
-import { ZoneId } from '@js-joda/core';
-import '@js-joda/timezone';
+import { ZoneId } from "@js-joda/core";
+import "@js-joda/timezone";
 import console from "node:console";
 
 // 1. Get the full list
@@ -7,35 +7,47 @@ const allZones = ZoneId.getAvailableZoneIds();
 
 // 2. Define the "Standard" Continental Prefixes to EXCLUDE
 const commonPrefixes = [
-    "Africa/",
-    "America/",
-    "Antarctica/",
-    "Arctic/",
-    "Asia/",
-    "Atlantic/",
-    "Australia/",
-    "Europe/",
-    "Indian/",
-    "Pacific/", "US/", "Mexico/", "Brazil/", "Canada/", "Chile/"
+  "Africa/",
+  "America/",
+  "Antarctica/",
+  "Arctic/",
+  "Asia/",
+  "Atlantic/",
+  "Australia/",
+  "Europe/",
+  "Indian/",
+  "Pacific/",
+  "US/",
+  "Mexico/",
+  "Brazil/",
+  "Canada/",
+  "Chile/",
 ];
 
+const normalZones = allZones.filter((zone) => {
+  return commonPrefixes.some((prefix) => zone.startsWith(prefix));
+});
+
 // 3. Filter: Keep only those that DO NOT start with any common prefix
-const specialZones = allZones.filter(zone => {
-    // Returns true if the zone does NOT start with any of the prefixes
-    return !commonPrefixes.some(prefix => zone.startsWith(prefix));
+const specialZones = allZones.filter((zone) => {
+  // Returns true if the zone does NOT start with any of the prefixes
+  return !commonPrefixes.some((prefix) => zone.startsWith(prefix));
 });
 
 // 4. Sort for easier reading
+normalZones.sort();
 specialZones.sort();
 
+console.log(`\n--- Common Timezones (${normalZones.length}) ---`);
+console.log(normalZones);
 console.log(`\n--- Special / Unusual Timezones (${specialZones.length}) ---`);
-console.log(specialZones);
+// console.log(specialZones);
 
 // // Optional: Categorize them to see what they usually are
 // const etcZones = specialZones.filter(z => z.startsWith("Etc/"));
 // const systemVZones = specialZones.filter(z => z.startsWith("SystemV/"));
 // const usZones = specialZones.filter(z => z.startsWith("US/"));
-// const others = specialZones.filter(z => 
+// const others = specialZones.filter(z =>
 //     !z.startsWith("Etc/") && !z.startsWith("SystemV/") && !z.startsWith("US/")
 // );
 

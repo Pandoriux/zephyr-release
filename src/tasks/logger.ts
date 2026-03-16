@@ -8,6 +8,7 @@ import type {
 import {
   formatDebugMessage,
   formatDebugStepMessage,
+  formatHeaderMessage,
   formatIndentedMessage,
   formatNoticeMessage,
   formatStepMessage,
@@ -93,6 +94,11 @@ activeCoreLogger = defaultCoreLogger;
 
 export const logger: Logger = {
   info: (message: string) => activeCoreLogger.info(message),
+
+  header: (message: string) =>
+    activeCoreLogger.info(formatHeaderMessage(message, { padChar: "=" })),
+  subHeader: (message: string) =>
+    activeCoreLogger.info(formatHeaderMessage(message, { padChar: "-" })),
 
   step: (message: string) => activeCoreLogger.info(formatStepMessage(message)),
   stepStart: (message: string) =>

@@ -1,6 +1,7 @@
 export const OperationKinds = {
   propose: "propose",
   release: "release",
+  autorelease: "autorelease",
 } as const;
 
 export type OperationKind = typeof OperationKinds[keyof typeof OperationKinds];
@@ -10,6 +11,16 @@ export const OperationJobs = {
   updatePr: "update-pr",
   createTag: "create-tag",
   createReleaseNote: "create-release-note",
+  createCommit: "create-commit",
 } as const;
 
 export type OperationJob = typeof OperationJobs[keyof typeof OperationJobs];
+
+const OperationOutcomes = {
+  success: "success",
+  skipped: "skipped",
+  failure: "failure",
+} as const;
+
+export type OperationOutcome =
+  typeof OperationOutcomes[keyof typeof OperationOutcomes];

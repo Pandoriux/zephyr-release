@@ -18,7 +18,7 @@ import { prepareChangelogFileToCommit } from "./changelog.ts";
 import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
-import type { PullRequestConfigOutput } from "../schemas/configs/modules/pull-request-config.ts";
+import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -274,22 +274,19 @@ type PrepareChangesInputsParams = Pick<
   "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
-type PrepareChangesConfigParams =
-  & Pick<
-    ConfigOutput,
-    "versionFiles" | "localFilesToCommit"
-  >
-  & {
-    changelog: Pick<
-      ChangelogConfigOutput,
-      | "writeToFile"
-      | "path"
-      | "fileHeaderTemplate"
-      | "fileHeaderTemplatePath"
-      | "fileFooterTemplate"
-      | "fileFooterTemplatePath"
-    >;
-  };
+type PrepareChangesConfigParams = {
+  versionFiles: ConfigOutput["versionFiles"];
+  changelog: Pick<
+    ChangelogConfigOutput,
+    | "writeToFile"
+    | "path"
+    | "fileHeaderTemplate"
+    | "fileHeaderTemplatePath"
+    | "fileFooterTemplate"
+    | "fileFooterTemplatePath"
+  >;
+  commit: Pick<CommitConfigOutput, "localFilesToCommit">;
+};
 
 export async function prepareChangesToCommit(
   provider: PlatformProvider,
@@ -298,7 +295,8 @@ export async function prepareChangesToCommit(
   newData: { changelogRelease: string; nextVersion: string },
 ): Promise<Map<string, string>> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
-  const { versionFiles, localFilesToCommit, changelog } = config;
+  const { versionFiles, changelog, commit } = config;
+  const { localFilesToCommit } = commit;
   const { writeToFile, path } = changelog;
   const { changelogRelease, nextVersion } = newData;
 
@@ -405,33 +403,90 @@ export async function prepareChangesToCommit(
   return changesData;
 }
 
+type CommitChangesInputsParams = Pick<
+  InputsOutput,
+  "workspacePath" | "sourceMode"
+>;
+
 interface CommitChangesConfigParams {
-  pullRequest: Pick<
-    PullRequestConfigOutput,
-    | "titleTemplate"
-    | "titleTemplatePath"
+  commit: Pick<
+    CommitConfigOutput,
+    | "headerTemplate"
+    | "headerTemplatePath"
+    | "bodyTemplate"
+    | "bodyTemplatePath"
+    | "footerTemplate"
+    | "footerTemplatePath"
   >;
 }
 
 export async function commitChangesToBranch(
   provider: PlatformProvider,
+  inputs: CommitChangesInputsParams,
+  config: CommitChangesConfigParams,
   options: {
     triggerCommitHash: string;
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
-    workingBranchName: string;
+    targetBranchName: string;
+    force?: boolean;
   },
-  config: CommitChangesConfigParams,
 ) {
+  const { workspacePath, sourceMode } = inputs;
+  const {
+    headerTemplate,
+    headerTemplatePath,
+    bodyTemplate,
+    bodyTemplatePath,
+    footerTemplate,
+    footerTemplatePath,
+  } = config.commit;
   const {
     triggerCommitHash,
     baseTreeHash,
     changesToCommit,
-    workingBranchName,
+    targetBranchName,
+    force,
   } = options;
-  const { titleTemplate } = config.pullRequest;
 
-  const commitMessage = await resolveStringTemplateOrThrow(titleTemplate);
+  let commitHeader: string;
+  if (headerTemplatePath) {
+    const headerTemplateFromFile = await getTextFileOrThrow(
+      sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
+      headerTemplatePath,
+      { provider, workspacePath, ref: triggerCommitHash },
+    );
+    commitHeader = await resolveStringTemplateOrThrow(headerTemplateFromFile);
+  } else {
+    commitHeader = await resolveStringTemplateOrThrow(headerTemplate);
+  }
+
+  let commitBody: string | undefined;
+  if (bodyTemplatePath) {
+    const bodyTemplateFromFile = await getTextFileOrThrow(
+      sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
+      bodyTemplatePath,
+      { provider, workspacePath, ref: triggerCommitHash },
+    );
+    commitBody = await resolveStringTemplateOrThrow(bodyTemplateFromFile);
+  } else if (bodyTemplate) {
+    commitBody = await resolveStringTemplateOrThrow(bodyTemplate);
+  }
+
+  let commitFooter: string | undefined;
+  if (footerTemplatePath) {
+    const footerTemplateFromFile = await getTextFileOrThrow(
+      sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
+      footerTemplatePath,
+      { provider, workspacePath, ref: triggerCommitHash },
+    );
+    commitFooter = await resolveStringTemplateOrThrow(footerTemplateFromFile);
+  } else if (footerTemplate) {
+    commitFooter = await resolveStringTemplateOrThrow(footerTemplate);
+  }
+
+  const commitMessage = [commitHeader, commitBody, commitFooter].filter(Boolean)
+    .join("\n\n");
 
   taskLogger.info("Creating commit and pushing to working branch...");
   const createdCommit = await provider.createCommitOnBranchOrThrow(
@@ -439,7 +494,8 @@ export async function commitChangesToBranch(
     baseTreeHash,
     changesToCommit,
     commitMessage,
-    workingBranchName,
+    targetBranchName,
+    force,
   );
 
   return createdCommit;

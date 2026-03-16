@@ -1,4 +1,4 @@
-import type { OctokitClient } from "./octokit.ts";
+import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
@@ -47,7 +47,7 @@ const RawBranchPullRequestsSchema = v.object({
   }),
 });
 
-export async function githubFindUniquePullRequestForCommitOrThrow(
+async function githubFindUniquePullRequestForCommitOrThrow(
   octokit: OctokitClient,
   commitHash: string,
   sourceBranch: string,
@@ -135,7 +135,7 @@ export async function githubFindUniquePullRequestForCommitOrThrow(
   return foundPr;
 }
 
-export async function githubFindUniquePullRequestFromBranchOrThrow(
+async function githubFindUniquePullRequestFromBranchOrThrow(
   octokit: OctokitClient,
   branchName: string,
   targetBranch: string,
@@ -211,7 +211,7 @@ export async function githubFindUniquePullRequestFromBranchOrThrow(
   return foundPr;
 }
 
-export async function githubCreatePullRequestOrThrow(
+async function githubCreatePullRequestOrThrow(
   octokit: OctokitClient,
   sourceBranch: string,
   targetBranch: string,
@@ -236,7 +236,7 @@ export async function githubCreatePullRequestOrThrow(
   };
 }
 
-export async function githubUpdatePullRequestOrThrow(
+async function githubUpdatePullRequestOrThrow(
   octokit: OctokitClient,
   number: number,
   title: string,
@@ -257,4 +257,59 @@ export async function githubUpdatePullRequestOrThrow(
     title: res.data.title,
     body: res.data.body || "",
   };
+}
+
+export function makeGithubFindUniquePullRequestForCommitOrThrow(
+  getOctokit: GetOctokitFn,
+) {
+  return (
+    commitHash: string,
+    sourceBranch: string,
+    targetBranch: string,
+    label: string,
+  ) =>
+    githubFindUniquePullRequestForCommitOrThrow(
+      getOctokit(),
+      commitHash,
+      sourceBranch,
+      targetBranch,
+      label,
+    );
+}
+
+export function makeGithubFindUniquePullRequestFromBranchOrThrow(
+  getOctokit: GetOctokitFn,
+) {
+  return (
+    branchName: string,
+    targetBranch: string,
+    requiredLabel: string,
+  ) =>
+    githubFindUniquePullRequestFromBranchOrThrow(
+      getOctokit(),
+      branchName,
+      targetBranch,
+      requiredLabel,
+    );
+}
+
+export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
+  return (
+    sourceBranch: string,
+    targetBranch: string,
+    title: string,
+    body: string,
+  ) =>
+    githubCreatePullRequestOrThrow(
+      getOctokit(),
+      sourceBranch,
+      targetBranch,
+      title,
+      body,
+    );
+}
+
+export function makeGithubUpdatePullRequestOrThrow(getOctokit: GetOctokitFn) {
+  return (number: number, title: string, body: string) =>
+    githubUpdatePullRequestOrThrow(getOctokit(), number, title, body);
 }

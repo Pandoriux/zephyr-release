@@ -105,28 +105,33 @@ jobs:
 
 ### ⚠️ Crucial: Managing Concurrency
 
-Because Zephyr Release resolves history up to the specific trigger commit to manage proposal PRs and tags/releases, running multiple workflows at the same time can lead to collisions or race conditions.  
+Because Zephyr Release resolves history up to the specific trigger commit to manage proposal PRs and tags/releases, running multiple workflows at the same time can lead to collisions or race conditions.
+
+- In **Review Mode**, parallel runs can collide while trying to update the same Release PR.
+- In **Auto Mode**, parallel runs will try to push version bump commits and Git tags to your branch simultaneously, resulting in Git push rejections and failed workflows.
+
 To prevent this, you must handle **parallel runs (concurrency)** by putting workflows into a queue so they run one-at-a-time (as shown above)
 
-<br/>
+> *More [examples](./docs/examples/).*
 
-**More examples:** [examples](./docs/examples/)
+## How It Works
 
-## How It Work
+Zephyr Release automates your versioning and changelogs. You can choose between two distinct [modes](./docs/config-options.md#mode-optional) for your workflow:  
 
-Zephyr Release follows a three-step cycle to automate your versioning and changelogs while ensuring you maintain control over the final release.
+- **Review Mode:** Creates a pull request and await for human approval.
+- **Auto Mode:** Releases automatically on every ***valid*** push (based on your [strategy](./docs/config-options.md#release--auto-strategy-optional)).
 
 ### 1. The Trigger
 
-Begin by creating commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. If you are working through Pull Requests (recommended), you *should* use **Squash and Merge** to maintain a linear git history.
+Begin by creating commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.  
+If you are working through Pull Requests (recommended), you should use **Squash and Merge** to maintain a linear git history.
 
-#### Handling Multiple Changes in one PR
+#### Handling Multiple Changes in one PR (Review Mode)
 
-If a single PR contains multiple features or fixes that need individual entries, you can use `APPEND` or `OVERRIDE` blocks in your PR commit body. Zephyr Release will parse these block and treat each entry as an individual commit for versioning purposes (which will affect both calculating next version and changelog generation).
+If a single Pull Request contains multiple features or fixes that need individual changelog entries, you can use `APPEND` or `OVERRIDE` blocks in your PR commit body. Zephyr Release will parse these blocks and treat each entry as an individual commit for versioning purposes.
 
-> Each entry must be a single line and follow conventional format: `<type>(<scope>)<!>: <description>`.
->
-> If both `APPEND` and `OVERRIDE` block exist, `OVERRIDE` will take over.
+> Each entry must be a single line and follow the conventional format: `<type>(<scope>)<!>: <description>`.  
+> If both an `APPEND` and `OVERRIDE` block exist, `OVERRIDE` will take over.
 
 Example:
 
@@ -144,21 +149,23 @@ docs: update API documentation
 END_OVERRIDE_CHANGES
 ```
 
-### 2. The Proposal
+### 2. The Execution (Based on Mode)
 
-Once a change is detected, Zephyr Release automatically creates (or updates) a **"Release Proposal" Pull Request**.
+Depending on your chosen mode, Zephyr Release will take different actions when a change is detected on your branch.
 
-- **Version Calculation**: It calculates the next [Semantic Version](https://semver.org/) based on your commit history.
-- **File Updates**: It updates the version in the files defined in your `version-files` configuration (e.g., `deno.json`).
-- **Changelog Preview**: It generates a preview of the upcoming release notes for your review.
-- **Sync**: The PR stays open and updates automatically with every new commit pushed to your branch.
+#### Mode: Review (Default)
 
-### 3. The Release
+This mode is best for teams that want human eyes on a release before it goes live.
 
-When you are ready to ship, simply **merge** the "Release Proposal" PR. Zephyr Release detects that this specific "propose" commit has landed in your default branch and will:
+- **The Proposal:** Zephyr Release automatically creates (or updates) a **Release Pull Request**. It calculates the next [Semantic Version](https://semver.org/), updates your `version-files` (e.g., `deno.json`), and generates a changelog preview. The PR stays open and updates automatically with every new commit.
+- **The Release:** When you are ready to ship, simply **merge** the PR. Zephyr Release detects the merge, automatically creates a Git Tag, and publishes the final Release.
 
-- **Create a Git Tag**: Automatically tags the repository with the new version number.
-- **Publish Release Notes**: Generates and publishes the final release.
+#### Mode: Auto
+
+This mode is perfect for libraries, packages, or rapid continuous deployment where no human review is needed.
+
+- **Direct Release:** Zephyr Release bypasses the Pull Request entirely. It calculates the new version, updates your files, generates the changelog, and pushes a new commit directly back to your branch.
+- **Instant Tagging:** In the exact same run, it creates the Git Tag and publishes the Release. *(Note: Zephyr automatically formats the commit to prevent infinite CI loops).*
 
 ## Dynamic Configuration Overrides
 
@@ -167,7 +174,7 @@ Sometimes a static configuration file is not enough. For example, you might want
 **1. Workflow Input Override:** You can generate configuration data in an earlier step of your CI/CD workflow and pass it directly into the operation using the [`config-override`](./docs/input-options.md#config-override-optional) input. This is great if your workflow already knows what needs to change before Zephyr Release even starts.
 
 **2. Runtime File Override:** If you need to calculate settings *during* the release process itself, you can use [`runtime-config-override`](./docs/config-options.md#runtime-config-override-optional).
-By pairing it with various [`command-hook`](./docs/config-options.md#command-hook-optional) options, you can run a custom script that generates a temporary JSON file on the runner. Zephyr Release will automatically read this file and merge it into your configuration after every `command-hook` run.
+By pairing it with various [`command-hooks`](./docs/config-options.md#command-hooks-optional) options, you can run a custom script that generates a temporary JSON file on the runner. Zephyr Release will automatically read this file and merge it into your configuration after any of `base`, `prepare`, or `publish` hooks run.
 
 ## Force a Specific Version
 

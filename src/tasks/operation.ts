@@ -3,10 +3,25 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
+import { taskLogger } from "./logger.ts";
+import type { InputsOutput } from "../schemas/inputs/inputs.ts";
+import { initTomlEditJs } from "../libs/@rainbowatcher/toml-edit-js/initWasm.ts";
+
+export function initOperationRuntime(
+  provider: PlatformProvider,
+  inputs: InputsOutput,
+) {
+  taskLogger.info("Setting up provider context with inputs");
+  provider.setupProviderContext(inputs);
+
+  taskLogger.info("Initializing @rainbowatcher/toml-edit-js wasm module...");
+  initTomlEditJs();
+}
 
 export function validateCurrentOperationTriggerCtxOrExit(
   provider: PlatformProvider,
   allowedCommitTypes: ConfigOutput["commitTypes"],
+  mode: ConfigOutput["mode"],
 ): OperationTriggerContext {
   const operationContext = provider.getOperationTriggerContextOrThrow();
 
@@ -34,12 +49,18 @@ export function validateCurrentOperationTriggerCtxOrExit(
     parsedTriggerCommits: parsedTriggerCommits,
   } satisfies OperationTriggerContext;
 
-  if (
-    !((parsedLatestTriggerCommit.type &&
-      allowedTypes.has(parsedLatestTriggerCommit.type)) ||
-      parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type)))
-  ) {
-    throw new SafeExit("No commits with an allowed type found");
+  const hasAllowedType = (parsedLatestTriggerCommit.type &&
+    allowedTypes.has(parsedLatestTriggerCommit.type)) ||
+    parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type));
+
+  if (!hasAllowedType) {
+    if (mode !== "auto") {
+      taskLogger.info(
+        'No commits with an allowed type found. But operation continues because execution mode is "auto"',
+      );
+    } else {
+      throw new SafeExit("No commits with an allowed type found");
+    }
   }
 
   return parsedOperationContext;

@@ -20,7 +20,7 @@ async function main() {
     markProcessEnd("Finished");
   } catch (error) {
     if (error instanceof SafeExit) {
-      logger.info(`ℹ️  ${error.message}`);
+      logger.info(`ℹ️ Operation Exited Safely! • ${error.message}`);
 
       markProcessEnd("Exit");
     } else {

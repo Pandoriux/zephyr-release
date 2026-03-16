@@ -1,11 +1,11 @@
 import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
-import { githubGetTextFileOrThrow } from "./file.ts";
+import { makeGithubGetTextFileOrThrow } from "./file.ts";
 import {
-  githubCreatePullRequestOrThrow,
-  githubFindUniquePullRequestForCommitOrThrow,
-  githubFindUniquePullRequestFromBranchOrThrow,
-  githubUpdatePullRequestOrThrow,
+  makeGithubCreatePullRequestOrThrow,
+  makeGithubFindUniquePullRequestForCommitOrThrow,
+  makeGithubFindUniquePullRequestFromBranchOrThrow,
+  makeGithubUpdatePullRequestOrThrow,
 } from "./pull-request.ts";
 import {
   githubGetCommitPathPart,
@@ -16,37 +16,30 @@ import {
 } from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { githubExportEnvVars, githubExportOutputs } from "./export.ts";
-import { githubEnsureBranchExistOrThrow } from "./branch.ts";
+import { makeGithubEnsureBranchExistOrThrow } from "./branch.ts";
 import {
-  githubCompareCommitsOrThrow,
-  githubCreateCommitOnBranchOrThrow,
-  githubFindCommitsFromGivenToPreviousTaggedOrThrow,
-  githubGetCommitOrThrow,
+  makeGithubCompareCommitsOrThrow,
+  makeGithubCreateCommitOnBranchOrThrow,
+  makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow,
+  makeGithubGetCommitOrThrow,
 } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import {
-  githubCreateTagOrThrow,
   githubGetCompareTagUrl,
-  githubGetCompareTagUrlFromCurrentToLatest,
-  githubGetLatestReleaseTagOrThrow,
+  makeGithubCreateTagOrThrow,
+  makeGithubGetCompareTagUrlFromCurrentToLatest,
+  makeGithubGetLatestReleaseTagOrThrow,
 } from "./tag.ts";
 import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
 import {
-  githubAddLabelsToPullRequestOrThrow,
-  githubRemoveLabelFromPullRequestOrThrow,
+  makeGithubAddLabelsToPullRequestOrThrow,
+  makeGithubRemoveLabelFromPullRequestOrThrow,
 } from "./label.ts";
-import type { ProviderLabelOptions } from "../../types/providers/label.ts";
-import type { TaggerRequest } from "../../types/tag.ts";
-import type { TagTypeOption } from "../../constants/release-tag-options.ts";
 import {
-  githubAttachReleaseAssetOrThrow,
-  githubCreateReleaseOrThrow,
+  makeGithubAttachReleaseAssetOrThrow,
+  makeGithubCreateReleaseOrThrow,
 } from "./release.ts";
-import type {
-  ProviderAssetParams,
-  ProviderReleaseOptions,
-} from "../../types/providers/release.ts";
 import { githubGetReferenceUrl } from "./reference.ts";
 
 export function createGitHubProvider(): PlatformProvider {
@@ -82,194 +75,43 @@ export function createGitHubProvider(): PlatformProvider {
 
     getReferenceUrl: githubGetReferenceUrl,
     getCompareTagUrl: githubGetCompareTagUrl,
-    getCompareTagUrlFromCurrentToLatest: (
-      currentTag: string,
-      skip?: number,
-    ) => {
-      return githubGetCompareTagUrlFromCurrentToLatest(
-        getOctokit(),
-        currentTag,
-        skip,
-      );
-    },
+    getCompareTagUrlFromCurrentToLatest:
+      makeGithubGetCompareTagUrlFromCurrentToLatest(getOctokit),
 
-    getTextFileOrThrow: async (filePath: string, ref?: string) => {
-      return await githubGetTextFileOrThrow(getOctokit(), filePath, ref);
-    },
+    getTextFileOrThrow: makeGithubGetTextFileOrThrow(getOctokit),
 
-    ensureBranchExistOrThrow: async (
-      branchName: string,
-      commitHash: string,
-    ) => {
-      return await githubEnsureBranchExistOrThrow(
-        getOctokit(),
-        branchName,
-        commitHash,
-      );
-    },
+    ensureBranchExistOrThrow: makeGithubEnsureBranchExistOrThrow(getOctokit),
 
-    findUniquePullRequestForCommitOrThrow: async (
-      commitHash: string,
-      sourceBranch: string,
-      targetBranch: string,
-      label: string,
-    ) => {
-      return await githubFindUniquePullRequestForCommitOrThrow(
-        getOctokit(),
-        commitHash,
-        sourceBranch,
-        targetBranch,
-        label,
-      );
-    },
+    findUniquePullRequestForCommitOrThrow:
+      makeGithubFindUniquePullRequestForCommitOrThrow(getOctokit),
 
-    findUniquePullRequestFromBranchOrThrow: async (
-      branchName: string,
-      targetBranch: string,
-      requiredLabel: string,
-    ) => {
-      return await githubFindUniquePullRequestFromBranchOrThrow(
-        getOctokit(),
-        branchName,
-        targetBranch,
-        requiredLabel,
-      );
-    },
+    findUniquePullRequestFromBranchOrThrow:
+      makeGithubFindUniquePullRequestFromBranchOrThrow(getOctokit),
 
-    findCommitsFromGivenToPreviousTaggedOrThrow: async (
-      commitHash: string,
-      stopResolvingCommitAt?: number | string,
-    ) => {
-      return await githubFindCommitsFromGivenToPreviousTaggedOrThrow(
-        getOctokit(),
-        commitHash,
-        stopResolvingCommitAt,
-      );
-    },
-    compareCommitsOrThrow: async (
-      base: string,
-      head: string,
-    ) => {
-      return await githubCompareCommitsOrThrow(
-        getOctokit(),
-        base,
-        head,
-      );
-    },
-    getCommit: async (hash: string) => {
-      return await githubGetCommitOrThrow(getOctokit(), hash);
-    },
-    createCommitOnBranchOrThrow: async (
-      triggerCommitHash: string,
-      baseTreeHash: string,
-      changesToCommit: Map<string, string>,
-      message: string,
-      workingBranchName: string,
-    ) => {
-      return await githubCreateCommitOnBranchOrThrow(
-        getOctokit(),
-        {
-          triggerCommitHash,
-          baseTreeHash,
-          changesToCommit,
-          message,
-          workingBranchName,
-        },
-      );
-    },
+    findCommitsFromGivenToPreviousTaggedOrThrow:
+      makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow(getOctokit),
+    compareCommitsOrThrow: makeGithubCompareCommitsOrThrow(getOctokit),
+    getCommit: makeGithubGetCommitOrThrow(getOctokit),
+    createCommitOnBranchOrThrow:
+      makeGithubCreateCommitOnBranchOrThrow(getOctokit),
 
-    createPullRequestOrThrow: async (
-      sourceBranch: string,
-      targetBranch: string,
-      title: string,
-      body: string,
-    ) => {
-      return await githubCreatePullRequestOrThrow(
-        getOctokit(),
-        sourceBranch,
-        targetBranch,
-        title,
-        body,
-      );
-    },
-    updatePullRequestOrThrow: async (
-      number: number,
-      title: string,
-      body: string,
-    ) => {
-      return await githubUpdatePullRequestOrThrow(
-        getOctokit(),
-        number,
-        title,
-        body,
-      );
-    },
+    createPullRequestOrThrow:
+      makeGithubCreatePullRequestOrThrow(getOctokit),
+    updatePullRequestOrThrow:
+      makeGithubUpdatePullRequestOrThrow(getOctokit),
 
-    addLabelsToPullRequestOrThrow: async (
-      prNumber: number,
-      labelOptions: ProviderLabelOptions,
-    ) => {
-      return await githubAddLabelsToPullRequestOrThrow(
-        getOctokit(),
-        prNumber,
-        labelOptions,
-      );
-    },
-    removeLabelFromPullRequestOrThrow: async (
-      prNumber: number,
-      label: string,
-    ) => {
-      return await githubRemoveLabelFromPullRequestOrThrow(
-        getOctokit(),
-        prNumber,
-        label,
-      );
-    },
+    addLabelsToPullRequestOrThrow:
+      makeGithubAddLabelsToPullRequestOrThrow(getOctokit),
+    removeLabelFromPullRequestOrThrow:
+      makeGithubRemoveLabelFromPullRequestOrThrow(getOctokit),
 
-    getLatestReleaseTagOrThrow: async () => {
-      return await githubGetLatestReleaseTagOrThrow(getOctokit());
-    },
-    createTagOrThrow: async (
-      tagName: string,
-      commitHash: string,
-      tagType: TagTypeOption,
-      message: string,
-      tagger?: TaggerRequest,
-    ) => {
-      return await githubCreateTagOrThrow(
-        getOctokit(),
-        tagName,
-        commitHash,
-        tagType,
-        message,
-        tagger,
-      );
-    },
+    getLatestReleaseTagOrThrow:
+      makeGithubGetLatestReleaseTagOrThrow(getOctokit),
+    createTagOrThrow: makeGithubCreateTagOrThrow(getOctokit),
 
-    createReleaseOrThrow: async (
-      tagName: string,
-      title: string,
-      body: string,
-      options: ProviderReleaseOptions,
-    ) => {
-      return await githubCreateReleaseOrThrow(
-        getOctokit(),
-        tagName,
-        title,
-        body,
-        options,
-      );
-    },
-    attachReleaseAssetOrThrow: async (
-      releaseId: string,
-      asset: ProviderAssetParams,
-    ) => {
-      return await githubAttachReleaseAssetOrThrow(
-        getOctokit(),
-        releaseId,
-        asset,
-      );
-    },
+    createReleaseOrThrow: makeGithubCreateReleaseOrThrow(getOctokit),
+    attachReleaseAssetOrThrow:
+      makeGithubAttachReleaseAssetOrThrow(getOctokit),
 
     exportOutputs: githubExportOutputs,
     exportEnvVars: githubExportEnvVars,

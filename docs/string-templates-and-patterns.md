@@ -9,7 +9,7 @@ Example:
 - [Pr title template](./config-options.md#pull--title-template-optional): `chore: release {{ name | upper }} version {{version}}`
 - [Tag template](./config-options.md#release--tag-name-template-optional): `v{{version}}`
 
-<br/>
+<br>
 
 Under the hood, Zephyr Release uses **LiquidJS** as the template engine. For more advanced usages, refer to the [LiquidJS official documentation](https://liquidjs.com/tutorials/intro-to-liquid.html).
 
@@ -31,10 +31,15 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 - `{{ host }}`: Repository host
 - `{{ namespace }}`: Repository namespace (organization or user)
 - `{{ repository }}`: Repository name
-- `{{ commitPathPart }}`: the commit part of the url
-- `{{ referencePathPart }}`: the reference part of the url
+- `{{ commitPathPart }}`: The commit part of the url
+- `{{ referencePathPart }}`: The reference part of the url
 
-<br/>
+<br>
+
+- `{{ triggerBranchName }}`: The trigger branch name
+- `{{ workingBranchName }}`: the working branch name
+
+<br>
 
 - `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
 - `{{ timestamp }}`: Timestamp, always UTC
@@ -47,18 +52,18 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 - `{{ versionPre }}`: The calculated next prerelease identifier of the semantic version
 - `{{ versionBld }}`: The calculated next build metadata of the semantic version
 
-<br/>
+<br>
 
 - `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#release--tag-name-template-optional))
 
 #### Previous Version
 
+Only available in "auto" mode or "review" mode propose operation. Can be undefined if the project has no version yet (the calculated version is initial version)
+
 - `{{ previousVersion }}`: The previous full semantic version (SemVer)
 - `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
 - `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
 - `{{ previousVersionBld }}`: The previous build metadata of the semantic version
-
-> Only available in "propose" operation. Can be undefined if the project has no version yet (calculated next version is initial version)
 
 ### Dynamic String Patterns
 

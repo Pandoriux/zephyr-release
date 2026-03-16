@@ -1,9 +1,9 @@
 import { taskLogger } from "../../tasks/logger.ts";
 import type { ProviderBranch } from "../../types/providers/branch.ts";
-import type { OctokitClient } from "./octokit.ts";
+import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
-export async function githubEnsureBranchExistOrThrow(
+async function githubEnsureBranchExistOrThrow(
   octokit: OctokitClient,
   branchName: string,
   commitHash: string,
@@ -61,6 +61,11 @@ export async function githubEnsureBranchExistOrThrow(
 
     throw error;
   }
+}
+
+export function makeGithubEnsureBranchExistOrThrow(getOctokit: GetOctokitFn) {
+  return (branchName: string, commitHash: string) =>
+    githubEnsureBranchExistOrThrow(getOctokit(), branchName, commitHash);
 }
 
 // Helper made by AI, might need verification
