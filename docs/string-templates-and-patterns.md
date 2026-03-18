@@ -6,8 +6,8 @@ To inject values into your templates, put [patterns](#available-string-patterns)
 
 Example:
 
-- [Pr title template](./config-options.md#pull--title-template-optional): `chore: release {{ name | upper }} version {{version}}`
-- [Tag template](./config-options.md#release--tag-name-template-optional): `v{{version}}`
+- [Pr title template](./config-options.md#review--title-template-optional): `chore: release {{ name | upper }} version {{ version }}`
+- [Tag template](./config-options.md#tag--name-template-optional): `v{{ version }}`
 
 <br>
 
@@ -43,7 +43,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 - `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
 - `{{ timestamp }}`: Timestamp, always UTC
-- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` — date/time components
+- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` - date/time components
 
 #### Version (and tag)
 
@@ -54,7 +54,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 <br>
 
-- `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#release--tag-name-template-optional))
+- `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#tag--name-template-optional))
 
 #### Previous Version
 

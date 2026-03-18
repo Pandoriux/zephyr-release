@@ -119,7 +119,7 @@ To prevent this, you must handle **parallel runs (concurrency)** by putting work
 Zephyr Release automates your versioning and changelogs. You can choose between two distinct [modes](./docs/config-options.md#mode-optional) for your workflow:  
 
 - **Review Mode:** Creates a pull request and await for human approval.
-- **Auto Mode:** Releases automatically on every ***valid*** push (based on your [strategy](./docs/config-options.md#release--auto-strategy-optional)).
+- **Auto Mode:** Releases automatically on every ***valid*** push (based on your [strategy](./docs/config-options.md#auto--trigger-strategy-optional)).
 
 ### 1. The Trigger
 

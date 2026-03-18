@@ -70,17 +70,17 @@ These variables are available starting from the first [`command-hooks > base > p
   Export: zr-mode; Env: ZR_MODE
 - **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when create/update pull request, "release" when create tag and publish release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
   Export: zr-operation; Env: ZR_OPERATION
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release-note" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-tag" and/or "create-release-note" and/or "create-commit"  
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release-note" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [pre prepare phase](#pre-prepare)  
   Export: zr-jobs; Env: ZR_JOBS
 
 ### Dynamic (available at all time)
 
 These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `pullRequestNumber`).
 
-- **config:** **Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-path-optional) is applied during execution, ensuring it always reflects the active configuration rules.  
+- **config:** **Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution, ensuring it always reflects the active configuration rules.  
   Export: zr-config; Env: ZR_CONFIG
 
-- **internalConfig:** **Current** internally resolved config object, with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). This value also updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-path-optional) is applied during execution. For schema shape see: [config.ts](../src/schemas/configs/config.ts)  
+- **internalConfig:** **Current** internally resolved config object, with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). This value also updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution. For schema shape see: [config.ts](../src/schemas/configs/config.ts)  
   Export: zr-internal-config; Env: ZR_INTERNAL_CONFIG
 
 <br>
@@ -93,36 +93,39 @@ These variables are exposed continuously throughout the operation, and their val
   For example, when there is no PR open for "propose" operation yet, the initial value will be undefined. Then the "create-pr" job will create the PR, and re-update the number. The value can now be accessed in the next cmds like ([`command-hooks > prepare > post`](./config-options.md#command-hooks-optional))  
   Export: zr-pull-request-number; Env: ZR_PULL_REQUEST_NUMBER
 
-### Review mode - Propose (when operation is "propose")
+### Prepare Phase
 
-#### Pre Propose
+#### Pre Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > pre`](./config-options.md#command-hooks-optional) command runs.
 
 - **resolvedCommitEntries:** Array of resolved commit entries (parsed and filtered) from the trigger commit to the last release (JSON stringified). Each entry contains fields such as hash, type, scope, subject, isBreaking, etc. See: [commit.ts](../src/tasks/commit.ts)  
   Export: zr-resolved-commit-entries; Env: ZR_RESOLVED_COMMIT_ENTRIES
 
-- **previousVersion:** Current version string  
-  Export: zr-current-version; Env: ZR_CURRENT_VERSION
+- **previousVersion:** Previous version string (the current version of your project)  
+  Export: zr-previous-version; Env: ZR_PREVIOUS_VERSION
 
-- **version:** Next version string  
-  Export: zr-next-version; Env: ZR_NEXT_VERSION
+- **version:** Calculated next version string  
+  Export: zr-version; Env: ZR_VERSION
 
-#### Post Propose
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is already avaiable at [base](#base-available-at-all-time). For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-commit" and/or "create-tag" and/or "create-release-note"  
+  Export: zr-jobs; Env: ZR_JOBS
+
+#### Post Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > post`](./config-options.md#command-hooks-optional) command runs.
 
 - **committedFilePaths:** Stringified array of file paths that have been committed  
   Export: zr-committed-file-paths; Env: ZR_COMMITTED_FILE_PATHS
 
-### Review mode - Release (when operation is "release")
+### Publish Phase
 
-#### Pre Release
+#### Pre Publish
 
 - **version:** The version string used for the release  
   Export: zr-next-version; Env: ZR_NEXT_VERSION
 
-#### Post Release
+#### Post Publish
 
 These variables are available starting from the first [`command-hooks > publish > post`](./config-options.md#command-hooks-optional) command runs.
 
