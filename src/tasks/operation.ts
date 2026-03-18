@@ -54,7 +54,7 @@ export function validateCurrentOperationTriggerCtxOrExit(
     parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type));
 
   if (!hasAllowedType) {
-    if (mode !== "auto") {
+    if (mode === "auto") {
       taskLogger.info(
         'No commits with an allowed type found. But operation continues because execution mode is "auto"',
       );
