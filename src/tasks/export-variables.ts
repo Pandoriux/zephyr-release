@@ -22,7 +22,6 @@ import { taskLogger } from "./logger.ts";
 import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 import {
   type OperationJob,
-  OperationJobs,
   type OperationKind,
   OperationKinds,
   type OperationOutcome,
@@ -55,53 +54,46 @@ export async function exportBaseOperationVariables(
     config,
   } = options;
 
-  let operationTarget: OperationKind | undefined;
+  let operationKind: OperationKind | undefined;
   switch (config.mode) {
     case "review":
-      operationTarget = prForCommit
+      operationKind = prForCommit
         ? OperationKinds.release
         : OperationKinds.propose;
 
       break;
 
     case "auto":
-      operationTarget = OperationKinds.autorelease;
+      operationKind = OperationKinds.autorelease;
 
       break;
   }
 
   const operationJobs: OperationJob[] = [];
-  switch (operationTarget) {
+  switch (operationKind) {
     case "propose":
       if (prFromBranch) {
-        operationJobs.push(OperationJobs.updatePr);
+        operationJobs.push("update-pr");
       } else {
-        operationJobs.push(OperationJobs.createPr);
+        operationJobs.push("create-pr");
       }
 
       break;
 
     case "release":
       if (config.tag.createTag) {
-        operationJobs.push(OperationJobs.createTag);
+        operationJobs.push("create-tag");
       }
 
-      if (config.tag.createTag && config.release.createReleaseNote) {
-        operationJobs.push(OperationJobs.createReleaseNote);
+      if (config.tag.createTag && config.release.createRelease) {
+        operationJobs.push("create-release");
       }
 
       break;
 
     case "autorelease":
-      operationJobs.push(OperationJobs.createCommit);
-
-      if (config.tag.createTag) {
-        operationJobs.push(OperationJobs.createTag);
-      }
-
-      if (config.tag.createTag && config.release.createReleaseNote) {
-        operationJobs.push(OperationJobs.createReleaseNote);
-      }
+      // Empty
+      // For mode "auto", jobs are available at post prepare phase
 
       break;
   }
@@ -126,13 +118,13 @@ export async function exportBaseOperationVariables(
     workingBranchHash: workingBranchResult.object.sha,
 
     mode: config.mode,
-    operation: operationTarget,
+    operation: operationKind,
     jobs: JSON.stringify(operationJobs),
 
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
-    pullRequestNumber: operationTarget === "propose"
+    pullRequestNumber: operationKind === "propose"
       ? prFromBranch?.number
       : prForCommit?.number,
     patternContext: await stringifyCurrentPatternContext(),
@@ -187,9 +179,24 @@ export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
   prNumber: number,
   changesData: Map<string, string>,
+  config?: ConfigOutput,
 ) {
+  const operationJobs: OperationJob[] = [];
+  if (config) {
+    operationJobs.push("create-commit");
+
+    if (config.tag.createTag) {
+      operationJobs.push("create-tag");
+    }
+
+    if (config.tag.createTag && config.release.createRelease) {
+      operationJobs.push("create-release");
+    }
+  }
+
   const prepareExportObject = {
     committedFilePaths: JSON.stringify([...changesData.keys()]),
+    jobs: JSON.stringify(operationJobs),
 
     pullRequestNumber: prNumber,
     patternContext: await stringifyCurrentPatternContext(),

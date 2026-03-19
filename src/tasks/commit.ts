@@ -405,7 +405,7 @@ export async function prepareChangesToCommit(
 
 type CommitChangesInputsParams = Pick<
   InputsOutput,
-  "workspacePath" | "sourceMode"
+  "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
 interface CommitChangesConfigParams {
@@ -420,19 +420,18 @@ interface CommitChangesConfigParams {
   >;
 }
 
-export async function commitChangesToBranch(
+export async function commitChangesToBranchOrThrow(
   provider: PlatformProvider,
   inputs: CommitChangesInputsParams,
   config: CommitChangesConfigParams,
   options: {
-    triggerCommitHash: string;
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
     targetBranchName: string;
     force?: boolean;
   },
 ) {
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const {
     headerTemplate,
     headerTemplatePath,
@@ -442,7 +441,6 @@ export async function commitChangesToBranch(
     footerTemplatePath,
   } = config.commit;
   const {
-    triggerCommitHash,
     baseTreeHash,
     changesToCommit,
     targetBranchName,

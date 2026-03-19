@@ -10,7 +10,7 @@ export const OperationJobs = {
   createPr: "create-pr",
   updatePr: "update-pr",
   createTag: "create-tag",
-  createReleaseNote: "create-release-note",
+  createRelease: "create-release",
   createCommit: "create-commit",
 } as const;
 

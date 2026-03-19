@@ -17,7 +17,7 @@ export async function executeReviewStrategy(
 
   if (!bootstrapData.associatedPrForCommit) {
     logger.subHeader(
-      "Review mode execution: Creating/Updating release proposal pull request...",
+      "Review mode execution (prepare): Creating/Updating release proposal pull request...",
     );
     runSettings = await executeReviewPreparePhase(
       provider,
@@ -25,7 +25,9 @@ export async function executeReviewStrategy(
       bootstrapData,
     );
   } else if (runSettings.config.tag.createTag) {
-    logger.subHeader("Review mode execution: Creating tag and release...");
+    logger.subHeader(
+      "Review mode execution (publish): Creating tag and release...",
+    );
     runSettings = await executeReviewPublishPhase(
       provider,
       runSettings,
@@ -33,7 +35,7 @@ export async function executeReviewStrategy(
     );
   } else {
     logger.subHeader(
-      "Review mode execution: Skip create tag and release (disabled in config)",
+      "Review mode execution (publish): Skip create tag and release (disabled in config)",
     );
   }
 

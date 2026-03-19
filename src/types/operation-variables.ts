@@ -77,7 +77,7 @@ export type PrePrepareOperationVariables = Pick<
 
 export type PostPrepareOperationVariables = Pick<
   OperationVariables,
-  "committedFilePaths"
+  "jobs" | "committedFilePaths"
 >;
 
 export type PrePublishOperationVariables = Pick<

@@ -78,8 +78,7 @@ export const AutoStrategySchema = v.variant("type", [
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          'The specific value the footer token must have (e.g., "true"). If omitted, the strategy triggers as long as ' +
-          "the token exists.",
+          'The specific value the footer token must have (e.g., "true"). If omitted, only the token presence is required.',
       }),
     ),
   }),

@@ -1,6 +1,6 @@
 import { logger } from "../tasks/logger.ts";
 import {
-  commitChangesToBranch,
+  commitChangesToBranchOrThrow,
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
@@ -85,7 +85,7 @@ export async function executeReviewPreparePhase(
   createFixedPreviousVersionStringPatternContext(previousVersion);
   await createFixedVersionStringPatternContext(
     nextVersion,
-    runSettings.config.tag.tagNameTemplate,
+    runSettings.config.tag.nameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -100,21 +100,21 @@ export async function executeReviewPreparePhase(
   );
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
-  logger.stepStart("Starting: Execute pull request pre commands");
+  logger.stepStart("Starting: Execute prepare pre commands");
   const preResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.prepare,
     "pre",
   );
   if (preResult) {
     logger.stepFinish(
-      `Finished: Execute pull request pre commands. ${preResult}`,
+      `Finished: Execute prepare pre commands. ${preResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute pull request pre commands (empty)");
+    logger.stepSkip("Skipped: Execute prepare pre commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (pull request pre commands)",
+    "Starting: Resolve runtime config override (prepare pre commands)",
   );
   const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
     runSettings.rawConfig,
@@ -128,11 +128,11 @@ export async function executeReviewPreparePhase(
       config: _prPreRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
-      "Finished: Resolve runtime config override (pull request pre commands)",
+      "Finished: Resolve runtime config override (prepare pre commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (pull request pre commands)",
+      "Skipped: Resolve runtime config override (prepare pre commands)",
     );
   }
 
@@ -169,12 +169,11 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const _commitResult = await commitChangesToBranch(
+  const _commitResult = await commitChangesToBranchOrThrow(
     provider,
     runSettings.inputs,
     runSettings.config,
     {
-      triggerCommitHash: runSettings.inputs.triggerCommitHash,
       baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
       changesToCommit: changesData,
       targetBranchName: workingBranchResult.name,
@@ -204,21 +203,21 @@ export async function executeReviewPreparePhase(
   await exportPostPrepareOperationVariables(provider, prNumber, changesData);
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
-  logger.stepStart("Starting: Execute pull request post commands");
+  logger.stepStart("Starting: Execute prepare post commands");
   const postResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.prepare,
     "post",
   );
   if (postResult) {
     logger.stepFinish(
-      `Finished: Execute pull request post commands. ${postResult}`,
+      `Finished: Execute prepare post commands. ${postResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute pull request post commands (empty)");
+    logger.stepSkip("Skipped: Execute prepare post commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (pull request post commands)",
+    "Starting: Resolve runtime config override (prepare post commands)",
   );
   const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
     runSettings.rawConfig,
@@ -232,11 +231,11 @@ export async function executeReviewPreparePhase(
       config: _prPostRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
-      "Finished: Resolve runtime config override (pull request post commands)",
+      "Finished: Resolve runtime config override (prepare post commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (pull request post commands)",
+      "Skipped: Resolve runtime config override (prepare post commands)",
     );
   }
 

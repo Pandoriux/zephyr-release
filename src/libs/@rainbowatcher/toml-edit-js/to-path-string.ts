@@ -1,6 +1,6 @@
 /**
  * Convert a path array (e.g. from nimma) to a TOML path string for @rainbowatcher/toml-edit-js.
- * Format: "key.subkey[0].field" — keys as-is, indices as [n]; keys with dots/spaces quoted.
+ * Format: "key.subkey[0].field" - keys as-is, indices as [n]; keys with dots/spaces quoted.
  */
 export function toTomlPathString(pathArray: (string | number)[]): string {
   return pathArray.reduce<string>((acc, seg, i) => {

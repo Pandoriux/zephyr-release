@@ -70,7 +70,7 @@ These variables are available starting from the first [`command-hooks > base > p
   Export: zr-mode; Env: ZR_MODE
 - **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when create/update pull request, "release" when create tag and publish release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
   Export: zr-operation; Env: ZR_OPERATION
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release-note" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [pre prepare phase](#pre-prepare)  
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [popst prepare phase](#post-prepare)  
   Export: zr-jobs; Env: ZR_JOBS
 
 ### Dynamic (available at all time)
@@ -108,15 +108,15 @@ These variables are available starting from the first [`command-hooks > prepare 
 - **version:** Calculated next version string  
   Export: zr-version; Env: ZR_VERSION
 
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is already avaiable at [base](#base-available-at-all-time). For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-commit" and/or "create-tag" and/or "create-release-note"  
-  Export: zr-jobs; Env: ZR_JOBS
-
 #### Post Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > post`](./config-options.md#command-hooks-optional) command runs.
 
 - **committedFilePaths:** Stringified array of file paths that have been committed  
   Export: zr-committed-file-paths; Env: ZR_COMMITTED_FILE_PATHS
+
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is already avaiable at [base](#base-available-at-all-time). For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-commit" and/or "create-tag" and/or "create-release"  
+  Export: zr-jobs; Env: ZR_JOBS
 
 ### Publish Phase
 

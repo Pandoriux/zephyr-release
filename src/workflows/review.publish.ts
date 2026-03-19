@@ -59,7 +59,7 @@ export async function executeReviewPublishPhase(
   );
   await createFixedVersionStringPatternContext(
     version,
-    runSettings.config.tag.tagNameTemplate,
+    runSettings.config.tag.nameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -81,21 +81,21 @@ export async function executeReviewPublishPhase(
   );
   logger.debugStepFinish("Finished: Export pre publish operation variables");
 
-  logger.stepStart("Starting: Execute release pre commands");
+  logger.stepStart("Starting: Execute publish pre commands");
   const preResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.publish,
     "pre",
   );
   if (preResult) {
     logger.stepFinish(
-      `Finished: Execute release pre commands. ${preResult}`,
+      `Finished: Execute publish pre commands. ${preResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute release pre commands (empty)");
+    logger.stepSkip("Skipped: Execute publish pre commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (release pre commands)",
+    "Starting: Resolve runtime config override (publish pre commands)",
   );
   const _releasePreRuntimeConfigResult =
     await resolveRuntimeConfigOverrideOrThrow(
@@ -110,11 +110,11 @@ export async function executeReviewPublishPhase(
       config: _releasePreRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
-      "Finished: Resolve runtime config override (release pre commands)",
+      "Finished: Resolve runtime config override (publish pre commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (release pre commands)",
+      "Skipped: Resolve runtime config override (publish pre commands)",
     );
   }
 
@@ -172,21 +172,21 @@ export async function executeReviewPublishPhase(
   );
   logger.debugStepFinish("Finished: Export post publish operation variables");
 
-  logger.stepStart("Starting: Execute release post commands");
+  logger.stepStart("Starting: Execute publish post commands");
   const postResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.publish,
     "post",
   );
   if (postResult) {
     logger.stepFinish(
-      `Finished: Execute release post commands. ${postResult}`,
+      `Finished: Execute publish post commands. ${postResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute release post commands (empty)");
+    logger.stepSkip("Skipped: Execute publish post commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (release post commands)",
+    "Starting: Resolve runtime config override (publish post commands)",
   );
   const _releasePostRuntimeConfigResult =
     await resolveRuntimeConfigOverrideOrThrow(
@@ -201,11 +201,11 @@ export async function executeReviewPublishPhase(
       config: _releasePostRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
-      "Finished: Resolve runtime config override (release post commands)",
+      "Finished: Resolve runtime config override (publish post commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (release post commands)",
+      "Skipped: Resolve runtime config override (publish post commands)",
     );
   }
 

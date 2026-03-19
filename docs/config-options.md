@@ -1108,7 +1108,7 @@ A discriminated union based on the `type` field. Defines the strategy for automa
 
 - `type` (Required): `"commit-footer"`
 - `token` (Required): The conventional commit footer token to look for (e.g., `"Autorelease"`).
-- `value` (Optional): The specific value the footer token must have (e.g., `"true"`). If omitted, the strategy triggers as long as the token exists.
+- `value` (Optional): The specific value the footer token must have (e.g., `"true"`). If omitted, only the token's presence is required.
 
 **Type: `"flag"`** - Triggers a release based on a strict boolean flag. Ideal for dynamic configuration overrides and custom script evaluations. The strategy will be evaluated after the cmd hooks `base.pre` and `prepare.pre` run.
 
