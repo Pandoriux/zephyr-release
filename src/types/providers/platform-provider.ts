@@ -11,7 +11,6 @@ import type {
   ProviderCommit,
   ProviderCommitDetails,
   ProviderCompareCommits,
-  ProviderWorkingCommit,
 } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
 import type { ProviderPullRequest } from "./pull-request.ts";
@@ -79,7 +78,7 @@ export interface PlatformProvider {
     message: string,
     targetBranchName: string,
     force?: boolean,
-  ) => Promise<ProviderWorkingCommit>;
+  ) => Promise<ProviderCommit>;
 
   createPullRequestOrThrow: (
     sourceBranch: string,

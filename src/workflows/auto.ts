@@ -14,7 +14,6 @@ import {
 } from "../tasks/commit.ts";
 import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
-  exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
@@ -44,9 +43,9 @@ export async function executeAutoStrategy(
   opts: AutoWorkflowOptions,
 ) {
   const {
-    workingBranchResult,
-    associatedPrForCommit,
-    associatedPrFromBranch,
+    // workingBranchResult,
+    // associatedPrForCommit,
+    // associatedPrFromBranch,
     triggerContext,
   } = opts;
 
@@ -203,7 +202,7 @@ export async function executeAutoStrategy(
   logger.stepFinish("Finished: Commit changes");
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  await exportPostPrepareOperationVariables(provider, prNumber, changesData); // expect error, do not fix
+  // await exportPostPrepareOperationVariables(provider, prNumber, changesData); // expect error, do not fix
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");

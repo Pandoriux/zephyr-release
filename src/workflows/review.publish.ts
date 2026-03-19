@@ -128,7 +128,7 @@ export async function executeReviewPublishPhase(
 
   logger.stepStart("Starting: Create release");
   let createdReleaseNote: ProviderRelease | undefined;
-  if (runSettings.config.release.createReleaseNote) {
+  if (runSettings.config.release.createRelease) {
     createdReleaseNote = await createRelease(
       provider,
       runSettings.inputs,

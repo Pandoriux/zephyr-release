@@ -19,7 +19,7 @@ type CreateReleaseInputsParams = Pick<
 >;
 
 interface CreateReleaseConfigParams {
-  tag: Pick<TagConfigOutput, "tagNameTemplate">;
+  tag: Pick<TagConfigOutput, "nameTemplate">;
   release: Pick<
     ReleaseConfigOutput,
     | "prerelease"
@@ -38,7 +38,7 @@ export async function createRelease(
   config: CreateReleaseConfigParams,
 ) {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
-  const { tagNameTemplate } = config.tag;
+  const { tag } = config;
   const {
     prerelease,
     draft,
@@ -74,7 +74,7 @@ export async function createRelease(
   }
 
   const createdRelease = await provider.createReleaseOrThrow(
-    await resolveStringTemplateOrThrow(tagNameTemplate),
+    await resolveStringTemplateOrThrow(tag.nameTemplate),
     releaseNoteTitle,
     releaseNoteBody,
     { prerelease, draft, setLatest },
