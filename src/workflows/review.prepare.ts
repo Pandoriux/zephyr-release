@@ -13,6 +13,7 @@ import {
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
+  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -128,6 +129,7 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
     );
@@ -232,6 +234,7 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",
     );

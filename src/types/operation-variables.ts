@@ -44,7 +44,7 @@ export type OperationVariables =
     internalConfig: string;
 
     patternContext: string;
-    proposalId: string | undefined;
+    proposalId?: string;
   };
 
 export type BaseOperationVariables = Pick<

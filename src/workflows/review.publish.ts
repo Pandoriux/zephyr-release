@@ -9,6 +9,7 @@ import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import {
+  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
@@ -111,6 +112,7 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePreRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish pre commands)",
     );
@@ -202,6 +204,7 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePostRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish post commands)",
     );

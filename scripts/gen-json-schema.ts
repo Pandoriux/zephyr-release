@@ -113,13 +113,13 @@ function createTransformers(casingFn: GenJsonSchemaConfig["casingFn"]) {
       if ("description" in schema && typeof schema.description === "string") {
         schema.description = schema.description.replace(
           /`([^`]+)`/g,
-          (match, content) => {
-            const replacement = schemaPropertyNameMap.get(content);
-            if (!replacement) {
-              return match;
-            }
+          (_match, content: string) => {
+            const transformedContent = content
+              .split(".")
+              .map((part) => schemaPropertyNameMap.get(part) ?? part)
+              .join(".");
 
-            return "`" + replacement + "`";
+            return "`" + transformedContent + "`";
           },
         );
       }
