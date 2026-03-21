@@ -41,10 +41,10 @@ export const BaseConfigSchema = v.object({
   mode: v.pipe(
     v.optional(v.enum(ExecutionModes), "review"),
     v.metadata({
-      description:
-        'Defines the execution strategy. "review" routes updates through a Pull Request. ' +
-        '"auto" bypasses the PR and commits directly to the branch.\n' +
-        'If choosing "auto", see release `autoStrategy`.\n' +
+      description: "Defines the execution strategy:\n" +
+        '- "review": routes updates through a proposal (PR, MR, ...).\n' +
+        '- "auto": bypasses the proposal and commits directly to the branch.\n' +
+        'If choosing "auto", see `auto.triggerStrategy`.\n' +
         'Default: "review"',
     }),
   ),
@@ -68,7 +68,7 @@ export const BaseConfigSchema = v.object({
           v.optional(CommandHookSchema, {}),
           v.metadata({
             description:
-              "Pre/post commands to run around the pull request operation. Each command runs from the repository root.\n" +
+              "Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.\n" +
               "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
           }),
         ),

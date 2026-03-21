@@ -13,7 +13,7 @@ import type {
   ProviderCompareCommits,
 } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
-import type { ProviderPullRequest } from "./pull-request.ts";
+import type { ProviderProposal } from "./proposal.ts";
 import type { ProviderOperationTriggerContext } from "./provider-operation-context.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { ProviderTag } from "./tag.ts";
@@ -49,18 +49,18 @@ export interface PlatformProvider {
     commitHash: string,
   ) => Promise<ProviderBranch>;
 
-  findUniquePullRequestForCommitOrThrow: (
+  findUniqueProposalForCommitOrThrow: (
     commitHash: string,
     sourceBranch: string,
     targetBranch: string,
     label: string,
-  ) => Promise<ProviderPullRequest | undefined>;
+  ) => Promise<ProviderProposal | undefined>;
 
-  findUniquePullRequestFromBranchOrThrow: (
+  findUniqueProposalFromBranchOrThrow: (
     branchName: string,
     targetBranch: string,
     requiredLabel: string,
-  ) => Promise<ProviderPullRequest | undefined>;
+  ) => Promise<ProviderProposal | undefined>;
 
   findCommitsFromGivenToPreviousTaggedOrThrow: (
     commitHash: string,
@@ -80,24 +80,24 @@ export interface PlatformProvider {
     force?: boolean,
   ) => Promise<ProviderCommit>;
 
-  createPullRequestOrThrow: (
+  createProposalOrThrow: (
     sourceBranch: string,
     targetBranch: string,
     title: string,
     body: string,
-  ) => Promise<ProviderPullRequest>;
-  updatePullRequestOrThrow: (
-    number: number,
+  ) => Promise<ProviderProposal>;
+  updateProposalOrThrow: (
+    id: string,
     title: string,
     body: string,
-  ) => Promise<ProviderPullRequest>;
+  ) => Promise<ProviderProposal>;
 
-  addLabelsToPullRequestOrThrow: (
-    prNumber: number,
+  addLabelsToProposalOrThrow: (
+    proposalId: string,
     labelOptions: ProviderLabelOptions,
   ) => Promise<void>;
-  removeLabelFromPullRequestOrThrow: (
-    prNumber: number,
+  removeLabelFromProposalOrThrow: (
+    proposalId: string,
     label: string,
   ) => Promise<void>;
 

@@ -27,13 +27,13 @@ import type {
   OperationTriggerContext,
 } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../types/providers/proposal.ts";
 import { evaluateAutoModeTriggerStrategyOrExit } from "../tasks/auto-trigger-strategy.ts";
 
 interface AutoWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
-  associatedPrForCommit: ProviderPullRequest | undefined;
-  associatedPrFromBranch: ProviderPullRequest | undefined;
+  associatedProposalForCommit: ProviderProposal | undefined;
+  associatedProposalFromBranch: ProviderProposal | undefined;
   triggerContext: OperationTriggerContext;
 }
 
@@ -44,8 +44,8 @@ export async function executeAutoStrategy(
 ) {
   const {
     // workingBranchResult,
-    // associatedPrForCommit,
-    // associatedPrFromBranch,
+    // associatedProposalForCommit,
+    // associatedProposalFromBranch,
     triggerContext,
   } = opts;
 
@@ -128,16 +128,17 @@ export async function executeAutoStrategy(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
-  const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPreRuntimeConfigResult) {
+  const _preparePreRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPreRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPreRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
@@ -221,16 +222,17 @@ export async function executeAutoStrategy(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
-  const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPostRuntimeConfigResult) {
+  const _preparePostRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPostRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPostRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",

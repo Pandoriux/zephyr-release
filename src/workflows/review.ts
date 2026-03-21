@@ -15,9 +15,9 @@ export async function executeReviewStrategy(
    */
   let runSettings: OperationRunSettings = currentRunSettings;
 
-  if (!bootstrapData.associatedPrForCommit) {
+  if (!bootstrapData.associatedProposalForCommit) {
     logger.subHeader(
-      "Review mode execution (prepare): Creating/Updating release proposal pull request...",
+      "Review mode execution (prepare): Creating/Updating release proposal (PR, MR, etc.)...",
     );
     runSettings = await executeReviewPreparePhase(
       provider,
@@ -31,7 +31,7 @@ export async function executeReviewStrategy(
     runSettings = await executeReviewPublishPhase(
       provider,
       runSettings,
-      bootstrapData.associatedPrForCommit,
+      bootstrapData.associatedProposalForCommit,
     );
   } else {
     logger.subHeader(

@@ -2,36 +2,36 @@ import { taskLogger } from "./logger.ts";
 import type { CoreLabelOutput } from "../schemas/configs/modules/components/core-label.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../types/providers/proposal.ts";
 import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
-import { PR_MARKERS } from "../constants/markers.ts";
+import { PROPOSAL_MARKERS } from "../constants/markers.ts";
 
-type FindPrForCommitInputsParams = Pick<
+type FindProposalForCommitInputsParams = Pick<
   InputsOutput,
   "triggerCommitHash" | "triggerBranchName"
 >;
 
-interface PullRequestBranchAndLabelConfigParams {
+interface ProposalBranchAndLabelConfigParams {
   review: {
     label: { onCreate: CoreLabelOutput["onCreate"] };
   };
 }
 
-export async function findPullRequestForCommitOrThrow(
+export async function findProposalForCommitOrThrow(
   provider: PlatformProvider,
   workingBranchName: string,
-  inputs: FindPrForCommitInputsParams,
-  config: PullRequestBranchAndLabelConfigParams,
-): Promise<ProviderPullRequest | undefined> {
+  inputs: FindProposalForCommitInputsParams,
+  config: ProposalBranchAndLabelConfigParams,
+): Promise<ProviderProposal | undefined> {
   const { triggerCommitHash, triggerBranchName } = inputs;
 
   const label = typeof config.review.label.onCreate === "string"
     ? config.review.label.onCreate
     : config.review.label.onCreate.name;
 
-  const foundPr = await provider.findUniquePullRequestForCommitOrThrow(
+  const foundProposal = await provider.findUniqueProposalForCommitOrThrow(
     triggerCommitHash,
     workingBranchName,
     triggerBranchName,
@@ -39,40 +39,40 @@ export async function findPullRequestForCommitOrThrow(
   );
 
   taskLogger.debug(
-    `Found associated pull request for trigger commit (${triggerCommitHash}):\n` +
-      JSON.stringify(foundPr, null, 2),
+    `Found associated proposal for trigger commit (${triggerCommitHash}):\n` +
+      JSON.stringify(foundProposal, null, 2),
   );
 
-  return foundPr;
+  return foundProposal;
 }
 
-export async function findPullRequestFromBranchOrThrow(
+export async function findProposalFromBranchOrThrow(
   provider: PlatformProvider,
   workingBranchName: string,
-  inputs: FindPrForCommitInputsParams,
-  config: PullRequestBranchAndLabelConfigParams,
-): Promise<ProviderPullRequest | undefined> {
+  inputs: FindProposalForCommitInputsParams,
+  config: ProposalBranchAndLabelConfigParams,
+): Promise<ProviderProposal | undefined> {
   const { triggerBranchName } = inputs;
 
   const label = typeof config.review.label.onCreate === "string"
     ? config.review.label.onCreate
     : config.review.label.onCreate.name;
 
-  const foundPr = await provider.findUniquePullRequestFromBranchOrThrow(
+  const foundProposal = await provider.findUniqueProposalFromBranchOrThrow(
     workingBranchName,
     triggerBranchName,
     label,
   );
 
   taskLogger.debug(
-    `Found associated pull request for branch '${workingBranchName}':\n` +
-      JSON.stringify(foundPr, null, 2),
+    `Found associated proposal for branch '${workingBranchName}':\n` +
+      JSON.stringify(foundProposal, null, 2),
   );
 
-  return foundPr;
+  return foundProposal;
 }
 
-interface CreatePullRequestContentConfigParams {
+interface CreateProposalContentConfigParams {
   review: Pick<
     ReviewConfigOutput,
     | "headerTemplate"
@@ -84,13 +84,13 @@ interface CreatePullRequestContentConfigParams {
   >;
 }
 
-export async function createPullRequestContent(
+export async function createProposalContent(
   provider: PlatformProvider,
   inputs: Pick<
     InputsOutput,
     "triggerCommitHash" | "sourceMode" | "workspacePath"
   >,
-  config: CreatePullRequestContentConfigParams,
+  config: CreateProposalContentConfigParams,
 ): Promise<string> {
   const {
     headerTemplate,
@@ -102,48 +102,54 @@ export async function createPullRequestContent(
   } = config.review;
   const { triggerCommitHash, sourceMode, workspacePath } = inputs;
 
-  let prHeader: string;
+  let proposalHeader: string;
   if (headerTemplatePath) {
-    const prHeaderTemplate = await getTextFileOrThrow(
+    const proposalHeaderTemplate = await getTextFileOrThrow(
       sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
       headerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    prHeader = await resolveStringTemplateOrThrow(prHeaderTemplate);
+    proposalHeader = await resolveStringTemplateOrThrow(proposalHeaderTemplate);
   } else {
-    prHeader = await resolveStringTemplateOrThrow(headerTemplate);
+    proposalHeader = await resolveStringTemplateOrThrow(headerTemplate);
   }
 
-  let prBody: string;
+  let proposalBody: string;
   if (bodyTemplatePath) {
-    const prBodyTemplate = await getTextFileOrThrow(
+    const proposalBodyTemplate = await getTextFileOrThrow(
       sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    prBody = await resolveStringTemplateOrThrow(prBodyTemplate);
+    proposalBody = await resolveStringTemplateOrThrow(proposalBodyTemplate);
   } else {
-    prBody = await resolveStringTemplateOrThrow(bodyTemplate);
+    proposalBody = await resolveStringTemplateOrThrow(bodyTemplate);
   }
-  const prBodyWithMarkers = [PR_MARKERS.bodyStart, prBody, PR_MARKERS.bodyEnd]
+  const proposalBodyWithMarkers = [
+    PROPOSAL_MARKERS.bodyStart,
+    proposalBody,
+    PROPOSAL_MARKERS.bodyEnd,
+  ]
     .join("\n");
 
-  let prFooter: string;
+  let proposalFooter: string;
   if (footerTemplatePath) {
-    const prFooterTemplate = await getTextFileOrThrow(
+    const proposalFooterTemplate = await getTextFileOrThrow(
       sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
       footerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    prFooter = await resolveStringTemplateOrThrow(prFooterTemplate);
+    proposalFooter = await resolveStringTemplateOrThrow(proposalFooterTemplate);
   } else {
-    prFooter = await resolveStringTemplateOrThrow(footerTemplate);
+    proposalFooter = await resolveStringTemplateOrThrow(footerTemplate);
   }
 
-  return [prHeader, prBodyWithMarkers, prFooter].filter(Boolean).join("\n\n");
+  return [proposalHeader, proposalBodyWithMarkers, proposalFooter].filter(
+    Boolean,
+  ).join("\n\n");
 }
 
-interface CreateOrUpdatePullRequestConfigParams {
+interface CreateOrUpdateProposalConfigParams {
   review: Pick<
     ReviewConfigOutput,
     | "titleTemplate"
@@ -157,76 +163,75 @@ interface CreateOrUpdatePullRequestConfigParams {
   >;
 }
 
-export async function createOrUpdatePullRequestOrThrow(
+export async function createOrUpdateProposalOrThrow(
   provider: PlatformProvider,
   options: {
     workingBranchName: string;
     triggerBranchName: string;
-    associatedPrFromBranch: ProviderPullRequest | undefined;
+    associatedProposalFromBranch: ProviderProposal | undefined;
   },
   inputs: Pick<
     InputsOutput,
     "triggerCommitHash" | "workspacePath" | "sourceMode"
   >,
-  config: CreateOrUpdatePullRequestConfigParams,
-): Promise<number> {
+  config: CreateOrUpdateProposalConfigParams,
+): Promise<ProviderProposal> {
   const {
     workingBranchName,
     triggerBranchName,
-    associatedPrFromBranch,
+    associatedProposalFromBranch,
   } = options;
   const { titleTemplate } = config.review;
 
-  const prTitle = await resolveStringTemplateOrThrow(titleTemplate);
-  const prContent = await createPullRequestContent(
+  const proposalTitle = await resolveStringTemplateOrThrow(titleTemplate);
+  const proposalContent = await createProposalContent(
     provider,
     inputs,
     config,
   );
 
-  let prNumber: number;
-  if (associatedPrFromBranch) {
-    taskLogger.info("Updating current working PR...");
-    const updatedPr = await provider.updatePullRequestOrThrow(
-      associatedPrFromBranch.number,
-      prTitle,
-      prContent,
+  let proposal: ProviderProposal;
+  if (associatedProposalFromBranch) {
+    taskLogger.info("Updating current working proposal...");
+    proposal = await provider.updateProposalOrThrow(
+      associatedProposalFromBranch.id,
+      proposalTitle,
+      proposalContent,
     );
-    prNumber = updatedPr.number;
   } else {
-    taskLogger.info("Creating new working PR...");
-    const newPr = await provider.createPullRequestOrThrow(
+    taskLogger.info("Creating new working proposal...");
+    proposal = await provider.createProposalOrThrow(
       workingBranchName,
       triggerBranchName,
-      prTitle,
-      prContent,
+      proposalTitle,
+      proposalContent,
     );
-    prNumber = newPr.number;
   }
 
-  return prNumber;
+  return proposal;
 }
 
-export function extractChangelogFromPr(
-  mergedPr: ProviderPullRequest,
+export function extractChangelogFromProposal(
+  mergedProposal: ProviderProposal,
 ): string | undefined {
-  const changelogReleaseStartIndex = mergedPr.body.indexOf(
-    PR_MARKERS.bodyStart,
+  const changelogReleaseStartIndex = mergedProposal.body.indexOf(
+    PROPOSAL_MARKERS.bodyStart,
   );
-  const changelogReleaseEndIndex = mergedPr.body.lastIndexOf(
-    PR_MARKERS.bodyEnd,
+  const changelogReleaseEndIndex = mergedProposal.body.lastIndexOf(
+    PROPOSAL_MARKERS.bodyEnd,
   );
 
   if (changelogReleaseStartIndex === -1 || changelogReleaseEndIndex === -1) {
     return undefined;
   }
 
-  const changelogRelease = mergedPr.body.substring(
-    changelogReleaseStartIndex + PR_MARKERS.bodyStart.length,
+  const changelogRelease = mergedProposal.body.substring(
+    changelogReleaseStartIndex + PROPOSAL_MARKERS.bodyStart.length,
     changelogReleaseEndIndex,
   ).trim();
   taskLogger.info(
-    "Extracted changelog release from merged PR body: " + changelogRelease,
+    "Extracted changelog release from merged proposal body: " +
+      changelogRelease,
   );
 
   return changelogRelease;

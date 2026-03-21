@@ -7,7 +7,7 @@ import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 
 async function githubAddLabelsToPullRequestOrThrow(
   octokit: OctokitClient,
-  prNumber: number,
+  prNumber: string,
   labelOptions: ProviderLabelOptions,
 ) {
   const owner = githubGetNamespace();
@@ -24,7 +24,7 @@ async function githubAddLabelsToPullRequestOrThrow(
       await octokit.rest.issues.addLabels({
         owner,
         repo,
-        issue_number: prNumber,
+        issue_number: Number(prNumber),
         labels: initialLabels,
       });
     } catch (error) {
@@ -50,7 +50,7 @@ async function githubAddLabelsToPullRequestOrThrow(
       await octokit.rest.issues.addLabels({
         owner,
         repo,
-        issue_number: prNumber,
+        issue_number: Number(prNumber),
         labels: labelsToAdd,
       });
     }
@@ -61,7 +61,7 @@ async function githubAddLabelsToPullRequestOrThrow(
       await octokit.rest.issues.addLabels({
         owner,
         repo,
-        issue_number: prNumber,
+        issue_number: Number(prNumber),
         labels: requiredLabels.map((l) => l.name),
       });
     } catch (error) {
@@ -102,7 +102,7 @@ async function githubAddLabelsToPullRequestOrThrow(
       await octokit.rest.issues.addLabels({
         owner,
         repo,
-        issue_number: prNumber,
+        issue_number: Number(prNumber),
         labels: labelsToAdd,
       });
     }
@@ -165,13 +165,13 @@ async function githubGetAllLabelNames(
 
 async function githubRemoveLabelFromPullRequestOrThrow(
   octokit: OctokitClient,
-  prNumber: number,
+  prNumber: string,
   label: string,
 ) {
   await octokit.rest.issues.removeLabel({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
-    issue_number: prNumber,
+    issue_number: Number(prNumber),
     name: label,
   });
 }
@@ -179,13 +179,13 @@ async function githubRemoveLabelFromPullRequestOrThrow(
 export function makeGithubAddLabelsToPullRequestOrThrow(
   getOctokit: GetOctokitFn,
 ) {
-  return (prNumber: number, labelOptions: ProviderLabelOptions) =>
-    githubAddLabelsToPullRequestOrThrow(getOctokit(), prNumber, labelOptions);
+  return (proposalId: string, labelOptions: ProviderLabelOptions) =>
+    githubAddLabelsToPullRequestOrThrow(getOctokit(), proposalId, labelOptions);
 }
 
 export function makeGithubRemoveLabelFromPullRequestOrThrow(
   getOctokit: GetOctokitFn,
 ) {
-  return (prNumber: number, label: string) =>
-    githubRemoveLabelFromPullRequestOrThrow(getOctokit(), prNumber, label);
+  return (proposalId: string, label: string) =>
+    githubRemoveLabelFromPullRequestOrThrow(getOctokit(), proposalId, label);
 }

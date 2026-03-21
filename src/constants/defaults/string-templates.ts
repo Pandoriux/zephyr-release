@@ -1,7 +1,7 @@
 /** Fake fn just to get Liquid highlight from extension */
 const liquid = String.raw;
 
-// Review Proposal (PR)
+// Working branch
 export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
   "zephyr-release/{{ triggerBranchName }}";
 
@@ -20,17 +20,16 @@ export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
 export const DEFAULT_COMMIT_HEADER_TEMPLATE =
   liquid`chore: release v{{ version }}`;
 
-// Pull request
-export const DEFAULT_PULL_REQUEST_TITLE_TEMPLATE =
+// Proposal (PR, MR, ...)
+export const DEFAULT_PROPOSAL_TITLE_TEMPLATE =
   liquid`chore: release v{{ version }}`;
 
-export const DEFAULT_PULL_REQUEST_HEADER_TEMPLATE =
+export const DEFAULT_PROPOSAL_HEADER_TEMPLATE =
   "🤖 New release prepared. Awaiting approval~";
 
-export const DEFAULT_PULL_REQUEST_BODY_TEMPLATE =
-  liquid`{{ changelogRelease }}`;
+export const DEFAULT_PROPOSAL_BODY_TEMPLATE = liquid`{{ changelogRelease }}`;
 
-export const DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE =
+export const DEFAULT_PROPOSAL_FOOTER_TEMPLATE =
   "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)";
 
 // Tag and Release

@@ -77,7 +77,7 @@ export const CommitConfigSchema = v.pipe(
       v.metadata({
         description:
           "Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. " +
-          'Paths are relative to the repo root. To include all files, use a glob such as "**/*".',
+          'Paths are relative to the repo root. To include all changed files, use a glob such as "**/*".',
         examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
       }),
     ),

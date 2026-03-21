@@ -82,10 +82,10 @@ export function createGitHubProvider(): PlatformProvider {
 
     ensureBranchExistOrThrow: makeGithubEnsureBranchExistOrThrow(getOctokit),
 
-    findUniquePullRequestForCommitOrThrow:
+    findUniqueProposalForCommitOrThrow:
       makeGithubFindUniquePullRequestForCommitOrThrow(getOctokit),
 
-    findUniquePullRequestFromBranchOrThrow:
+    findUniqueProposalFromBranchOrThrow:
       makeGithubFindUniquePullRequestFromBranchOrThrow(getOctokit),
 
     findCommitsFromGivenToPreviousTaggedOrThrow:
@@ -95,14 +95,14 @@ export function createGitHubProvider(): PlatformProvider {
     createCommitOnBranchOrThrow:
       makeGithubCreateCommitOnBranchOrThrow(getOctokit),
 
-    createPullRequestOrThrow:
+    createProposalOrThrow:
       makeGithubCreatePullRequestOrThrow(getOctokit),
-    updatePullRequestOrThrow:
+    updateProposalOrThrow:
       makeGithubUpdatePullRequestOrThrow(getOctokit),
 
-    addLabelsToPullRequestOrThrow:
+    addLabelsToProposalOrThrow:
       makeGithubAddLabelsToPullRequestOrThrow(getOctokit),
-    removeLabelFromPullRequestOrThrow:
+    removeLabelFromProposalOrThrow:
       makeGithubRemoveLabelFromPullRequestOrThrow(getOctokit),
 
     getLatestReleaseTagOrThrow:

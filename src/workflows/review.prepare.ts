@@ -4,7 +4,7 @@ import {
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
-import { createOrUpdatePullRequestOrThrow } from "../tasks/pull-request.ts";
+import { createOrUpdateProposalOrThrow } from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { format } from "@std/semver";
 import {
@@ -25,7 +25,7 @@ import {
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import type { OperationRunSettings } from "../types/operation-context.ts";
-import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
+import { addLabelsToProposalOrThrow } from "../tasks/label.ts";
 import type { BootstrapResult } from "./bootstrap.ts";
 
 export async function executeReviewPreparePhase(
@@ -35,7 +35,7 @@ export async function executeReviewPreparePhase(
 ): Promise<OperationRunSettings> {
   const {
     workingBranchResult,
-    associatedPrFromBranch,
+    associatedProposalFromBranch,
     triggerContext,
   } = bootstrapData;
 
@@ -116,16 +116,17 @@ export async function executeReviewPreparePhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
-  const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPreRuntimeConfigResult) {
+  const _preparePreRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPreRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPreRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
@@ -182,25 +183,25 @@ export async function executeReviewPreparePhase(
   );
   logger.stepFinish("Finished: Commit changes");
 
-  logger.stepStart("Starting: Create or update pull request");
-  const prNumber = await createOrUpdatePullRequestOrThrow(
+  logger.stepStart("Starting: Create or update proposal");
+  const proposal = await createOrUpdateProposalOrThrow(
     provider,
     {
       workingBranchName: workingBranchResult.name,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      associatedPrFromBranch,
+      associatedProposalFromBranch,
     },
     runSettings.inputs,
     runSettings.config,
   );
-  logger.stepFinish("Finished: Create or update pull request");
+  logger.stepFinish("Finished: Create or update proposal");
 
-  logger.stepStart("Starting: Add labels to pull request");
-  await addLabelsToPullRequestOrThrow(provider, prNumber, runSettings.config);
-  logger.stepFinish("Finished: Add labels to pull request");
+  logger.stepStart("Starting: Add labels to proposal");
+  await addLabelsToProposalOrThrow(provider, proposal.id, runSettings.config);
+  logger.stepFinish("Finished: Add labels to proposal");
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  await exportPostPrepareOperationVariables(provider, prNumber, changesData);
+  await exportPostPrepareOperationVariables(provider, proposal.id, changesData);
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");
@@ -219,16 +220,17 @@ export async function executeReviewPreparePhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
-  const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPostRuntimeConfigResult) {
+  const _preparePostRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPostRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPostRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",

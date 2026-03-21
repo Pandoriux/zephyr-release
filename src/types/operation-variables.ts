@@ -44,7 +44,7 @@ export type OperationVariables =
     internalConfig: string;
 
     patternContext: string;
-    pullRequestNumber: number | undefined;
+    proposalId: string | undefined;
   };
 
 export type BaseOperationVariables = Pick<
@@ -67,7 +67,7 @@ export type DynamicOperationVariables = Pick<
   | "config"
   | "internalConfig"
   | "patternContext"
-  | "pullRequestNumber"
+  | "proposalId"
 >;
 
 export type PrePrepareOperationVariables = Pick<

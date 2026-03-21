@@ -5,7 +5,7 @@ export const CHANGELOG_MARKERS = {
   archived: "<!-- ARCHIVED-CONTENT -->",
 } as const;
 
-export const PR_MARKERS = {
-  bodyStart: "<!-- PR-CHANGELOG-RELEASE-START -->",
-  bodyEnd: "<!-- PR-CHANGELOG-RELEASE-END -->",
+export const PROPOSAL_MARKERS = {
+  bodyStart: "<!-- PROPOSAL-CHANGELOG-RELEASE-START -->",
+  bodyEnd: "<!-- PROPOSAL-CHANGELOG-RELEASE-END -->",
 } as const;

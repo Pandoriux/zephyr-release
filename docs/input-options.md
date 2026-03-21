@@ -75,7 +75,7 @@ When providing a JSON object, use the following structure:
 
 - **`mode`**: Global default mode for all operations. Either `"remote"` or `"local"`. Defaults to `"remote"` when omitted.
 - **`overrides`**: An optional map of **file paths** to `"local"` or `"remote"`.
-  - **Key**: An exact file path string, as used in your config (for example, `CHANGELOG.md`, `.github/zephyr-release-config.jsonc`, `templates/pr-title.md`, `deno.json`).
+  - **Key**: An exact file path string, as used in your config (for example, `CHANGELOG.md`, `.github/zephyr-release-config.jsonc`, `templates/pr-title.txt`, `deno.json`).
   - **Value**: Either `"local"` or `"remote"`.
 
 At runtime, Zephyr Release resolves the source mode for any file it needs by looking up:

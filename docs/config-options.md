@@ -173,8 +173,8 @@ Default: `"review"`
 
 Defines the execution strategy.
 
-- **`"review"`**: Routes updates through a Pull Request. This is the default behavior where Zephyr Release creates or updates a PR with version bumps and changelog changes.
-- **`"auto"`**: Bypasses the PR and commits directly to the branch. When set to `"auto"`, the release operation will commit changes directly to the branch without creating a PR.
+- **`"review"`**: Routes updates through a release proposal (PR, MR, ...). This is the default behavior where Zephyr Release creates or updates a proposal with version bumps and changelog changes.
+- **`"auto"`**: Bypasses the proposal and commits directly to the branch. When set to `"auto"`, the release operation will commit changes directly to the branch without creating a proposal (PR, MR, ...).
 
 If choosing `"auto"`, see [`auto > trigger-strategy`](#auto--trigger-strategy-optional) for configuring when automated releases are triggered.
 
@@ -183,7 +183,7 @@ If choosing `"auto"`, see [`auto > trigger-strategy`](#auto--trigger-strategy-op
 Type: `object`  
 **Properties:** [`draft`](#review--draft-optional), [`working-branch-name-template`](#review--working-branch-name-template-optional), [`title-template`](#review--title-template-optional), [`title-template-path`](#review--title-template-path-optional), [`header-template`](#review--header-template-optional), [`header-template-path`](#review--header-template-path-optional), [`body-template`](#review--body-template-optional), [`body-template-path`](#review--body-template-path-optional), [`footer-template`](#review--footer-template-optional), [`footer-template-path`](#review--footer-template-path-optional), [`label`](#review--label-optional), [`additional-label`](#review--additional-label-optional), [`assignees`](#review--assignees-optional), [`reviewers`](#review--reviewers-optional)
 
-Configuration specific to the `"review"` execution `mode`. Defines how release proposals (such as Pull Requests) are generated, formatted, and tracked.
+Configuration specific to the `"review"` execution `mode`. Defines how release proposals (such as PRs, MRs, ...) are generated, formatted, and tracked.
 
 #### review > draft (Optional)
 
@@ -203,61 +203,61 @@ Allowed patterns to use are: fixed base string patterns.
 #### review > title-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_PROPOSAL_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request title, using with string patterns like {{ version }}.  
+String template for proposal title, using with string patterns like {{ version }}.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > title-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing pull request title template. Overrides `title-template` when both are provided.  
+Path to text file containing proposal title template. Overrides `title-template` when both are provided.  
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### review > header-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_PROPOSAL_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request header, using with string patterns like {{ version }}.  
+String template for proposal header, using with string patterns like {{ version }}.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > header-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing pull request header template. Overrides `header-template` when both are provided.  
+Path to text file containing proposal header template. Overrides `header-template` when both are provided.  
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### review > body-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_PROPOSAL_BODY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request body, using with string patterns like {{ changelogRelease }}.  
+String template for proposal body, using with string patterns like {{ changelogRelease }}.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > body-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing pull request body template. Overrides `body-template` when both are provided.  
+Path to text file containing proposal body template. Overrides `body-template` when both are provided.  
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### review > footer-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_PROPOSAL_FOOTER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for pull request footer, using with string patterns.  
+String template for proposal footer, using with string patterns.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > footer-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing pull request footer template. Overrides `footer-template` when both are provided.  
+Path to text file containing proposal footer template. Overrides `footer-template` when both are provided.  
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### review > label (Optional)
@@ -265,14 +265,14 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `object`  
 Default: `{}`
 
-Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These label should not be manually added or removed.
+Core label used by Zephyr Release to track proposals, managed exclusively by the tool. These label should not be manually added or removed.
 
 ##### ... > label > on-create (Optional)
 
 Type: `string | object`  
 Default: [`DEFAULT_LABEL_ON_CREATE`](../src/constants/defaults/label.ts)
 
-Label to add when pull request is created.
+Label to add when proposal is created.
 
 ###### ... > on-create > name (Required)
 
@@ -298,7 +298,7 @@ The hexadecimal color code for the label, in standard format with the leading #.
 Type: `string | object`  
 Default: [`DEFAULT_LABEL_ON_CLOSE`](../src/constants/defaults/label.ts)
 
-Label to add when pull request is closed and release operation has completed (replaces `on-create` label).
+Label to add when proposal is closed and release operation has completed (replaces `on-create` label).
 
 Same as [`review > label > on-create`](#--label--on-create-optional).
 
@@ -311,25 +311,25 @@ Same as [`review > label > on-create`](#--label--on-create-optional).
 Type: `object`  
 Default: `{}`
 
-Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
+Additional labels to attach to proposals, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
 
 ##### ... > additional-label > on-create-add (Optional)
 
 Type: `string | string[]`
 
-Additional labels to add when pull request is created.
+Additional labels to add when proposal is created.
 
 ##### ... > additional-label > on-close-add (Optional)
 
 Type: `string | string[]`
 
-Additional labels to add when pull request is closed and release operation has completed.
+Additional labels to add when proposal is closed and release operation has completed.
 
 ##### ... > additional-label > on-close-remove (Optional)
 
 Type: `string | string[]`
 
-Additional labels to remove when pull request is closed and release operation has completed. Use `"<ALL_ON_CREATE_ADD>"` to remove all labels added in `on-create-add`.
+Additional labels to remove when proposal is closed and release operation has completed. Use `"<ALL_ON_CREATE_ADD>"` to remove all labels added in `on-create-add`.
 
 #### review > assignees (Optional)
 
@@ -442,7 +442,7 @@ Same as [`command-hooks > base > pre`](#--base--pre-optional).
 
 Type: `object`
 
-Pre/post commands to run around the pull request operation. Each command runs from the repository root.  
+Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.  
 Available variables that cmds can use: see [Export operation variables](./export-variables.md).
 
 ##### ... > prepare > same properties as `command-hooks > base`
@@ -747,7 +747,7 @@ Configuration specific to changelogs. All generated changelog content are availa
 Type: `boolean`  
 Default: `true`
 
-Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and [string templates](./string-templates-and-patterns.md) but they won't be written to file.
+Enable/disable writing changelog to file. When disabled, changelogs are still generated for proposals, releases and [string templates](./string-templates-and-patterns.md) but they won't be written to file.
 
 #### changelog > path (Optional)
 
@@ -939,9 +939,9 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 
 Type: `string | string[]`
 
-Additional changed local files to include in the commit when creating a pull request. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
 
-To include all files, you can use a glob pattern such as `"**/*"`.
+To include all changed files, you can use a glob pattern such as `"**/*"`.
 
 ### tag (Optional)
 

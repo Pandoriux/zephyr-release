@@ -68,14 +68,14 @@ These variables are available starting from the first [`command-hooks > base > p
 
 - **mode:** The execution mode. It is the same as the config [`mode`](./config-options.md#mode-optional) option and is included here for convenience  
   Export: zr-mode; Env: ZR_MODE
-- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when create/update pull request, "release" when create tag and publish release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
+- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when creating or updating proposal, "release" when creating tag or publishing release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
   Export: zr-operation; Env: ZR_OPERATION
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-pr" or "update-pr" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [popst prepare phase](#post-prepare)  
+- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-proposal" or "update-proposal" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [post prepare phase](#post-prepare)  
   Export: zr-jobs; Env: ZR_JOBS
 
 ### Dynamic (available at all time)
 
-These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `pullRequestNumber`).
+These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `proposalId`).
 
 - **config:** **Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution, ensuring it always reflects the active configuration rules.  
   Export: zr-config; Env: ZR_CONFIG
@@ -89,9 +89,9 @@ These variables are exposed continuously throughout the operation, and their val
   For example, the patternContext exposed at `command-hooks > base > pre` might be differ compared to the patternContext exposed at `command-hooks > prepare > pre`  
   Export: zr-pattern-context; Env: ZR_PATTERN_CONTEXT
 
-- **pullRequestNumber:** Pull request number. For "propose" operation (create/update PR), it is the PR number we are working with. For "release" operation, it is the PR number we just merged into. Will be undefined if PR not found  
-  For example, when there is no PR open for "propose" operation yet, the initial value will be undefined. Then the "create-pr" job will create the PR, and re-update the number. The value can now be accessed in the next cmds like ([`command-hooks > prepare > post`](./config-options.md#command-hooks-optional))  
-  Export: zr-pull-request-number; Env: ZR_PULL_REQUEST_NUMBER
+- **proposalId:** Proposal ID (pull request number, ...). For "propose" operation (create/update proposal), it is the proposal ID we are working with. For "release" operation, it is the proposal ID we just merged into. Will be undefined if proposal not found  
+  For example, when there is no proposal open for "propose" operation yet, the initial value will be undefined. Then the "create-proposal" job will create the proposal, and re-update the number. The value can now be accessed in the next cmds like ([`command-hooks > prepare > post`](./config-options.md#command-hooks-optional))  
+  Export: zr-proposal-id; Env: ZR_PROPOSAL_ID
 
 ### Prepare Phase
 

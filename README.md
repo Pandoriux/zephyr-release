@@ -105,9 +105,9 @@ jobs:
 
 ### ⚠️ Crucial: Managing Concurrency
 
-Because Zephyr Release resolves history up to the specific trigger commit to manage proposal PRs and tags/releases, running multiple workflows at the same time can lead to collisions or race conditions.
+Because Zephyr Release resolves history up to the specific trigger commit to manage proposals (PRs, MRs, ...) and tags/releases, running multiple workflows at the same time can lead to collisions or race conditions.
 
-- In **Review Mode**, parallel runs can collide while trying to update the same Release PR.
+- In **Review Mode**, parallel runs can collide while trying to update the same Release Proposal.
 - In **Auto Mode**, parallel runs will try to push version bump commits and Git tags to your branch simultaneously, resulting in Git push rejections and failed workflows.
 
 To prevent this, you must handle **parallel runs (concurrency)** by putting workflows into a queue so they run one-at-a-time (as shown above)
@@ -118,17 +118,17 @@ To prevent this, you must handle **parallel runs (concurrency)** by putting work
 
 Zephyr Release automates your versioning and changelogs. You can choose between two distinct [modes](./docs/config-options.md#mode-optional) for your workflow:  
 
-- **Review Mode:** Creates a pull request and await for human approval.
+- **Review Mode:** Creates a release proposal and await for human approval.
 - **Auto Mode:** Releases automatically on every ***valid*** push (based on your [strategy](./docs/config-options.md#auto--trigger-strategy-optional)).
 
 ### 1. The Trigger
 
 Begin by creating commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.  
-If you are working through Pull Requests (recommended), you should use **Squash and Merge** to maintain a linear git history.
+If you are working through proposals (recommended), you should use **Squash and Merge** to maintain a linear git history.
 
-#### Handling Multiple Changes in one PR (Review Mode)
+#### Handling Multiple Changes in one proposal (Review Mode)
 
-If a single Pull Request contains multiple features or fixes that need individual changelog entries, you can use `APPEND` or `OVERRIDE` blocks in your PR commit body. Zephyr Release will parse these blocks and treat each entry as an individual commit for versioning purposes.
+If a single proposal (PR, MR, ...) contains multiple features or fixes that need individual changelog entries, you can use `APPEND` or `OVERRIDE` blocks in your proposal commit body. Zephyr Release will parse these blocks and treat each entry as an individual commit for versioning purposes.
 
 > Each entry must be a single line and follow the conventional format: `<type>(<scope>)<!>: <description>`.  
 > If both an `APPEND` and `OVERRIDE` block exist, `OVERRIDE` will take over.
@@ -138,7 +138,7 @@ Example:
 ```text
 feat: add multiple changes
 
-this is PR commit body
+this is proposal commit body
 
 footer: zephyr
 
@@ -157,14 +157,14 @@ Depending on your chosen mode, Zephyr Release will take different actions when a
 
 This mode is best for teams that want human eyes on a release before it goes live.
 
-- **The Proposal:** Zephyr Release automatically creates (or updates) a **Release Pull Request**. It calculates the next [Semantic Version](https://semver.org/), updates your `version-files` (e.g., `deno.json`), and generates a changelog preview. The PR stays open and updates automatically with every new commit.
-- **The Release:** When you are ready to ship, simply **merge** the PR. Zephyr Release detects the merge, automatically creates a Git Tag, and publishes the final Release.
+- **The Proposal:** Zephyr Release automatically creates (or updates) a **Release Proposal**. It calculates the next [Semantic Version](https://semver.org/), updates your `version-files` (e.g., `deno.json`), and generates a changelog preview. The proposal stays open and updates automatically with every new commit.
+- **The Release:** When you are ready to ship, simply **merge** the proposal. Zephyr Release detects the merge, automatically creates a Git Tag, and publishes the final Release.
 
 #### Mode: Auto
 
 This mode is perfect for libraries, packages, or rapid continuous deployment where no human review is needed.
 
-- **Direct Release:** Zephyr Release bypasses the Pull Request entirely. It calculates the new version, updates your files, generates the changelog, and pushes a new commit directly back to your branch.
+- **Direct Release:** Zephyr Release bypasses the proposal entirely. It calculates the new version, updates your files, generates the changelog, and pushes a new commit directly back to your branch.
 - **Instant Tagging:** In the exact same run, it creates the Git Tag and publishes the Release. *(Note: Zephyr automatically formats the commit to prevent infinite CI loops).*
 
 ## Dynamic Configuration Overrides

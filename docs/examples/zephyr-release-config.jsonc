@@ -50,7 +50,7 @@
     }
   ],
 
-  // Ex: Include additional files using "ALL" option when creating pull request
+  // Ex: Include additional files using "ALL" option when creating proposal
   "local-files-to-commit": "ALL",
   // Ex: Include specific paths/globs
   // "local-files-to-commit": ["docs/**/*.md", "dist/**"],
@@ -144,8 +144,8 @@
     "content-header-template": "## ${tagName:mdLink(compare=tagPrev,prev=1)} (${YYYY-MM-DD}) <!-- time-zone: ${timeZone} -->"
   },
 
-  "pull-request": {
-    // Ex: Run commands before and after pull request creation
+  "review": {
+    // Ex: Run commands before and after proposal creation
     "command-hook": {
       "timeout": 60000,
       "continueOnError": false,
@@ -158,12 +158,12 @@
     "label": {
       "onCreate": {
         "name": "zp-release: pending",
-        "description": "Indicates that the pull request is pending release",
+        "description": "Indicates that the proposal is pending release",
         "color": "FBCA04"
       },
       "onClose": {
         "name": "zp-release: released",
-        "description": "Indicates that the pull request is closed and released",
+        "description": "Indicates that the proposal is closed and released",
         "color": "0E8A16"
       }
     },

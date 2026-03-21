@@ -4,9 +4,9 @@ import {
   exportPostPublishOperationVariables,
   exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
-import { updateMergedPullRequestLabelsOrThrow } from "../tasks/label.ts";
+import { updateMergedProposalLabelsOrThrow } from "../tasks/label.ts";
 import { logger } from "../tasks/logger.ts";
-import { extractChangelogFromPr } from "../tasks/pull-request.ts";
+import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import {
   createDynamicChangelogStringPatternContext,
@@ -19,22 +19,24 @@ import {
 } from "../tasks/version-files/version-file.ts";
 import type { OperationRunSettings } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../types/providers/proposal.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
 
 export async function executeReviewPublishPhase(
   provider: PlatformProvider,
   currentRunSettings: OperationRunSettings,
-  associatedPrForCommit: ProviderPullRequest,
+  associatedProposalForCommit: ProviderProposal,
 ): Promise<OperationRunSettings> {
   /**
    * Publish phase run settings.
    */
   let runSettings: OperationRunSettings = currentRunSettings;
 
-  logger.stepStart("Starting: Extract changelog from pull request body");
-  const prChangelogRelease = extractChangelogFromPr(associatedPrForCommit);
-  logger.stepFinish("Finished: Extract changelog from pull request body");
+  logger.stepStart("Starting: Extract changelog from proposal body");
+  const proposalChangelogRelease = extractChangelogFromProposal(
+    associatedProposalForCommit,
+  );
+  logger.stepFinish("Finished: Extract changelog from proposal body");
 
   logger.stepStart("Starting: Extract version from primary version file");
   const primaryVersionFile = getPrimaryVersionFile(
@@ -68,7 +70,7 @@ export async function executeReviewPublishPhase(
   logger.debugStepStart(
     "Starting: Create dynamic changelog string pattern contextt",
   );
-  createDynamicChangelogStringPatternContext(prChangelogRelease);
+  createDynamicChangelogStringPatternContext(proposalChangelogRelease);
   logger.debugStepFinish(
     "Finished: Create dynamic changelog string pattern contextt",
   );
@@ -76,7 +78,7 @@ export async function executeReviewPublishPhase(
   logger.debugStepStart("Starting: Export pre publish operation variables");
   await exportPrePublishOperationVariables(
     provider,
-    associatedPrForCommit.number,
+    associatedProposalForCommit.id,
     version,
   );
   logger.debugStepFinish("Finished: Export pre publish operation variables");
@@ -155,13 +157,13 @@ export async function executeReviewPublishPhase(
     );
   }
 
-  logger.stepStart("Starting: Update merged pull request labels");
-  await updateMergedPullRequestLabelsOrThrow(
+  logger.stepStart("Starting: Update merged proposal labels");
+  await updateMergedProposalLabelsOrThrow(
     provider,
-    associatedPrForCommit.number,
+    associatedProposalForCommit.id,
     runSettings.config,
   );
-  logger.stepFinish("Finished: Update merged pull request labels");
+  logger.stepFinish("Finished: Update merged proposal labels");
 
   logger.debugStepStart("Starting: Export post publish operation variables");
   await exportPostPublishOperationVariables(

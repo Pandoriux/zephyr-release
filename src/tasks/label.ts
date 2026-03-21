@@ -5,19 +5,19 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { taskLogger } from "./logger.ts";
 import { consumeAsyncIterable } from "../utils/async.ts";
 
-interface AddLabelsToPrConfigParams {
+interface AddLabelsToProposalConfigParams {
   review: Pick<ReviewConfigOutput, "label" | "additionalLabel">;
 }
 
-export async function addLabelsToPullRequestOrThrow(
+export async function addLabelsToProposalOrThrow(
   provider: PlatformProvider,
-  prNumber: number,
-  config: AddLabelsToPrConfigParams,
+  proposalId: string,
+  config: AddLabelsToProposalConfigParams,
 ) {
   const { label, additionalLabel } = config.review;
 
   taskLogger.info("Adding core labels...");
-  await provider.addLabelsToPullRequestOrThrow(prNumber, {
+  await provider.addLabelsToProposalOrThrow(proposalId, {
     createIfMissing: true,
     labels: [label.onCreate],
   });
@@ -25,33 +25,33 @@ export async function addLabelsToPullRequestOrThrow(
   if (additionalLabel?.onCreateAdd) {
     taskLogger.info("Adding additional labels...");
 
-    await provider.addLabelsToPullRequestOrThrow(prNumber, {
+    await provider.addLabelsToProposalOrThrow(proposalId, {
       createIfMissing: false,
       labels: additionalLabel.onCreateAdd,
     });
   }
 }
 
-type UpdateMergedPrLabelsConfigParams = AddLabelsToPrConfigParams;
+type UpdateMergedProposalLabelsConfigParams = AddLabelsToProposalConfigParams;
 
-export async function updateMergedPullRequestLabelsOrThrow(
+export async function updateMergedProposalLabelsOrThrow(
   provider: PlatformProvider,
-  prNumber: number,
-  config: UpdateMergedPrLabelsConfigParams,
+  proposalId: string,
+  config: UpdateMergedProposalLabelsConfigParams,
 ) {
   const { label, additionalLabel } = config.review;
 
-  taskLogger.info("Updating core labels on merged pull request...");
-  await provider.removeLabelFromPullRequestOrThrow(
-    prNumber,
+  taskLogger.info("Updating core labels on merged proposal...");
+  await provider.removeLabelFromProposalOrThrow(
+    proposalId,
     label.onCreate.name,
   );
-  await provider.addLabelsToPullRequestOrThrow(prNumber, {
+  await provider.addLabelsToProposalOrThrow(proposalId, {
     createIfMissing: true,
     labels: [label.onClose],
   });
 
-  taskLogger.info("Updating other labels on merged pull request...");
+  taskLogger.info("Updating other additional labels on merged proposal...");
 
   if (additionalLabel.onCloseRemove) {
     const labelsToRemove = new Set<string>();
@@ -70,12 +70,12 @@ export async function updateMergedPullRequestLabelsOrThrow(
     }
 
     taskLogger.info(
-      `Removing labels from merged pull request (${labelsToRemove.size} in total)...`,
+      `Removing labels from merged proposal (${labelsToRemove.size} in total)...`,
     );
     await consumeAsyncIterable(
       pooledMap(5, labelsToRemove, async (label) => {
         try {
-          await provider.removeLabelFromPullRequestOrThrow(prNumber, label);
+          await provider.removeLabelFromProposalOrThrow(proposalId, label);
         } catch { /* ignore */ }
       }),
     );
@@ -83,9 +83,9 @@ export async function updateMergedPullRequestLabelsOrThrow(
 
   if (additionalLabel.onCloseAdd) {
     taskLogger.info(
-      `Adding labels to merged pull request (${additionalLabel.onCloseAdd.length} in total)...`,
+      `Adding labels to merged proposal (${additionalLabel.onCloseAdd.length} in total)...`,
     );
-    await provider.addLabelsToPullRequestOrThrow(prNumber, {
+    await provider.addLabelsToProposalOrThrow(proposalId, {
       createIfMissing: false,
       labels: additionalLabel.onCloseAdd,
     });

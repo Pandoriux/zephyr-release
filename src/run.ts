@@ -53,8 +53,8 @@ export async function run(provider: PlatformProvider) {
     await exportBaseOperationVariables(provider, {
       triggerContext: bootstrapData.triggerContext,
       workingBranchResult: bootstrapData.workingBranchResult,
-      prForCommit: bootstrapData.associatedPrForCommit,
-      prFromBranch: bootstrapData.associatedPrFromBranch,
+      proposalForCommit: bootstrapData.associatedProposalForCommit,
+      proposalFromBranch: bootstrapData.associatedProposalFromBranch,
       rawInputs: runSettings.rawInputs,
       inputs: runSettings.inputs,
       rawConfig: runSettings.rawConfig,

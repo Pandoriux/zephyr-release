@@ -1,7 +1,7 @@
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../../types/providers/proposal.ts";
 
 const RawPullRequestNodeSchema = v.object({
   number: v.number(),
@@ -53,8 +53,8 @@ async function githubFindUniquePullRequestForCommitOrThrow(
   sourceBranch: string,
   targetBranch: string,
   requiredLabel: string,
-): Promise<ProviderPullRequest | undefined> {
-  let foundPr: ProviderPullRequest | undefined = undefined;
+): Promise<ProviderProposal | undefined> {
+  let foundPr: ProviderProposal | undefined = undefined;
 
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
@@ -122,7 +122,7 @@ async function githubFindUniquePullRequestForCommitOrThrow(
         }
 
         foundPr = {
-          number: pr.number,
+          id: String(pr.number),
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
           title: pr.title,
@@ -140,8 +140,8 @@ async function githubFindUniquePullRequestFromBranchOrThrow(
   branchName: string,
   targetBranch: string,
   requiredLabel: string,
-): Promise<ProviderPullRequest | undefined> {
-  let foundPr: ProviderPullRequest | undefined = undefined;
+): Promise<ProviderProposal | undefined> {
+  let foundPr: ProviderProposal | undefined = undefined;
 
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
@@ -198,7 +198,7 @@ async function githubFindUniquePullRequestFromBranchOrThrow(
         }
 
         foundPr = {
-          number: pr.number,
+          id: String(pr.number),
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
           title: pr.title,
@@ -217,7 +217,7 @@ async function githubCreatePullRequestOrThrow(
   targetBranch: string,
   title: string,
   body: string,
-): Promise<ProviderPullRequest> {
+): Promise<ProviderProposal> {
   const res = await octokit.rest.pulls.create({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
@@ -228,7 +228,7 @@ async function githubCreatePullRequestOrThrow(
   });
 
   return {
-    number: res.data.number,
+    id: String(res.data.number),
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
     title: res.data.title,
@@ -238,20 +238,20 @@ async function githubCreatePullRequestOrThrow(
 
 async function githubUpdatePullRequestOrThrow(
   octokit: OctokitClient,
-  number: number,
+  prNumber: string,
   title: string,
   body: string,
-): Promise<ProviderPullRequest> {
+): Promise<ProviderProposal> {
   const res = await octokit.rest.pulls.update({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
-    pull_number: number,
+    pull_number: Number(prNumber),
     title,
     body,
   });
 
   return {
-    number: res.data.number,
+    id: String(res.data.number),
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
     title: res.data.title,
@@ -310,6 +310,6 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
 }
 
 export function makeGithubUpdatePullRequestOrThrow(getOctokit: GetOctokitFn) {
-  return (number: number, title: string, body: string) =>
-    githubUpdatePullRequestOrThrow(getOctokit(), number, title, body);
+  return (id: string, title: string, body: string) =>
+    githubUpdatePullRequestOrThrow(getOctokit(), id, title, body);
 }
