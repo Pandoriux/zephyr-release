@@ -19,6 +19,8 @@ import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
+import { BranchOutOfDateError } from "../errors/providers/branch.ts";
+import { SafeExit } from "../errors/safe-exit.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -409,6 +411,7 @@ type CommitChangesInputsParams = Pick<
 >;
 
 interface CommitChangesConfigParams {
+  mode: ConfigOutput["mode"];
   commit: Pick<
     CommitConfigOutput,
     | "headerTemplate"
@@ -432,6 +435,7 @@ export async function commitChangesToBranchOrThrow(
   },
 ) {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const { mode } = config;
   const {
     headerTemplate,
     headerTemplatePath,
@@ -494,7 +498,15 @@ export async function commitChangesToBranchOrThrow(
     commitMessage,
     targetBranchName,
     force,
-  );
+  ).catch((error) => {
+    if (mode === "auto" && error instanceof BranchOutOfDateError) {
+      throw new SafeExit(
+        "Trigger branch has moved forward. Letting the newer commit take over",
+      );
+    }
+
+    throw error;
+  });
 
   return createdCommit;
 }

@@ -1,3 +1,5 @@
+import { RequestError } from "@octokit/request-error";
+import { BranchOutOfDateError } from "../../errors/providers/branch.ts";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
@@ -189,13 +191,25 @@ async function githubCreateCommitOnBranchOrThrow(
 
   // If true (in review mode), we are effectively "overwriting" the branch history with this new timeline
   // If false (in auto mode), throws error if there are newer commits
-  await octokit.rest.git.updateRef({
-    owner,
-    repo,
-    ref: `heads/${targetBranchName}`,
-    sha: createCommitRes.data.sha,
-    force,
-  });
+  try {
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${targetBranchName}`,
+      sha: createCommitRes.data.sha,
+      force,
+    });
+  } catch (error) {
+    if (
+      error instanceof RequestError &&
+      error.status === 422 &&
+      error.message.toLowerCase().includes("is not a fast forward")
+    ) {
+      throw new BranchOutOfDateError();
+    }
+
+    throw error;
+  }
 
   return {
     hash: createCommitRes.data.sha,
