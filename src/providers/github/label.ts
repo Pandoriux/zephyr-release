@@ -1,7 +1,7 @@
 import * as v from "@valibot/valibot";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import { isGitHubErrorResponse } from "./utils/error-validations.ts";
+import { RequestError } from "@octokit/request-error";
 import { taskLogger } from "../../tasks/logger.ts";
 import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 
@@ -28,7 +28,7 @@ async function githubAddLabelsToPullRequestOrThrow(
         labels: initialLabels,
       });
     } catch (error) {
-      if (!isGitHubErrorResponse(error) || error.status !== 422) {
+      if (!(error instanceof RequestError) || error.status !== 422) {
         // Other errors...
         throw error;
       }
@@ -65,7 +65,7 @@ async function githubAddLabelsToPullRequestOrThrow(
         labels: requiredLabels.map((l) => l.name),
       });
     } catch (error) {
-      if (!isGitHubErrorResponse(error) || error.status !== 422) {
+      if (!(error instanceof RequestError) || error.status !== 422) {
         // Other errors...
         throw error;
       }
