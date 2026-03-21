@@ -19,7 +19,6 @@ import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
 import { taskLogger } from "./logger.ts";
-import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 import {
   type OperationJob,
   type OperationKind,
@@ -29,6 +28,7 @@ import {
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
+import { STRING_PATTERN_CONTEXT } from "./string-templates-and-patterns/pattern-context.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
@@ -177,10 +177,14 @@ export async function exportPrePrepareOperationVariables(
 
 export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
-  proposalId: string,
   changesData: Map<string, string>,
-  config?: ConfigOutput,
+  modeRelatedData?: {
+    proposalId?: string;
+    config?: ConfigOutput;
+  },
 ) {
+  const { proposalId, config } = modeRelatedData ?? {};
+
   const operationJobs: OperationJob[] = [];
   if (config) {
     operationJobs.push("create-commit");
@@ -293,4 +297,26 @@ export function exportFinalOperationVariables(
     provider.exportOutputs(toExportOutputKey(k), v);
     provider.exportEnvVars(toExportEnvVarKey(k), v);
   });
+}
+
+async function stringifyCurrentPatternContext(): Promise<string> {
+  const resolvedContext: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
+    if (typeof value === "function") {
+      try {
+        const result = await value();
+        // If result is not another function, use it; otherwise use original value
+        resolvedContext[key] = typeof result !== "function" ? result : value;
+      } catch {
+        // If function throws, use original value
+        resolvedContext[key] = value;
+      }
+    } else {
+      resolvedContext[key] = value;
+    }
+  }
+
+  // jsonValueNormalizer will catch weird value like BigInt, ...
+  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }

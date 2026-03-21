@@ -16,13 +16,18 @@ import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
+// new introduced
+const BUILT_IN_CONTEXT: Record<string, unknown> = {};
+const CUSTOM_CONTEXT: Record<string, unknown> = {};
+
 export function createCustomStringPatternContext(
   context: ConfigOutput["customStringPatterns"],
 ): void {
-  Object.assign(STRING_PATTERN_CONTEXT, context);
+  Object.assign(CUSTOM_CONTEXT, context);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
-    "Custom string pattern context: " + JSON.stringify(context, null, 2),
+    "Custom string pattern context: " + JSON.stringify(CUSTOM_CONTEXT, null, 2),
   );
 }
 
@@ -70,7 +75,8 @@ export async function createFixedBaseStringPatternContext(
     "workingBranchName"
   >;
 
-  Object.assign(STRING_PATTERN_CONTEXT, context);
+  Object.assign(BUILT_IN_CONTEXT, context);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   const workingBranchContext = {
     workingBranchName: await resolveStringTemplateOrThrow(
@@ -78,7 +84,8 @@ export async function createFixedBaseStringPatternContext(
     ),
   } satisfies Pick<Record<FixedBaseStringPattern, string>, "workingBranchName">;
 
-  Object.assign(STRING_PATTERN_CONTEXT, workingBranchContext);
+  Object.assign(BUILT_IN_CONTEXT, workingBranchContext);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
     "Fixed base string pattern context: " +
@@ -103,7 +110,8 @@ export function createFixedPreviousVersionStringPatternContext(
       : undefined,
   } satisfies Record<FixedPreviousVersionStringPattern, string | undefined>;
 
-  Object.assign(STRING_PATTERN_CONTEXT, versionContext);
+  Object.assign(BUILT_IN_CONTEXT, versionContext);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
     "Fixed previous version string pattern context: " +
@@ -127,13 +135,15 @@ export async function createFixedVersionStringPatternContext(
     "tagName"
   >;
 
-  Object.assign(STRING_PATTERN_CONTEXT, versionContext);
+  Object.assign(BUILT_IN_CONTEXT, versionContext);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   const tagContext = {
     tagName: await resolveStringTemplateOrThrow(tagTemplate),
   } satisfies Pick<Record<FixedVersionStringPattern, string>, "tagName">;
 
-  Object.assign(STRING_PATTERN_CONTEXT, tagContext);
+  Object.assign(BUILT_IN_CONTEXT, tagContext);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
     "Fixed version string pattern context: " +
@@ -150,31 +160,11 @@ export function createDynamicChangelogStringPatternContext(
     changelogReleaseBody,
   } satisfies Record<DynamicChangelogStringPattern, string | undefined>;
 
-  Object.assign(STRING_PATTERN_CONTEXT, context);
+  Object.assign(BUILT_IN_CONTEXT, context);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
     "Dynamic changelog string pattern context: " +
       JSON.stringify(context, null, 2),
   );
-}
-
-export async function stringifyCurrentPatternContext(): Promise<string> {
-  const resolvedContext: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
-    if (typeof value === "function") {
-      try {
-        const result = await value();
-        // If result is not a function, use it; otherwise use original value
-        resolvedContext[key] = typeof result === "function" ? value : result;
-      } catch {
-        // If function throws, use original value
-        resolvedContext[key] = value;
-      }
-    } else {
-      resolvedContext[key] = value;
-    }
-  }
-
-  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }
