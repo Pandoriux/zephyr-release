@@ -15,6 +15,7 @@ import {
 import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
   exportPostPrepareOperationVariables,
+  exportPostPublishOperationVariables,
   exportPrePrepareOperationVariables,
   exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
@@ -33,6 +34,8 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
 import { evaluateAutoModeTriggerStrategyOrExit } from "../tasks/auto-trigger-strategy.ts";
 import { createTagOrThrow } from "../tasks/tag.ts";
+import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
+import type { ProviderRelease } from "../types/providers/release.ts";
 
 interface AutoWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
@@ -313,22 +316,87 @@ export async function executeAutoStrategy(
       runSettings.config,
     );
     logger.stepFinish("Finished: Create tag");
+
+    logger.stepStart("Starting: Create release");
+    let createdReleaseNote: ProviderRelease | undefined;
+    if (runSettings.config.release.createRelease) {
+      createdReleaseNote = await createRelease(
+        provider,
+        runSettings.inputs,
+        runSettings.config,
+      );
+      logger.stepFinish("Finished: Create release");
+    } else {
+      logger.stepSkip(
+        "Skipped: Create release (config create release is false)",
+      );
+    }
+
+    logger.stepStart("Starting: Attach release assets");
+    if (createdReleaseNote?.id && runSettings.config.release.assets) {
+      await attachReleaseAssets(
+        provider,
+        createdReleaseNote.id,
+        runSettings.config.release.assets,
+      );
+      logger.stepFinish("Finished: Attach release assets");
+    } else {
+      logger.stepSkip(
+        "Skipped: Attach release assets (no assets to attach or config create release is false)",
+      );
+    }
+
+    logger.debugStepStart("Starting: Export post publish operation variables");
+    await exportPostPublishOperationVariables(
+      provider,
+      createdTag.hash,
+      createdReleaseNote?.id,
+      createdReleaseNote?.uploadUrl,
+    );
+    logger.debugStepFinish("Finished: Export post publish operation variables");
+
+    logger.stepStart("Starting: Execute publish post commands");
+    const postResult = await runCommandsOrThrow(
+      runSettings.config.commandHooks.publish,
+      "post",
+    );
+    if (postResult) {
+      logger.stepFinish(
+        `Finished: Execute publish post commands. ${postResult}`,
+      );
+    } else {
+      logger.stepSkip("Skipped: Execute publish post commands (empty)");
+    }
+
+    logger.stepStart(
+      "Starting: Resolve runtime config override (publish post commands)",
+    );
+    const _releasePostRuntimeConfigResult =
+      await resolveRuntimeConfigOverrideOrThrow(
+        runSettings.rawConfig,
+        runSettings.config,
+        runSettings.inputs.workspacePath,
+      );
+    if (_releasePostRuntimeConfigResult) {
+      runSettings = {
+        ...runSettings,
+        rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
+        config: _releasePostRuntimeConfigResult.resolvedRuntime,
+      };
+      createCustomStringPatternContext(runSettings.config.customStringPatterns);
+      logger.stepFinish(
+        "Finished: Resolve runtime config override (publish post commands)",
+      );
+    } else {
+      logger.stepSkip(
+        "Skipped: Resolve runtime config override (publish post commands)",
+      );
+    }
   } else {
     logger.subHeader(
       "Auto mode execution (publish): Skip create tag and release (disabled in config)",
     );
   }
-
-  // based on auto release strategy, evalute we should continue? orexit
-  // const result = valuateAutoreleaseStrategy()
-
-  // const changelogReleaseResult = await generateChangelogReleaseContent(
-
-  // const changesData = await prepareChangesToCommit(
-
-  // const _commitResult = await commitChangesToBranch(
-
-  // then create tag? release? attach release?
 
   return runSettings;
 }
