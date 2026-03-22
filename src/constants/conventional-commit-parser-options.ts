@@ -1,4 +1,5 @@
 import type { ParserOptions } from "conventional-commits-parser";
+import { ZEPHYR_RELEASE_COMMIT_SIGN } from "./commit.ts";
 
 /**
  * Builds on the library's default settings with support for modern features.
@@ -53,6 +54,8 @@ export const baseConventionalCommitParserOptions = {
     "BREAKING-CHANGE",
     "release as",
     "release-as",
+
+    ZEPHYR_RELEASE_COMMIT_SIGN,
   ],
 
   issuePrefixes: ["#"],

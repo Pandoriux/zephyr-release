@@ -226,8 +226,8 @@ export async function exportPostPrepareOperationVariables(
 
 export async function exportPrePublishOperationVariables(
   provider: PlatformProvider,
-  proposalId: string,
   version: SemVer,
+  proposalId?: string,
 ) {
   const prepareExportObject = {
     version: format(version),

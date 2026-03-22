@@ -11,7 +11,11 @@ import { prepareVersionFilesToCommit } from "./version-files/version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
-import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
+import {
+  NESTED_CLEANING_REGEX,
+  NESTED_COMMIT,
+  ZEPHYR_RELEASE_COMMIT_SIGN,
+} from "../constants/commit.ts";
 import type { ProviderCommit } from "../types/providers/commit.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import { prepareChangelogFileToCommit } from "./changelog.ts";
@@ -21,6 +25,7 @@ import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/re
 import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
 import { BranchOutOfDateError } from "../errors/providers/branch.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
+import { VERSION } from "../version.generated.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -427,7 +432,7 @@ export async function commitChangesToBranchOrThrow(
   provider: PlatformProvider,
   inputs: CommitChangesInputsParams,
   config: CommitChangesConfigParams,
-  options: {
+  commitData: {
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
     targetBranchName: string;
@@ -444,12 +449,7 @@ export async function commitChangesToBranchOrThrow(
     footerTemplate,
     footerTemplatePath,
   } = config.commit;
-  const {
-    baseTreeHash,
-    changesToCommit,
-    targetBranchName,
-    force,
-  } = options;
+  const { baseTreeHash, changesToCommit, targetBranchName, force } = commitData;
 
   let commitHeader: string;
   if (headerTemplatePath) {
@@ -487,7 +487,15 @@ export async function commitChangesToBranchOrThrow(
     commitFooter = await resolveStringTemplateOrThrow(footerTemplate);
   }
 
-  const commitMessage = [commitHeader, commitBody, commitFooter].filter(Boolean)
+  const zephyrReleaseSign = `${ZEPHYR_RELEASE_COMMIT_SIGN}: ${VERSION}`;
+  if (commitFooter?.trim()) {
+    commitFooter = `${commitFooter.trim()}\n${zephyrReleaseSign}`;
+  } else {
+    commitFooter = zephyrReleaseSign;
+  }
+
+  const commitMessage = [commitHeader, commitBody, commitFooter]
+    .filter(Boolean)
     .join("\n\n");
 
   taskLogger.info("Creating commit and pushing to working branch...");

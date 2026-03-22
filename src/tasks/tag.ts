@@ -24,6 +24,7 @@ interface CreateTagConfigParams {
 
 export async function createTagOrThrow(
   provider: PlatformProvider,
+  targetCommitHash: string,
   inputs: CreateTagInputsParams,
   config: CreateTagConfigParams,
 ) {
@@ -57,12 +58,12 @@ export async function createTagOrThrow(
           taggerDate = new Date().toISOString();
           break;
         case TaggerDateOptions.commitDate: {
-          const commitData = await provider.getCommit(triggerCommitHash);
+          const commitData = await provider.getCommit(targetCommitHash);
           taggerDate = commitData.committer.date.toISOString();
           break;
         }
         case TaggerDateOptions.authorDate: {
-          const commitData = await provider.getCommit(triggerCommitHash);
+          const commitData = await provider.getCommit(targetCommitHash);
           taggerDate = commitData.author.date.toISOString();
           break;
         }
@@ -82,7 +83,7 @@ export async function createTagOrThrow(
 
   return await provider.createTagOrThrow(
     await resolveStringTemplateOrThrow(nameTemplate),
-    triggerCommitHash,
+    targetCommitHash,
     type,
     tagMessage,
     taggerData,

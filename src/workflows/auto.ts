@@ -16,6 +16,7 @@ import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts"
 import {
   exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
+  exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
 import {
@@ -31,6 +32,7 @@ import type {
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
 import { evaluateAutoModeTriggerStrategyOrExit } from "../tasks/auto-trigger-strategy.ts";
+import { createTagOrThrow } from "../tasks/tag.ts";
 
 interface AutoWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
@@ -261,7 +263,56 @@ export async function executeAutoStrategy(
       "Auto mode execution (publish): Creating tag and release...",
     );
 
-    //
+    logger.debugStepStart("Starting: Export pre publish operation variables");
+    await exportPrePublishOperationVariables(provider, nextVersion);
+    logger.debugStepFinish("Finished: Export pre publish operation variables");
+
+    logger.stepStart("Starting: Execute publish pre commands");
+    const preResult = await runCommandsOrThrow(
+      runSettings.config.commandHooks.publish,
+      "pre",
+    );
+    if (preResult) {
+      logger.stepFinish(
+        `Finished: Execute publish pre commands. ${preResult}`,
+      );
+    } else {
+      logger.stepSkip("Skipped: Execute publish pre commands (empty)");
+    }
+
+    logger.stepStart(
+      "Starting: Resolve runtime config override (publish pre commands)",
+    );
+    const _releasePreRuntimeConfigResult =
+      await resolveRuntimeConfigOverrideOrThrow(
+        runSettings.rawConfig,
+        runSettings.config,
+        runSettings.inputs.workspacePath,
+      );
+    if (_releasePreRuntimeConfigResult) {
+      runSettings = {
+        ...runSettings,
+        rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
+        config: _releasePreRuntimeConfigResult.resolvedRuntime,
+      };
+      createCustomStringPatternContext(runSettings.config.customStringPatterns);
+      logger.stepFinish(
+        "Finished: Resolve runtime config override (publish pre commands)",
+      );
+    } else {
+      logger.stepSkip(
+        "Skipped: Resolve runtime config override (publish pre commands)",
+      );
+    }
+
+    logger.stepStart("Starting: Create tag");
+    const createdTag = await createTagOrThrow(
+      provider,
+      commitResult.hash,
+      runSettings.inputs,
+      runSettings.config,
+    );
+    logger.stepFinish("Finished: Create tag");
   } else {
     logger.subHeader(
       "Auto mode execution (publish): Skip create tag and release (disabled in config)",

@@ -79,8 +79,8 @@ export async function executeReviewPublishPhase(
   logger.debugStepStart("Starting: Export pre publish operation variables");
   await exportPrePublishOperationVariables(
     provider,
-    associatedProposalForCommit.id,
     version,
+    associatedProposalForCommit.id,
   );
   logger.debugStepFinish("Finished: Export pre publish operation variables");
 
@@ -125,6 +125,7 @@ export async function executeReviewPublishPhase(
   logger.stepStart("Starting: Create tag");
   const createdTag = await createTagOrThrow(
     provider,
+    runSettings.inputs.triggerCommitHash,
     runSettings.inputs,
     runSettings.config,
   );

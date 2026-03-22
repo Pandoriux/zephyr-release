@@ -894,8 +894,8 @@ Configuration specific to commits. These templates are used to build the commit 
 Type: `string`  
 Default: [`DEFAULT_COMMIT_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for commit header, using with string patterns like `{{ version }}`.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+String template for commit header, using with string patterns like `{{ version }}`. You can optionally include a CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).  
+Allowed patterns to use are: [all fixed and dynamic string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### commit > header-template-path (Optional)
 
@@ -909,8 +909,8 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 
 Type: `string`
 
-String template for commit body, using with string patterns like `{{ changelogRelease }}`.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+String template for commit body, using with string patterns like `{{ changelogRelease }}`. You can optionally include a CI skip token here (or header/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).  
+Allowed patterns to use are: [all fixed and dynamic string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### commit > body-template-path (Optional)
 
@@ -924,8 +924,8 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 
 Type: `string`
 
-String template for commit footer, using with string patterns.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+String template for commit footer, using with string patterns. You can optionally include a CI skip token here (or header/body) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).  
+Allowed patterns to use are: [all fixed and dynamic string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### commit > footer-template-path (Optional)
 
