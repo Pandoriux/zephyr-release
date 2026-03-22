@@ -217,7 +217,10 @@ async function githubCreatePullRequestOrThrow(
   targetBranch: string,
   title: string,
   body: string,
+  opts?: { draft?: boolean },
 ): Promise<ProviderProposal> {
+  const { draft } = opts ?? {};
+
   const res = await octokit.rest.pulls.create({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
@@ -225,6 +228,7 @@ async function githubCreatePullRequestOrThrow(
     base: targetBranch,
     title,
     body,
+    draft,
   });
 
   return {
@@ -299,6 +303,7 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
     targetBranch: string,
     title: string,
     body: string,
+    opts?: { draft?: boolean },
   ) =>
     githubCreatePullRequestOrThrow(
       getOctokit(),
@@ -306,6 +311,7 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
       targetBranch,
       title,
       body,
+      opts,
     );
 }
 

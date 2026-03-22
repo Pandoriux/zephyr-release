@@ -152,6 +152,7 @@ export async function createProposalContent(
 interface CreateOrUpdateProposalConfigParams {
   review: Pick<
     ReviewConfigOutput,
+    | "draft"
     | "titleTemplate"
     | "titleTemplatePath"
     | "headerTemplate"
@@ -165,7 +166,7 @@ interface CreateOrUpdateProposalConfigParams {
 
 export async function createOrUpdateProposalOrThrow(
   provider: PlatformProvider,
-  options: {
+  proposalData: {
     workingBranchName: string;
     triggerBranchName: string;
     associatedProposalFromBranch: ProviderProposal | undefined;
@@ -180,8 +181,8 @@ export async function createOrUpdateProposalOrThrow(
     workingBranchName,
     triggerBranchName,
     associatedProposalFromBranch,
-  } = options;
-  const { titleTemplate } = config.review;
+  } = proposalData;
+  const { draft, titleTemplate } = config.review;
 
   const proposalTitle = await resolveStringTemplateOrThrow(titleTemplate);
   const proposalContent = await createProposalContent(
@@ -205,6 +206,7 @@ export async function createOrUpdateProposalOrThrow(
       triggerBranchName,
       proposalTitle,
       proposalContent,
+      { draft },
     );
   }
 

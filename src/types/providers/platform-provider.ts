@@ -85,6 +85,7 @@ export interface PlatformProvider {
     targetBranch: string,
     title: string,
     body: string,
+    opts?: { draft?: boolean },
   ) => Promise<ProviderProposal>;
   updateProposalOrThrow: (
     id: string,
