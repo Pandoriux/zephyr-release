@@ -31,6 +31,7 @@ export type OperationVariables =
     previousVersion: string;
     version: string;
 
+    commitHash: string;
     committedFilePaths: string;
 
     tagHash: string;
@@ -77,7 +78,7 @@ export type PrePrepareOperationVariables = Pick<
 
 export type PostPrepareOperationVariables = Pick<
   OperationVariables,
-  "jobs" | "committedFilePaths"
+  "jobs" | "commitHash" | "committedFilePaths"
 >;
 
 export type PrePublishOperationVariables = Pick<

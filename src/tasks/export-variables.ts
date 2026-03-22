@@ -177,6 +177,7 @@ export async function exportPrePrepareOperationVariables(
 
 export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
+  commitHash: string,
   changesData: Map<string, string>,
   modeRelatedData?: {
     proposalId?: string;
@@ -199,6 +200,7 @@ export async function exportPostPrepareOperationVariables(
   }
 
   const prepareExportObject = {
+    commitHash,
     committedFilePaths: JSON.stringify([...changesData.keys()]),
     jobs: JSON.stringify(operationJobs),
 

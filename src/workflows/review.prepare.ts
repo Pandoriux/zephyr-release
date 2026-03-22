@@ -172,7 +172,7 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const _commitResult = await commitChangesToBranchOrThrow(
+  const commitResult = await commitChangesToBranchOrThrow(
     provider,
     runSettings.inputs,
     runSettings.config,
@@ -203,7 +203,14 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Add labels to proposal");
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  await exportPostPrepareOperationVariables(provider, proposal.id, changesData);
+  await exportPostPrepareOperationVariables(
+    provider,
+    commitResult.hash,
+    changesData,
+    {
+      proposalId: proposal.id,
+    },
+  );
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");

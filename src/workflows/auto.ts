@@ -14,10 +14,12 @@ import {
 } from "../tasks/commit.ts";
 import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
 import {
+  exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import { logger } from "../tasks/logger.ts";
 import {
+  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -140,6 +142,7 @@ export async function executeAutoStrategy(
       rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
     );
@@ -189,7 +192,7 @@ export async function executeAutoStrategy(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const _commitResult = await commitChangesToBranchOrThrow(
+  const commitResult = await commitChangesToBranchOrThrow(
     provider,
     runSettings.inputs,
     runSettings.config,
@@ -203,7 +206,14 @@ export async function executeAutoStrategy(
   logger.stepFinish("Finished: Commit changes");
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  // await exportPostPrepareOperationVariables(provider, prNumber, changesData); // expect error, do not fix
+  await exportPostPrepareOperationVariables(
+    provider,
+    commitResult.hash,
+    changesData,
+    {
+      config: runSettings.config,
+    },
+  );
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");
@@ -234,6 +244,7 @@ export async function executeAutoStrategy(
       rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",
     );

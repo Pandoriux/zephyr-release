@@ -68,7 +68,7 @@ These variables are available starting from the first [`command-hooks > base > p
 
 - **mode:** The execution mode. It is the same as the config [`mode`](./config-options.md#mode-optional) option and is included here for convenience  
   Export: zr-mode; Env: ZR_MODE
-- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" when creating or updating proposal, "release" when creating tag or publishing release. For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
+- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" in "prepare" phase (when creating or updating proposal), "release" in "publish" phase (when creating tag or publishing release). For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
   Export: zr-operation; Env: ZR_OPERATION
 - **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-proposal" or "update-proposal" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [post prepare phase](#post-prepare)  
   Export: zr-jobs; Env: ZR_JOBS
@@ -111,6 +111,9 @@ These variables are available starting from the first [`command-hooks > prepare 
 #### Post Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > post`](./config-options.md#command-hooks-optional) command runs.
+
+- **commitHash:** The committed commit hash. For [`mode`](./config-options.md#mode-optional) "review", it is the commit on the working branch. For [`mode`](./config-options.md#mode-optional) "auto", it is the commit on the trigger branch  
+  Export: zr-commit-hash; Env: ZR_COMMIT_HASH
 
 - **committedFilePaths:** Stringified array of file paths that have been committed  
   Export: zr-committed-file-paths; Env: ZR_COMMITTED_FILE_PATHS
