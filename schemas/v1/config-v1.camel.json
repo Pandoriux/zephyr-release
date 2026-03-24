@@ -10,36 +10,82 @@
       "default": "UTC",
       "description": "IANA timezone used to display times, available in string templates as {{ timeZone }}.\nDefault: \"UTC\""
     },
-    "commandHook": {
+    "customStringPatterns": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {},
+      "description": "Custom string patterns to use in templates. The key is the pattern, available as '{{ <key> }}' while the resolved value is the key value."
+    },
+    "mode": {
+      "enum": [
+        "review",
+        "auto"
+      ],
+      "default": "review",
+      "description": "Defines the execution strategy:\n- \"review\": routes updates through a proposal (PR, MR, ...).\n- \"auto\": bypasses the proposal and commits directly to the branch.\nIf choosing \"auto\", see `auto.triggerStrategy`.\nDefault: \"review\""
+    },
+    "review": {
       "type": "object",
       "properties": {
-        "timeout": {
-          "anyOf": [
-            {
-              "type": "number",
-              "minimum": 1
-            },
-            {
-              "const": null
-            },
-            {
-              "const": "Infinity"
-            },
-            {
-              "const": "infinity"
-            }
-          ],
-          "default": 60000,
-          "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
-        },
-        "continueOnError": {
+        "draft": {
           "type": "boolean",
           "default": false,
-          "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+          "description": "If enabled, the proposal will be created as draft.\nDefault: false"
         },
-        "pre": {
-          "anyOf": [
-            {
+        "workingBranchNameTemplate": {
+          "type": "string",
+          "minLength": 1,
+          "default": "zephyr-release/{{ triggerBranchName }}",
+          "description": "String template for branch name that Zephyr Release will use.\nAllowed patterns to use are: fixed base string patterns.\nDefault: \"zephyr-release/{{ triggerBranchName }}\""
+        },
+        "titleTemplate": {
+          "type": "string",
+          "minLength": 1,
+          "default": "chore: release v{{ version }}",
+          "description": "String template for proposal title, using with string patterns like {{ version }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"chore: release v{{ version }}\""
+        },
+        "titleTemplatePath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing proposal title template. Overrides `titleTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "headerTemplate": {
+          "type": "string",
+          "default": "🤖 New release prepared. Awaiting approval~",
+          "description": "String template for proposal header, using with string patterns like {{ version }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"🤖 New release prepared. Awaiting approval~\""
+        },
+        "headerTemplatePath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing proposal header template. Overrides `headerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "bodyTemplate": {
+          "type": "string",
+          "default": "{{ changelogRelease }}",
+          "description": "String template for proposal body, using with string patterns like {{ changelogRelease }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ changelogRelease }}\""
+        },
+        "bodyTemplatePath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing proposal body template. Overrides `bodyTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "footerTemplate": {
+          "type": "string",
+          "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
+          "description": "String template for proposal footer, using with string patterns.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
+        },
+        "footerTemplatePath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing proposal footer template. Overrides `footerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "label": {
+          "type": "object",
+          "properties": {
+            "onCreate": {
               "anyOf": [
                 {
                   "type": "string",
@@ -48,174 +94,155 @@
                 {
                   "type": "object",
                   "properties": {
-                    "cmd": {
+                    "name": {
                       "type": "string",
                       "minLength": 1
                     },
-                    "timeout": {
-                      "anyOf": [
-                        {
-                          "type": "number",
-                          "minimum": 1
-                        },
-                        {
-                          "const": null
-                        },
-                        {
-                          "const": "Infinity"
-                        },
-                        {
-                          "const": "infinity"
-                        }
-                      ],
-                      "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                    "description": {
+                      "type": "string"
                     },
-                    "continueOnError": {
-                      "type": "boolean",
-                      "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                    "color": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                      "default": "#ededed",
+                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
                     }
                   },
                   "required": [
-                    "cmd"
+                    "name"
                   ]
                 }
+              ],
+              "default": {
+                "name": "release: pending",
+                "description": "The proposal is pending release.",
+                "color": "#FBCA04"
+              }
+            },
+            "onClose": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                      "default": "#ededed",
+                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ],
+              "default": {
+                "name": "release: released",
+                "description": "The proposal is closed and the release has completed.",
+                "color": "#0E8A16"
+              }
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Core label used by Zephyr Release to track proposals, managed exclusively by the tool. These label should not be manually added or removed."
+        },
+        "additionalLabel": {
+          "type": "object",
+          "properties": {
+            "onCreateAdd": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
               ]
+            },
+            "onCloseAdd": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            },
+            "onCloseRemove": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Additional labels to attach to proposals, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing."
+        },
+        "assignees": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "array",
               "items": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "cmd": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "timeout": {
-                        "anyOf": [
-                          {
-                            "type": "number",
-                            "minimum": 1
-                          },
-                          {
-                            "const": null
-                          },
-                          {
-                            "const": "Infinity"
-                          },
-                          {
-                            "const": "infinity"
-                          }
-                        ],
-                        "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                      },
-                      "continueOnError": {
-                        "type": "boolean",
-                        "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                      }
-                    },
-                    "required": [
-                      "cmd"
-                    ]
-                  }
-                ]
+                "type": "string",
+                "minLength": 1
               },
               "minItems": 1
             }
           ]
         },
-        "post": {
+        "reviewers": {
           "anyOf": [
             {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "cmd": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "timeout": {
-                      "anyOf": [
-                        {
-                          "type": "number",
-                          "minimum": 1
-                        },
-                        {
-                          "const": null
-                        },
-                        {
-                          "const": "Infinity"
-                        },
-                        {
-                          "const": "infinity"
-                        }
-                      ],
-                      "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                    },
-                    "continueOnError": {
-                      "type": "boolean",
-                      "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                    }
-                  },
-                  "required": [
-                    "cmd"
-                  ]
-                }
-              ]
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "array",
               "items": {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "cmd": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "timeout": {
-                        "anyOf": [
-                          {
-                            "type": "number",
-                            "minimum": 1
-                          },
-                          {
-                            "const": null
-                          },
-                          {
-                            "const": "Infinity"
-                          },
-                          {
-                            "const": "infinity"
-                          }
-                        ],
-                        "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                      },
-                      "continueOnError": {
-                        "type": "boolean",
-                        "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                      }
-                    },
-                    "required": [
-                      "cmd"
-                    ]
-                  }
-                ]
+                "type": "string",
+                "minLength": 1
               },
               "minItems": 1
             }
@@ -223,7 +250,779 @@
         }
       },
       "required": [],
-      "description": "Pre/post command lists to run around the main operation. Each command runs from the repository root.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
+      "description": "Configuration specific to the \"review\" execution `mode`. Defines how release proposals (such as PRs, MRs, ...) are generated, formatted, and tracked.",
+      "default": {}
+    },
+    "auto": {
+      "type": "object",
+      "properties": {
+        "triggerStrategy": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "commit-types",
+                  "description": "Triggers a release automatically when the pushed commits contain specific allowed types."
+                },
+                "allowedTypes": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1
+                    }
+                  ]
+                },
+                "minCommitCount": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    }
+                  ],
+                  "default": 1,
+                  "description": "The minimum number of unreleased matching commits required to trigger a release. Accepts a single number for a global count, or an object mapping specific commit types to their own minimum counts.\nWhen using object, thresholds are evaluated using OR logic, the release triggers if ANY of the specified counts are met.\nDefault: 1",
+                  "examples": [
+                    5,
+                    {
+                      "feat": 1,
+                      "fix": 5
+                    }
+                  ]
+                },
+                "requireBreaking": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "If set to true, an auto-release will ONLY trigger if at least one of the matching commits contains a breaking change.\nDefault: false"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "commit-footer",
+                  "description": "Triggers a release automatically when a specific token is found in the commit footers."
+                },
+                "token": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The conventional commit footer token to look for (e.g., \"Autorelease\")."
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The specific value the footer token must have (e.g., \"true\"). If omitted, only the token presence is required."
+                }
+              },
+              "required": [
+                "type",
+                "token"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "flag",
+                  "description": "Triggers a release based on a strict boolean flag. Ideal for dynamic configuration overrides and custom script evaluations.\nThe strategy will be evaluated after the cmd hooks `base.pre` and `prepare.pre` run."
+                },
+                "value": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "A hardcoded boolean flag to explicitly force or skip the release trigger."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          ],
+          "default": {
+            "type": "commit-types"
+          },
+          "description": "Defines the strategy that determines whether an automated release should be triggered. Used when `mode` is set to \"auto\".\nDefault: {\"type\":\"commit-types\"}"
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to the \"auto\" execution `mode`. Defines the conditions and strategies for bypassing proposals and committing releases directly.",
+      "default": {}
+    },
+    "commandHooks": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "object",
+          "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continueOnError": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
+            "pre": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            },
+            "post": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post commands to run around the main operation. Each command runs from the repository root.\nPost commands will always run regardless of operation outcome (success, skipped or failure). It is recommended to check the outcome export variable if your script should only run under specific conditions.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
+        },
+        "prepare": {
+          "type": "object",
+          "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continueOnError": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
+            "pre": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            },
+            "post": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
+        },
+        "publish": {
+          "type": "object",
+          "properties": {
+            "timeout": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 1
+                },
+                {
+                  "const": null
+                },
+                {
+                  "const": "Infinity"
+                },
+                {
+                  "const": "infinity"
+                }
+              ],
+              "default": 60000,
+              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
+            },
+            "continueOnError": {
+              "type": "boolean",
+              "default": false,
+              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
+            },
+            "pre": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            },
+            "post": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "cmd": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timeout": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 1
+                            },
+                            {
+                              "const": null
+                            },
+                            {
+                              "const": "Infinity"
+                            },
+                            {
+                              "const": "infinity"
+                            }
+                          ],
+                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                        }
+                      },
+                      "required": [
+                        "cmd"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "cmd": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeout": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 1
+                              },
+                              {
+                                "const": null
+                              },
+                              {
+                                "const": "Infinity"
+                              },
+                              {
+                                "const": "infinity"
+                              }
+                            ],
+                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
+                          },
+                          "continueOnError": {
+                            "type": "boolean",
+                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
+                          }
+                        },
+                        "required": [
+                          "cmd"
+                        ]
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                }
+              ]
+            }
+          },
+          "required": [],
+          "default": {},
+          "description": "Pre/post commands to run around the release operation. Each command runs from the repository root.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
+        }
+      },
+      "required": [],
+      "default": {},
+      "description": "Command hooks to run at different phases of the operation."
     },
     "runtimeConfigOverride": {
       "type": "object",
@@ -248,15 +1047,6 @@
         "path"
       ],
       "description": "A dynamic configuration file to deep merge over the resolved config at runtime, typically generated by a `commandHook` script.\nThis file is always read from the local filesystem. If the file does not exist or empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error."
-    },
-    "customStringPatterns": {
-      "type": "object",
-      "propertyNames": {
-        "type": "string",
-        "minLength": 1
-      },
-      "additionalProperties": {},
-      "description": "Custom string patterns to use in templates. The key is the pattern, available as '{{ <key> }}' while the resolved value is the key value."
     },
     "initialVersion": {
       "type": "string",
@@ -359,22 +1149,6 @@
               "path",
               "selector"
             ]
-          },
-          "minItems": 1
-        }
-      ]
-    },
-    "localFilesToCommit": {
-      "anyOf": [
-        {
-          "type": "string",
-          "minLength": 1
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
           },
           "minItems": 1
         }
@@ -641,7 +1415,7 @@
                     "properties": {
                       "type": {
                         "const": "static",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\"."
                       },
                       "value": {
                         "type": "string",
@@ -665,7 +1439,7 @@
                     "properties": {
                       "type": {
                         "const": "dynamic",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name)."
                       },
                       "value": {
                         "type": "string",
@@ -685,7 +1459,7 @@
                     "properties": {
                       "type": {
                         "const": "incremental",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Integer value that auto-increments by 1."
                       },
                       "initialValue": {
                         "type": "number",
@@ -731,7 +1505,7 @@
                     "properties": {
                       "type": {
                         "const": "timestamp",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC)."
                       },
                       "unit": {
                         "enum": [
@@ -751,7 +1525,7 @@
                     "properties": {
                       "type": {
                         "const": "date",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A date string that changes over time."
                       },
                       "format": {
                         "enum": [
@@ -817,7 +1591,7 @@
                     "properties": {
                       "type": {
                         "const": "static",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\"."
                       },
                       "value": {
                         "type": "string",
@@ -841,7 +1615,7 @@
                     "properties": {
                       "type": {
                         "const": "dynamic",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name)."
                       },
                       "value": {
                         "type": "string",
@@ -861,7 +1635,7 @@
                     "properties": {
                       "type": {
                         "const": "incremental",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Integer value that auto-increments by 1."
                       },
                       "initialValue": {
                         "type": "number",
@@ -907,7 +1681,7 @@
                     "properties": {
                       "type": {
                         "const": "timestamp",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC)."
                       },
                       "unit": {
                         "enum": [
@@ -927,7 +1701,7 @@
                     "properties": {
                       "type": {
                         "const": "date",
-                        "description": "Specifies the type of pre-release/build identifier/metadata.\n\"static\": A stable label that should not change often. Examples: \"alpha\", \"beta\", \"rc\".\n\"dynamic\": A label value that often changes per build or commit, usually sourced externally (e.g., git hash, branch name).\n\"incremental\": Integer value that auto-increments by 1.\n\"timestamp\": Integer value that changes over time, representing a specific point in time since January 1, 1970 (UTC).\n\"date\": A date string that changes over time."
+                        "description": "A date string that changes over time."
                       },
                       "format": {
                         "enum": [
@@ -977,7 +1751,7 @@
         "writeToFile": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, releases and string templates.\nDefault: true"
+          "description": "Enable/disable writing changelog to file. When disabled, changelogs are still generated for proposals, releases and string templates.\nDefault: true"
         },
         "path": {
           "type": "string",
@@ -1065,640 +1839,74 @@
       "description": "Configuration specific to changelogs. All generated changelog content are available in string templates as {{ changelogRelease }} (release header + body) or {{ changelogReleaseHeader }} and {{ changelogReleaseBody }}.",
       "default": {}
     },
-    "pullRequest": {
+    "commit": {
       "type": "object",
       "properties": {
-        "commandHook": {
-          "type": "object",
-          "properties": {
-            "timeout": {
-              "anyOf": [
-                {
-                  "type": "number",
-                  "minimum": 1
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                },
-                {
-                  "const": "infinity"
-                }
-              ],
-              "default": 60000,
-              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
-            },
-            "continueOnError": {
-              "type": "boolean",
-              "default": false,
-              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
-            },
-            "pre": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                        },
-                        "continueOnError": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                          },
-                          "continueOnError": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "post": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                        },
-                        "continueOnError": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                          },
-                          "continueOnError": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  },
-                  "minItems": 1
-                }
-              ]
-            }
-          },
-          "required": [],
-          "description": "Pre/post command lists to run around the pull request operation. Each command runs from the repository root.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
-        },
-        "branchNameTemplate": {
-          "type": "string",
-          "minLength": 1,
-          "default": "release/zephyr-release",
-          "description": "String template for branch name that Zephyr Release uses.\nAllowed patterns to use are: fixed base string patterns.\nDefault: \"release/zephyr-release\""
-        },
-        "label": {
-          "type": "object",
-          "properties": {
-            "onCreate": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "color": {
-                      "type": "string",
-                      "minLength": 1,
-                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                      "default": "#ededed",
-                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ]
-                }
-              ],
-              "default": {
-                "name": "release: pending",
-                "description": "The pull request is pending release.",
-                "color": "#FBCA04"
-              }
-            },
-            "onClose": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "color": {
-                      "type": "string",
-                      "minLength": 1,
-                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                      "default": "#ededed",
-                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ]
-                }
-              ],
-              "default": {
-                "name": "release: released",
-                "description": "The pull request is closed and the release has completed.",
-                "color": "#0E8A16"
-              }
-            }
-          },
-          "required": [],
-          "default": {},
-          "description": "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. These label should not be manually added or removed."
-        },
-        "additionalLabel": {
-          "type": "object",
-          "properties": {
-            "onCreateAdd": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "onCloseAdd": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "onCloseRemove": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            }
-          },
-          "required": [],
-          "default": {},
-          "description": "Additional labels to attach to pull requests, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing."
-        },
-        "titleTemplate": {
+        "headerTemplate": {
           "type": "string",
           "minLength": 1,
           "default": "chore: release v{{ version }}",
-          "description": "String template for pull request title, using with string patterns like {{ version }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"chore: release v{{ version }}\""
-        },
-        "titleTemplatePath": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
-        },
-        "headerTemplate": {
-          "type": "string",
-          "default": "🤖 New release prepared. Awaiting approval~",
-          "description": "String template for pull request header, using with string patterns like {{ version }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"🤖 New release prepared. Awaiting approval~\""
+          "description": "String template for commit header, using with string patterns like {{ version }}. You can optionally include a CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"chore: release v{{ version }}\""
         },
         "headerTemplatePath": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+          "description": "Path to text file containing commit header template. Overrides `headerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
         "bodyTemplate": {
           "type": "string",
-          "default": "{{ changelogRelease }}",
-          "description": "String template for pull request body, using with string patterns like {{ changelogRelease }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ changelogRelease }}\""
+          "description": "String template for commit body, using with string patterns like {{ changelogRelease }}. You can optionally include a CI skip token here (or header/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).\nAllowed patterns to use are: all fixed and dynamic string patterns.\n"
         },
         "bodyTemplatePath": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+          "description": "Path to text file containing commit body template. Overrides `bodyTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
         "footerTemplate": {
           "type": "string",
-          "default": "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)",
-          "description": "String template for pull request footer, using with string patterns.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)\""
+          "description": "String template for commit footer, using with string patterns. You can optionally include a CI skip token here (or header/body) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).\nAllowed patterns to use are: all fixed and dynamic string patterns.\n"
         },
         "footerTemplatePath": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+          "description": "Path to text file containing commit footer template. Overrides `footerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "localFilesToCommit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          ]
         }
       },
       "required": [],
-      "description": "Configuration specific to pull requests.",
+      "description": "Configuration specific to commits.",
       "default": {}
     },
-    "release": {
+    "tag": {
       "type": "object",
       "properties": {
-        "enabled": {
+        "createTag": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable tag and release.\nDefault: true"
+          "description": "Enable/disable tag creation. If disabled, create release note will also be skipped.\nDefault: true"
         },
-        "commandHook": {
-          "type": "object",
-          "properties": {
-            "timeout": {
-              "anyOf": [
-                {
-                  "type": "number",
-                  "minimum": 1
-                },
-                {
-                  "const": null
-                },
-                {
-                  "const": "Infinity"
-                },
-                {
-                  "const": "infinity"
-                }
-              ],
-              "default": 60000,
-              "description": "Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command.\nUse Infinity to never timeout (not recommended).\nDefault: 60000 (1 min)"
-            },
-            "continueOnError": {
-              "type": "boolean",
-              "default": false,
-              "description": "Base default behavior for all commands in `pre` and `post`, can be overridden per command.\nDefault: false"
-            },
-            "pre": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                        },
-                        "continueOnError": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                          },
-                          "continueOnError": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "post": {
-              "anyOf": [
-                {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "cmd": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "timeout": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "minimum": 1
-                            },
-                            {
-                              "const": null
-                            },
-                            {
-                              "const": "Infinity"
-                            },
-                            {
-                              "const": "infinity"
-                            }
-                          ],
-                          "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                        },
-                        "continueOnError": {
-                          "type": "boolean",
-                          "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                        }
-                      },
-                      "required": [
-                        "cmd"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "cmd": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeout": {
-                            "anyOf": [
-                              {
-                                "type": "number",
-                                "minimum": 1
-                              },
-                              {
-                                "const": null
-                              },
-                              {
-                                "const": "Infinity"
-                              },
-                              {
-                                "const": "infinity"
-                              }
-                            ],
-                            "description": "Timeout in milliseconds, use Infinity to never timeout (not recommended).\nDefaults to `commandHook` base `timeout` value"
-                          },
-                          "continueOnError": {
-                            "type": "boolean",
-                            "description": "Continue or stop the process on commands error.\nDefaults to `commandHook` base `continueOnError` value"
-                          }
-                        },
-                        "required": [
-                          "cmd"
-                        ]
-                      }
-                    ]
-                  },
-                  "minItems": 1
-                }
-              ]
-            }
-          },
-          "required": [],
-          "description": "Pre/post command lists to run around the release operation. Each command runs from the repository root.\nAvailable variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md"
-        },
-        "tagNameTemplate": {
+        "nameTemplate": {
           "type": "string",
           "minLength": 1,
           "default": "v{{ version }}",
           "description": "String template for tag name, using with string patterns like {{ version }}. Available in string templates as {{ tagName }}.\nAllowed patterns to use are: fixed base and fixed version string patterns and dynamic patterns.\nDefault: \"v{{ version }}\""
         },
-        "tagType": {
+        "type": {
           "enum": [
             "annotated",
             "lightweight"
@@ -1706,15 +1914,15 @@
           "default": "annotated",
           "description": "The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.\nDefault: \"annotated\""
         },
-        "tagMessageTemplate": {
+        "messageTemplate": {
           "type": "string",
           "default": "Release {{ version }}",
           "description": "String template for the Git annotated tag message.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"Release {{ version }}\""
         },
-        "tagMessageTemplatePath": {
+        "messageTemplatePath": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing Git annotated tag message template. Overrides `tagMessageTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+          "description": "Path to text file containing Git annotated tag message template. Overrides `messageTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
         "tagger": {
           "type": "object",
@@ -1747,11 +1955,19 @@
             "email"
           ],
           "description": "Custom identity and timestamp information for the Git tag. If omitted, defaults to the platform native behavior."
-        },
-        "skipReleaseNote": {
+        }
+      },
+      "required": [],
+      "description": "Configuration specific to tags.",
+      "default": {}
+    },
+    "release": {
+      "type": "object",
+      "properties": {
+        "createRelease": {
           "type": "boolean",
-          "default": false,
-          "description": "If enabled, only the tag will be created, no release note will be made.\nDefault: false"
+          "default": true,
+          "description": "Enable/disable release creation.\nDefault: true"
         },
         "prerelease": {
           "type": "boolean",
@@ -1771,7 +1987,7 @@
         "titleTemplate": {
           "type": "string",
           "default": "{{ tagName }}",
-          "description": "String template for release title, using with string patterns like {{ tagName }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ tagName }}\""
+          "description": "String template for release note title, using with string patterns like {{ tagName }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ tagName }}\""
         },
         "titleTemplatePath": {
           "type": "string",
@@ -1781,7 +1997,7 @@
         "bodyTemplate": {
           "type": "string",
           "default": "{{ changelogRelease }}",
-          "description": "String template for release body, using with string patterns like {{ changelogRelease }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ changelogRelease }}\""
+          "description": "String template for release note body, using with string patterns like {{ changelogRelease }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"{{ changelogRelease }}\""
         },
         "bodyTemplatePath": {
           "type": "string",
@@ -1806,7 +2022,7 @@
         }
       },
       "required": [],
-      "description": "Configuration specific to tags and releases.",
+      "description": "Configuration specific to releases.",
       "default": {}
     }
   },

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/Pandoriux/zephyr-release/compare/v0.7.0...v0.8.0) (2026-03-24)
+
+### Features
+
+- add safe exit when version is unchanged ([#26](https://github.com/Pandoriux/zephyr-release/issues/26)) ([01a544d](https://github.com/Pandoriux/zephyr-release/commit/01a544d86e3c1496eccebd439e698915fd540448))
+- implement auto execution strategy ([#27](https://github.com/Pandoriux/zephyr-release/issues/27)) ([225b16c](https://github.com/Pandoriux/zephyr-release/commit/225b16cd7e1b1c14a8db62fb14454e7bd423fb7b))
+- refactor config and core architecture ([#25](https://github.com/Pandoriux/zephyr-release/issues/25)) ([7b5ee04](https://github.com/Pandoriux/zephyr-release/commit/7b5ee04746a50c51b2c7725aa546ba744beefd2f))
+
 ## [0.7.0](https://github.com/Pandoriux/zephyr-release/compare/v0.6.0...v0.7.0) (2026-02-28)
 
 ### Features
