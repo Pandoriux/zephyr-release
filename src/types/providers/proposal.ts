@@ -6,3 +6,7 @@ export interface ProviderProposal {
   title: string;
   body: string;
 }
+
+export interface ProviderAddedAssignees {
+  username: string;
+}

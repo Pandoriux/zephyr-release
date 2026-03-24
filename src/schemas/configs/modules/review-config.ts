@@ -120,7 +120,18 @@ export const ReviewConfigSchema = v.pipe(
     ),
 
     assignees: v.pipe(
-      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) {
+          return Array.isArray(input) ? input : [input];
+        }
+        return input;
+      }),
       v.metadata({
         description:
           "A list of user identifiers to assign to the release proposal.\n" +
@@ -128,7 +139,18 @@ export const ReviewConfigSchema = v.pipe(
       }),
     ),
     reviewers: v.pipe(
-      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) {
+          return Array.isArray(input) ? input : [input];
+        }
+        return input;
+      }),
       v.metadata({
         description:
           "A list of user or team identifiers requested to review the release proposal.\n" +

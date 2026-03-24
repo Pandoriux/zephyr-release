@@ -2,6 +2,8 @@ import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
 import { makeGithubGetTextFileOrThrow } from "./file.ts";
 import {
+  makeGithubAddAssigneesToPrOrThrow,
+  makeGithubAddReviewersToPrOrThrow,
   makeGithubCreatePullRequestOrThrow,
   makeGithubFindUniquePullRequestForCommitOrThrow,
   makeGithubFindUniquePullRequestFromBranchOrThrow,
@@ -92,26 +94,34 @@ export function createGitHubProvider(): PlatformProvider {
       makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow(getOctokit),
     compareCommitsOrThrow: makeGithubCompareCommitsOrThrow(getOctokit),
     getCommit: makeGithubGetCommitOrThrow(getOctokit),
-    createCommitOnBranchOrThrow:
-      makeGithubCreateCommitOnBranchOrThrow(getOctokit),
+    createCommitOnBranchOrThrow: makeGithubCreateCommitOnBranchOrThrow(
+      getOctokit,
+    ),
 
-    createProposalOrThrow:
-      makeGithubCreatePullRequestOrThrow(getOctokit),
-    updateProposalOrThrow:
-      makeGithubUpdatePullRequestOrThrow(getOctokit),
+    createProposalOrThrow: makeGithubCreatePullRequestOrThrow(getOctokit),
+    updateProposalOrThrow: makeGithubUpdatePullRequestOrThrow(getOctokit),
 
-    addLabelsToProposalOrThrow:
-      makeGithubAddLabelsToPullRequestOrThrow(getOctokit),
-    removeLabelFromProposalOrThrow:
-      makeGithubRemoveLabelFromPullRequestOrThrow(getOctokit),
+    addLabelsToProposalOrThrow: makeGithubAddLabelsToPullRequestOrThrow(
+      getOctokit,
+    ),
+    removeLabelFromProposalOrThrow: makeGithubRemoveLabelFromPullRequestOrThrow(
+      getOctokit,
+    ),
 
-    getLatestReleaseTagOrThrow:
-      makeGithubGetLatestReleaseTagOrThrow(getOctokit),
+    addAssigneesToProposalOrThrow: makeGithubAddAssigneesToPrOrThrow(
+      getOctokit,
+    ),
+    addReviewersToProposalOrThrow: makeGithubAddReviewersToPrOrThrow(
+      getOctokit,
+    ),
+
+    getLatestReleaseTagOrThrow: makeGithubGetLatestReleaseTagOrThrow(
+      getOctokit,
+    ),
     createTagOrThrow: makeGithubCreateTagOrThrow(getOctokit),
 
     createReleaseOrThrow: makeGithubCreateReleaseOrThrow(getOctokit),
-    attachReleaseAssetOrThrow:
-      makeGithubAttachReleaseAssetOrThrow(getOctokit),
+    attachReleaseAssetOrThrow: makeGithubAttachReleaseAssetOrThrow(getOctokit),
 
     exportOutputs: githubExportOutputs,
     exportEnvVars: githubExportEnvVars,

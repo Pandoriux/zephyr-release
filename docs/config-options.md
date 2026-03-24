@@ -333,14 +333,14 @@ Additional labels to remove when proposal is closed and release operation has co
 
 #### review > assignees (Optional)
 
-Type: `string[]`
+Type: `string | string[]`
 
 A list of user identifiers to assign to the release proposal.  
 Use the platform's expected format (e.g., usernames).
 
 #### review > reviewers (Optional)
 
-Type: `string[]`
+Type: `string | string[]`
 
 A list of user or team identifiers requested to review the release proposal.  
 Use the platform's expected format (e.g., usernames or team slugs).

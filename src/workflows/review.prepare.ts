@@ -4,7 +4,10 @@ import {
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
-import { createOrUpdateProposalOrThrow } from "../tasks/proposal.ts";
+import {
+  addAssigneesToProposal,
+  createOrUpdateProposalOrThrow,
+} from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { format } from "@std/semver";
 import {
@@ -201,6 +204,18 @@ export async function executeReviewPreparePhase(
   logger.stepStart("Starting: Add labels to proposal");
   await addLabelsToProposalOrThrow(provider, proposal.id, runSettings.config);
   logger.stepFinish("Finished: Add labels to proposal");
+
+  if (runSettings.config.review.assignees) {
+    logger.stepStart("Starting: Add assignees to proposal");
+    await addAssigneesToProposal(
+      provider,
+      proposal.id,
+      runSettings.config.review.assignees,
+    );
+    logger.stepFinish("Finished: Add assignees to proposal");
+  }
+
+  // add reviewers
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
   await exportPostPrepareOperationVariables(

@@ -68,10 +68,7 @@ export const CommitConfigSchema = v.pipe(
       v.optional(
         v.union([
           trimNonEmptyStringSchema,
-          v.pipe(
-            v.array(trimNonEmptyStringSchema),
-            v.nonEmpty(),
-          ),
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
         ]),
       ),
       v.transform((input) => {

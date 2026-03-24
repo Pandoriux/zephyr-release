@@ -1,7 +1,11 @@
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import type { ProviderProposal } from "../../types/providers/proposal.ts";
+import type {
+  ProviderAddedAssignees,
+  ProviderProposal,
+} from "../../types/providers/proposal.ts";
+import { taskLogger } from "../../tasks/logger.ts";
 
 const RawPullRequestNodeSchema = v.object({
   number: v.number(),
@@ -263,6 +267,41 @@ async function githubUpdatePullRequestOrThrow(
   };
 }
 
+async function githubAddAssigneesToPrOrThrow(
+  octokit: OctokitClient,
+  prNumber: string,
+  assignees: string[],
+): Promise<ProviderAddedAssignees[]> {
+  let assigneesToAdd = assignees;
+
+  if (assignees.length > 10) {
+    assigneesToAdd = assignees.slice(0, 10);
+    taskLogger.info(
+      "GitHub limits PRs to 10 assignees. Truncated the requested list",
+    );
+  }
+
+  const res = await octokit.rest.issues.addAssignees({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    issue_number: Number(prNumber),
+    assignees: assigneesToAdd,
+  });
+
+  return res.data.assignees?.map((assignee) => ({
+    username: assignee.login,
+  })) ?? [];
+}
+
+async function githubAddReviewersToPrOrThrow(
+  octokit: OctokitClient,
+  prNumber: string,
+  reviewers: string[],
+): Promise<void> {
+  // TODO: implement logic
+  return;
+}
+
 export function makeGithubFindUniquePullRequestForCommitOrThrow(
   getOctokit: GetOctokitFn,
 ) {
@@ -318,4 +357,14 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
 export function makeGithubUpdatePullRequestOrThrow(getOctokit: GetOctokitFn) {
   return (id: string, title: string, body: string) =>
     githubUpdatePullRequestOrThrow(getOctokit(), id, title, body);
+}
+
+export function makeGithubAddAssigneesToPrOrThrow(getOctokit: GetOctokitFn) {
+  return (proposalId: string, assignees: string[]) =>
+    githubAddAssigneesToPrOrThrow(getOctokit(), proposalId, assignees);
+}
+
+export function makeGithubAddReviewersToPrOrThrow(getOctokit: GetOctokitFn) {
+  return (proposalId: string, reviewers: string[]) =>
+    githubAddReviewersToPrOrThrow(getOctokit(), proposalId, reviewers);
 }

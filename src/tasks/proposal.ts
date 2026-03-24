@@ -238,3 +238,57 @@ export function extractChangelogFromProposal(
 
   return changelogRelease;
 }
+
+export async function addAssigneesToProposal(
+  provider: PlatformProvider,
+  proposalId: string,
+  assignees: string[],
+) {
+  try {
+    const addResult = await provider.addAssigneesToProposalOrThrow(
+      proposalId,
+      assignees,
+    );
+
+    if (addResult.length === 0) {
+      taskLogger.warn(
+        "Failed to add any assignees. Ensure the provided usernames are valid and have repository permissions",
+      );
+      return;
+    }
+
+    const missedAssignees = assignees.filter((a) =>
+      !addResult.some((added) =>
+        added.username.toLowerCase() === a.toLowerCase()
+      )
+    );
+
+    if (missedAssignees.length > 0) {
+      taskLogger.warn(
+        `Successfully assigned: ${
+          addResult.map((r) => r.username).join(", ")
+        }. ` +
+          `Skipped (invalid or unauthorized): ${missedAssignees.join(", ")}.`,
+      );
+    } else {
+      taskLogger.info(
+        `Successfully added all assignees: ${
+          addResult.map((r) => r.username).join(", ")
+        }.`,
+      );
+    }
+  } catch (error) {
+    taskLogger.warn(
+      `Failed to add assignees to proposal. ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+}
+
+export async function addReviewersToProposal(
+  provider: PlatformProvider,
+  proposalId: string,
+  reviewers: string[],
+) {
+}

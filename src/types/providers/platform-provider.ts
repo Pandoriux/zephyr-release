@@ -13,7 +13,7 @@ import type {
   ProviderCompareCommits,
 } from "./commit.ts";
 import type { ProviderInputs } from "./inputs.ts";
-import type { ProviderProposal } from "./proposal.ts";
+import type { ProviderAddedAssignees, ProviderProposal } from "./proposal.ts";
 import type { ProviderOperationTriggerContext } from "./provider-operation-context.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { ProviderTag } from "./tag.ts";
@@ -100,6 +100,15 @@ export interface PlatformProvider {
   removeLabelFromProposalOrThrow: (
     proposalId: string,
     label: string,
+  ) => Promise<void>;
+
+  addAssigneesToProposalOrThrow: (
+    proposalId: string,
+    assignees: string[],
+  ) => Promise<ProviderAddedAssignees[]>;
+  addReviewersToProposalOrThrow: (
+    proposalId: string,
+    reviewers: string[],
   ) => Promise<void>;
 
   getLatestReleaseTagOrThrow: () => Promise<string | undefined>;
