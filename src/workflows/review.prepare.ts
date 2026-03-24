@@ -6,6 +6,7 @@ import {
 } from "../tasks/commit.ts";
 import {
   addAssigneesToProposal,
+  addReviewersToProposal,
   createOrUpdateProposalOrThrow,
 } from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -215,7 +216,15 @@ export async function executeReviewPreparePhase(
     logger.stepFinish("Finished: Add assignees to proposal");
   }
 
-  // add reviewers
+  if (runSettings.config.review.reviewers) {
+    logger.stepStart("Starting: Add reviewers to proposal");
+    await addReviewersToProposal(
+      provider,
+      proposal.id,
+      runSettings.config.review.reviewers,
+    );
+    logger.stepFinish("Finished: Add reviewers to proposal");
+  }
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
   await exportPostPrepareOperationVariables(

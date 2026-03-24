@@ -298,8 +298,33 @@ async function githubAddReviewersToPrOrThrow(
   prNumber: string,
   reviewers: string[],
 ): Promise<void> {
-  // TODO: implement logic
-  return;
+  const userReviewers: string[] = [];
+  const teamReviewers: string[] = [];
+
+  for (const req of reviewers) {
+    const slashIndex = req.indexOf("/");
+
+    if (slashIndex !== -1) {
+      // Extract everything AFTER the first slash
+      // e.g., "org/team-slug" -> "team-slug"
+      // e.g., "org/wrong/format" -> "wrong/format" (which will safely trigger a 422 API error)
+      const slug = req.substring(slashIndex + 1);
+
+      if (slug) {
+        teamReviewers.push(slug);
+      }
+    } else {
+      userReviewers.push(req);
+    }
+  }
+
+  await octokit.rest.pulls.requestReviewers({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    pull_number: Number(prNumber),
+    reviewers: userReviewers,
+    team_reviewers: teamReviewers,
+  });
 }
 
 export function makeGithubFindUniquePullRequestForCommitOrThrow(

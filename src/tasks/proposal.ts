@@ -291,4 +291,20 @@ export async function addReviewersToProposal(
   proposalId: string,
   reviewers: string[],
 ) {
+  try {
+    await provider.addReviewersToProposalOrThrow(
+      proposalId,
+      reviewers,
+    );
+
+    taskLogger.info(
+      `Successfully requested reviews from: ${reviewers.join(", ")}`,
+    );
+  } catch (error) {
+    taskLogger.warn(
+      `Failed to request reviewers. ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
 }
