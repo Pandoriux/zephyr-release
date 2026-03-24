@@ -7,10 +7,10 @@ export const OperationKinds = {
 export type OperationKind = typeof OperationKinds[keyof typeof OperationKinds];
 
 export const OperationJobs = {
-  createPr: "create-pr",
-  updatePr: "update-pr",
+  createProposal: "create-proposal",
+  updateProposal: "update-proposal",
   createTag: "create-tag",
-  createReleaseNote: "create-release-note",
+  createRelease: "create-release",
   createCommit: "create-commit",
 } as const;
 

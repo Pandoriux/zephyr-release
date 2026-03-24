@@ -1,7 +1,7 @@
 export class SafeExit extends Error {
-  override name = "SafeExit";
+  constructor(message = "Safe exit", opts?: ErrorOptions) {
+    super(message, opts);
 
-  constructor(message = "Safe exit") {
-    super(message);
+    this.name = SafeExit.name;
   }
 }

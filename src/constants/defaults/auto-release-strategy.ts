@@ -1,5 +1,3 @@
-import type { AutoStrategyInput } from "../../schemas/configs/modules/components/auto-release-strategy.ts";
-
-export const DEFAULT_AUTO_RELEASE_STRATEGY: AutoStrategyInput = {
+export const DEFAULT_AUTO_RELEASE_STRATEGY = {
   type: "commit-types",
-};
+} as const;

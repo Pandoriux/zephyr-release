@@ -6,8 +6,8 @@ To inject values into your templates, put [patterns](#available-string-patterns)
 
 Example:
 
-- [Pr title template](./config-options.md#pull--title-template-optional): `chore: release {{ name | upper }} version {{version}}`
-- [Tag template](./config-options.md#release--tag-name-template-optional): `v{{version}}`
+- [Proposal title template](./config-options.md#review--title-template-optional): `chore: release {{ name | upper }} version {{ version }}`
+- [Tag template](./config-options.md#tag--name-template-optional): `v{{ version }}`
 
 <br>
 
@@ -43,7 +43,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 - `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
 - `{{ timestamp }}`: Timestamp, always UTC
-- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` — date/time components
+- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` - date/time components
 
 #### Version (and tag)
 
@@ -54,7 +54,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 <br>
 
-- `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#release--tag-name-template-optional))
+- `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#tag--name-template-optional))
 
 #### Previous Version
 
@@ -71,7 +71,7 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 #### Changelog
 
-- `{{ changelogRelease }}`: In `propose` operation (managing pull request), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body + release footer. In `release` operation (create tag and publish release), the value is the **pull request body** (this means any edits made to the pull request body will also be included)
+- `{{ changelogRelease }}`: In `propose` operation (managing proposals), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body + release footer. In `release` operation (create tag and publish release), the value is the **proposal body** (this means any edits made to the proposal body will also be included)
 
 - `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)).
 

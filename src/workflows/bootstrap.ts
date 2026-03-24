@@ -7,9 +7,9 @@ import {
 import { logger } from "../tasks/logger.ts";
 import { validateCurrentOperationTriggerCtxOrExit } from "../tasks/operation.ts";
 import {
-  findPullRequestForCommitOrThrow,
-  findPullRequestFromBranchOrThrow,
-} from "../tasks/pull-request.ts";
+  findProposalForCommitOrThrow,
+  findProposalFromBranchOrThrow,
+} from "../tasks/proposal.ts";
 import {
   createCustomStringPatternContext,
   createFixedBaseStringPatternContext,
@@ -18,13 +18,13 @@ import { registerTransformersToTemplateEngine } from "../tasks/string-templates-
 import type { OperationTriggerContext } from "../types/operation-context.ts";
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../types/providers/proposal.ts";
 
 export interface BootstrapResult {
   triggerContext: OperationTriggerContext;
   workingBranchResult: WorkingBranchResult;
-  associatedPrForCommit: ProviderPullRequest | undefined;
-  associatedPrFromBranch: ProviderPullRequest | undefined;
+  associatedProposalForCommit: ProviderProposal | undefined;
+  associatedProposalFromBranch: ProviderProposal | undefined;
 }
 
 export async function bootstrapOperation(
@@ -64,29 +64,29 @@ export async function bootstrapOperation(
   );
   logger.stepFinish("Finished: Ensure working branch is prepared");
 
-  let associatedPrForCommit: ProviderPullRequest | undefined;
-  let associatedPrFromBranch: ProviderPullRequest | undefined;
+  let associatedProposalForCommit: ProviderProposal | undefined;
+  let associatedProposalFromBranch: ProviderProposal | undefined;
   if (configResult.config.mode === "review") {
-    logger.stepStart("Starting: Get associated pull requests");
-    associatedPrForCommit = await findPullRequestForCommitOrThrow(
+    logger.stepStart("Starting: Get associated proposals");
+    associatedProposalForCommit = await findProposalForCommitOrThrow(
       provider,
       workingBranchResult.name,
       inputsResult.inputs,
       configResult.config,
     );
-    associatedPrFromBranch = await findPullRequestFromBranchOrThrow(
+    associatedProposalFromBranch = await findProposalFromBranchOrThrow(
       provider,
       workingBranchResult.name,
       inputsResult.inputs,
       configResult.config,
     );
-    logger.stepFinish("Finished: Get associated pull requests");
+    logger.stepFinish("Finished: Get associated proposals");
   }
 
   return {
     triggerContext,
     workingBranchResult,
-    associatedPrForCommit,
-    associatedPrFromBranch,
+    associatedProposalForCommit,
+    associatedProposalFromBranch,
   };
 }

@@ -31,6 +31,7 @@ export type OperationVariables =
     previousVersion: string;
     version: string;
 
+    commitHash: string;
     committedFilePaths: string;
 
     tagHash: string;
@@ -44,7 +45,7 @@ export type OperationVariables =
     internalConfig: string;
 
     patternContext: string;
-    pullRequestNumber: number | undefined;
+    proposalId?: string;
   };
 
 export type BaseOperationVariables = Pick<
@@ -67,7 +68,7 @@ export type DynamicOperationVariables = Pick<
   | "config"
   | "internalConfig"
   | "patternContext"
-  | "pullRequestNumber"
+  | "proposalId"
 >;
 
 export type PrePrepareOperationVariables = Pick<
@@ -77,7 +78,7 @@ export type PrePrepareOperationVariables = Pick<
 
 export type PostPrepareOperationVariables = Pick<
   OperationVariables,
-  "committedFilePaths"
+  "jobs" | "commitHash" | "committedFilePaths"
 >;
 
 export type PrePublishOperationVariables = Pick<

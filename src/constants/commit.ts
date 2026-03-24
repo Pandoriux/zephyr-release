@@ -16,3 +16,5 @@ export const NESTED_CLEANING_REGEX = new RegExp(
     .join("|"),
   "g",
 );
+
+export const ZEPHYR_RELEASE_COMMIT_SIGN = "Zephyr-Release";

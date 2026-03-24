@@ -1,7 +1,11 @@
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
-import type { ProviderPullRequest } from "../../types/providers/pull-request.ts";
+import type {
+  ProviderAddedAssignees,
+  ProviderProposal,
+} from "../../types/providers/proposal.ts";
+import { taskLogger } from "../../tasks/logger.ts";
 
 const RawPullRequestNodeSchema = v.object({
   number: v.number(),
@@ -53,8 +57,8 @@ async function githubFindUniquePullRequestForCommitOrThrow(
   sourceBranch: string,
   targetBranch: string,
   requiredLabel: string,
-): Promise<ProviderPullRequest | undefined> {
-  let foundPr: ProviderPullRequest | undefined = undefined;
+): Promise<ProviderProposal | undefined> {
+  let foundPr: ProviderProposal | undefined = undefined;
 
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
@@ -122,7 +126,7 @@ async function githubFindUniquePullRequestForCommitOrThrow(
         }
 
         foundPr = {
-          number: pr.number,
+          id: String(pr.number),
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
           title: pr.title,
@@ -140,8 +144,8 @@ async function githubFindUniquePullRequestFromBranchOrThrow(
   branchName: string,
   targetBranch: string,
   requiredLabel: string,
-): Promise<ProviderPullRequest | undefined> {
-  let foundPr: ProviderPullRequest | undefined = undefined;
+): Promise<ProviderProposal | undefined> {
+  let foundPr: ProviderProposal | undefined = undefined;
 
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
@@ -198,7 +202,7 @@ async function githubFindUniquePullRequestFromBranchOrThrow(
         }
 
         foundPr = {
-          number: pr.number,
+          id: String(pr.number),
           sourceBranch: pr.headRefName,
           targetBranch: pr.baseRefName,
           title: pr.title,
@@ -217,7 +221,10 @@ async function githubCreatePullRequestOrThrow(
   targetBranch: string,
   title: string,
   body: string,
-): Promise<ProviderPullRequest> {
+  opts?: { draft?: boolean },
+): Promise<ProviderProposal> {
+  const { draft } = opts ?? {};
+
   const res = await octokit.rest.pulls.create({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
@@ -225,10 +232,11 @@ async function githubCreatePullRequestOrThrow(
     base: targetBranch,
     title,
     body,
+    draft,
   });
 
   return {
-    number: res.data.number,
+    id: String(res.data.number),
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
     title: res.data.title,
@@ -238,25 +246,85 @@ async function githubCreatePullRequestOrThrow(
 
 async function githubUpdatePullRequestOrThrow(
   octokit: OctokitClient,
-  number: number,
+  prNumber: string,
   title: string,
   body: string,
-): Promise<ProviderPullRequest> {
+): Promise<ProviderProposal> {
   const res = await octokit.rest.pulls.update({
     owner: githubGetNamespace(),
     repo: githubGetRepositoryName(),
-    pull_number: number,
+    pull_number: Number(prNumber),
     title,
     body,
   });
 
   return {
-    number: res.data.number,
+    id: String(res.data.number),
     sourceBranch: res.data.head.ref,
     targetBranch: res.data.base.ref,
     title: res.data.title,
     body: res.data.body || "",
   };
+}
+
+async function githubAddAssigneesToPrOrThrow(
+  octokit: OctokitClient,
+  prNumber: string,
+  assignees: string[],
+): Promise<ProviderAddedAssignees[]> {
+  let assigneesToAdd = assignees;
+
+  if (assignees.length > 10) {
+    assigneesToAdd = assignees.slice(0, 10);
+    taskLogger.info(
+      "GitHub limits PRs to 10 assignees. Truncated the requested list",
+    );
+  }
+
+  const res = await octokit.rest.issues.addAssignees({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    issue_number: Number(prNumber),
+    assignees: assigneesToAdd,
+  });
+
+  return res.data.assignees?.map((assignee) => ({
+    username: assignee.login,
+  })) ?? [];
+}
+
+async function githubAddReviewersToPrOrThrow(
+  octokit: OctokitClient,
+  prNumber: string,
+  reviewers: string[],
+): Promise<void> {
+  const userReviewers: string[] = [];
+  const teamReviewers: string[] = [];
+
+  for (const req of reviewers) {
+    const slashIndex = req.indexOf("/");
+
+    if (slashIndex !== -1) {
+      // Extract everything AFTER the first slash
+      // e.g., "org/team-slug" -> "team-slug"
+      // e.g., "org/wrong/format" -> "wrong/format" (which will safely trigger a 422 API error)
+      const slug = req.substring(slashIndex + 1);
+
+      if (slug) {
+        teamReviewers.push(slug);
+      }
+    } else {
+      userReviewers.push(req);
+    }
+  }
+
+  await octokit.rest.pulls.requestReviewers({
+    owner: githubGetNamespace(),
+    repo: githubGetRepositoryName(),
+    pull_number: Number(prNumber),
+    reviewers: userReviewers,
+    team_reviewers: teamReviewers,
+  });
 }
 
 export function makeGithubFindUniquePullRequestForCommitOrThrow(
@@ -299,6 +367,7 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
     targetBranch: string,
     title: string,
     body: string,
+    opts?: { draft?: boolean },
   ) =>
     githubCreatePullRequestOrThrow(
       getOctokit(),
@@ -306,10 +375,21 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
       targetBranch,
       title,
       body,
+      opts,
     );
 }
 
 export function makeGithubUpdatePullRequestOrThrow(getOctokit: GetOctokitFn) {
-  return (number: number, title: string, body: string) =>
-    githubUpdatePullRequestOrThrow(getOctokit(), number, title, body);
+  return (id: string, title: string, body: string) =>
+    githubUpdatePullRequestOrThrow(getOctokit(), id, title, body);
+}
+
+export function makeGithubAddAssigneesToPrOrThrow(getOctokit: GetOctokitFn) {
+  return (proposalId: string, assignees: string[]) =>
+    githubAddAssigneesToPrOrThrow(getOctokit(), proposalId, assignees);
+}
+
+export function makeGithubAddReviewersToPrOrThrow(getOctokit: GetOctokitFn) {
+  return (proposalId: string, reviewers: string[]) =>
+    githubAddReviewersToPrOrThrow(getOctokit(), proposalId, reviewers);
 }

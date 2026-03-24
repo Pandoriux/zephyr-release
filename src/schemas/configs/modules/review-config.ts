@@ -1,10 +1,10 @@
 import * as v from "@valibot/valibot";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import {
-  DEFAULT_PULL_REQUEST_BODY_TEMPLATE,
-  DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE,
-  DEFAULT_PULL_REQUEST_HEADER_TEMPLATE,
-  DEFAULT_PULL_REQUEST_TITLE_TEMPLATE,
+  DEFAULT_PROPOSAL_BODY_TEMPLATE,
+  DEFAULT_PROPOSAL_FOOTER_TEMPLATE,
+  DEFAULT_PROPOSAL_HEADER_TEMPLATE,
+  DEFAULT_PROPOSAL_TITLE_TEMPLATE,
   DEFAULT_WORKING_BRANCH_NAME_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
 import { AdditionalLabelSchema } from "./components/additional-label.ts";
@@ -34,70 +34,70 @@ export const ReviewConfigSchema = v.pipe(
     ),
 
     titleTemplate: v.pipe(
-      v.optional(trimNonEmptyStringSchema, DEFAULT_PULL_REQUEST_TITLE_TEMPLATE),
+      v.optional(trimNonEmptyStringSchema, DEFAULT_PROPOSAL_TITLE_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request title, using with string patterns like {{ version }}.\n" +
+          "String template for proposal title, using with string patterns like {{ version }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_TITLE_TEMPLATE)}`,
+          `Default: ${JSON.stringify(DEFAULT_PROPOSAL_TITLE_TEMPLATE)}`,
       }),
     ),
     titleTemplatePath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request title template. Overrides `titleTemplate` when both are provided.\n" +
+          "Path to text file containing proposal title template. Overrides `titleTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     headerTemplate: v.pipe(
-      v.optional(v.string(), DEFAULT_PULL_REQUEST_HEADER_TEMPLATE),
+      v.optional(v.string(), DEFAULT_PROPOSAL_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request header, using with string patterns like {{ version }}.\n" +
+          "String template for proposal header, using with string patterns like {{ version }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_HEADER_TEMPLATE)}`,
+          `Default: ${JSON.stringify(DEFAULT_PROPOSAL_HEADER_TEMPLATE)}`,
       }),
     ),
     headerTemplatePath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request header template. Overrides `headerTemplate` when both are provided.\n" +
+          "Path to text file containing proposal header template. Overrides `headerTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     bodyTemplate: v.pipe(
-      v.optional(v.string(), DEFAULT_PULL_REQUEST_BODY_TEMPLATE),
+      v.optional(v.string(), DEFAULT_PROPOSAL_BODY_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request body, using with string patterns like {{ changelogRelease }}.\n" +
+          "String template for proposal body, using with string patterns like {{ changelogRelease }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_BODY_TEMPLATE)}`,
+          `Default: ${JSON.stringify(DEFAULT_PROPOSAL_BODY_TEMPLATE)}`,
       }),
     ),
     bodyTemplatePath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request body template. Overrides `bodyTemplate` when both are provided.\n" +
+          "Path to text file containing proposal body template. Overrides `bodyTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
     footerTemplate: v.pipe(
-      v.optional(v.string(), DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE),
+      v.optional(v.string(), DEFAULT_PROPOSAL_FOOTER_TEMPLATE),
       v.metadata({
         description:
-          "String template for pull request footer, using with string patterns.\n" +
+          "String template for proposal footer, using with string patterns.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
-          `Default: ${JSON.stringify(DEFAULT_PULL_REQUEST_FOOTER_TEMPLATE)}`,
+          `Default: ${JSON.stringify(DEFAULT_PROPOSAL_FOOTER_TEMPLATE)}`,
       }),
     ),
     footerTemplatePath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing pull request footer template. Overrides `footerTemplate` when both are provided.\n" +
+          "Path to text file containing proposal footer template. Overrides `footerTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
@@ -106,7 +106,7 @@ export const ReviewConfigSchema = v.pipe(
       v.optional(CoreLabelSchema, {}),
       v.metadata({
         description:
-          "Core label used by Zephyr Release to track pull requests, managed exclusively by the tool. " +
+          "Core label used by Zephyr Release to track proposals, managed exclusively by the tool. " +
           "These label should not be manually added or removed.",
       }),
     ),
@@ -114,13 +114,24 @@ export const ReviewConfigSchema = v.pipe(
       v.optional(AdditionalLabelSchema, {}),
       v.metadata({
         description:
-          "Additional labels to attach to pull requests, managed and supplied by you. " +
+          "Additional labels to attach to proposals, managed and supplied by you. " +
           "Unlike the core label, these labels are not automatically created if missing.",
       }),
     ),
 
     assignees: v.pipe(
-      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) {
+          return Array.isArray(input) ? input : [input];
+        }
+        return input;
+      }),
       v.metadata({
         description:
           "A list of user identifiers to assign to the release proposal.\n" +
@@ -128,7 +139,18 @@ export const ReviewConfigSchema = v.pipe(
       }),
     ),
     reviewers: v.pipe(
-      v.optional(v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty())),
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) {
+          return Array.isArray(input) ? input : [input];
+        }
+        return input;
+      }),
       v.metadata({
         description:
           "A list of user or team identifiers requested to review the release proposal.\n" +
@@ -138,7 +160,7 @@ export const ReviewConfigSchema = v.pipe(
   }),
   v.metadata({
     description:
-      'Configuration specific to the "review" execution `mode`. Defines how release proposals (such as Pull Requests) ' +
+      'Configuration specific to the "review" execution `mode`. Defines how release proposals (such as PRs, MRs, ...) ' +
       "are generated, formatted, and tracked.",
   }),
 );

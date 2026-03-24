@@ -22,4 +22,4 @@ export const AutoConfigSchema = v.pipe(
 );
 
 type _AutoConfigInput = v.InferInput<typeof AutoConfigSchema>;
-type _AutoConfigOutput = v.InferOutput<typeof AutoConfigSchema>;
+export type AutoConfigOutput = v.InferOutput<typeof AutoConfigSchema>;

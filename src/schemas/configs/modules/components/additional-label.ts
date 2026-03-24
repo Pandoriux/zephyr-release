@@ -15,7 +15,7 @@ export const AdditionalLabelSchema = v.object({
       return input;
     }),
     v.metadata({
-      description: "Additional labels to add when pull request is created.",
+      description: "Additional labels to add when proposal is created.",
     }),
   ),
   onCloseAdd: v.pipe(
@@ -34,7 +34,7 @@ export const AdditionalLabelSchema = v.object({
     }),
     v.metadata({
       description:
-        "Additional labels to add when pull request is closed and release operation has completed.",
+        "Additional labels to add when proposal is closed and release operation has completed.",
     }),
   ),
   onCloseRemove: v.pipe(
@@ -53,7 +53,7 @@ export const AdditionalLabelSchema = v.object({
     }),
     v.metadata({
       description:
-        "Additional labels to remove when pull request is closed and release operation has completed. Use " +
+        "Additional labels to remove when proposal is closed and release operation has completed. Use " +
         `"${AdditionalLabelOnCloseRemoveOptions.allOnCreateAdd}" ` +
         "to remove all labels added in `onCreateAdd`.",
       examples: [AdditionalLabelOnCloseRemoveOptions.allOnCreateAdd],

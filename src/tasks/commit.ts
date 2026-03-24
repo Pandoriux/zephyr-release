@@ -11,7 +11,11 @@ import { prepareVersionFilesToCommit } from "./version-files/version-file.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
-import { NESTED_CLEANING_REGEX, NESTED_COMMIT } from "../constants/commit.ts";
+import {
+  NESTED_CLEANING_REGEX,
+  NESTED_COMMIT,
+  ZEPHYR_RELEASE_COMMIT_SIGN,
+} from "../constants/commit.ts";
 import type { ProviderCommit } from "../types/providers/commit.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import { prepareChangelogFileToCommit } from "./changelog.ts";
@@ -19,6 +23,9 @@ import { execSync } from "node:child_process";
 import { getTextFileOrThrow } from "./file.ts";
 import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
 import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
+import { BranchOutOfDateError } from "../errors/providers/branch.ts";
+import { SafeExit } from "../errors/safe-exit.ts";
+import { VERSION } from "../version.generated.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -405,10 +412,11 @@ export async function prepareChangesToCommit(
 
 type CommitChangesInputsParams = Pick<
   InputsOutput,
-  "workspacePath" | "sourceMode"
+  "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
 interface CommitChangesConfigParams {
+  mode: ConfigOutput["mode"];
   commit: Pick<
     CommitConfigOutput,
     | "headerTemplate"
@@ -420,19 +428,19 @@ interface CommitChangesConfigParams {
   >;
 }
 
-export async function commitChangesToBranch(
+export async function commitChangesToBranchOrThrow(
   provider: PlatformProvider,
   inputs: CommitChangesInputsParams,
   config: CommitChangesConfigParams,
-  options: {
-    triggerCommitHash: string;
+  commitData: {
     baseTreeHash: string;
     changesToCommit: Map<string, string>;
     targetBranchName: string;
     force?: boolean;
   },
 ) {
-  const { workspacePath, sourceMode } = inputs;
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const { mode } = config;
   const {
     headerTemplate,
     headerTemplatePath,
@@ -441,13 +449,7 @@ export async function commitChangesToBranch(
     footerTemplate,
     footerTemplatePath,
   } = config.commit;
-  const {
-    triggerCommitHash,
-    baseTreeHash,
-    changesToCommit,
-    targetBranchName,
-    force,
-  } = options;
+  const { baseTreeHash, changesToCommit, targetBranchName, force } = commitData;
 
   let commitHeader: string;
   if (headerTemplatePath) {
@@ -485,7 +487,15 @@ export async function commitChangesToBranch(
     commitFooter = await resolveStringTemplateOrThrow(footerTemplate);
   }
 
-  const commitMessage = [commitHeader, commitBody, commitFooter].filter(Boolean)
+  const zephyrReleaseSign = `${ZEPHYR_RELEASE_COMMIT_SIGN}: ${VERSION}`;
+  if (commitFooter?.trim()) {
+    commitFooter = `${commitFooter.trim()}\n${zephyrReleaseSign}`;
+  } else {
+    commitFooter = zephyrReleaseSign;
+  }
+
+  const commitMessage = [commitHeader, commitBody, commitFooter]
+    .filter(Boolean)
     .join("\n\n");
 
   taskLogger.info("Creating commit and pushing to working branch...");
@@ -496,7 +506,15 @@ export async function commitChangesToBranch(
     commitMessage,
     targetBranchName,
     force,
-  );
+  ).catch((error) => {
+    if (mode === "auto" && error instanceof BranchOutOfDateError) {
+      throw new SafeExit(
+        "Trigger branch has moved forward. Letting the newer commit take over",
+      );
+    }
+
+    throw error;
+  });
 
   return createdCommit;
 }

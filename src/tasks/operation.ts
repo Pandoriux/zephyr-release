@@ -6,6 +6,7 @@ import type { ConfigOutput } from "../schemas/configs/config.ts";
 import { taskLogger } from "./logger.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import { initTomlEditJs } from "../libs/@rainbowatcher/toml-edit-js/initWasm.ts";
+import { ZEPHYR_RELEASE_COMMIT_SIGN } from "../constants/commit.ts";
 
 export function initOperationRuntime(
   provider: PlatformProvider,
@@ -37,6 +38,16 @@ export function validateCurrentOperationTriggerCtxOrExit(
   const parsedLatestTriggerCommit = commitParser.parse(
     operationContext.latestTriggerCommit.message,
   );
+
+  const isZephyrReleaseSignCommit = parsedLatestTriggerCommit.notes.some((n) =>
+    n.title.toLowerCase() === ZEPHYR_RELEASE_COMMIT_SIGN.toLowerCase()
+  );
+  if (isZephyrReleaseSignCommit) {
+    throw new SafeExit(
+      "Detected Zephyr Release bot signature in the trigger commit. Exiting safely to prevent an infinite CI loop",
+    );
+  }
+
   const parsedTriggerCommits = operationContext.triggerCommits.map((c) =>
     commitParser.parse(c.message)
   );
@@ -54,7 +65,7 @@ export function validateCurrentOperationTriggerCtxOrExit(
     parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type));
 
   if (!hasAllowedType) {
-    if (mode !== "auto") {
+    if (mode === "auto") {
       taskLogger.info(
         'No commits with an allowed type found. But operation continues because execution mode is "auto"',
       );

@@ -12,7 +12,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
         description:
-          "Enable/disable writing changelog to file. When disabled, changelogs are still generated for pull requests, " +
+          "Enable/disable writing changelog to file. When disabled, changelogs are still generated for proposals, " +
           "releases and string templates.\n" +
           "Default: true",
       }),

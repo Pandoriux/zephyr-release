@@ -1,5 +1,3 @@
 support pull request assignee, reviewer and draft state
 
-hoi gemini ve shape cua platform provider nhu pullrequest co nen doi ten
-
 refactor toan bo pipeline, chi nen throw voi core operation, nhu create PR, con lai create tag,... catch va log thoi

@@ -1,10 +1,14 @@
 import { logger } from "../tasks/logger.ts";
 import {
-  commitChangesToBranch,
+  commitChangesToBranchOrThrow,
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
-import { createOrUpdatePullRequestOrThrow } from "../tasks/pull-request.ts";
+import {
+  addAssigneesToProposal,
+  addReviewersToProposal,
+  createOrUpdateProposalOrThrow,
+} from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { format } from "@std/semver";
 import {
@@ -13,6 +17,7 @@ import {
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
+  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
@@ -25,7 +30,7 @@ import {
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import type { OperationRunSettings } from "../types/operation-context.ts";
-import { addLabelsToPullRequestOrThrow } from "../tasks/label.ts";
+import { addLabelsToProposalOrThrow } from "../tasks/label.ts";
 import type { BootstrapResult } from "./bootstrap.ts";
 
 export async function executeReviewPreparePhase(
@@ -35,7 +40,7 @@ export async function executeReviewPreparePhase(
 ): Promise<OperationRunSettings> {
   const {
     workingBranchResult,
-    associatedPrFromBranch,
+    associatedProposalFromBranch,
     triggerContext,
   } = bootstrapData;
 
@@ -85,7 +90,7 @@ export async function executeReviewPreparePhase(
   createFixedPreviousVersionStringPatternContext(previousVersion);
   await createFixedVersionStringPatternContext(
     nextVersion,
-    runSettings.config.tag.tagNameTemplate,
+    runSettings.config.tag.nameTemplate,
   );
   logger.debugStepFinish(
     "Finished: Create fixed version string pattern context",
@@ -100,39 +105,41 @@ export async function executeReviewPreparePhase(
   );
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
-  logger.stepStart("Starting: Execute pull request pre commands");
+  logger.stepStart("Starting: Execute prepare pre commands");
   const preResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.prepare,
     "pre",
   );
   if (preResult) {
     logger.stepFinish(
-      `Finished: Execute pull request pre commands. ${preResult}`,
+      `Finished: Execute prepare pre commands. ${preResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute pull request pre commands (empty)");
+    logger.stepSkip("Skipped: Execute prepare pre commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (pull request pre commands)",
+    "Starting: Resolve runtime config override (prepare pre commands)",
   );
-  const _prPreRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPreRuntimeConfigResult) {
+  const _preparePreRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPreRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPreRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
-      "Finished: Resolve runtime config override (pull request pre commands)",
+      "Finished: Resolve runtime config override (prepare pre commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (pull request pre commands)",
+      "Skipped: Resolve runtime config override (prepare pre commands)",
     );
   }
 
@@ -169,12 +176,11 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const _commitResult = await commitChangesToBranch(
+  const commitResult = await commitChangesToBranchOrThrow(
     provider,
     runSettings.inputs,
     runSettings.config,
     {
-      triggerCommitHash: runSettings.inputs.triggerCommitHash,
       baseTreeHash: triggerContext.latestTriggerCommit.treeHash,
       changesToCommit: changesData,
       targetBranchName: workingBranchResult.name,
@@ -183,60 +189,89 @@ export async function executeReviewPreparePhase(
   );
   logger.stepFinish("Finished: Commit changes");
 
-  logger.stepStart("Starting: Create or update pull request");
-  const prNumber = await createOrUpdatePullRequestOrThrow(
+  logger.stepStart("Starting: Create or update proposal");
+  const proposal = await createOrUpdateProposalOrThrow(
     provider,
     {
       workingBranchName: workingBranchResult.name,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      associatedPrFromBranch,
+      associatedProposalFromBranch,
     },
     runSettings.inputs,
     runSettings.config,
   );
-  logger.stepFinish("Finished: Create or update pull request");
+  logger.stepFinish("Finished: Create or update proposal");
 
-  logger.stepStart("Starting: Add labels to pull request");
-  await addLabelsToPullRequestOrThrow(provider, prNumber, runSettings.config);
-  logger.stepFinish("Finished: Add labels to pull request");
+  logger.stepStart("Starting: Add labels to proposal");
+  await addLabelsToProposalOrThrow(provider, proposal.id, runSettings.config);
+  logger.stepFinish("Finished: Add labels to proposal");
+
+  if (runSettings.config.review.assignees) {
+    logger.stepStart("Starting: Add assignees to proposal");
+    await addAssigneesToProposal(
+      provider,
+      proposal.id,
+      runSettings.config.review.assignees,
+    );
+    logger.stepFinish("Finished: Add assignees to proposal");
+  }
+
+  if (runSettings.config.review.reviewers) {
+    logger.stepStart("Starting: Add reviewers to proposal");
+    await addReviewersToProposal(
+      provider,
+      proposal.id,
+      runSettings.config.review.reviewers,
+    );
+    logger.stepFinish("Finished: Add reviewers to proposal");
+  }
 
   logger.debugStepStart("Starting: Export post prepare operation variables");
-  await exportPostPrepareOperationVariables(provider, prNumber, changesData);
+  await exportPostPrepareOperationVariables(
+    provider,
+    commitResult.hash,
+    changesData,
+    {
+      proposalId: proposal.id,
+    },
+  );
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
-  logger.stepStart("Starting: Execute pull request post commands");
+  logger.stepStart("Starting: Execute prepare post commands");
   const postResult = await runCommandsOrThrow(
     runSettings.config.commandHooks.prepare,
     "post",
   );
   if (postResult) {
     logger.stepFinish(
-      `Finished: Execute pull request post commands. ${postResult}`,
+      `Finished: Execute prepare post commands. ${postResult}`,
     );
   } else {
-    logger.stepSkip("Skipped: Execute pull request post commands (empty)");
+    logger.stepSkip("Skipped: Execute prepare post commands (empty)");
   }
 
   logger.stepStart(
-    "Starting: Resolve runtime config override (pull request post commands)",
+    "Starting: Resolve runtime config override (prepare post commands)",
   );
-  const _prPostRuntimeConfigResult = await resolveRuntimeConfigOverrideOrThrow(
-    runSettings.rawConfig,
-    runSettings.config,
-    runSettings.inputs.workspacePath,
-  );
-  if (_prPostRuntimeConfigResult) {
+  const _preparePostRuntimeConfigResult =
+    await resolveRuntimeConfigOverrideOrThrow(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
+  if (_preparePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
-      rawConfig: _prPostRuntimeConfigResult.rawResolvedRuntime,
-      config: _prPostRuntimeConfigResult.resolvedRuntime,
+      rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
+      config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
+    createCustomStringPatternContext(runSettings.config.customStringPatterns);
     logger.stepFinish(
-      "Finished: Resolve runtime config override (pull request post commands)",
+      "Finished: Resolve runtime config override (prepare post commands)",
     );
   } else {
     logger.stepSkip(
-      "Skipped: Resolve runtime config override (pull request post commands)",
+      "Skipped: Resolve runtime config override (prepare post commands)",
     );
   }
 

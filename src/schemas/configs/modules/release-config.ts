@@ -7,10 +7,10 @@ import { trimNonEmptyStringSchema } from "../../string.ts";
 
 export const ReleaseConfigSchema = v.pipe(
   v.object({
-    createReleaseNote: v.pipe(
+    createRelease: v.pipe(
       v.optional(v.boolean(), true),
       v.metadata({
-        description: "Enable/disable release note creation.\n" +
+        description: "Enable/disable release creation.\n" +
           "Default: true",
       }),
     ),
@@ -41,7 +41,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_RELEASE_TITLE_TEMPLATE),
       v.metadata({
         description:
-          "String template for release title, using with string patterns like {{ tagName }}.\n" +
+          "String template for release note title, using with string patterns like {{ tagName }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_TITLE_TEMPLATE)}`,
       }),
@@ -58,7 +58,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_RELEASE_BODY_TEMPLATE),
       v.metadata({
         description:
-          "String template for release body, using with string patterns like {{ changelogRelease }}.\n" +
+          "String template for release note body, using with string patterns like {{ changelogRelease }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_RELEASE_BODY_TEMPLATE)}`,
       }),

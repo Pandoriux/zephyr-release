@@ -17,7 +17,7 @@ export const TagConfigSchema = v.pipe(
           "Default: true",
       }),
     ),
-    tagNameTemplate: v.pipe(
+    nameTemplate: v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_TAG_NAME_TEMPLATE),
       v.metadata({
         description:
@@ -27,7 +27,7 @@ export const TagConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_TAG_NAME_TEMPLATE)}`,
       }),
     ),
-    tagType: v.pipe(
+    type: v.pipe(
       v.optional(v.enum(TagTypeOptions), TagTypeOptions.annotated),
       v.metadata({
         description:
@@ -35,7 +35,7 @@ export const TagConfigSchema = v.pipe(
           `Default: ${JSON.stringify(TagTypeOptions.annotated)}`,
       }),
     ),
-    tagMessageTemplate: v.pipe(
+    messageTemplate: v.pipe(
       v.optional(v.string(), DEFAULT_TAG_MESSAGE_TEMPLATE),
       v.metadata({
         description: "String template for the Git annotated tag message.\n" +
@@ -43,11 +43,11 @@ export const TagConfigSchema = v.pipe(
           `Default: ${JSON.stringify(DEFAULT_TAG_MESSAGE_TEMPLATE)}`,
       }),
     ),
-    tagMessageTemplatePath: v.pipe(
+    messageTemplatePath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing Git annotated tag message template. Overrides `tagMessageTemplate` when both are provided.\n" +
+          "Path to text file containing Git annotated tag message template. Overrides `messageTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),

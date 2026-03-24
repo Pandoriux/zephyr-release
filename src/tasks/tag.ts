@@ -14,38 +14,39 @@ type CreateTagInputsParams = Pick<
 interface CreateTagConfigParams {
   tag: Pick<
     TagConfigOutput,
-    | "tagNameTemplate"
-    | "tagType"
-    | "tagMessageTemplate"
-    | "tagMessageTemplatePath"
+    | "nameTemplate"
+    | "type"
+    | "messageTemplate"
+    | "messageTemplatePath"
     | "tagger"
   >;
 }
 
 export async function createTagOrThrow(
   provider: PlatformProvider,
+  targetCommitHash: string,
   inputs: CreateTagInputsParams,
   config: CreateTagConfigParams,
 ) {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const {
-    tagNameTemplate,
-    tagType,
-    tagMessageTemplate,
-    tagMessageTemplatePath,
+    nameTemplate,
+    type,
+    messageTemplate,
+    messageTemplatePath,
     tagger,
   } = config.tag;
 
   let tagMessage: string | undefined;
-  if (tagMessageTemplatePath) {
+  if (messageTemplatePath) {
     const msgTemplate = await getTextFileOrThrow(
-      sourceMode.overrides?.[tagMessageTemplatePath] ?? sourceMode.mode,
-      tagMessageTemplatePath,
+      sourceMode.overrides?.[messageTemplatePath] ?? sourceMode.mode,
+      messageTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
     tagMessage = await resolveStringTemplateOrThrow(msgTemplate);
   } else {
-    tagMessage = await resolveStringTemplateOrThrow(tagMessageTemplate);
+    tagMessage = await resolveStringTemplateOrThrow(messageTemplate);
   }
 
   let taggerData: TaggerRequest | undefined;
@@ -57,12 +58,12 @@ export async function createTagOrThrow(
           taggerDate = new Date().toISOString();
           break;
         case TaggerDateOptions.commitDate: {
-          const commitData = await provider.getCommit(triggerCommitHash);
+          const commitData = await provider.getCommit(targetCommitHash);
           taggerDate = commitData.committer.date.toISOString();
           break;
         }
         case TaggerDateOptions.authorDate: {
-          const commitData = await provider.getCommit(triggerCommitHash);
+          const commitData = await provider.getCommit(targetCommitHash);
           taggerDate = commitData.author.date.toISOString();
           break;
         }
@@ -81,9 +82,9 @@ export async function createTagOrThrow(
   }
 
   return await provider.createTagOrThrow(
-    await resolveStringTemplateOrThrow(tagNameTemplate),
-    triggerCommitHash,
-    tagType,
+    await resolveStringTemplateOrThrow(nameTemplate),
+    targetCommitHash,
+    type,
     tagMessage,
     taggerData,
   );

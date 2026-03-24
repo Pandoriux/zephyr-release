@@ -9,7 +9,7 @@ import type {
   PrePublishOperationVariables,
 } from "../types/operation-variables.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import type { ProviderPullRequest } from "../types/providers/pull-request.ts";
+import type { ProviderProposal } from "../types/providers/proposal.ts";
 import {
   toExportEnvVarKey,
   toExportOutputKey,
@@ -19,10 +19,8 @@ import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
 import { taskLogger } from "./logger.ts";
-import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 import {
   type OperationJob,
-  OperationJobs,
   type OperationKind,
   OperationKinds,
   type OperationOutcome,
@@ -30,14 +28,15 @@ import {
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
+import { STRING_PATTERN_CONTEXT } from "./string-templates-and-patterns/pattern-context.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
   options: {
     triggerContext: OperationTriggerContext;
     workingBranchResult: WorkingBranchResult;
-    prForCommit: ProviderPullRequest | undefined;
-    prFromBranch: ProviderPullRequest | undefined;
+    proposalForCommit: ProviderProposal | undefined;
+    proposalFromBranch: ProviderProposal | undefined;
     rawInputs: ProviderInputs;
     inputs: InputsOutput;
     rawConfig: object;
@@ -47,61 +46,54 @@ export async function exportBaseOperationVariables(
   const {
     triggerContext,
     workingBranchResult,
-    prForCommit,
-    prFromBranch,
+    proposalForCommit,
+    proposalFromBranch,
     rawInputs,
     inputs,
     rawConfig,
     config,
   } = options;
 
-  let operationTarget: OperationKind | undefined;
+  let operationKind: OperationKind | undefined;
   switch (config.mode) {
     case "review":
-      operationTarget = prForCommit
+      operationKind = proposalForCommit
         ? OperationKinds.release
         : OperationKinds.propose;
 
       break;
 
     case "auto":
-      operationTarget = OperationKinds.autorelease;
+      operationKind = OperationKinds.autorelease;
 
       break;
   }
 
   const operationJobs: OperationJob[] = [];
-  switch (operationTarget) {
+  switch (operationKind) {
     case "propose":
-      if (prFromBranch) {
-        operationJobs.push(OperationJobs.updatePr);
+      if (proposalFromBranch) {
+        operationJobs.push("update-proposal");
       } else {
-        operationJobs.push(OperationJobs.createPr);
+        operationJobs.push("create-proposal");
       }
 
       break;
 
     case "release":
       if (config.tag.createTag) {
-        operationJobs.push(OperationJobs.createTag);
+        operationJobs.push("create-tag");
       }
 
-      if (config.tag.createTag && config.release.createReleaseNote) {
-        operationJobs.push(OperationJobs.createReleaseNote);
+      if (config.tag.createTag && config.release.createRelease) {
+        operationJobs.push("create-release");
       }
 
       break;
 
     case "autorelease":
-      operationJobs.push(OperationJobs.createCommit);
-
-      if (config.tag.createTag) {
-        operationJobs.push(OperationJobs.createTag);
-      }
-
-      if (config.tag.createTag && config.release.createReleaseNote) {
-        operationJobs.push(OperationJobs.createReleaseNote);
-      }
+      // Empty
+      // For mode "auto", jobs are available at post prepare phase
 
       break;
   }
@@ -126,15 +118,15 @@ export async function exportBaseOperationVariables(
     workingBranchHash: workingBranchResult.object.sha,
 
     mode: config.mode,
-    operation: operationTarget,
+    operation: operationKind,
     jobs: JSON.stringify(operationJobs),
 
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
 
-    pullRequestNumber: operationTarget === "propose"
-      ? prFromBranch?.number
-      : prForCommit?.number,
+    proposalId: operationKind === "propose"
+      ? proposalFromBranch?.id
+      : proposalForCommit?.id,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies BaseOperationVariables & DynamicOperationVariables;
 
@@ -185,17 +177,38 @@ export async function exportPrePrepareOperationVariables(
 
 export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
-  prNumber: number,
+  commitHash: string,
   changesData: Map<string, string>,
+  modeRelatedData?: {
+    proposalId?: string;
+    config?: ConfigOutput;
+  },
 ) {
-  const prepareExportObject = {
-    committedFilePaths: JSON.stringify([...changesData.keys()]),
+  const { proposalId, config } = modeRelatedData ?? {};
 
-    pullRequestNumber: prNumber,
+  const operationJobs: OperationJob[] = [];
+  if (config) {
+    operationJobs.push("create-commit");
+
+    if (config.tag.createTag) {
+      operationJobs.push("create-tag");
+    }
+
+    if (config.tag.createTag && config.release.createRelease) {
+      operationJobs.push("create-release");
+    }
+  }
+
+  const prepareExportObject = {
+    commitHash,
+    committedFilePaths: JSON.stringify([...changesData.keys()]),
+    jobs: JSON.stringify(operationJobs),
+
+    proposalId: proposalId,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
     & PostPrepareOperationVariables
-    & Pick<DynamicOperationVariables, "pullRequestNumber" | "patternContext">;
+    & Pick<DynamicOperationVariables, "proposalId" | "patternContext">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
@@ -213,17 +226,17 @@ export async function exportPostPrepareOperationVariables(
 
 export async function exportPrePublishOperationVariables(
   provider: PlatformProvider,
-  prNumber: number,
   version: SemVer,
+  proposalId?: string,
 ) {
   const prepareExportObject = {
     version: format(version),
 
-    pullRequestNumber: prNumber,
+    proposalId: proposalId,
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
     & PrePublishOperationVariables
-    & Pick<DynamicOperationVariables, "patternContext" | "pullRequestNumber">;
+    & Pick<DynamicOperationVariables, "patternContext" | "proposalId">;
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup(
@@ -286,4 +299,26 @@ export function exportFinalOperationVariables(
     provider.exportOutputs(toExportOutputKey(k), v);
     provider.exportEnvVars(toExportEnvVarKey(k), v);
   });
+}
+
+async function stringifyCurrentPatternContext(): Promise<string> {
+  const resolvedContext: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
+    if (typeof value === "function") {
+      try {
+        const result = await value();
+        // If result is not another function, use it; otherwise use original value
+        resolvedContext[key] = typeof result !== "function" ? result : value;
+      } catch {
+        // If function throws, use original value
+        resolvedContext[key] = value;
+      }
+    } else {
+      resolvedContext[key] = value;
+    }
+  }
+
+  // jsonValueNormalizer will catch weird value like BigInt, ...
+  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }

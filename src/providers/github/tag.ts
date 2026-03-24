@@ -5,7 +5,7 @@ import {
   githubGetRepositoryName,
 } from "./repository.ts";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
-import { isGitHubErrorResponse } from "./utils/error-validations.ts";
+import { RequestError } from "@octokit/request-error";
 import { joinUrlSegments } from "../../utils/transformers/url.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
 import type { ProviderTag } from "../../types/providers/tag.ts";
@@ -92,7 +92,7 @@ async function githubGetLatestReleaseTagOrThrow(
 
     return res.data.tag_name;
   } catch (error) {
-    if (isGitHubErrorResponse(error) && error.status === 404) {
+    if (error instanceof RequestError && error.status === 404) {
       // No releases found
       return undefined;
     }

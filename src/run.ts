@@ -16,6 +16,7 @@ import type { OperationRunSettings } from "./types/operation-context.ts";
 import { executeAutoStrategy } from "./workflows/auto.ts";
 import { SafeExit } from "./errors/safe-exit.ts";
 import { bootstrapOperation } from "./workflows/bootstrap.ts";
+import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -53,8 +54,8 @@ export async function run(provider: PlatformProvider) {
     await exportBaseOperationVariables(provider, {
       triggerContext: bootstrapData.triggerContext,
       workingBranchResult: bootstrapData.workingBranchResult,
-      prForCommit: bootstrapData.associatedPrForCommit,
-      prFromBranch: bootstrapData.associatedPrFromBranch,
+      proposalForCommit: bootstrapData.associatedProposalForCommit,
+      proposalFromBranch: bootstrapData.associatedProposalFromBranch,
       rawInputs: runSettings.rawInputs,
       inputs: runSettings.inputs,
       rawConfig: runSettings.rawConfig,
@@ -88,6 +89,7 @@ export async function run(provider: PlatformProvider) {
         rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
         config: _basePreRuntimeConfigResult.resolvedRuntime,
       };
+      createCustomStringPatternContext(runSettings.config.customStringPatterns);
       logger.stepFinish(
         "Finished: Resolve runtime config override (base pre commands)",
       );

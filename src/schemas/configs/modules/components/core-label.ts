@@ -21,7 +21,7 @@ export const CoreLabelSchema = v.object({
         : input
     ),
     v.metadata({
-      description: "Label to add when pull request is created.\n" +
+      description: "Label to add when proposal is created.\n" +
         `Default: ${
           JSON.stringify(
             transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CREATE),
@@ -44,7 +44,7 @@ export const CoreLabelSchema = v.object({
     ),
     v.metadata({
       description:
-        "Label to add when pull request is closed and release operation has completed (replaces `onCreate` label).\n" +
+        "Label to add when proposal is closed and release operation has completed (replaces `onCreate` label).\n" +
         `Default: ${
           JSON.stringify(
             transformObjKeyToKebabCase(DEFAULT_LABEL_ON_CLOSE),

@@ -10,7 +10,9 @@ export const CommitConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_COMMIT_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for commit header, using with string patterns like {{ version }}.\n" +
+          "String template for commit header, using with string patterns like {{ version }}. You can optionally include a " +
+          "CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` " +
+          "for GitHub, GitLab, and Bitbucket).\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_COMMIT_HEADER_TEMPLATE)}`,
       }),
@@ -28,7 +30,9 @@ export const CommitConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for commit body, using with string patterns like {{ changelogRelease }}.\n" +
+          "String template for commit body, using with string patterns like {{ changelogRelease }}. You can optionally include a " +
+          "CI skip token here (or header/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` " +
+          "for GitHub, GitLab, and Bitbucket).\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n",
       }),
     ),
@@ -45,7 +49,9 @@ export const CommitConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for commit footer, using with string patterns.\n" +
+          "String template for commit footer, using with string patterns. You can optionally include a " +
+          "CI skip token here (or header/body) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` " +
+          "for GitHub, GitLab, and Bitbucket).\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n",
       }),
     ),
@@ -62,10 +68,7 @@ export const CommitConfigSchema = v.pipe(
       v.optional(
         v.union([
           trimNonEmptyStringSchema,
-          v.pipe(
-            v.array(trimNonEmptyStringSchema),
-            v.nonEmpty(),
-          ),
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
         ]),
       ),
       v.transform((input) => {
@@ -77,7 +80,7 @@ export const CommitConfigSchema = v.pipe(
       v.metadata({
         description:
           "Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. " +
-          'Paths are relative to the repo root. To include all files, use a glob such as "**/*".',
+          'Paths are relative to the repo root. To include all changed files, use a glob such as "**/*".',
         examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
       }),
     ),

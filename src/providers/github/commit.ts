@@ -1,3 +1,5 @@
+import { RequestError } from "@octokit/request-error";
+import { BranchOutOfDateError } from "../../errors/providers/branch.ts";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
@@ -5,7 +7,6 @@ import type {
   ProviderCommit,
   ProviderCommitDetails,
   ProviderCompareCommits,
-  ProviderWorkingCommit,
 } from "../../types/providers/commit.ts";
 
 const RawCommitNodeSchema = v.object({
@@ -13,6 +14,9 @@ const RawCommitNodeSchema = v.object({
   messageHeadline: v.string(),
   messageBody: v.string(),
   message: v.string(),
+  tree: v.object({
+    oid: v.string(),
+  }),
   refs: v.object({
     nodes: v.array(
       v.object({
@@ -41,6 +45,7 @@ async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
                 messageHeadline
                 messageBody
                 message
+                tree { oid }
                 refs(refPrefix: "refs/tags/", first: 1) {
                   nodes { name }
                 }
@@ -88,6 +93,7 @@ async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
         header: commit.messageHeadline,
         body: commit.messageBody,
         message: commit.message,
+        treeHash: commit.tree.oid,
       });
 
       if (stopResolvingCommitAt) {
@@ -147,7 +153,7 @@ async function githubCreateCommitOnBranchOrThrow(
     targetBranchName: string;
     force?: boolean;
   },
-): Promise<ProviderWorkingCommit> {
+): Promise<ProviderCommit> {
   const {
     triggerCommitHash,
     baseTreeHash,
@@ -185,17 +191,32 @@ async function githubCreateCommitOnBranchOrThrow(
 
   // If true (in review mode), we are effectively "overwriting" the branch history with this new timeline
   // If false (in auto mode), throws error if there are newer commits
-  await octokit.rest.git.updateRef({
-    owner,
-    repo,
-    ref: `heads/${targetBranchName}`,
-    sha: createCommitRes.data.sha,
-    force,
-  });
+  try {
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${targetBranchName}`,
+      sha: createCommitRes.data.sha,
+      force,
+    });
+  } catch (error) {
+    if (
+      error instanceof RequestError &&
+      error.status === 422 &&
+      error.message.toLowerCase().includes("is not a fast forward")
+    ) {
+      throw new BranchOutOfDateError();
+    }
+
+    throw error;
+  }
 
   return {
-    workingCommitHash: createCommitRes.data.sha,
-    workingTreeHash: createTreeRes.data.sha,
+    hash: createCommitRes.data.sha,
+    header: message.split("\n")[0] ?? "",
+    body: message.split("\n").slice(1).join("\n").trim(),
+    message,
+    treeHash: createTreeRes.data.sha,
   };
 }
 
@@ -214,6 +235,7 @@ async function githubGetCommitOrThrow(
     header: res.data.message.split("\n")[0] ?? "",
     body: res.data.message.split("\n").slice(1).join("\n").trim(),
     message: res.data.message,
+    treeHash: res.data.tree.sha,
 
     author: {
       name: res.data.author.name,
