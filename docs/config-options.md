@@ -33,10 +33,10 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
         - [... \> on-create \> description (Optional)](#--on-create--description-optional)
         - [... \> on-create \> color (Optional)](#--on-create--color-optional)
         - [... \> on-create \> create-if-missing (Optional)](#--on-create--create-if-missing-optional)
-      - [... \> labels \> on-close (Optional)](#--labels--on-close-optional)
-        - [... \> on-close \> add (Optional)](#--on-close--add-optional)
+      - [... \> labels \> on-merge (Optional)](#--labels--on-merge-optional)
+        - [... \> on-merge \> add (Optional)](#--on-merge--add-optional)
         - [... \> add \> same properties as `review > labels > on-create`](#--add--same-properties-as-review--labels--on-create)
-        - [... \> on-close \> remove (Optional)](#--on-close--remove-optional)
+        - [... \> on-merge \> remove (Optional)](#--on-merge--remove-optional)
         - [... \> remove \> same properties as `review > labels > on-create`](#--remove--same-properties-as-review--labels--on-create)
     - [review \> assignees (Optional)](#review--assignees-optional)
     - [review \> reviewers (Optional)](#review--reviewers-optional)
@@ -300,17 +300,17 @@ Default: `false`
 
 If enabled, the label will be created if it does not exist on the platform.
 
-##### ... > labels > on-close (Optional)
+##### ... > labels > on-merge (Optional)
 
 Type: `object`
 
-Labels to attach and remove from proposals when closed and release operation has completed.
+Labels to attach and remove from proposals when merged and release operation has completed.
 
-###### ... > on-close > add (Optional)
+###### ... > on-merge > add (Optional)
 
 Type: `string | object | (string | object)[]`
 
-Labels to add when proposal is closed.
+Labels to add when proposal is merged.
 
 ###### ... > add > same properties as `review > labels > on-create`
 
@@ -321,11 +321,11 @@ Same as [`review > labels > on-create`](#--labels--on-create-optional).
 - [`color`](#--on-create--color-optional)
 - [`create-if-missing`](#--on-create--create-if-missing-optional)
 
-###### ... > on-close > remove (Optional)
+###### ... > on-merge > remove (Optional)
 
 Type: `string | object | (string | object)[]`
 
-Labels to remove when proposal is closed. Use `"<ALL_ON_CREATE>"` to remove all labels added in `on-create`.
+Labels to remove when proposal is merged. Use `"<ALL_ON_CREATE>"` to remove all labels added in `on-create`.
 
 ###### ... > remove > same properties as `review > labels > on-create`
 

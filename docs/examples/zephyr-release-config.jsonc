@@ -166,7 +166,7 @@
         "documentation",
         "ready-for-review"
       ],
-      "on-close": {
+      "on-merge": {
         "add": [
           {
             "name": "zp-release: released",

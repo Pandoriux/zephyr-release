@@ -1,6 +1,6 @@
 import * as v from "@valibot/valibot";
 import { LabelItemSchema } from "./label.ts";
-import { LabelOnCloseRemoveOptions } from "../../../../constants/label-options.ts";
+import { LabelOnMergeRemoveOptions } from "../../../../constants/label-options.ts";
 
 export const ReviewLabelsSchema = v.object({
   onCreate: v.pipe(
@@ -21,7 +21,7 @@ export const ReviewLabelsSchema = v.object({
     }),
   ),
 
-  onClose: v.pipe(
+  onMerge: v.pipe(
     v.optional(v.object({
       add: v.pipe(
         v.optional(
@@ -51,16 +51,16 @@ export const ReviewLabelsSchema = v.object({
           return input;
         }),
         v.metadata({
-          description: `Use "${LabelOnCloseRemoveOptions.allOnCreate}" ` +
+          description: `Use "${LabelOnMergeRemoveOptions.allOnCreate}" ` +
             "to remove all labels added in `onCreate`.",
         }),
       ),
     })),
     v.metadata({
       description:
-        "Labels to attach and remove from proposals when closed. Can be a string, a label object, " +
+        "Labels to attach and remove from proposals when merged. Can be a string, a label object, " +
         "or an array containing either.\n" +
-        `For remove, you can use "${LabelOnCloseRemoveOptions.allOnCreate}" ` +
+        `For remove, you can use "${LabelOnMergeRemoveOptions.allOnCreate}" ` +
         "to remove all labels added in `onCreate`.",
     }),
   ),
