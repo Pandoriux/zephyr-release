@@ -1,5 +1,5 @@
 import { pooledMap } from "@std/async";
-import { AdditionalLabelOnCloseRemoveOptions } from "../constants/additional-label-options.ts";
+import { LabelOnCloseRemoveOptions } from "../constants/label-options.ts";
 import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { taskLogger } from "./logger.ts";
@@ -60,7 +60,7 @@ export async function updateMergedProposalLabels(
 
     for (const label of additionalLabel.onCloseRemove) {
       if (
-        label === AdditionalLabelOnCloseRemoveOptions.allOnCreateAdd &&
+        label === LabelOnCloseRemoveOptions.allOnCreate &&
         additionalLabel.onCreateAdd
       ) {
         additionalLabel.onCreateAdd.forEach((l) => labelsToRemove.add(l));

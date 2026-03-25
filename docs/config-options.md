@@ -27,16 +27,17 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [review \> body-template-path (Optional)](#review--body-template-path-optional)
     - [review \> footer-template (Optional)](#review--footer-template-optional)
     - [review \> footer-template-path (Optional)](#review--footer-template-path-optional)
-    - [review \> label (Optional)](#review--label-optional)
-      - [... \> label \> on-create (Optional)](#--label--on-create-optional)
+    - [review \> labels (Optional)](#review--labels-optional)
+      - [... \> labels \> on-create (Optional)](#--labels--on-create-optional)
         - [... \> on-create \> name (Required)](#--on-create--name-required)
         - [... \> on-create \> description (Optional)](#--on-create--description-optional)
         - [... \> on-create \> color (Optional)](#--on-create--color-optional)
-      - [... \> label \> on-close (Optional)](#--label--on-close-optional)
-    - [review \> additional-label (Optional)](#review--additional-label-optional)
-      - [... \> additional-label \> on-create-add (Optional)](#--additional-label--on-create-add-optional)
-      - [... \> additional-label \> on-close-add (Optional)](#--additional-label--on-close-add-optional)
-      - [... \> additional-label \> on-close-remove (Optional)](#--additional-label--on-close-remove-optional)
+        - [... \> on-create \> create-if-missing (Optional)](#--on-create--create-if-missing-optional)
+      - [... \> labels \> on-close (Optional)](#--labels--on-close-optional)
+        - [... \> on-close \> add (Optional)](#--on-close--add-optional)
+        - [... \> add \> same properties as `review > labels > on-create`](#--add--same-properties-as-review--labels--on-create)
+        - [... \> on-close \> remove (Optional)](#--on-close--remove-optional)
+        - [... \> remove \> same properties as `review > labels > on-create`](#--remove--same-properties-as-review--labels--on-create)
     - [review \> assignees (Optional)](#review--assignees-optional)
     - [review \> reviewers (Optional)](#review--reviewers-optional)
   - [auto (Optional)](#auto-optional)
@@ -181,7 +182,7 @@ If choosing `"auto"`, see [`auto > trigger-strategy`](#auto--trigger-strategy-op
 ### review (Optional)
 
 Type: `object`  
-**Properties:** [`draft`](#review--draft-optional), [`working-branch-name-template`](#review--working-branch-name-template-optional), [`title-template`](#review--title-template-optional), [`title-template-path`](#review--title-template-path-optional), [`header-template`](#review--header-template-optional), [`header-template-path`](#review--header-template-path-optional), [`body-template`](#review--body-template-optional), [`body-template-path`](#review--body-template-path-optional), [`footer-template`](#review--footer-template-optional), [`footer-template-path`](#review--footer-template-path-optional), [`label`](#review--label-optional), [`additional-label`](#review--additional-label-optional), [`assignees`](#review--assignees-optional), [`reviewers`](#review--reviewers-optional)
+**Properties:** [`draft`](#review--draft-optional), [`working-branch-name-template`](#review--working-branch-name-template-optional), [`title-template`](#review--title-template-optional), [`title-template-path`](#review--title-template-path-optional), [`header-template`](#review--header-template-optional), [`header-template-path`](#review--header-template-path-optional), [`body-template`](#review--body-template-optional), [`body-template-path`](#review--body-template-path-optional), [`footer-template`](#review--footer-template-optional), [`footer-template-path`](#review--footer-template-path-optional), [`labels`](#review--labels-optional), [`assignees`](#review--assignees-optional), [`reviewers`](#review--reviewers-optional)
 
 Configuration specific to the `"review"` execution `mode`. Defines how release proposals (such as PRs, MRs, ...) are generated, formatted, and tracked.
 
@@ -260,19 +261,18 @@ Type: `string`
 Path to text file containing proposal footer template. Overrides `footer-template` when both are provided.  
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
-#### review > label (Optional)
+#### review > labels (Optional)
 
 Type: `object`  
 Default: `{}`
 
-Core label used by Zephyr Release to track proposals, managed exclusively by the tool. These label should not be manually added or removed.
+Labels to attach and remove from proposals on different stages.
 
-##### ... > label > on-create (Optional)
+##### ... > labels > on-create (Optional)
 
-Type: `string | object`  
-Default: [`DEFAULT_LABEL_ON_CREATE`](../src/constants/defaults/label.ts)
+Type: `string | object | (string | object)[]`
 
-Label to add when proposal is created.
+Labels to attach to proposals when created. Can be a string, a label object, or an array containing either.
 
 ###### ... > on-create > name (Required)
 
@@ -293,43 +293,48 @@ Default: `"#ededed"`
 
 The hexadecimal color code for the label, in standard format with the leading #.
 
-##### ... > label > on-close (Optional)
+###### ... > on-create > create-if-missing (Optional)
 
-Type: `string | object`  
-Default: [`DEFAULT_LABEL_ON_CLOSE`](../src/constants/defaults/label.ts)
+Type: `boolean`  
+Default: `false`
 
-Label to add when proposal is closed and release operation has completed (replaces `on-create` label).
+If enabled, the label will be created if it does not exist on the platform.
 
-Same as [`review > label > on-create`](#--label--on-create-optional).
+##### ... > labels > on-close (Optional)
+
+Type: `object`
+
+Labels to attach and remove from proposals when closed and release operation has completed.
+
+###### ... > on-close > add (Optional)
+
+Type: `string | object | (string | object)[]`
+
+Labels to add when proposal is closed.
+
+###### ... > add > same properties as `review > labels > on-create`
+
+Same as [`review > labels > on-create`](#--labels--on-create-optional).
 
 - [`name`](#--on-create--name-required)
 - [`description`](#--on-create--description-optional)
 - [`color`](#--on-create--color-optional)
+- [`create-if-missing`](#--on-create--create-if-missing-optional)
 
-#### review > additional-label (Optional)
+###### ... > on-close > remove (Optional)
 
-Type: `object`  
-Default: `{}`
+Type: `string | object | (string | object)[]`
 
-Additional labels to attach to proposals, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing.
+Labels to remove when proposal is closed. Use `"<ALL_ON_CREATE>"` to remove all labels added in `on-create`.
 
-##### ... > additional-label > on-create-add (Optional)
+###### ... > remove > same properties as `review > labels > on-create`
 
-Type: `string | string[]`
+Same as [`review > labels > on-create`](#--labels--on-create-optional).
 
-Additional labels to add when proposal is created.
-
-##### ... > additional-label > on-close-add (Optional)
-
-Type: `string | string[]`
-
-Additional labels to add when proposal is closed and release operation has completed.
-
-##### ... > additional-label > on-close-remove (Optional)
-
-Type: `string | string[]`
-
-Additional labels to remove when proposal is closed and release operation has completed. Use `"<ALL_ON_CREATE_ADD>"` to remove all labels added in `on-create-add`.
+- [`name`](#--on-create--name-required)
+- [`description`](#--on-create--description-optional)
+- [`color`](#--on-create--color-optional)
+- [`create-if-missing`](#--on-create--create-if-missing-optional)
 
 #### review > assignees (Optional)
 
