@@ -1,13 +1,13 @@
-import { githubLogger } from "./logger.ts";
+﻿import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
-import { makeGithubGetTextFileOrThrow } from "./file.ts";
+import { makeGithubGetTextFile } from "./file.ts";
 import {
-  makeGithubAddAssigneesToPrOrThrow,
-  makeGithubAddReviewersToPrOrThrow,
-  makeGithubCreatePullRequestOrThrow,
-  makeGithubFindUniquePullRequestForCommitOrThrow,
-  makeGithubFindUniquePullRequestFromBranchOrThrow,
-  makeGithubUpdatePullRequestOrThrow,
+  makeGithubAddAssigneesToPr,
+  makeGithubAddReviewersToPr,
+  makeGithubCreatePullRequest,
+  makeGithubFindUniquePullRequestForCommit,
+  makeGithubFindUniquePullRequestFromBranch,
+  makeGithubUpdatePullRequest,
 } from "./pull-request.ts";
 import {
   githubGetCommitPathPart,
@@ -18,29 +18,29 @@ import {
 } from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { githubExportEnvVars, githubExportOutputs } from "./export.ts";
-import { makeGithubEnsureBranchExistOrThrow } from "./branch.ts";
+import { makeGithubEnsureBranchExist } from "./branch.ts";
 import {
-  makeGithubCompareCommitsOrThrow,
-  makeGithubCreateCommitOnBranchOrThrow,
-  makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow,
-  makeGithubGetCommitOrThrow,
+  makeGithubCompareCommits,
+  makeGithubCreateCommitOnBranch,
+  makeGithubFindCommitsFromGivenToPreviousTagged,
+  makeGithubGetCommit,
 } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import {
   githubGetCompareTagUrl,
-  makeGithubCreateTagOrThrow,
+  makeGithubCreateTag,
   makeGithubGetCompareTagUrlFromCurrentToLatest,
-  makeGithubGetLatestReleaseTagOrThrow,
+  makeGithubGetLatestReleaseTag,
 } from "./tag.ts";
 import { getOctokitClient, type OctokitClient } from "./octokit.ts";
-import { githubGetOperationTriggerContextOrThrow } from "./operation.ts";
+import { githubGetOperationTriggerContext } from "./operation.ts";
 import {
-  makeGithubAddLabelsToPullRequestOrThrow,
-  makeGithubRemoveLabelFromPullRequestOrThrow,
+  makeGithubAddLabelsToPullRequest,
+  makeGithubRemoveLabelFromPullRequest,
 } from "./label.ts";
 import {
-  makeGithubAttachReleaseAssetOrThrow,
-  makeGithubCreateReleaseOrThrow,
+  makeGithubAttachReleaseAsset,
+  makeGithubCreateRelease,
 } from "./release.ts";
 import { githubGetReferenceUrl } from "./reference.ts";
 
@@ -73,55 +73,55 @@ export function createGitHubProvider(): PlatformProvider {
     getRepositoryName: githubGetRepositoryName,
     getCommitPathPart: githubGetCommitPathPart,
     getReferencePathPart: githubGetReferencePathPart,
-    getOperationTriggerContextOrThrow: githubGetOperationTriggerContextOrThrow,
+    getOperationTriggerContext: githubGetOperationTriggerContext,
 
     getReferenceUrl: githubGetReferenceUrl,
     getCompareTagUrl: githubGetCompareTagUrl,
     getCompareTagUrlFromCurrentToLatest:
       makeGithubGetCompareTagUrlFromCurrentToLatest(getOctokit),
 
-    getTextFileOrThrow: makeGithubGetTextFileOrThrow(getOctokit),
+    getTextFile: makeGithubGetTextFile(getOctokit),
 
-    ensureBranchExistOrThrow: makeGithubEnsureBranchExistOrThrow(getOctokit),
+    ensureBranchExist: makeGithubEnsureBranchExist(getOctokit),
 
-    findUniqueProposalForCommitOrThrow:
-      makeGithubFindUniquePullRequestForCommitOrThrow(getOctokit),
+    findUniqueProposalForCommit:
+      makeGithubFindUniquePullRequestForCommit(getOctokit),
 
-    findUniqueProposalFromBranchOrThrow:
-      makeGithubFindUniquePullRequestFromBranchOrThrow(getOctokit),
+    findUniqueProposalFromBranch:
+      makeGithubFindUniquePullRequestFromBranch(getOctokit),
 
-    findCommitsFromGivenToPreviousTaggedOrThrow:
-      makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow(getOctokit),
-    compareCommitsOrThrow: makeGithubCompareCommitsOrThrow(getOctokit),
-    getCommit: makeGithubGetCommitOrThrow(getOctokit),
-    createCommitOnBranchOrThrow: makeGithubCreateCommitOnBranchOrThrow(
+    findCommitsFromGivenToPreviousTagged:
+      makeGithubFindCommitsFromGivenToPreviousTagged(getOctokit),
+    compareCommits: makeGithubCompareCommits(getOctokit),
+    getCommit: makeGithubGetCommit(getOctokit),
+    createCommitOnBranch: makeGithubCreateCommitOnBranch(
       getOctokit,
     ),
 
-    createProposalOrThrow: makeGithubCreatePullRequestOrThrow(getOctokit),
-    updateProposalOrThrow: makeGithubUpdatePullRequestOrThrow(getOctokit),
+    createProposal: makeGithubCreatePullRequest(getOctokit),
+    updateProposal: makeGithubUpdatePullRequest(getOctokit),
 
-    addLabelsToProposalOrThrow: makeGithubAddLabelsToPullRequestOrThrow(
+    addLabelsToProposal: makeGithubAddLabelsToPullRequest(
       getOctokit,
     ),
-    removeLabelFromProposalOrThrow: makeGithubRemoveLabelFromPullRequestOrThrow(
-      getOctokit,
-    ),
-
-    addAssigneesToProposalOrThrow: makeGithubAddAssigneesToPrOrThrow(
-      getOctokit,
-    ),
-    addReviewersToProposalOrThrow: makeGithubAddReviewersToPrOrThrow(
+    removeLabelFromProposal: makeGithubRemoveLabelFromPullRequest(
       getOctokit,
     ),
 
-    getLatestReleaseTagOrThrow: makeGithubGetLatestReleaseTagOrThrow(
+    addAssigneesToProposal: makeGithubAddAssigneesToPr(
       getOctokit,
     ),
-    createTagOrThrow: makeGithubCreateTagOrThrow(getOctokit),
+    addReviewersToProposal: makeGithubAddReviewersToPr(
+      getOctokit,
+    ),
 
-    createReleaseOrThrow: makeGithubCreateReleaseOrThrow(getOctokit),
-    attachReleaseAssetOrThrow: makeGithubAttachReleaseAssetOrThrow(getOctokit),
+    getLatestReleaseTag: makeGithubGetLatestReleaseTag(
+      getOctokit,
+    ),
+    createTag: makeGithubCreateTag(getOctokit),
+
+    createRelease: makeGithubCreateRelease(getOctokit),
+    attachReleaseAsset: makeGithubAttachReleaseAsset(getOctokit),
 
     exportOutputs: githubExportOutputs,
     exportEnvVars: githubExportEnvVars,

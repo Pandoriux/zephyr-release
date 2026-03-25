@@ -6,23 +6,24 @@ import type {
   SourceModeOptions,
 } from "../constants/source-mode-options.ts";
 
-export async function getTextFileOrThrow(
+/** @throws */
+export async function getTextFile(
   source: typeof SourceModeOptions.remote,
   path: string,
   options: { provider: PlatformProvider; ref?: string },
 ): Promise<string>;
-export async function getTextFileOrThrow(
+export async function getTextFile(
   source: typeof SourceModeOptions.local,
   path: string,
   options: { workspacePath: string },
 ): Promise<string>;
-export async function getTextFileOrThrow(
+export async function getTextFile(
   source: SourceModeOption,
   path: string,
   options: { provider: PlatformProvider; workspacePath: string; ref?: string },
 ): Promise<string>;
 
-export async function getTextFileOrThrow(
+export async function getTextFile(
   source: SourceModeOption,
   path: string,
   opts: { provider?: PlatformProvider; workspacePath?: string; ref?: string },
@@ -32,7 +33,7 @@ export async function getTextFileOrThrow(
       if (!opts.provider) {
         throw new Error("Provider is required for remote source.");
       }
-      return await opts.provider.getTextFileOrThrow(path, opts.ref);
+      return await opts.provider.getTextFile(path, opts.ref);
     }
 
     case "local": {

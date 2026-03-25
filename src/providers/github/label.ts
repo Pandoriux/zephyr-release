@@ -5,7 +5,8 @@ import { RequestError } from "@octokit/request-error";
 import { taskLogger } from "../../tasks/logger.ts";
 import type { ProviderLabelOptions } from "../../types/providers/label.ts";
 
-async function githubAddLabelsToPullRequestOrThrow(
+/** @throws */
+async function githubAddLabelsToPullRequest(
   octokit: OctokitClient,
   prNumber: string,
   labelOptions: ProviderLabelOptions,
@@ -163,7 +164,8 @@ async function githubGetAllLabelNames(
   return labelNames;
 }
 
-async function githubRemoveLabelFromPullRequestOrThrow(
+/** @throws */
+async function githubRemoveLabelFromPullRequest(
   octokit: OctokitClient,
   prNumber: string,
   label: string,
@@ -176,16 +178,16 @@ async function githubRemoveLabelFromPullRequestOrThrow(
   });
 }
 
-export function makeGithubAddLabelsToPullRequestOrThrow(
+export function makeGithubAddLabelsToPullRequest(
   getOctokit: GetOctokitFn,
 ) {
   return (proposalId: string, labelOptions: ProviderLabelOptions) =>
-    githubAddLabelsToPullRequestOrThrow(getOctokit(), proposalId, labelOptions);
+    githubAddLabelsToPullRequest(getOctokit(), proposalId, labelOptions);
 }
 
-export function makeGithubRemoveLabelFromPullRequestOrThrow(
+export function makeGithubRemoveLabelFromPullRequest(
   getOctokit: GetOctokitFn,
 ) {
   return (proposalId: string, label: string) =>
-    githubRemoveLabelFromPullRequestOrThrow(getOctokit(), proposalId, label);
+    githubRemoveLabelFromPullRequest(getOctokit(), proposalId, label);
 }

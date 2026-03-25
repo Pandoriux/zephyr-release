@@ -6,9 +6,9 @@ import type { TagConfigOutput } from "../schemas/configs/modules/tag-config.ts";
 import type { ReleaseConfigOutput } from "../schemas/configs/modules/release-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import { getTextFileOrThrow } from "./file.ts";
+import { getTextFile } from "./file.ts";
 import { taskLogger } from "./logger.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import { basename } from "@std/path";
 import { consumeAsyncIterable } from "../utils/async.ts";
 import { pooledMap } from "@std/async";
@@ -51,30 +51,30 @@ export async function createRelease(
 
   let releaseNoteTitle: string | undefined;
   if (titleTemplatePath) {
-    const releaseTitleTemplate = await getTextFileOrThrow(
+    const releaseTitleTemplate = await getTextFile(
       sourceMode.overrides?.[titleTemplatePath] ?? sourceMode.mode,
       titleTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
-    releaseNoteTitle = await resolveStringTemplateOrThrow(releaseTitleTemplate);
+    releaseNoteTitle = await resolveStringTemplate(releaseTitleTemplate);
   } else {
-    releaseNoteTitle = await resolveStringTemplateOrThrow(titleTemplate);
+    releaseNoteTitle = await resolveStringTemplate(titleTemplate);
   }
 
   let releaseNoteBody: string | undefined;
   if (bodyTemplatePath) {
-    const releaseBodyTemplate = await getTextFileOrThrow(
+    const releaseBodyTemplate = await getTextFile(
       sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
-    releaseNoteBody = await resolveStringTemplateOrThrow(releaseBodyTemplate);
+    releaseNoteBody = await resolveStringTemplate(releaseBodyTemplate);
   } else {
-    releaseNoteBody = await resolveStringTemplateOrThrow(bodyTemplate);
+    releaseNoteBody = await resolveStringTemplate(bodyTemplate);
   }
 
-  const createdRelease = await provider.createReleaseOrThrow(
-    await resolveStringTemplateOrThrow(tag.nameTemplate),
+  const createdRelease = await provider.createRelease(
+    await resolveStringTemplate(tag.nameTemplate),
     releaseNoteTitle,
     releaseNoteBody,
     { prerelease, draft, setLatest },
@@ -121,7 +121,7 @@ export async function attachReleaseAssets(
       const sizeMb = (target.sizeBytes / 1024 / 1024).toFixed(2);
       taskLogger.info(`↑ Uploading: ${target.fileName} (${sizeMb} MB)`);
 
-      await provider.attachReleaseAssetOrThrow(
+      await provider.attachReleaseAsset(
         releaseId.toString(),
         {
           name: target.fileName,

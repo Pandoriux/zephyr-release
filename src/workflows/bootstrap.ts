@@ -1,14 +1,14 @@
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import {
-  setupWorkingBranchOrThrow,
+  setupWorkingBranch,
   type WorkingBranchResult,
 } from "../tasks/branch.ts";
 import { logger } from "../tasks/logger.ts";
-import { validateCurrentOperationTriggerCtxOrExit } from "../tasks/operation.ts";
+import { validateCurrentOperationTriggerCtx } from "../tasks/operation.ts";
 import {
-  findProposalForCommitOrThrow,
-  findProposalFromBranchOrThrow,
+  findProposalForCommit,
+  findProposalFromBranch,
 } from "../tasks/proposal.ts";
 import {
   createCustomStringPatternContext,
@@ -33,7 +33,7 @@ export async function bootstrapOperation(
   inputsResult: { rawInputs: ProviderInputs; inputs: InputsOutput },
 ): Promise<BootstrapResult> {
   logger.stepStart("Starting: Parse and validate current trigger context");
-  const triggerContext = validateCurrentOperationTriggerCtxOrExit(
+  const triggerContext = validateCurrentOperationTriggerCtx(
     provider,
     configResult.config.commitTypes,
     configResult.config.mode,
@@ -57,7 +57,7 @@ export async function bootstrapOperation(
   logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
   logger.stepStart("Starting: Ensure working branch is prepared");
-  const workingBranchResult = await setupWorkingBranchOrThrow(
+  const workingBranchResult = await setupWorkingBranch(
     provider,
     inputsResult.inputs,
     configResult.config,
@@ -68,13 +68,13 @@ export async function bootstrapOperation(
   let associatedProposalFromBranch: ProviderProposal | undefined;
   if (configResult.config.mode === "review") {
     logger.stepStart("Starting: Get associated proposals");
-    associatedProposalForCommit = await findProposalForCommitOrThrow(
+    associatedProposalForCommit = await findProposalForCommit(
       provider,
       workingBranchResult.name,
       inputsResult.inputs,
       configResult.config,
     );
-    associatedProposalFromBranch = await findProposalFromBranchOrThrow(
+    associatedProposalFromBranch = await findProposalFromBranch(
       provider,
       workingBranchResult.name,
       inputsResult.inputs,

@@ -9,7 +9,8 @@ interface AddLabelsToProposalConfigParams {
   review: Pick<ReviewConfigOutput, "label" | "additionalLabel">;
 }
 
-export async function addLabelsToProposalOrThrow(
+/** @throws */
+export async function addLabelsToProposal(
   provider: PlatformProvider,
   proposalId: string,
   config: AddLabelsToProposalConfigParams,
@@ -17,7 +18,7 @@ export async function addLabelsToProposalOrThrow(
   const { label, additionalLabel } = config.review;
 
   taskLogger.info("Adding core labels...");
-  await provider.addLabelsToProposalOrThrow(proposalId, {
+  await provider.addLabelsToProposal(proposalId, {
     createIfMissing: true,
     labels: [label.onCreate],
   });
@@ -25,7 +26,7 @@ export async function addLabelsToProposalOrThrow(
   if (additionalLabel?.onCreateAdd) {
     taskLogger.info("Adding additional labels...");
 
-    await provider.addLabelsToProposalOrThrow(proposalId, {
+    await provider.addLabelsToProposal(proposalId, {
       createIfMissing: false,
       labels: additionalLabel.onCreateAdd,
     });
@@ -34,7 +35,8 @@ export async function addLabelsToProposalOrThrow(
 
 type UpdateMergedProposalLabelsConfigParams = AddLabelsToProposalConfigParams;
 
-export async function updateMergedProposalLabelsOrThrow(
+/** @throws */
+export async function updateMergedProposalLabels(
   provider: PlatformProvider,
   proposalId: string,
   config: UpdateMergedProposalLabelsConfigParams,
@@ -42,11 +44,11 @@ export async function updateMergedProposalLabelsOrThrow(
   const { label, additionalLabel } = config.review;
 
   taskLogger.info("Updating core labels on merged proposal...");
-  await provider.removeLabelFromProposalOrThrow(
+  await provider.removeLabelFromProposal(
     proposalId,
     label.onCreate.name,
   );
-  await provider.addLabelsToProposalOrThrow(proposalId, {
+  await provider.addLabelsToProposal(proposalId, {
     createIfMissing: true,
     labels: [label.onClose],
   });
@@ -75,7 +77,7 @@ export async function updateMergedProposalLabelsOrThrow(
     await consumeAsyncIterable(
       pooledMap(5, labelsToRemove, async (label) => {
         try {
-          await provider.removeLabelFromProposalOrThrow(proposalId, label);
+          await provider.removeLabelFromProposal(proposalId, label);
         } catch { /* ignore */ }
       }),
     );
@@ -85,7 +87,7 @@ export async function updateMergedProposalLabelsOrThrow(
     taskLogger.info(
       `Adding labels to merged proposal (${additionalLabel.onCloseAdd.length} in total)...`,
     );
-    await provider.addLabelsToProposalOrThrow(proposalId, {
+    await provider.addLabelsToProposal(proposalId, {
       createIfMissing: false,
       labels: additionalLabel.onCloseAdd,
     });

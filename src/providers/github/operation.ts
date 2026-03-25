@@ -2,7 +2,8 @@ import process from "node:process";
 import fs from "node:fs";
 import type { ProviderOperationTriggerContext } from "../../types/providers/provider-operation-context.ts";
 
-export function githubGetOperationTriggerContextOrThrow(): ProviderOperationTriggerContext {
+/** @throws */
+export function githubGetOperationTriggerContext(): ProviderOperationTriggerContext {
   const eventPath = process.env.GITHUB_EVENT_PATH;
   if (!eventPath) {
     throw new Error("GITHUB_EVENT_PATH not found");

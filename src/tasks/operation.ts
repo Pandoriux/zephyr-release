@@ -19,12 +19,13 @@ export function initOperationRuntime(
   initTomlEditJs();
 }
 
-export function validateCurrentOperationTriggerCtxOrExit(
+/** @throws {SafeExit} */
+export function validateCurrentOperationTriggerCtx(
   provider: PlatformProvider,
   allowedCommitTypes: ConfigOutput["commitTypes"],
   mode: ConfigOutput["mode"],
 ): OperationTriggerContext {
-  const operationContext = provider.getOperationTriggerContextOrThrow();
+  const operationContext = provider.getOperationTriggerContext();
 
   if (!operationContext.latestTriggerCommit) {
     throw new SafeExit("Latest commit is invalid, this might be a delete push");

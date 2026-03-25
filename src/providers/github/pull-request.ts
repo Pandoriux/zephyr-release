@@ -51,7 +51,8 @@ const RawBranchPullRequestsSchema = v.object({
   }),
 });
 
-async function githubFindUniquePullRequestForCommitOrThrow(
+/** @throws */
+async function githubFindUniquePullRequestForCommit(
   octokit: OctokitClient,
   commitHash: string,
   sourceBranch: string,
@@ -139,7 +140,8 @@ async function githubFindUniquePullRequestForCommitOrThrow(
   return foundPr;
 }
 
-async function githubFindUniquePullRequestFromBranchOrThrow(
+/** @throws */
+async function githubFindUniquePullRequestFromBranch(
   octokit: OctokitClient,
   branchName: string,
   targetBranch: string,
@@ -215,7 +217,8 @@ async function githubFindUniquePullRequestFromBranchOrThrow(
   return foundPr;
 }
 
-async function githubCreatePullRequestOrThrow(
+/** @throws */
+async function githubCreatePullRequest(
   octokit: OctokitClient,
   sourceBranch: string,
   targetBranch: string,
@@ -244,7 +247,8 @@ async function githubCreatePullRequestOrThrow(
   };
 }
 
-async function githubUpdatePullRequestOrThrow(
+/** @throws */
+async function githubUpdatePullRequest(
   octokit: OctokitClient,
   prNumber: string,
   title: string,
@@ -267,7 +271,8 @@ async function githubUpdatePullRequestOrThrow(
   };
 }
 
-async function githubAddAssigneesToPrOrThrow(
+/** @throws */
+async function githubAddAssigneesToPr(
   octokit: OctokitClient,
   prNumber: string,
   assignees: string[],
@@ -293,7 +298,8 @@ async function githubAddAssigneesToPrOrThrow(
   })) ?? [];
 }
 
-async function githubAddReviewersToPrOrThrow(
+/** @throws */
+async function githubAddReviewersToPr(
   octokit: OctokitClient,
   prNumber: string,
   reviewers: string[],
@@ -327,7 +333,7 @@ async function githubAddReviewersToPrOrThrow(
   });
 }
 
-export function makeGithubFindUniquePullRequestForCommitOrThrow(
+export function makeGithubFindUniquePullRequestForCommit(
   getOctokit: GetOctokitFn,
 ) {
   return (
@@ -336,7 +342,7 @@ export function makeGithubFindUniquePullRequestForCommitOrThrow(
     targetBranch: string,
     label: string,
   ) =>
-    githubFindUniquePullRequestForCommitOrThrow(
+    githubFindUniquePullRequestForCommit(
       getOctokit(),
       commitHash,
       sourceBranch,
@@ -345,7 +351,7 @@ export function makeGithubFindUniquePullRequestForCommitOrThrow(
     );
 }
 
-export function makeGithubFindUniquePullRequestFromBranchOrThrow(
+export function makeGithubFindUniquePullRequestFromBranch(
   getOctokit: GetOctokitFn,
 ) {
   return (
@@ -353,7 +359,7 @@ export function makeGithubFindUniquePullRequestFromBranchOrThrow(
     targetBranch: string,
     requiredLabel: string,
   ) =>
-    githubFindUniquePullRequestFromBranchOrThrow(
+    githubFindUniquePullRequestFromBranch(
       getOctokit(),
       branchName,
       targetBranch,
@@ -361,7 +367,7 @@ export function makeGithubFindUniquePullRequestFromBranchOrThrow(
     );
 }
 
-export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubCreatePullRequest(getOctokit: GetOctokitFn) {
   return (
     sourceBranch: string,
     targetBranch: string,
@@ -369,7 +375,7 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
     body: string,
     opts?: { draft?: boolean },
   ) =>
-    githubCreatePullRequestOrThrow(
+    githubCreatePullRequest(
       getOctokit(),
       sourceBranch,
       targetBranch,
@@ -379,17 +385,17 @@ export function makeGithubCreatePullRequestOrThrow(getOctokit: GetOctokitFn) {
     );
 }
 
-export function makeGithubUpdatePullRequestOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubUpdatePullRequest(getOctokit: GetOctokitFn) {
   return (id: string, title: string, body: string) =>
-    githubUpdatePullRequestOrThrow(getOctokit(), id, title, body);
+    githubUpdatePullRequest(getOctokit(), id, title, body);
 }
 
-export function makeGithubAddAssigneesToPrOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubAddAssigneesToPr(getOctokit: GetOctokitFn) {
   return (proposalId: string, assignees: string[]) =>
-    githubAddAssigneesToPrOrThrow(getOctokit(), proposalId, assignees);
+    githubAddAssigneesToPr(getOctokit(), proposalId, assignees);
 }
 
-export function makeGithubAddReviewersToPrOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubAddReviewersToPr(getOctokit: GetOctokitFn) {
   return (proposalId: string, reviewers: string[]) =>
-    githubAddReviewersToPrOrThrow(getOctokit(), proposalId, reviewers);
+    githubAddReviewersToPr(getOctokit(), proposalId, reviewers);
 }

@@ -3,8 +3,9 @@ import Nimma from "nimma";
 /**
  * Resolve the path array for the first match of a JSONPath selector against data.
  * Library-specific: uses nimma's query callback `path` (array of keys/indices).
+ * @throws
  */
-export function getJsonPathArrayOrThrow(
+export function getJsonPathArray(
   data: unknown,
   jsonPathSelector: string,
 ): (string | number)[] {

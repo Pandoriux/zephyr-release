@@ -7,7 +7,10 @@ import type { FileFormat } from "../../constants/file-formats.ts";
 /**
  * Supported structured file formats: json, jsonc, json5, yaml, toml
  */
-export type StructuredFileFormat = Extract<FileFormat, "json" | "jsonc" | "json5" | "yaml" | "toml">;
+export type StructuredFileFormat = Extract<
+  FileFormat,
+  "json" | "jsonc" | "json5" | "yaml" | "toml"
+>;
 
 /**
  * Type guard to check if a file format is structured (not plain txt).
@@ -40,8 +43,9 @@ export function detectFileFormatFromPath<T extends string>(
 
 /**
  * Parse file content string based on format
+ * @throws
  */
-export function parseFileStringOrThrow(
+export function parseFileString(
   fileContent: string,
   format: StructuredFileFormat,
 ): object {

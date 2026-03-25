@@ -33,7 +33,8 @@ export interface PlatformProvider {
   getRepositoryName: () => string;
   getCommitPathPart: () => string;
   getReferencePathPart: () => string;
-  getOperationTriggerContextOrThrow: () => ProviderOperationTriggerContext;
+  /** @throws */
+  getOperationTriggerContext: () => ProviderOperationTriggerContext;
 
   getReferenceUrl: (ref: string) => string;
   getCompareTagUrl: (tag1: string, tag2: string) => string;
@@ -42,36 +43,44 @@ export interface PlatformProvider {
     skip?: number,
   ) => Promise<string>;
 
-  getTextFileOrThrow: (filePath: string, ref?: string) => Promise<string>;
+  /** @throws */
+  getTextFile: (filePath: string, ref?: string) => Promise<string>;
 
-  ensureBranchExistOrThrow: (
+  /** @throws */
+  ensureBranchExist: (
     branchName: string,
     commitHash: string,
   ) => Promise<ProviderBranch>;
 
-  findUniqueProposalForCommitOrThrow: (
+  /** @throws */
+  findUniqueProposalForCommit: (
     commitHash: string,
     sourceBranch: string,
     targetBranch: string,
     label: string,
   ) => Promise<ProviderProposal | undefined>;
 
-  findUniqueProposalFromBranchOrThrow: (
+  /** @throws */
+  findUniqueProposalFromBranch: (
     branchName: string,
     targetBranch: string,
     requiredLabel: string,
   ) => Promise<ProviderProposal | undefined>;
 
-  findCommitsFromGivenToPreviousTaggedOrThrow: (
+  /** @throws */
+  findCommitsFromGivenToPreviousTagged: (
     commitHash: string,
     stopResolvingCommitAt?: number | string,
   ) => Promise<ProviderCommit[]>;
-  compareCommitsOrThrow: (
+  /** @throws */
+  compareCommits: (
     base: string,
     head: string,
   ) => Promise<ProviderCompareCommits>;
+  /** @throws */
   getCommit: (hash: string) => Promise<ProviderCommitDetails>;
-  createCommitOnBranchOrThrow: (
+  /** @throws */
+  createCommitOnBranch: (
     triggerCommitHash: string,
     baseTreeHash: string,
     changesToCommit: Map<string, string>,
@@ -80,39 +89,47 @@ export interface PlatformProvider {
     force?: boolean,
   ) => Promise<ProviderCommit>;
 
-  createProposalOrThrow: (
+  /** @throws */
+  createProposal: (
     sourceBranch: string,
     targetBranch: string,
     title: string,
     body: string,
     opts?: { draft?: boolean },
   ) => Promise<ProviderProposal>;
-  updateProposalOrThrow: (
+  /** @throws */
+  updateProposal: (
     id: string,
     title: string,
     body: string,
   ) => Promise<ProviderProposal>;
 
-  addLabelsToProposalOrThrow: (
+  /** @throws */
+  addLabelsToProposal: (
     proposalId: string,
     labelOptions: ProviderLabelOptions,
   ) => Promise<void>;
-  removeLabelFromProposalOrThrow: (
+  /** @throws */
+  removeLabelFromProposal: (
     proposalId: string,
     label: string,
   ) => Promise<void>;
 
-  addAssigneesToProposalOrThrow: (
+  /** @throws */
+  addAssigneesToProposal: (
     proposalId: string,
     assignees: string[],
   ) => Promise<ProviderAddedAssignees[]>;
-  addReviewersToProposalOrThrow: (
+  /** @throws */
+  addReviewersToProposal: (
     proposalId: string,
     reviewers: string[],
   ) => Promise<void>;
 
-  getLatestReleaseTagOrThrow: () => Promise<string | undefined>;
-  createTagOrThrow: (
+  /** @throws */
+  getLatestReleaseTag: () => Promise<string | undefined>;
+  /** @throws */
+  createTag: (
     tagName: string,
     commitHash: string,
     tagType: TagTypeOption,
@@ -120,13 +137,15 @@ export interface PlatformProvider {
     tagger?: TaggerRequest,
   ) => Promise<ProviderTag>;
 
-  createReleaseOrThrow: (
+  /** @throws */
+  createRelease: (
     tagName: string,
     title: string,
     body: string,
     options: ProviderReleaseOptions,
   ) => Promise<ProviderRelease>;
-  attachReleaseAssetOrThrow: (
+  /** @throws */
+  attachReleaseAsset: (
     releaseId: string,
     asset: ProviderAssetParams,
   ) => Promise<void>;

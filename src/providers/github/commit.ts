@@ -26,7 +26,8 @@ const RawCommitNodeSchema = v.object({
   }),
 });
 
-async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
+/** @throws */
+async function githubFindCommitsFromGivenToPreviousTagged(
   octokit: OctokitClient,
   commitHash: string,
   stopResolvingCommitAt?: number | string,
@@ -125,7 +126,8 @@ async function githubFindCommitsFromGivenToPreviousTaggedOrThrow(
   return collectedCommits;
 }
 
-async function githubCompareCommitsOrThrow(
+/** @throws */
+async function githubCompareCommits(
   octokit: OctokitClient,
   base: string,
   head: string,
@@ -143,7 +145,8 @@ async function githubCompareCommitsOrThrow(
   };
 }
 
-async function githubCreateCommitOnBranchOrThrow(
+/** @throws */
+async function githubCreateCommitOnBranch(
   octokit: OctokitClient,
   data: {
     triggerCommitHash: string;
@@ -220,7 +223,8 @@ async function githubCreateCommitOnBranchOrThrow(
   };
 }
 
-async function githubGetCommitOrThrow(
+/** @throws */
+async function githubGetCommit(
   octokit: OctokitClient,
   hash: string,
 ): Promise<ProviderCommitDetails> {
@@ -250,26 +254,26 @@ async function githubGetCommitOrThrow(
   };
 }
 
-export function makeGithubFindCommitsFromGivenToPreviousTaggedOrThrow(
+export function makeGithubFindCommitsFromGivenToPreviousTagged(
   getOctokit: GetOctokitFn,
 ) {
   return (
     commitHash: string,
     stopResolvingCommitAt?: number | string,
   ) =>
-    githubFindCommitsFromGivenToPreviousTaggedOrThrow(
+    githubFindCommitsFromGivenToPreviousTagged(
       getOctokit(),
       commitHash,
       stopResolvingCommitAt,
     );
 }
 
-export function makeGithubCompareCommitsOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubCompareCommits(getOctokit: GetOctokitFn) {
   return (base: string, head: string) =>
-    githubCompareCommitsOrThrow(getOctokit(), base, head);
+    githubCompareCommits(getOctokit(), base, head);
 }
 
-export function makeGithubCreateCommitOnBranchOrThrow(
+export function makeGithubCreateCommitOnBranch(
   getOctokit: GetOctokitFn,
 ) {
   return (
@@ -280,7 +284,7 @@ export function makeGithubCreateCommitOnBranchOrThrow(
     targetBranchName: string,
     force?: boolean,
   ) =>
-    githubCreateCommitOnBranchOrThrow(getOctokit(), {
+    githubCreateCommitOnBranch(getOctokit(), {
       triggerCommitHash,
       baseTreeHash,
       changesToCommit,
@@ -290,6 +294,6 @@ export function makeGithubCreateCommitOnBranchOrThrow(
     });
 }
 
-export function makeGithubGetCommitOrThrow(getOctokit: GetOctokitFn) {
-  return (hash: string) => githubGetCommitOrThrow(getOctokit(), hash);
+export function makeGithubGetCommit(getOctokit: GetOctokitFn) {
+  return (hash: string) => githubGetCommit(getOctokit(), hash);
 }

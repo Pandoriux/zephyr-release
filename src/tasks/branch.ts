@@ -1,5 +1,5 @@
 import { taskLogger } from "./logger.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
@@ -16,17 +16,18 @@ interface SetupWorkingBranchConfigParams {
 
 export type WorkingBranchResult = ProviderBranch & { name: string };
 
-export async function setupWorkingBranchOrThrow(
+/** @throws */
+export async function setupWorkingBranch(
   provider: PlatformProvider,
   inputs: SetupWorkingBranchInputsParams,
   config: SetupWorkingBranchConfigParams,
 ): Promise<WorkingBranchResult> {
   const { triggerCommitHash } = inputs;
-  const branchName = await resolveStringTemplateOrThrow(
+  const branchName = await resolveStringTemplate(
     config.review.workingBranchNameTemplate,
   );
 
-  const workingBranch = await provider.ensureBranchExistOrThrow(
+  const workingBranch = await provider.ensureBranchExist(
     branchName,
     triggerCommitHash,
   );

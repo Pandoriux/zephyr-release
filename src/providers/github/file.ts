@@ -2,7 +2,8 @@ import { Buffer } from "node:buffer";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
-async function githubGetTextFileOrThrow(
+/** @throws */
+async function githubGetTextFile(
   octokit: OctokitClient,
   filePath: string,
   ref?: string,
@@ -36,7 +37,7 @@ async function githubGetTextFileOrThrow(
   return Buffer.from(data.content, "base64").toString("utf-8");
 }
 
-export function makeGithubGetTextFileOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubGetTextFile(getOctokit: GetOctokitFn) {
   return (filePath: string, ref?: string) =>
-    githubGetTextFileOrThrow(getOctokit(), filePath, ref);
+    githubGetTextFile(getOctokit(), filePath, ref);
 }

@@ -1,7 +1,8 @@
 import process from "node:process";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 
-export async function getProviderOrThrow(): Promise<PlatformProvider> {
+/** @throws */
+export async function getProvider(): Promise<PlatformProvider> {
   if (process.env.GITHUB_ACTIONS === "true") {
     const { createGitHubProvider } = await import("./github/github-provider.ts");
     return createGitHubProvider();

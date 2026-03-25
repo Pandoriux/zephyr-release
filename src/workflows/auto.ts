@@ -2,17 +2,17 @@ import { format } from "@std/semver";
 import type { WorkingBranchResult } from "../tasks/branch.ts";
 import {
   calculateNextVersion,
-  compareVersionToPreviousVersionOrExit,
+  compareVersionToPreviousVersion,
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
-import { runCommandsOrThrow } from "../tasks/command.ts";
+import { runCommands } from "../tasks/command.ts";
 import {
-  commitChangesToBranchOrThrow,
+  commitChangesToBranch,
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
-import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
+import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPrepareOperationVariables,
   exportPostPublishOperationVariables,
@@ -32,8 +32,8 @@ import type {
 } from "../types/operation-context.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
-import { evaluateAutoModeTriggerStrategyOrExit } from "../tasks/auto-trigger-strategy.ts";
-import { createTagOrThrow } from "../tasks/tag.ts";
+import { evaluateAutoModeTriggerStrategy } from "../tasks/auto-trigger-strategy.ts";
+import { createTag } from "../tasks/tag.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
 
@@ -90,7 +90,7 @@ export async function executeAutoStrategy(
   logger.stepStart(
     "Starting: Compare calculated next version with previous version",
   );
-  compareVersionToPreviousVersionOrExit(
+  compareVersionToPreviousVersion(
     nextVersion,
     previousVersion,
   );
@@ -120,7 +120,7 @@ export async function executeAutoStrategy(
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare pre commands");
-  const preResult = await runCommandsOrThrow(
+  const preResult = await runCommands(
     runSettings.config.commandHooks.prepare,
     "pre",
   );
@@ -136,7 +136,7 @@ export async function executeAutoStrategy(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
   const _preparePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,
@@ -158,7 +158,7 @@ export async function executeAutoStrategy(
   }
 
   logger.stepStart("Starting: Evaluate auto mode trigger strategy");
-  evaluateAutoModeTriggerStrategyOrExit(
+  evaluateAutoModeTriggerStrategy(
     resolvedCommitsResult.entries,
     runSettings.config,
   );
@@ -197,7 +197,7 @@ export async function executeAutoStrategy(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const commitResult = await commitChangesToBranchOrThrow(
+  const commitResult = await commitChangesToBranch(
     provider,
     runSettings.inputs,
     runSettings.config,
@@ -222,7 +222,7 @@ export async function executeAutoStrategy(
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");
-  const postResult = await runCommandsOrThrow(
+  const postResult = await runCommands(
     runSettings.config.commandHooks.prepare,
     "post",
   );
@@ -238,7 +238,7 @@ export async function executeAutoStrategy(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
   const _preparePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,
@@ -271,7 +271,7 @@ export async function executeAutoStrategy(
     logger.debugStepFinish("Finished: Export pre publish operation variables");
 
     logger.stepStart("Starting: Execute publish pre commands");
-    const preResult = await runCommandsOrThrow(
+    const preResult = await runCommands(
       runSettings.config.commandHooks.publish,
       "pre",
     );
@@ -287,7 +287,7 @@ export async function executeAutoStrategy(
       "Starting: Resolve runtime config override (publish pre commands)",
     );
     const _releasePreRuntimeConfigResult =
-      await resolveRuntimeConfigOverrideOrThrow(
+      await resolveRuntimeConfigOverride(
         runSettings.rawConfig,
         runSettings.config,
         runSettings.inputs.workspacePath,
@@ -309,7 +309,7 @@ export async function executeAutoStrategy(
     }
 
     logger.stepStart("Starting: Create tag");
-    const createdTag = await createTagOrThrow(
+    const createdTag = await createTag(
       provider,
       commitResult.hash,
       runSettings.inputs,
@@ -356,7 +356,7 @@ export async function executeAutoStrategy(
     logger.debugStepFinish("Finished: Export post publish operation variables");
 
     logger.stepStart("Starting: Execute publish post commands");
-    const postResult = await runCommandsOrThrow(
+    const postResult = await runCommands(
       runSettings.config.commandHooks.publish,
       "post",
     );
@@ -372,7 +372,7 @@ export async function executeAutoStrategy(
       "Starting: Resolve runtime config override (publish post commands)",
     );
     const _releasePostRuntimeConfigResult =
-      await resolveRuntimeConfigOverrideOrThrow(
+      await resolveRuntimeConfigOverride(
         runSettings.rawConfig,
         runSettings.config,
         runSettings.inputs.workspacePath,

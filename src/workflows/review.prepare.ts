@@ -1,19 +1,19 @@
 import { logger } from "../tasks/logger.ts";
 import {
-  commitChangesToBranchOrThrow,
+  commitChangesToBranch,
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
 import {
   addAssigneesToProposal,
   addReviewersToProposal,
-  createOrUpdateProposalOrThrow,
+  createOrUpdateProposal,
 } from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { format } from "@std/semver";
 import {
   calculateNextVersion,
-  compareVersionToPreviousVersionOrExit,
+  compareVersionToPreviousVersion,
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
@@ -23,14 +23,14 @@ import {
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
-import { runCommandsOrThrow } from "../tasks/command.ts";
-import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
+import { runCommands } from "../tasks/command.ts";
+import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import type { OperationRunSettings } from "../types/operation-context.ts";
-import { addLabelsToProposalOrThrow } from "../tasks/label.ts";
+import { addLabelsToProposal } from "../tasks/label.ts";
 import type { BootstrapResult } from "./bootstrap.ts";
 
 export async function executeReviewPreparePhase(
@@ -76,7 +76,7 @@ export async function executeReviewPreparePhase(
   logger.stepStart(
     "Starting: Compare calculated next version with previous version",
   );
-  compareVersionToPreviousVersionOrExit(
+  compareVersionToPreviousVersion(
     nextVersion,
     previousVersion,
   );
@@ -106,7 +106,7 @@ export async function executeReviewPreparePhase(
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare pre commands");
-  const preResult = await runCommandsOrThrow(
+  const preResult = await runCommands(
     runSettings.config.commandHooks.prepare,
     "pre",
   );
@@ -122,7 +122,7 @@ export async function executeReviewPreparePhase(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
   const _preparePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,
@@ -176,7 +176,7 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 
   logger.stepStart("Starting: Commit changes");
-  const commitResult = await commitChangesToBranchOrThrow(
+  const commitResult = await commitChangesToBranch(
     provider,
     runSettings.inputs,
     runSettings.config,
@@ -190,7 +190,7 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Commit changes");
 
   logger.stepStart("Starting: Create or update proposal");
-  const proposal = await createOrUpdateProposalOrThrow(
+  const proposal = await createOrUpdateProposal(
     provider,
     {
       workingBranchName: workingBranchResult.name,
@@ -203,7 +203,7 @@ export async function executeReviewPreparePhase(
   logger.stepFinish("Finished: Create or update proposal");
 
   logger.stepStart("Starting: Add labels to proposal");
-  await addLabelsToProposalOrThrow(provider, proposal.id, runSettings.config);
+  await addLabelsToProposal(provider, proposal.id, runSettings.config);
   logger.stepFinish("Finished: Add labels to proposal");
 
   if (runSettings.config.review.assignees) {
@@ -238,7 +238,7 @@ export async function executeReviewPreparePhase(
   logger.debugStepFinish("Finished: Export post prepare operation variables");
 
   logger.stepStart("Starting: Execute prepare post commands");
-  const postResult = await runCommandsOrThrow(
+  const postResult = await runCommands(
     runSettings.config.commandHooks.prepare,
     "post",
   );
@@ -254,7 +254,7 @@ export async function executeReviewPreparePhase(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
   const _preparePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,

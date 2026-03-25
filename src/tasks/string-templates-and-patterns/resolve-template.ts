@@ -5,7 +5,8 @@ export const liquidEngine = new Liquid({ jsTruthy: true });
 
 const PARSED_TEMPLATE_CACHE = new Map<string, Template[]>();
 
-export async function resolveStringTemplateOrThrow(
+/** @throws */
+export async function resolveStringTemplate(
   template: string,
   additionalContext?: Record<string, unknown>,
 ): Promise<string> {
@@ -33,7 +34,7 @@ export async function resolveStringTemplateOrThrow(
     return renderedTemplate;
   } catch (error) {
     throw new Error(
-      `'${resolveStringTemplateOrThrow.name}' error: failed to resolve string template '${template}'`,
+      `'${resolveStringTemplate.name}' error: failed to resolve string template '${template}'`,
       { cause: error },
     );
   }

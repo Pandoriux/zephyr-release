@@ -8,7 +8,7 @@ import {
 import {
   detectFileFormatFromPath,
   isStructuredFileFormat,
-  parseFileStringOrThrow,
+  parseFileString,
   type StructuredFileFormat,
 } from "../../utils/parsers/file.ts";
 
@@ -36,8 +36,9 @@ interface ParseVersionFileResult {
 
 /**
  * Parse version file with auto-detection support
+ * @throws
  */
-export function parseVersionFileOrThrow(
+export function parseVersionFile(
   fileContent: string,
   fileFormat: FileFormatWithAuto,
   filePath: string,
@@ -54,7 +55,7 @@ export function parseVersionFileOrThrow(
         );
       }
 
-      const parsedContent = parseFileStringOrThrow(fileContent, fileFormat);
+      const parsedContent = parseFileString(fileContent, fileFormat);
       return { parsedContent, resolvedFormatResult: fileFormat };
     }
 
@@ -74,7 +75,7 @@ export function parseVersionFileOrThrow(
       triedFormats.push(fmt);
 
       try {
-        const parsedContent = parseFileStringOrThrow(fileContent, fmt);
+        const parsedContent = parseFileString(fileContent, fmt);
         const resolvedFormat = `auto -> ${triedFormats.join(" -> ")}`;
         return { parsedContent, resolvedFormatResult: resolvedFormat };
       } catch (error) {
@@ -103,8 +104,9 @@ export function parseVersionFileOrThrow(
 /**
  * Resolve to a structured version file format (json, jsonc, json5, yaml, toml).
  * txt is never returned; when format is "auto", resolution excludes txt.
+ * @throws
  */
-export function resolveStructuredVersionFileFormatOrThrow(
+export function resolveStructuredVersionFileFormat(
   fileContent: string,
   filePath: string,
   format?: FileFormatWithAuto,
@@ -133,7 +135,7 @@ export function resolveStructuredVersionFileFormatOrThrow(
 
   for (const fmt of trialOrder) {
     try {
-      parseFileStringOrThrow(fileContent, fmt);
+      parseFileString(fileContent, fmt);
       return fmt;
     } catch { /* try next format */ }
   }

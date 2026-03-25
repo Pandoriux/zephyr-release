@@ -1,9 +1,9 @@
 import { JsonObjectNode, JsonParser } from "@croct/json5-parser";
 import { parseDocument } from "@eemeli/yaml";
 import { edit as editToml } from "@rainbowatcher/toml-edit-js/index";
-import { getJsonPathArrayOrThrow } from "../../libs/nimma/get-path-array.ts";
+import { getJsonPathArray } from "../../libs/nimma/get-path-array.ts";
 import { toTomlPathString } from "../../libs/@rainbowatcher/toml-edit-js/to-path-string.ts";
-import { parseFileStringOrThrow } from "../../utils/parsers/file.ts";
+import { parseFileString } from "../../utils/parsers/file.ts";
 import type { FileFormat } from "../../constants/file-formats.ts";
 import { updateJsonCstByPath } from "../../libs/@croct/json5-parser/update.ts";
 
@@ -17,8 +17,8 @@ export function updateVersionInStructuredFile(
   jsonPathSelector: string,
   newVersion: string,
 ): string {
-  const parsedData = parseFileStringOrThrow(fileContent, format);
-  const pathArray = getJsonPathArrayOrThrow(parsedData, jsonPathSelector);
+  const parsedData = parseFileString(fileContent, format);
+  const pathArray = getJsonPathArray(parsedData, jsonPathSelector);
 
   switch (format) {
     case "json":

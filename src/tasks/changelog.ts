@@ -1,10 +1,10 @@
 import { toTitleCase } from "@std/text/unstable-to-title-case";
 import type { ResolvedCommit } from "./commit.ts";
-import { getTextFileOrThrow } from "./file.ts";
+import { getTextFile } from "./file.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import type { ChangelogReleaseEntryPattern } from "../constants/string-patterns.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { CHANGELOG_MARKERS } from "../constants/markers.ts";
@@ -64,35 +64,35 @@ export async function generateChangelogReleaseContent(
 
   let releaseHeader: string;
   if (releaseHeaderTemplatePath) {
-    const headerTemplate = await getTextFileOrThrow(
+    const headerTemplate = await getTextFile(
       sourceMode.overrides?.[releaseHeaderTemplatePath] ?? sourceMode.mode,
       releaseHeaderTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    releaseHeader = await resolveStringTemplateOrThrow(headerTemplate);
+    releaseHeader = await resolveStringTemplate(headerTemplate);
   } else {
-    releaseHeader = await resolveStringTemplateOrThrow(
+    releaseHeader = await resolveStringTemplate(
       releaseHeaderTemplate,
     );
   }
 
   let releaseFooter: string | undefined;
   if (releaseFooterTemplatePath) {
-    const footerTemplate = await getTextFileOrThrow(
+    const footerTemplate = await getTextFile(
       sourceMode.overrides?.[releaseFooterTemplatePath] ?? sourceMode.mode,
       releaseFooterTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    releaseFooter = await resolveStringTemplateOrThrow(footerTemplate);
+    releaseFooter = await resolveStringTemplate(footerTemplate);
   } else if (releaseFooterTemplate) {
-    releaseFooter = await resolveStringTemplateOrThrow(
+    releaseFooter = await resolveStringTemplate(
       releaseFooterTemplate,
     );
   }
 
   let releaseBody: string;
   if (releaseBodyOverridePath) {
-    releaseBody = await getTextFileOrThrow(
+    releaseBody = await getTextFile(
       sourceMode.overrides?.[releaseBodyOverridePath] ?? sourceMode.mode,
       releaseBodyOverridePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
@@ -137,7 +137,7 @@ async function generateReleaseBody(
   // Type -> Section
   const typeToSection = new Map<string, string>();
 
-  const breakingSectionHeading = await resolveStringTemplateOrThrow(
+  const breakingSectionHeading = await resolveStringTemplate(
     releaseBreakingSectionHeading,
   );
   sectionGroups.set(breakingSectionHeading, []);
@@ -154,7 +154,7 @@ async function generateReleaseBody(
   }
 
   const sectionEntryTemplate = releaseSectionEntryTemplatePath
-    ? await getTextFileOrThrow(
+    ? await getTextFile(
       sourceMode.overrides?.[releaseSectionEntryTemplatePath] ??
         sourceMode.mode,
       releaseSectionEntryTemplatePath,
@@ -163,7 +163,7 @@ async function generateReleaseBody(
     : releaseSectionEntryTemplate;
 
   const breakingSectionEntryTemplate = releaseBreakingSectionEntryTemplatePath
-    ? await getTextFileOrThrow(
+    ? await getTextFile(
       sourceMode.overrides?.[releaseBreakingSectionEntryTemplatePath] ??
         sourceMode.mode,
       releaseBreakingSectionEntryTemplatePath,
@@ -181,7 +181,7 @@ async function generateReleaseBody(
 
     const commitPatterns = createCommitExtraPatterns(commit);
 
-    const commitStr = await resolveStringTemplateOrThrow(
+    const commitStr = await resolveStringTemplate(
       sectionEntryTemplate,
       commitPatterns,
     );
@@ -189,7 +189,7 @@ async function generateReleaseBody(
 
     if (commit.isBreaking) {
       const commitBreakingStr = breakingSectionEntryTemplate
-        ? await resolveStringTemplateOrThrow(
+        ? await resolveStringTemplate(
           breakingSectionEntryTemplate,
           commitPatterns,
         )
@@ -261,7 +261,7 @@ export async function prepareChangelogFileToCommit(
 
   const changelogSourceMode = sourceMode.overrides?.[path] ?? sourceMode.mode;
 
-  const currentFileContent = await getTextFileOrThrow(
+  const currentFileContent = await getTextFile(
     changelogSourceMode,
     path,
     { provider, workspacePath: workspacePath, ref: triggerCommitHash },
@@ -269,24 +269,24 @@ export async function prepareChangelogFileToCommit(
 
   let header: string;
   if (fileHeaderTemplatePath) {
-    const headerTemplate = await getTextFileOrThrow(
+    const headerTemplate = await getTextFile(
       sourceMode.overrides?.[fileHeaderTemplatePath] ?? sourceMode.mode,
       fileHeaderTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    header = await resolveStringTemplateOrThrow(headerTemplate);
-  } else header = await resolveStringTemplateOrThrow(fileHeaderTemplate);
+    header = await resolveStringTemplate(headerTemplate);
+  } else header = await resolveStringTemplate(fileHeaderTemplate);
 
   let footer: string | undefined;
   if (fileFooterTemplatePath) {
-    const footerTemplate = await getTextFileOrThrow(
+    const footerTemplate = await getTextFile(
       sourceMode.overrides?.[fileFooterTemplatePath] ?? sourceMode.mode,
       fileFooterTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    footer = await resolveStringTemplateOrThrow(footerTemplate);
+    footer = await resolveStringTemplate(footerTemplate);
   } else if (fileFooterTemplate) {
-    footer = await resolveStringTemplateOrThrow(fileFooterTemplate);
+    footer = await resolveStringTemplate(fileFooterTemplate);
   }
 
   if (!currentFileContent.trim()) {

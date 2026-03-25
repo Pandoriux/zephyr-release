@@ -6,7 +6,7 @@ import {
 } from "../../constants/file-formats.ts";
 import {
   detectFileFormatFromPath,
-  parseFileStringOrThrow,
+  parseFileString,
 } from "../../utils/parsers/file.ts";
 
 /**
@@ -32,15 +32,16 @@ interface ParseConfigResult {
 
 /**
  * Parse config file with auto-detection support
+ * @throws
  */
-export function parseConfigOrThrow(
+export function parseConfig(
   configStr: string,
   configFormat: ConfigFileFormatWithAuto,
   configPath?: string,
 ): ParseConfigResult {
   try {
     if (configFormat !== "auto") {
-      const parsedConfig = parseFileStringOrThrow(configStr, configFormat);
+      const parsedConfig = parseFileString(configStr, configFormat);
       return { parsedConfig, resolvedFormatResult: configFormat };
     }
 
@@ -53,7 +54,7 @@ export function parseConfigOrThrow(
       triedFormats.push(fmt);
 
       try {
-        const parsedConfig = parseFileStringOrThrow(configStr, fmt);
+        const parsedConfig = parseFileString(configStr, fmt);
         const resolvedFormat = `auto -> ${triedFormats.join(" -> ")}`;
         return { parsedConfig, resolvedFormatResult: resolvedFormat };
       } catch (error) {

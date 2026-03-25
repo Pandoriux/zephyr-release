@@ -4,8 +4,8 @@ import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
 import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
-import { getTextFileOrThrow } from "./file.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { getTextFile } from "./file.ts";
+import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import { PROPOSAL_MARKERS } from "../constants/markers.ts";
 
 type FindProposalForCommitInputsParams = Pick<
@@ -19,7 +19,8 @@ interface ProposalBranchAndLabelConfigParams {
   };
 }
 
-export async function findProposalForCommitOrThrow(
+/** @throws */
+export async function findProposalForCommit(
   provider: PlatformProvider,
   workingBranchName: string,
   inputs: FindProposalForCommitInputsParams,
@@ -31,7 +32,7 @@ export async function findProposalForCommitOrThrow(
     ? config.review.label.onCreate
     : config.review.label.onCreate.name;
 
-  const foundProposal = await provider.findUniqueProposalForCommitOrThrow(
+  const foundProposal = await provider.findUniqueProposalForCommit(
     triggerCommitHash,
     workingBranchName,
     triggerBranchName,
@@ -46,7 +47,8 @@ export async function findProposalForCommitOrThrow(
   return foundProposal;
 }
 
-export async function findProposalFromBranchOrThrow(
+/** @throws */
+export async function findProposalFromBranch(
   provider: PlatformProvider,
   workingBranchName: string,
   inputs: FindProposalForCommitInputsParams,
@@ -58,7 +60,7 @@ export async function findProposalFromBranchOrThrow(
     ? config.review.label.onCreate
     : config.review.label.onCreate.name;
 
-  const foundProposal = await provider.findUniqueProposalFromBranchOrThrow(
+  const foundProposal = await provider.findUniqueProposalFromBranch(
     workingBranchName,
     triggerBranchName,
     label,
@@ -104,26 +106,26 @@ export async function createProposalContent(
 
   let proposalHeader: string;
   if (headerTemplatePath) {
-    const proposalHeaderTemplate = await getTextFileOrThrow(
+    const proposalHeaderTemplate = await getTextFile(
       sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
       headerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    proposalHeader = await resolveStringTemplateOrThrow(proposalHeaderTemplate);
+    proposalHeader = await resolveStringTemplate(proposalHeaderTemplate);
   } else {
-    proposalHeader = await resolveStringTemplateOrThrow(headerTemplate);
+    proposalHeader = await resolveStringTemplate(headerTemplate);
   }
 
   let proposalBody: string;
   if (bodyTemplatePath) {
-    const proposalBodyTemplate = await getTextFileOrThrow(
+    const proposalBodyTemplate = await getTextFile(
       sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    proposalBody = await resolveStringTemplateOrThrow(proposalBodyTemplate);
+    proposalBody = await resolveStringTemplate(proposalBodyTemplate);
   } else {
-    proposalBody = await resolveStringTemplateOrThrow(bodyTemplate);
+    proposalBody = await resolveStringTemplate(bodyTemplate);
   }
   const proposalBodyWithMarkers = [
     PROPOSAL_MARKERS.bodyStart,
@@ -134,14 +136,14 @@ export async function createProposalContent(
 
   let proposalFooter: string;
   if (footerTemplatePath) {
-    const proposalFooterTemplate = await getTextFileOrThrow(
+    const proposalFooterTemplate = await getTextFile(
       sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
       footerTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    proposalFooter = await resolveStringTemplateOrThrow(proposalFooterTemplate);
+    proposalFooter = await resolveStringTemplate(proposalFooterTemplate);
   } else {
-    proposalFooter = await resolveStringTemplateOrThrow(footerTemplate);
+    proposalFooter = await resolveStringTemplate(footerTemplate);
   }
 
   return [proposalHeader, proposalBodyWithMarkers, proposalFooter].filter(
@@ -164,7 +166,8 @@ interface CreateOrUpdateProposalConfigParams {
   >;
 }
 
-export async function createOrUpdateProposalOrThrow(
+/** @throws */
+export async function createOrUpdateProposal(
   provider: PlatformProvider,
   proposalData: {
     workingBranchName: string;
@@ -184,7 +187,7 @@ export async function createOrUpdateProposalOrThrow(
   } = proposalData;
   const { draft, titleTemplate } = config.review;
 
-  const proposalTitle = await resolveStringTemplateOrThrow(titleTemplate);
+  const proposalTitle = await resolveStringTemplate(titleTemplate);
   const proposalContent = await createProposalContent(
     provider,
     inputs,
@@ -194,14 +197,14 @@ export async function createOrUpdateProposalOrThrow(
   let proposal: ProviderProposal;
   if (associatedProposalFromBranch) {
     taskLogger.info("Updating current working proposal...");
-    proposal = await provider.updateProposalOrThrow(
+    proposal = await provider.updateProposal(
       associatedProposalFromBranch.id,
       proposalTitle,
       proposalContent,
     );
   } else {
     taskLogger.info("Creating new working proposal...");
-    proposal = await provider.createProposalOrThrow(
+    proposal = await provider.createProposal(
       workingBranchName,
       triggerBranchName,
       proposalTitle,
@@ -245,7 +248,7 @@ export async function addAssigneesToProposal(
   assignees: string[],
 ) {
   try {
-    const addResult = await provider.addAssigneesToProposalOrThrow(
+    const addResult = await provider.addAssigneesToProposal(
       proposalId,
       assignees,
     );
@@ -292,7 +295,7 @@ export async function addReviewersToProposal(
   reviewers: string[],
 ) {
   try {
-    await provider.addReviewersToProposalOrThrow(
+    await provider.addReviewersToProposal(
       proposalId,
       reviewers,
     );

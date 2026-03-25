@@ -20,8 +20,8 @@ import type { ProviderCommit } from "../types/providers/commit.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import { prepareChangelogFileToCommit } from "./changelog.ts";
 import { execSync } from "node:child_process";
-import { getTextFileOrThrow } from "./file.ts";
-import { resolveStringTemplateOrThrow } from "./string-templates-and-patterns/resolve-template.ts";
+import { getTextFile } from "./file.ts";
+import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import type { CommitConfigOutput } from "../schemas/configs/modules/commit-config.ts";
 import { BranchOutOfDateError } from "../errors/providers/branch.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
@@ -145,7 +145,7 @@ export async function resolveCommitsFromTriggerToLastRelease(
   const { triggerCommitHash } = inputs;
   const { commitTypes, stopResolvingCommitAt } = config;
 
-  const rawCommits = await provider.findCommitsFromGivenToPreviousTaggedOrThrow(
+  const rawCommits = await provider.findCommitsFromGivenToPreviousTagged(
     triggerCommitHash,
     stopResolvingCommitAt,
   );
@@ -358,7 +358,7 @@ export async function prepareChangesToCommit(
         const status = line.slice(0, 2);
 
         // Skip deleted files. If a file is deleted (e.g., ' D', 'D ', 'DD'),
-        // we cannot read its content from disk via getTextFileOrThrow.
+        // we cannot read its content from disk via getTextFile.
         if (status.includes("D")) {
           continue;
         }
@@ -400,7 +400,7 @@ export async function prepareChangesToCommit(
       // we do NOT overwrite it with the old version from disk.
       if (changesData.has(normalizedPath)) continue;
 
-      const fileContent = await getTextFileOrThrow("local", normalizedPath, {
+      const fileContent = await getTextFile("local", normalizedPath, {
         workspacePath: workspacePath,
       });
       changesData.set(normalizedPath, fileContent);
@@ -428,7 +428,8 @@ interface CommitChangesConfigParams {
   >;
 }
 
-export async function commitChangesToBranchOrThrow(
+/** @throws */
+export async function commitChangesToBranch(
   provider: PlatformProvider,
   inputs: CommitChangesInputsParams,
   config: CommitChangesConfigParams,
@@ -453,38 +454,38 @@ export async function commitChangesToBranchOrThrow(
 
   let commitHeader: string;
   if (headerTemplatePath) {
-    const headerTemplateFromFile = await getTextFileOrThrow(
+    const headerTemplateFromFile = await getTextFile(
       sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
       headerTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
-    commitHeader = await resolveStringTemplateOrThrow(headerTemplateFromFile);
+    commitHeader = await resolveStringTemplate(headerTemplateFromFile);
   } else {
-    commitHeader = await resolveStringTemplateOrThrow(headerTemplate);
+    commitHeader = await resolveStringTemplate(headerTemplate);
   }
 
   let commitBody: string | undefined;
   if (bodyTemplatePath) {
-    const bodyTemplateFromFile = await getTextFileOrThrow(
+    const bodyTemplateFromFile = await getTextFile(
       sourceMode.overrides?.[bodyTemplatePath] ?? sourceMode.mode,
       bodyTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
-    commitBody = await resolveStringTemplateOrThrow(bodyTemplateFromFile);
+    commitBody = await resolveStringTemplate(bodyTemplateFromFile);
   } else if (bodyTemplate) {
-    commitBody = await resolveStringTemplateOrThrow(bodyTemplate);
+    commitBody = await resolveStringTemplate(bodyTemplate);
   }
 
   let commitFooter: string | undefined;
   if (footerTemplatePath) {
-    const footerTemplateFromFile = await getTextFileOrThrow(
+    const footerTemplateFromFile = await getTextFile(
       sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
       footerTemplatePath,
       { provider, workspacePath, ref: triggerCommitHash },
     );
-    commitFooter = await resolveStringTemplateOrThrow(footerTemplateFromFile);
+    commitFooter = await resolveStringTemplate(footerTemplateFromFile);
   } else if (footerTemplate) {
-    commitFooter = await resolveStringTemplateOrThrow(footerTemplate);
+    commitFooter = await resolveStringTemplate(footerTemplate);
   }
 
   const zephyrReleaseSign = `${ZEPHYR_RELEASE_COMMIT_SIGN}: ${VERSION}`;
@@ -499,7 +500,7 @@ export async function commitChangesToBranchOrThrow(
     .join("\n\n");
 
   taskLogger.info("Creating commit and pushing to working branch...");
-  const createdCommit = await provider.createCommitOnBranchOrThrow(
+  const createdCommit = await provider.createCommitOnBranch(
     triggerCommitHash,
     baseTreeHash,
     changesToCommit,

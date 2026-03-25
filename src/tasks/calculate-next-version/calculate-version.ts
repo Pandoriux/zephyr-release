@@ -146,7 +146,8 @@ function isReleaseAsAllowed(
   return false;
 }
 
-export function compareVersionToPreviousVersionOrExit(
+/** @throws {SafeExit} */
+export function compareVersionToPreviousVersion(
   version: SemVer,
   previousVersion: SemVer | undefined,
 ) {

@@ -10,9 +10,9 @@ import type {
   FixedPreviousVersionStringPattern,
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
-import { resolveStringTemplateOrThrow } from "./resolve-template.ts";
+import { resolveStringTemplate } from "./resolve-template.ts";
 import type { ReviewConfigOutput } from "../../schemas/configs/modules/review-config.ts";
-import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
+
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -79,7 +79,7 @@ export async function createFixedBaseStringPatternContext(
   Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   const workingBranchContext = {
-    workingBranchName: await resolveStringTemplateOrThrow(
+    workingBranchName: await resolveStringTemplate(
       workingBranchNameTemplate,
     ),
   } satisfies Pick<Record<FixedBaseStringPattern, string>, "workingBranchName">;
@@ -139,7 +139,7 @@ export async function createFixedVersionStringPatternContext(
   Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   const tagContext = {
-    tagName: await resolveStringTemplateOrThrow(tagTemplate),
+    tagName: await resolveStringTemplate(tagTemplate),
   } satisfies Pick<Record<FixedVersionStringPattern, string>, "tagName">;
 
   Object.assign(BUILT_IN_CONTEXT, tagContext);

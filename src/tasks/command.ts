@@ -7,7 +7,8 @@ import type {
   CommandHookOutput,
 } from "../schemas/configs/modules/components/command-hook.ts";
 
-export async function runCommandsOrThrow(
+/** @throws */
+export async function runCommands(
   commandHook: CommandHookOutput | undefined,
   kind: CommandHookKind,
 ): Promise<string | undefined> {
@@ -34,7 +35,7 @@ export async function runCommandsOrThrow(
     const continueOnError = cmd.continueOnError ?? baseContinueOnError;
 
     try {
-      await runChildProcessOrThrow(cmdStr, timeout);
+      await runChildProcess(cmdStr, timeout);
       succeedCount++;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -45,7 +46,7 @@ export async function runCommandsOrThrow(
       } else {
         taskLogger.endGroup();
         throw new Error(
-          `\`${runCommandsOrThrow.name}\` failed!`,
+          `\`${runCommands.name}\` failed!`,
           { cause: error },
         );
       }
@@ -58,7 +59,8 @@ export async function runCommandsOrThrow(
   }`;
 }
 
-async function runChildProcessOrThrow(
+/** @throws */
+async function runChildProcess(
   cmd: string,
   timeout: number,
 ) {

@@ -81,7 +81,8 @@ async function githubGetCompareTagUrlFromCurrentToLatest(
   ).href;
 }
 
-async function githubGetLatestReleaseTagOrThrow(
+/** @throws */
+async function githubGetLatestReleaseTag(
   octokit: OctokitClient,
 ): Promise<string | undefined> {
   try {
@@ -101,7 +102,8 @@ async function githubGetLatestReleaseTagOrThrow(
   }
 }
 
-async function githubCreateTagOrThrow(
+/** @throws */
+async function githubCreateTag(
   octokit: OctokitClient,
   tagName: string,
   commitHash: string,
@@ -149,11 +151,11 @@ export function makeGithubGetCompareTagUrlFromCurrentToLatest(
     );
 }
 
-export function makeGithubGetLatestReleaseTagOrThrow(getOctokit: GetOctokitFn) {
-  return () => githubGetLatestReleaseTagOrThrow(getOctokit());
+export function makeGithubGetLatestReleaseTag(getOctokit: GetOctokitFn) {
+  return () => githubGetLatestReleaseTag(getOctokit());
 }
 
-export function makeGithubCreateTagOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubCreateTag(getOctokit: GetOctokitFn) {
   return (
     tagName: string,
     commitHash: string,
@@ -161,7 +163,7 @@ export function makeGithubCreateTagOrThrow(getOctokit: GetOctokitFn) {
     message: string,
     tagger?: TaggerRequest,
   ) =>
-    githubCreateTagOrThrow(
+    githubCreateTag(
       getOctokit(),
       tagName,
       commitHash,

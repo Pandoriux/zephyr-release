@@ -6,7 +6,8 @@ import type {
 } from "../../types/providers/release.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 
-async function githubCreateReleaseOrThrow(
+/** @throws */
+async function githubCreateRelease(
   octokit: OctokitClient,
   tagName: string,
   title: string,
@@ -33,7 +34,8 @@ async function githubCreateReleaseOrThrow(
   };
 }
 
-async function githubAttachReleaseAssetOrThrow(
+/** @throws */
+async function githubAttachReleaseAsset(
   octokit: OctokitClient,
   releaseId: string,
   asset: ProviderAssetParams,
@@ -56,14 +58,14 @@ async function githubAttachReleaseAssetOrThrow(
   );
 }
 
-export function makeGithubCreateReleaseOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubCreateRelease(getOctokit: GetOctokitFn) {
   return (
     tagName: string,
     title: string,
     body: string,
     options: ProviderReleaseOptions,
   ) =>
-    githubCreateReleaseOrThrow(
+    githubCreateRelease(
       getOctokit(),
       tagName,
       title,
@@ -72,7 +74,7 @@ export function makeGithubCreateReleaseOrThrow(getOctokit: GetOctokitFn) {
     );
 }
 
-export function makeGithubAttachReleaseAssetOrThrow(getOctokit: GetOctokitFn) {
+export function makeGithubAttachReleaseAsset(getOctokit: GetOctokitFn) {
   return (releaseId: string, asset: ProviderAssetParams) =>
-    githubAttachReleaseAssetOrThrow(getOctokit(), releaseId, asset);
+    githubAttachReleaseAsset(getOctokit(), releaseId, asset);
 }

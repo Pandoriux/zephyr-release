@@ -1,11 +1,11 @@
 import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
-import { getInputsOrThrow } from "./tasks/inputs.ts";
+import { getInputs } from "./tasks/inputs.ts";
 import {
-  resolveConfigOrThrow,
-  resolveRuntimeConfigOverrideOrThrow,
+  resolveConfig,
+  resolveRuntimeConfigOverride,
 } from "./tasks/configs/config.ts";
-import { runCommandsOrThrow } from "./tasks/command.ts";
+import { runCommands } from "./tasks/command.ts";
 import {
   exportBaseOperationVariables,
   exportFinalOperationVariables,
@@ -20,7 +20,7 @@ import { createCustomStringPatternContext } from "./tasks/string-templates-and-p
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
-  const inputsResult = getInputsOrThrow(provider);
+  const inputsResult = getInputs(provider);
   logger.stepFinish("Finished: Get operation inputs");
 
   logger.stepStart("Starting: Initialize operation runtime");
@@ -28,7 +28,7 @@ export async function run(provider: PlatformProvider) {
   logger.stepFinish("Finished: Initialize operation runtime");
 
   logger.stepStart("Starting: Resolve config from file and override");
-  const configResult = await resolveConfigOrThrow(
+  const configResult = await resolveConfig(
     provider,
     inputsResult.inputs,
   );
@@ -64,7 +64,7 @@ export async function run(provider: PlatformProvider) {
     logger.debugStepFinish("Finished: Export base operation variables");
 
     logger.stepStart("Starting: Execute base pre commands");
-    const preResult = await runCommandsOrThrow(
+    const preResult = await runCommands(
       runSettings.config.commandHooks.base,
       "pre",
     );
@@ -78,7 +78,7 @@ export async function run(provider: PlatformProvider) {
       "Starting: Resolve runtime config override (base pre commands)",
     );
     const _basePreRuntimeConfigResult =
-      await resolveRuntimeConfigOverrideOrThrow(
+      await resolveRuntimeConfigOverride(
         runSettings.rawConfig,
         runSettings.config,
         runSettings.inputs.workspacePath,
@@ -119,7 +119,7 @@ export async function run(provider: PlatformProvider) {
     throw error;
   } finally {
     logger.stepStart("Starting: Execute base post commands");
-    const postResult = await runCommandsOrThrow(
+    const postResult = await runCommands(
       runSettings.config.commandHooks.base,
       "post",
     );

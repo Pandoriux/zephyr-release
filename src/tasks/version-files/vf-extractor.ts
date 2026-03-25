@@ -35,8 +35,9 @@ export function detectVersionFileExtractor(
 
 /**
  * Extract version string from parsed version file content
+ * @throws
  */
-export function extractVersionStringOrThrow(
+export function extractVersionString(
   parsedVersionFile: unknown,
   extractor: VersionFileExtractor,
   selector: string,

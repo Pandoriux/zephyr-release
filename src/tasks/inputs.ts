@@ -12,7 +12,11 @@ interface GetInputsResult {
   inputs: InputsOutput;
 }
 
-export function getInputsOrThrow(provider: PlatformProvider): GetInputsResult {
+/**
+ * Get and validate inputs for the current operation
+ * @throws
+ */
+export function getInputs(provider: PlatformProvider): GetInputsResult {
   const rawInputs = provider.getRawInputs();
   let processedRawInputs: unknown = rawInputs;
 
@@ -31,7 +35,7 @@ export function getInputsOrThrow(provider: PlatformProvider): GetInputsResult {
   const parsedInputsResult = v.safeParse(InputsSchema, processedRawInputs);
   if (!parsedInputsResult.success) {
     throw new Error(
-      `\`${getInputsOrThrow.name}\` failed!` +
+      `\`${getInputs.name}\` failed!` +
         formatValibotIssues(parsedInputsResult.issues),
     );
   }

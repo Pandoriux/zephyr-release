@@ -1,7 +1,7 @@
 import "@js-joda/timezone";
 import { markProcessEnd, markProcessStart } from "./lifecycle.ts";
 import { run } from "./run.ts";
-import { getProviderOrThrow } from "./providers/provider.ts";
+import { getProvider } from "./providers/provider.ts";
 import { logger, setLogger } from "./tasks/logger.ts";
 import { formatErrorHierarchy } from "./utils/formatters/error.ts";
 import { SafeExit } from "./errors/safe-exit.ts";
@@ -10,7 +10,7 @@ export const startTime = new Date();
 
 async function main() {
   try {
-    const provider = await getProviderOrThrow();
+    const provider = await getProvider();
     setLogger(provider.logger);
 
     markProcessStart();

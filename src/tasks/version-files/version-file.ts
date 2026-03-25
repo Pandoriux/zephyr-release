@@ -4,14 +4,14 @@ import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { VersionFileOutput } from "../../schemas/configs/modules/components/version-file.ts";
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import { getTextFileOrThrow } from "../file.ts";
+import { getTextFile } from "../file.ts";
 import {
-  parseVersionFileOrThrow,
-  resolveStructuredVersionFileFormatOrThrow,
+  parseVersionFile,
+  resolveStructuredVersionFileFormat,
 } from "./vf-parser.ts";
 import {
   detectVersionFileExtractor,
-  extractVersionStringOrThrow,
+  extractVersionString,
 } from "./vf-extractor.ts";
 import { updateVersionInStructuredFile } from "./vf-transformer.ts";
 import { parseRegExpFromSelector } from "../../utils/parsers/regex.ts";
@@ -40,13 +40,13 @@ export async function getVersionSemVerFromVersionFile(
   workspacePath: string,
   triggerCommitHash: string,
 ): Promise<SemVer | undefined> {
-  const fileContent = await getTextFileOrThrow(
+  const fileContent = await getTextFile(
     sourceMode.overrides?.[versionFile.path] ?? sourceMode.mode,
     versionFile.path,
     { workspacePath: workspacePath, provider, ref: triggerCommitHash },
   );
 
-  const parsedResult = parseVersionFileOrThrow(
+  const parsedResult = parseVersionFile(
     fileContent,
     versionFile.format,
     versionFile.path,
@@ -64,7 +64,7 @@ export async function getVersionSemVerFromVersionFile(
     );
   }
 
-  const versionString = extractVersionStringOrThrow(
+  const versionString = extractVersionString(
     parsedResult.parsedContent,
     extractor,
     versionFile.selector,
@@ -88,7 +88,7 @@ export async function prepareVersionFilesToCommit(
   const vfChangesData: [string, string][] = [];
 
   for (const vf of versionFiles) {
-    const fileContent = await getTextFileOrThrow(
+    const fileContent = await getTextFile(
       sourceMode.overrides?.[vf.path] ?? sourceMode.mode,
       vf.path,
       {
@@ -110,7 +110,7 @@ export async function prepareVersionFilesToCommit(
 
     switch (extractor) {
       case "json-path": {
-        const resolvedFormat = resolveStructuredVersionFileFormatOrThrow(
+        const resolvedFormat = resolveStructuredVersionFileFormat(
           fileContent,
           vf.path,
           vf.format,

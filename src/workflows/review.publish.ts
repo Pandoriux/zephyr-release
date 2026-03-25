@@ -1,10 +1,10 @@
-import { runCommandsOrThrow } from "../tasks/command.ts";
-import { resolveRuntimeConfigOverrideOrThrow } from "../tasks/configs/config.ts";
+import { runCommands } from "../tasks/command.ts";
+import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPublishOperationVariables,
   exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
-import { updateMergedProposalLabelsOrThrow } from "../tasks/label.ts";
+import { updateMergedProposalLabels } from "../tasks/label.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
@@ -13,7 +13,7 @@ import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
-import { createTagOrThrow } from "../tasks/tag.ts";
+import { createTag } from "../tasks/tag.ts";
 import {
   getPrimaryVersionFile,
   getVersionSemVerFromVersionFile,
@@ -85,7 +85,7 @@ export async function executeReviewPublishPhase(
   logger.debugStepFinish("Finished: Export pre publish operation variables");
 
   logger.stepStart("Starting: Execute publish pre commands");
-  const preResult = await runCommandsOrThrow(
+  const preResult = await runCommands(
     runSettings.config.commandHooks.publish,
     "pre",
   );
@@ -101,7 +101,7 @@ export async function executeReviewPublishPhase(
     "Starting: Resolve runtime config override (publish pre commands)",
   );
   const _releasePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,
@@ -123,7 +123,7 @@ export async function executeReviewPublishPhase(
   }
 
   logger.stepStart("Starting: Create tag");
-  const createdTag = await createTagOrThrow(
+  const createdTag = await createTag(
     provider,
     runSettings.inputs.triggerCommitHash,
     runSettings.inputs,
@@ -161,7 +161,7 @@ export async function executeReviewPublishPhase(
   }
 
   logger.stepStart("Starting: Update merged proposal labels");
-  await updateMergedProposalLabelsOrThrow(
+  await updateMergedProposalLabels(
     provider,
     associatedProposalForCommit.id,
     runSettings.config,
@@ -178,7 +178,7 @@ export async function executeReviewPublishPhase(
   logger.debugStepFinish("Finished: Export post publish operation variables");
 
   logger.stepStart("Starting: Execute publish post commands");
-  const postResult = await runCommandsOrThrow(
+  const postResult = await runCommands(
     runSettings.config.commandHooks.publish,
     "post",
   );
@@ -194,7 +194,7 @@ export async function executeReviewPublishPhase(
     "Starting: Resolve runtime config override (publish post commands)",
   );
   const _releasePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverrideOrThrow(
+    await resolveRuntimeConfigOverride(
       runSettings.rawConfig,
       runSettings.config,
       runSettings.inputs.workspacePath,

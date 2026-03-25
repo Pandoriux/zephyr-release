@@ -1,7 +1,7 @@
 import { deepMerge } from "@std/collections";
 import * as v from "@valibot/valibot";
 import { taskLogger } from "../logger.ts";
-import { getTextFileOrThrow } from "../file.ts";
+import { getTextFile } from "../file.ts";
 import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 import {
   type ConfigOutput,
@@ -10,7 +10,7 @@ import {
 import type { InputsOutput } from "../../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { formatValibotIssues } from "../../utils/formatters/valibot.ts";
-import { parseConfigOrThrow } from "./config-parser.ts";
+import { parseConfig } from "./config-parser.ts";
 import { transformObjKeyToCamelCase } from "../../utils/transformers/object.ts";
 
 type ResolveConfigInputsParams = Pick<
@@ -27,7 +27,8 @@ interface ResolvedConfigContext {
   config: ConfigOutput;
 }
 
-export async function resolveConfigOrThrow(
+/** @throws */
+export async function resolveConfig(
   provider: PlatformProvider,
   inputs: ResolveConfigInputsParams,
 ): Promise<ResolvedConfigContext> {
@@ -49,12 +50,12 @@ export async function resolveConfigOrThrow(
 
   taskLogger.info("Reading config file from path...");
   if (configPath) {
-    const configText = await getTextFileOrThrow("remote", configPath, {
+    const configText = await getTextFile("remote", configPath, {
       provider,
       ref: triggerCommitHash,
     });
 
-    const parsedResult = parseConfigOrThrow(
+    const parsedResult = parseConfig(
       configText,
       configFormat,
       configPath,
@@ -77,7 +78,7 @@ export async function resolveConfigOrThrow(
 
   taskLogger.info("Reading config override from inputs...");
   if (configOverride) {
-    const parsedResult = parseConfigOrThrow(
+    const parsedResult = parseConfig(
       configOverride,
       configOverrideFormat,
     );
@@ -139,7 +140,7 @@ export async function resolveConfigOrThrow(
   );
   if (!resolvedFinalConfigResult.success) {
     throw new Error(
-      `\`${resolveConfigOrThrow.name}\` failed!` +
+      `\`${resolveConfig.name}\` failed!` +
         formatValibotIssues(resolvedFinalConfigResult.issues),
     );
   }
@@ -161,7 +162,8 @@ export interface ResolvedRuntimeConfigResult {
   resolvedRuntime: ConfigOutput;
 }
 
-export async function resolveRuntimeConfigOverrideOrThrow(
+/** @throws */
+export async function resolveRuntimeConfigOverride(
   rawConfig: object,
   config: ConfigOutput,
   workspacePath: string,
@@ -170,7 +172,7 @@ export async function resolveRuntimeConfigOverrideOrThrow(
 
   if (!runtimeConfigOverride) return undefined;
 
-  const runtimeOverrideText = await getTextFileOrThrow(
+  const runtimeOverrideText = await getTextFile(
     "local",
     runtimeConfigOverride.path,
     { workspacePath },
@@ -178,7 +180,7 @@ export async function resolveRuntimeConfigOverrideOrThrow(
 
   if (!runtimeOverrideText.trim()) return undefined;
 
-  const parsedRawResult = parseConfigOrThrow(
+  const parsedRawResult = parseConfig(
     runtimeOverrideText,
     runtimeConfigOverride.format,
     runtimeConfigOverride.path,
@@ -207,7 +209,7 @@ export async function resolveRuntimeConfigOverrideOrThrow(
   );
   if (!resolvedFinalConfigResult.success) {
     throw new Error(
-      `\`${resolveConfigOrThrow.name}\` failed!` +
+      `\`${resolveConfig.name}\` failed!` +
         formatValibotIssues(resolvedFinalConfigResult.issues),
     );
   }
