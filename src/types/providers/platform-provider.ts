@@ -53,18 +53,16 @@ export interface PlatformProvider {
   ) => Promise<ProviderBranch>;
 
   /** @throws */
-  findUniqueProposalForCommit: (
+  findMergedProposalByCommit: (
     commitHash: string,
     sourceBranch: string,
     targetBranch: string,
-    label: string,
   ) => Promise<ProviderProposal | undefined>;
 
   /** @throws */
-  findUniqueProposalFromBranch: (
-    branchName: string,
+  findOpenProposal: (
+    sourceBranch: string,
     targetBranch: string,
-    requiredLabel: string,
   ) => Promise<ProviderProposal | undefined>;
 
   /** @throws */

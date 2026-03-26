@@ -5,8 +5,8 @@ import {
   makeGithubAddAssigneesToPr,
   makeGithubAddReviewersToPr,
   makeGithubCreatePullRequest,
-  makeGithubFindUniquePullRequestForCommit,
-  makeGithubFindUniquePullRequestFromBranch,
+  makeGithubFindMergedProposalPrByCommit,
+  makeGithubFindOpenProposalPr,
   makeGithubUpdatePullRequest,
 } from "./pull-request.ts";
 import {
@@ -84,11 +84,11 @@ export function createGitHubProvider(): PlatformProvider {
 
     ensureBranchExist: makeGithubEnsureBranchExist(getOctokit),
 
-    findUniqueProposalForCommit: makeGithubFindUniquePullRequestForCommit(
+    findMergedProposalByCommit: makeGithubFindMergedProposalPrByCommit(
       getOctokit,
     ),
 
-    findUniqueProposalFromBranch: makeGithubFindUniquePullRequestFromBranch(
+    findOpenProposal: makeGithubFindOpenProposalPr(
       getOctokit,
     ),
 

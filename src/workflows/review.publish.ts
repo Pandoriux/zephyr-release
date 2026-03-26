@@ -163,7 +163,8 @@ export async function executeReviewPublishPhase(
   await updateProposalLabelsOnMerge(
     provider,
     associatedProposalForCommit.id,
-    runSettings.config,
+    runSettings.config.review.labels?.onMerge?.add,
+    runSettings.config.review.labels?.onMerge?.remove,
   );
   logger.stepFinish("Finished: Update merged proposal labels");
 
