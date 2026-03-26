@@ -137,6 +137,7 @@ export interface ResolvedCommitsResult {
   entries: ResolvedCommit[];
 }
 
+/** @throws */
 export async function resolveCommitsFromTriggerToLastRelease(
   provider: PlatformProvider,
   inputs: ResolveCommitsInputsParams,
@@ -295,6 +296,7 @@ type PrepareChangesConfigParams = {
   commit: Pick<CommitConfigOutput, "localFilesToCommit">;
 };
 
+/** @throws */
 export async function prepareChangesToCommit(
   provider: PlatformProvider,
   inputs: PrepareChangesInputsParams,

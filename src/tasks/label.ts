@@ -2,15 +2,24 @@ import { LabelOnMergeRemoveOptions } from "../constants/label-options.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { taskLogger } from "./logger.ts";
 import type { LabelItemOutput } from "../schemas/configs/modules/components/label.ts";
+import { failedNonCriticalTasks } from "../main.ts";
 
-/** @throws */
 export async function addLabelsToProposalOnCreate(
   provider: PlatformProvider,
   proposalId: string,
   labelsToAdd: LabelItemOutput[],
 ) {
-  taskLogger.info(`Adding ${labelsToAdd.length} labels to created proposal...`);
-  await provider.addLabelsToProposal(proposalId, labelsToAdd);
+  try {
+    taskLogger.info(
+      `Adding ${labelsToAdd.length} labels to created proposal...`,
+    );
+    await provider.addLabelsToProposal(proposalId, labelsToAdd);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    taskLogger.warn(`Failed to add labels to proposal: ${message}`);
+    failedNonCriticalTasks.push(message);
+  }
 }
 
 /** @throws */

@@ -99,13 +99,22 @@ export async function run(provider: PlatformProvider) {
     }
 
     // Main operation workflow //
-    const strategies = {
-      review: executeReviewStrategy,
-      auto: executeAutoStrategy,
-    };
-
-    const executeStrategy = strategies[runSettings.config.mode];
-    runSettings = await executeStrategy(provider, runSettings, bootstrapData);
+    switch (runSettings.config.mode) {
+      case "review":
+        runSettings = await executeReviewStrategy(
+          provider,
+          runSettings,
+          bootstrapData,
+        );
+        break;
+      case "auto":
+        runSettings = await executeAutoStrategy(
+          provider,
+          runSettings,
+          bootstrapData,
+        );
+        break;
+    }
 
     exportFinalOperationVariables(provider, "success");
   } catch (error) {

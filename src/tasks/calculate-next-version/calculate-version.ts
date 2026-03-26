@@ -17,6 +17,7 @@ type CalculateNextVersionConfigParams = Pick<
   | "bumpStrategy"
 >;
 
+/** @throws */
 export function calculateNextVersion(
   resolvedCommitsResult: ResolvedCommitsResult,
   config: CalculateNextVersionConfigParams,

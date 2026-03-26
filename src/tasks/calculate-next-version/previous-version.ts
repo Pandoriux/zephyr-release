@@ -18,6 +18,7 @@ type GetPreviousVersionConfigParams = Pick<
   "versionFiles"
 >;
 
+/** @throws */
 export async function getPreviousVersion(
   provider: PlatformProvider,
   inputs: GetPreviousVersionInputsParams,

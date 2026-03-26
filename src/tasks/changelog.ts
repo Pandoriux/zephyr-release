@@ -38,6 +38,7 @@ export interface GenerateChangelogReleaseResult {
   releaseBody: string;
 }
 
+/** @throws */
 export async function generateChangelogReleaseContent(
   provider: PlatformProvider,
   resolvedCommits: ResolvedCommit[],
