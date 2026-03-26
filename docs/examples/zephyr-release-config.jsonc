@@ -155,22 +155,29 @@
 
     "branch-name-pattern": "release/zephyr-release",
 
-    "label": {
-      "onCreate": {
-        "name": "zp-release: pending",
-        "description": "Indicates that the proposal is pending release",
-        "color": "FBCA04"
-      },
-      "onClose": {
-        "name": "zp-release: released",
-        "description": "Indicates that the proposal is closed and released",
-        "color": "0E8A16"
+    "labels": {
+      "on-create": [
+        {
+          "name": "zp-release: pending",
+          "description": "Indicates that the proposal is pending release",
+          "color": "FBCA04",
+          "create-if-missing": true
+        },
+        "documentation",
+        "ready-for-review"
+      ],
+      "on-merge": {
+        "add": [
+          {
+            "name": "zp-release: released",
+            "description": "Indicates that the proposal is closed and released",
+            "color": "0E8A16",
+            "create-if-missing": true
+          },
+          "released"
+        ],
+        "remove": "<ALL_ON_CREATE>"
       }
-    },
-    "additional-label": {
-      "onCreateAdd": ["documentation", "ready-for-review"],
-      "onCloseAdd": "released",
-      "onCloseRemove": "allOnCreate"
     },
 
     "title-pattern": "chore: release v${version}",

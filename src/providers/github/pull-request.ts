@@ -1,220 +1,116 @@
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
-import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type {
   ProviderAddedAssignees,
   ProviderProposal,
 } from "../../types/providers/proposal.ts";
 import { taskLogger } from "../../tasks/logger.ts";
-
-const RawPullRequestNodeSchema = v.object({
-  number: v.number(),
-  headRefName: v.string(),
-  baseRefName: v.string(),
-  state: v.string(),
-  title: v.string(),
-  body: v.string(),
-  labels: v.object({
-    nodes: v.array(
-      v.object({
-        name: v.string(),
-      }),
-    ),
-  }),
-});
-
-const RawCommitPullRequestsSchema = v.object({
-  repository: v.object({
-    object: v.nullable(
-      v.object({
-        associatedPullRequests: v.object({
-          nodes: v.array(RawPullRequestNodeSchema),
-          pageInfo: v.object({
-            hasNextPage: v.boolean(),
-            endCursor: v.string(),
-          }),
-        }),
-      }),
-    ),
-  }),
-});
-
-const RawBranchPullRequestsSchema = v.object({
-  repository: v.object({
-    pullRequests: v.object({
-      nodes: v.array(RawPullRequestNodeSchema),
-      pageInfo: v.object({
-        hasNextPage: v.boolean(),
-        endCursor: v.string(),
-      }),
-    }),
-  }),
-});
+import { RequestError } from "@octokit/request-error";
 
 /** @throws */
-async function githubFindUniquePullRequestForCommit(
+async function githubFindMergedProposalPrByCommit(
   octokit: OctokitClient,
   commitHash: string,
   sourceBranch: string,
   targetBranch: string,
-  requiredLabel: string,
 ): Promise<ProviderProposal | undefined> {
-  let foundPr: ProviderProposal | undefined = undefined;
+  try {
+    const paginatedIterator = octokit.paginate.iterator(
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+      {
+        owner: githubGetNamespace(),
+        repo: githubGetRepositoryName(),
+        commit_sha: commitHash,
+        per_page: 100,
+      },
+    );
 
-  const owner = githubGetNamespace();
-  const repo = githubGetRepositoryName();
-
-  const paginatedIterator = octokit.graphql.paginate.iterator(
-    `
-    query getPullRequestsForCommit($owner: String!, $repo: String!, $sha: GitObjectID!, $cursor: String) {
-      repository(owner: $owner, name: $repo) {
-        object(oid: $sha) {
-          ... on Commit {
-            associatedPullRequests(first: 100, after: $cursor) @paginate {
-              nodes {
-                number
-                headRefName
-                baseRefName
-                state
-                title
-                body
-                labels(first: 100) {
-                  nodes {
-                    name
-                  }
-                }
-              }
-              pageInfo {
-                hasNextPage
-                endCursor
-              }
-            }
-          }
+    for await (const response of paginatedIterator) {
+      for (const pr of response.data) {
+        if (
+          pr.head.ref === sourceBranch &&
+          pr.base.ref === targetBranch &&
+          pr.merged_at !== null
+        ) {
+          // We found the exact match!
+          // Returning here instantly stops the iterator and cancels future API requests.
+          return {
+            id: String(pr.number),
+            sourceBranch: pr.head.ref,
+            targetBranch: pr.base.ref,
+            title: pr.title,
+            body: pr.body || "",
+          };
         }
       }
     }
-  `,
-    {
-      owner,
-      repo,
-      sha: commitHash,
-    },
-  );
 
-  for await (const response of paginatedIterator) {
-    const rawResponse = v.parse(RawCommitPullRequestsSchema, response, {
-      message: "Received malformed pull request data from GitHub GraphQL API",
-    });
-
-    const commitObject = rawResponse.repository.object;
-    if (!commitObject || commitObject === null) {
-      continue;
+    // If the loop exhausts all pages and finishes, no matching PR exists
+    return undefined;
+  } catch (error) {
+    if (error instanceof RequestError && error.status === 404) {
+      return undefined;
     }
 
-    for (const pr of commitObject.associatedPullRequests.nodes) {
-      if (pr.headRefName !== sourceBranch || pr.baseRefName !== targetBranch) {
-        continue;
-      }
-
-      const hasLabel = pr.labels.nodes.some((l) => l.name === requiredLabel);
-      if (hasLabel) {
-        if (foundPr) {
-          throw new Error(
-            `Multiple PRs with label '${requiredLabel}' found while searching for PRs on branch '${sourceBranch}' targeting '${targetBranch}' associated with commit ${
-              commitHash.substring(0, 7)
-            }`,
-          );
-        }
-
-        foundPr = {
-          id: String(pr.number),
-          sourceBranch: pr.headRefName,
-          targetBranch: pr.baseRefName,
-          title: pr.title,
-          body: pr.body,
-        };
-      }
-    }
+    throw new Error(
+      `Failed to fetch associated PRs for commit ${
+        commitHash.substring(0, 7)
+      }. GitHub API responded with: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error },
+    );
   }
-
-  return foundPr;
 }
 
 /** @throws */
-async function githubFindUniquePullRequestFromBranch(
+async function githubFindOpenProposalPr(
   octokit: OctokitClient,
-  branchName: string,
+  sourceBranch: string,
   targetBranch: string,
-  requiredLabel: string,
 ): Promise<ProviderProposal | undefined> {
-  let foundPr: ProviderProposal | undefined = undefined;
-
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 
-  const paginatedIterator = octokit.graphql.paginate.iterator(
-    `
-    query getPullRequestsFromBranch($owner: String!, $repo: String!, $headRefName: String!, $cursor: String) {
-      repository(owner: $owner, name: $repo) {
-        pullRequests(first: 100, after: $cursor, states: [OPEN], headRefName: $headRefName) @paginate {
-          nodes {
-            number
-            headRefName
-            baseRefName
-            state
-            title
-            body
-            labels(first: 100) {
-              nodes {
-                name
-              }
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  `,
-    {
+  try {
+    const res = await octokit.rest.pulls.list({
       owner,
       repo,
-      headRefName: branchName,
-    },
-  );
-
-  for await (const response of paginatedIterator) {
-    const rawResponse = v.parse(RawBranchPullRequestsSchema, response, {
-      message: "Received malformed pull request data from GitHub GraphQL API",
+      state: "open", // We only care about active proposals
+      head: `${owner}:${sourceBranch}`, // Server-side filter for sourceBranch
+      base: targetBranch, // Server-side filter for targetBranch
+      per_page: 2, // Fetch 2 just to be safe, but we only expect 1
     });
 
-    for (const pr of rawResponse.repository.pullRequests.nodes) {
-      if (pr.baseRefName !== targetBranch) {
-        continue;
-      }
-
-      const hasLabel = pr.labels.nodes.some((l) => l.name === requiredLabel);
-      if (hasLabel) {
-        if (foundPr) {
-          throw new Error(
-            `Multiple PRs with label '${requiredLabel}' found while searching for PRs originating from branch '${branchName}' targeting '${targetBranch}'`,
-          );
-        }
-
-        foundPr = {
-          id: String(pr.number),
-          sourceBranch: pr.headRefName,
-          targetBranch: pr.baseRefName,
-          title: pr.title,
-          body: pr.body,
-        };
-      }
+    if (!res.data[0]) {
+      return undefined;
     }
-  }
 
-  return foundPr;
+    // Defensive check: This should be mathematically impossible on GitHub,
+    // but if the API ever misbehaves, we catch it before it does damage.
+    if (res.data.length > 1) {
+      throw new Error(
+        `Multiple open PRs found for branch '${sourceBranch}' targeting '${targetBranch}'. GitHub should not allow this state.`,
+      );
+    }
+
+    const pr = res.data[0];
+
+    return {
+      id: String(pr.number),
+      sourceBranch: pr.head.ref,
+      targetBranch: pr.base.ref,
+      title: pr.title,
+      body: pr.body || "",
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch open PRs for branch '${sourceBranch}'. GitHub API responded with: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error },
+    );
+  }
 }
 
 /** @throws */
@@ -333,38 +229,23 @@ async function githubAddReviewersToPr(
   });
 }
 
-export function makeGithubFindUniquePullRequestForCommit(
+export function makeGithubFindMergedProposalPrByCommit(
   getOctokit: GetOctokitFn,
 ) {
-  return (
-    commitHash: string,
-    sourceBranch: string,
-    targetBranch: string,
-    label: string,
-  ) =>
-    githubFindUniquePullRequestForCommit(
+  return (commitHash: string, sourceBranch: string, targetBranch: string) =>
+    githubFindMergedProposalPrByCommit(
       getOctokit(),
       commitHash,
       sourceBranch,
       targetBranch,
-      label,
     );
 }
 
-export function makeGithubFindUniquePullRequestFromBranch(
+export function makeGithubFindOpenProposalPr(
   getOctokit: GetOctokitFn,
 ) {
-  return (
-    branchName: string,
-    targetBranch: string,
-    requiredLabel: string,
-  ) =>
-    githubFindUniquePullRequestFromBranch(
-      getOctokit(),
-      branchName,
-      targetBranch,
-      requiredLabel,
-    );
+  return (sourceBranch: string, targetBranch: string) =>
+    githubFindOpenProposalPr(getOctokit(), sourceBranch, targetBranch);
 }
 
 export function makeGithubCreatePullRequest(getOctokit: GetOctokitFn) {

@@ -1,95 +1,46 @@
-import { pooledMap } from "@std/async";
-import { AdditionalLabelOnCloseRemoveOptions } from "../constants/additional-label-options.ts";
-import type { ReviewConfigOutput } from "../schemas/configs/modules/review-config.ts";
+import { LabelOnMergeRemoveOptions } from "../constants/label-options.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { taskLogger } from "./logger.ts";
-import { consumeAsyncIterable } from "../utils/async.ts";
+import type { LabelItemOutput } from "../schemas/configs/modules/components/label.ts";
 
-interface AddLabelsToProposalConfigParams {
-  review: Pick<ReviewConfigOutput, "label" | "additionalLabel">;
+/** @throws */
+export async function addLabelsToProposalOnCreate(
+  provider: PlatformProvider,
+  proposalId: string,
+  labelsToAdd: LabelItemOutput[],
+) {
+  taskLogger.info(`Adding ${labelsToAdd.length} labels to created proposal...`);
+  await provider.addLabelsToProposal(proposalId, labelsToAdd);
 }
 
 /** @throws */
-export async function addLabelsToProposal(
+export async function updateProposalLabelsOnMerge(
   provider: PlatformProvider,
   proposalId: string,
-  config: AddLabelsToProposalConfigParams,
+  labelsToAdd?: LabelItemOutput[],
+  labelsToRemove?: LabelItemOutput[],
 ) {
-  const { label, additionalLabel } = config.review;
-
-  taskLogger.info("Adding core labels...");
-  await provider.addLabelsToProposal(proposalId, {
-    createIfMissing: true,
-    labels: [label.onCreate],
-  });
-
-  if (additionalLabel?.onCreateAdd) {
-    taskLogger.info("Adding additional labels...");
-
-    await provider.addLabelsToProposal(proposalId, {
-      createIfMissing: false,
-      labels: additionalLabel.onCreateAdd,
-    });
+  if (labelsToAdd) {
+    taskLogger.info(
+      `Adding ${labelsToAdd.length} labels to merged proposal...`,
+    );
+    await provider.addLabelsToProposal(proposalId, labelsToAdd);
   }
-}
 
-type UpdateMergedProposalLabelsConfigParams = AddLabelsToProposalConfigParams;
+  if (labelsToRemove) {
+    const resolvedRemoveSet = new Set<string>();
 
-/** @throws */
-export async function updateMergedProposalLabels(
-  provider: PlatformProvider,
-  proposalId: string,
-  config: UpdateMergedProposalLabelsConfigParams,
-) {
-  const { label, additionalLabel } = config.review;
-
-  taskLogger.info("Updating core labels on merged proposal...");
-  await provider.removeLabelFromProposal(
-    proposalId,
-    label.onCreate.name,
-  );
-  await provider.addLabelsToProposal(proposalId, {
-    createIfMissing: true,
-    labels: [label.onClose],
-  });
-
-  taskLogger.info("Updating other additional labels on merged proposal...");
-
-  if (additionalLabel.onCloseRemove) {
-    const labelsToRemove = new Set<string>();
-
-    for (const label of additionalLabel.onCloseRemove) {
-      if (
-        label === AdditionalLabelOnCloseRemoveOptions.allOnCreateAdd &&
-        additionalLabel.onCreateAdd
-      ) {
-        additionalLabel.onCreateAdd.forEach((l) => labelsToRemove.add(l));
-
-        continue;
+    for (const label of labelsToRemove) {
+      if (label.name === LabelOnMergeRemoveOptions.allOnCreate && labelsToAdd) {
+        labelsToAdd.forEach((l) => resolvedRemoveSet.add(l.name));
+      } else {
+        resolvedRemoveSet.add(label.name);
       }
-
-      labelsToRemove.add(label);
     }
 
     taskLogger.info(
-      `Removing labels from merged proposal (${labelsToRemove.size} in total)...`,
+      `Removing ${resolvedRemoveSet.size} labels from merged proposal...`,
     );
-    await consumeAsyncIterable(
-      pooledMap(5, labelsToRemove, async (label) => {
-        try {
-          await provider.removeLabelFromProposal(proposalId, label);
-        } catch { /* ignore */ }
-      }),
-    );
-  }
-
-  if (additionalLabel.onCloseAdd) {
-    taskLogger.info(
-      `Adding labels to merged proposal (${additionalLabel.onCloseAdd.length} in total)...`,
-    );
-    await provider.addLabelsToProposal(proposalId, {
-      createIfMissing: false,
-      labels: additionalLabel.onCloseAdd,
-    });
+    await provider.removeLabelsFromProposal(proposalId, [...resolvedRemoveSet]);
   }
 }

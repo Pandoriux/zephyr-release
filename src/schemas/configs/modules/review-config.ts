@@ -7,8 +7,7 @@ import {
   DEFAULT_PROPOSAL_TITLE_TEMPLATE,
   DEFAULT_WORKING_BRANCH_NAME_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
-import { AdditionalLabelSchema } from "./components/additional-label.ts";
-import { CoreLabelSchema } from "./components/core-label.ts";
+import { ReviewLabelsSchema } from "./components/review-labels.ts";
 
 export const ReviewConfigSchema = v.pipe(
   v.object({
@@ -102,20 +101,11 @@ export const ReviewConfigSchema = v.pipe(
       }),
     ),
 
-    label: v.pipe(
-      v.optional(CoreLabelSchema, {}),
+    labels: v.pipe(
+      v.optional(ReviewLabelsSchema),
       v.metadata({
         description:
-          "Core label used by Zephyr Release to track proposals, managed exclusively by the tool. " +
-          "These label should not be manually added or removed.",
-      }),
-    ),
-    additionalLabel: v.pipe(
-      v.optional(AdditionalLabelSchema, {}),
-      v.metadata({
-        description:
-          "Additional labels to attach to proposals, managed and supplied by you. " +
-          "Unlike the core label, these labels are not automatically created if missing.",
+          "Labels to attach and remove from proposals on different stages.",
       }),
     ),
 

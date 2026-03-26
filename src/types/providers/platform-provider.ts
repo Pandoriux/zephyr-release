@@ -5,7 +5,7 @@ import type {
   ProviderRelease,
   ProviderReleaseOptions,
 } from "./release.ts";
-import type { ProviderLabelOptions } from "./label.ts";
+import type { ProviderInputLabel, ProviderLabel } from "./label.ts";
 import type { CoreLogger } from "../logger.ts";
 import type {
   ProviderCommit,
@@ -53,18 +53,16 @@ export interface PlatformProvider {
   ) => Promise<ProviderBranch>;
 
   /** @throws */
-  findUniqueProposalForCommit: (
+  findMergedProposalByCommit: (
     commitHash: string,
     sourceBranch: string,
     targetBranch: string,
-    label: string,
   ) => Promise<ProviderProposal | undefined>;
 
   /** @throws */
-  findUniqueProposalFromBranch: (
-    branchName: string,
+  findOpenProposal: (
+    sourceBranch: string,
     targetBranch: string,
-    requiredLabel: string,
   ) => Promise<ProviderProposal | undefined>;
 
   /** @throws */
@@ -107,13 +105,13 @@ export interface PlatformProvider {
   /** @throws */
   addLabelsToProposal: (
     proposalId: string,
-    labelOptions: ProviderLabelOptions,
-  ) => Promise<void>;
+    labels: ProviderInputLabel[],
+  ) => Promise<ProviderLabel[]>;
   /** @throws */
-  removeLabelFromProposal: (
+  removeLabelsFromProposal: (
     proposalId: string,
-    label: string,
-  ) => Promise<void>;
+    labels: string[],
+  ) => Promise<string[]>;
 
   /** @throws */
   addAssigneesToProposal: (

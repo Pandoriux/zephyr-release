@@ -46,8 +46,8 @@ export async function run(provider: PlatformProvider) {
     logger.header("Start Bootstrap Operation");
     const bootstrapData = await bootstrapOperation(
       provider,
-      configResult,
-      inputsResult,
+      runSettings.config,
+      runSettings.inputs,
     );
 
     logger.debugStepStart("Starting: Export base operation variables");
@@ -77,12 +77,11 @@ export async function run(provider: PlatformProvider) {
     logger.stepStart(
       "Starting: Resolve runtime config override (base pre commands)",
     );
-    const _basePreRuntimeConfigResult =
-      await resolveRuntimeConfigOverride(
-        runSettings.rawConfig,
-        runSettings.config,
-        runSettings.inputs.workspacePath,
-      );
+    const _basePreRuntimeConfigResult = await resolveRuntimeConfigOverride(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
     if (_basePreRuntimeConfigResult) {
       runSettings = {
         ...runSettings,

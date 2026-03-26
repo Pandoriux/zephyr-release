@@ -7,8 +7,8 @@ import {
 import { logger } from "../tasks/logger.ts";
 import { validateCurrentOperationTriggerCtx } from "../tasks/operation.ts";
 import {
-  findProposalForCommit,
-  findProposalFromBranch,
+  findMergedProposalByCommit,
+  findOpenProposal,
 } from "../tasks/proposal.ts";
 import {
   createCustomStringPatternContext,
@@ -16,7 +16,6 @@ import {
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "../tasks/string-templates-and-patterns/transformers.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
-import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
 
@@ -29,14 +28,14 @@ export interface BootstrapResult {
 
 export async function bootstrapOperation(
   provider: PlatformProvider,
-  configResult: { rawConfig: object; config: ConfigOutput },
-  inputsResult: { rawInputs: ProviderInputs; inputs: InputsOutput },
+  config: ConfigOutput,
+  inputs: InputsOutput,
 ): Promise<BootstrapResult> {
   logger.stepStart("Starting: Parse and validate current trigger context");
   const triggerContext = validateCurrentOperationTriggerCtx(
     provider,
-    configResult.config.commitTypes,
-    configResult.config.mode,
+    config.commitTypes,
+    config.mode,
   );
   logger.stepFinish("Finished: Parse and validate current trigger context");
 
@@ -45,40 +44,38 @@ export async function bootstrapOperation(
   logger.stepFinish("Finished: Register transformers to template engine");
 
   logger.debugStepStart("Starting: Create custom string pattern context");
-  createCustomStringPatternContext(configResult.config.customStringPatterns);
+  createCustomStringPatternContext(config.customStringPatterns);
   logger.debugStepFinish("Finished: Create custom string pattern context");
 
   logger.debugStepStart("Starting: Create fixed base string pattern context");
   await createFixedBaseStringPatternContext(
     provider,
-    inputsResult.inputs.triggerBranchName,
-    configResult.config,
+    inputs.triggerBranchName,
+    config,
   );
   logger.debugStepFinish("Finished: Create fixed base string pattern context");
 
   logger.stepStart("Starting: Ensure working branch is prepared");
   const workingBranchResult = await setupWorkingBranch(
     provider,
-    inputsResult.inputs,
-    configResult.config,
+    inputs,
+    config,
   );
   logger.stepFinish("Finished: Ensure working branch is prepared");
 
   let associatedProposalForCommit: ProviderProposal | undefined;
   let associatedProposalFromBranch: ProviderProposal | undefined;
-  if (configResult.config.mode === "review") {
+  if (config.mode === "review") {
     logger.stepStart("Starting: Get associated proposals");
-    associatedProposalForCommit = await findProposalForCommit(
+    associatedProposalForCommit = await findMergedProposalByCommit(
       provider,
       workingBranchResult.name,
-      inputsResult.inputs,
-      configResult.config,
+      inputs,
     );
-    associatedProposalFromBranch = await findProposalFromBranch(
+    associatedProposalFromBranch = await findOpenProposal(
       provider,
       workingBranchResult.name,
-      inputsResult.inputs,
-      configResult.config,
+      inputs,
     );
     logger.stepFinish("Finished: Get associated proposals");
   }

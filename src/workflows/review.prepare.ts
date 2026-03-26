@@ -30,7 +30,7 @@ import {
   exportPrePrepareOperationVariables,
 } from "../tasks/export-variables.ts";
 import type { OperationRunSettings } from "../types/operation-context.ts";
-import { addLabelsToProposal } from "../tasks/label.ts";
+import { addLabelsToProposalOnCreate } from "../tasks/label.ts";
 import type { BootstrapResult } from "./bootstrap.ts";
 
 export async function executeReviewPreparePhase(
@@ -121,12 +121,11 @@ export async function executeReviewPreparePhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
-  const _preparePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _preparePreRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_preparePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
@@ -202,9 +201,15 @@ export async function executeReviewPreparePhase(
   );
   logger.stepFinish("Finished: Create or update proposal");
 
-  logger.stepStart("Starting: Add labels to proposal");
-  await addLabelsToProposal(provider, proposal.id, runSettings.config);
-  logger.stepFinish("Finished: Add labels to proposal");
+  if (runSettings.config.review.labels?.onCreate) {
+    logger.stepStart("Starting: Add labels to proposal");
+    await addLabelsToProposalOnCreate(
+      provider,
+      proposal.id,
+      runSettings.config.review.labels.onCreate,
+    );
+    logger.stepFinish("Finished: Add labels to proposal");
+  }
 
   if (runSettings.config.review.assignees) {
     logger.stepStart("Starting: Add assignees to proposal");
@@ -253,12 +258,11 @@ export async function executeReviewPreparePhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
-  const _preparePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _preparePostRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_preparePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,

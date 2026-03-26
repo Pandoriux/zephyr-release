@@ -1,5 +1,4 @@
 import { taskLogger } from "./logger.ts";
-import type { CoreLabelOutput } from "../schemas/configs/modules/components/core-label.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
@@ -8,39 +7,27 @@ import { getTextFile } from "./file.ts";
 import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-template.ts";
 import { PROPOSAL_MARKERS } from "../constants/markers.ts";
 
-type FindProposalForCommitInputsParams = Pick<
+type FindProposalInputsParams = Pick<
   InputsOutput,
   "triggerCommitHash" | "triggerBranchName"
 >;
 
-interface ProposalBranchAndLabelConfigParams {
-  review: {
-    label: { onCreate: CoreLabelOutput["onCreate"] };
-  };
-}
-
 /** @throws */
-export async function findProposalForCommit(
+export async function findMergedProposalByCommit(
   provider: PlatformProvider,
   workingBranchName: string,
-  inputs: FindProposalForCommitInputsParams,
-  config: ProposalBranchAndLabelConfigParams,
+  inputs: FindProposalInputsParams,
 ): Promise<ProviderProposal | undefined> {
   const { triggerCommitHash, triggerBranchName } = inputs;
 
-  const label = typeof config.review.label.onCreate === "string"
-    ? config.review.label.onCreate
-    : config.review.label.onCreate.name;
-
-  const foundProposal = await provider.findUniqueProposalForCommit(
+  const foundProposal = await provider.findMergedProposalByCommit(
     triggerCommitHash,
     workingBranchName,
     triggerBranchName,
-    label,
   );
 
   taskLogger.debug(
-    `Found associated proposal for trigger commit (${triggerCommitHash}):\n` +
+    `Found associated merged proposal for trigger commit (${triggerCommitHash}):\n` +
       JSON.stringify(foundProposal, null, 2),
   );
 
@@ -48,26 +35,20 @@ export async function findProposalForCommit(
 }
 
 /** @throws */
-export async function findProposalFromBranch(
+export async function findOpenProposal(
   provider: PlatformProvider,
   workingBranchName: string,
-  inputs: FindProposalForCommitInputsParams,
-  config: ProposalBranchAndLabelConfigParams,
+  inputs: FindProposalInputsParams,
 ): Promise<ProviderProposal | undefined> {
   const { triggerBranchName } = inputs;
 
-  const label = typeof config.review.label.onCreate === "string"
-    ? config.review.label.onCreate
-    : config.review.label.onCreate.name;
-
-  const foundProposal = await provider.findUniqueProposalFromBranch(
+  const foundProposal = await provider.findOpenProposal(
     workingBranchName,
     triggerBranchName,
-    label,
   );
 
   taskLogger.debug(
-    `Found associated proposal for branch '${workingBranchName}':\n` +
+    `Found associated open proposal for branch "${triggerBranchName}":\n` +
       JSON.stringify(foundProposal, null, 2),
   );
 
