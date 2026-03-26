@@ -4,7 +4,7 @@ import {
   exportPostPublishOperationVariables,
   exportPrePublishOperationVariables,
 } from "../tasks/export-variables.ts";
-import { updateMergedProposalLabels } from "../tasks/label.ts";
+import { updateProposalLabelsOnMerge } from "../tasks/label.ts";
 import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
@@ -100,12 +100,11 @@ export async function executeReviewPublishPhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (publish pre commands)",
   );
-  const _releasePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _releasePreRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_releasePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
@@ -161,7 +160,7 @@ export async function executeReviewPublishPhase(
   }
 
   logger.stepStart("Starting: Update merged proposal labels");
-  await updateMergedProposalLabels(
+  await updateProposalLabelsOnMerge(
     provider,
     associatedProposalForCommit.id,
     runSettings.config,
@@ -193,12 +192,11 @@ export async function executeReviewPublishPhase(
   logger.stepStart(
     "Starting: Resolve runtime config override (publish post commands)",
   );
-  const _releasePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _releasePostRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_releasePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,

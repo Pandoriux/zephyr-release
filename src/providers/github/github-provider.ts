@@ -36,7 +36,7 @@ import { getOctokitClient, type OctokitClient } from "./octokit.ts";
 import { githubGetOperationTriggerContext } from "./operation.ts";
 import {
   makeGithubAddLabelsToPullRequest,
-  makeGithubRemoveLabelFromPullRequest,
+  makeGithubRemoveLabelsFromPullRequest,
 } from "./label.ts";
 import {
   makeGithubAttachReleaseAsset,
@@ -84,11 +84,13 @@ export function createGitHubProvider(): PlatformProvider {
 
     ensureBranchExist: makeGithubEnsureBranchExist(getOctokit),
 
-    findUniqueProposalForCommit:
-      makeGithubFindUniquePullRequestForCommit(getOctokit),
+    findUniqueProposalForCommit: makeGithubFindUniquePullRequestForCommit(
+      getOctokit,
+    ),
 
-    findUniqueProposalFromBranch:
-      makeGithubFindUniquePullRequestFromBranch(getOctokit),
+    findUniqueProposalFromBranch: makeGithubFindUniquePullRequestFromBranch(
+      getOctokit,
+    ),
 
     findCommitsFromGivenToPreviousTagged:
       makeGithubFindCommitsFromGivenToPreviousTagged(getOctokit),
@@ -104,7 +106,7 @@ export function createGitHubProvider(): PlatformProvider {
     addLabelsToProposal: makeGithubAddLabelsToPullRequest(
       getOctokit,
     ),
-    removeLabelFromProposal: makeGithubRemoveLabelFromPullRequest(
+    removeLabelsFromProposal: makeGithubRemoveLabelsFromPullRequest(
       getOctokit,
     ),
 

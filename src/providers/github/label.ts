@@ -3,110 +3,96 @@ import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import { RequestError } from "@octokit/request-error";
 import { taskLogger } from "../../tasks/logger.ts";
-import type { ProviderLabelOptions } from "../../types/providers/label.ts";
+import type {
+  ProviderInputLabel,
+  ProviderLabel,
+} from "../../types/providers/label.ts";
+import { pooledMap } from "@std/async";
+import { consumeAsyncIterable } from "../../utils/async.ts";
 
 /** @throws */
 async function githubAddLabelsToPullRequest(
   octokit: OctokitClient,
   prNumber: string,
-  labelOptions: ProviderLabelOptions,
-) {
+  labels: ProviderInputLabel[],
+): Promise<ProviderLabel[]> {
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 
-  if (labelOptions.labels.length === 0) {
-    return;
-  }
+  try {
+    const res = await octokit.rest.issues.addLabels({
+      owner,
+      repo,
+      issue_number: Number(prNumber),
+      labels: labels.map((l) => l.name),
+    });
 
-  if (labelOptions.createIfMissing === false) {
-    const initialLabels = labelOptions.labels;
-
-    try {
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: Number(prNumber),
-        labels: initialLabels,
-      });
-    } catch (error) {
-      if (!(error instanceof RequestError) || error.status !== 422) {
-        // Other errors...
-        throw error;
-      }
-
-      // Labels might be missing: fall back to only existing labels
-      taskLogger.debug(
-        "Failed to add labels (status 422). Retrying with only existing labels...",
-      );
-
-      const existingLabelNames = await githubGetAllLabelNames(octokit);
-      const labelsToAdd = initialLabels.filter((name: string) =>
-        existingLabelNames.has(name)
-      );
-
-      if (labelsToAdd.length === 0) {
-        return;
-      }
-
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: Number(prNumber),
-        labels: labelsToAdd,
-      });
+    return res.data.map((l) => ({
+      name: l.name,
+      color: l.color,
+      description: l.description ?? undefined,
+    }));
+  } catch (error) {
+    if (!(error instanceof RequestError) || error.status !== 422) {
+      // Other errors...
+      throw error;
     }
-  } else {
-    const requiredLabels = labelOptions.labels;
 
-    try {
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: Number(prNumber),
-        labels: requiredLabels.map((l) => l.name),
-      });
-    } catch (error) {
-      if (!(error instanceof RequestError) || error.status !== 422) {
-        // Other errors...
-        throw error;
+    taskLogger.debug(
+      "Failed to add labels (status 422). Ensuring labels exist and retrying...",
+    );
+
+    const existingLabelNames = await githubGetAllLabelNames(octokit);
+    const labelsToAdd: string[] = [];
+
+    for (const label of labels) {
+      if (existingLabelNames.has(label.name)) {
+        labelsToAdd.push(label.name);
+        continue;
       }
 
-      // Labels might be missing: ensure they exist then retry once
-      taskLogger.debug(
-        "Failed to add labels (status 422). Ensuring labels exist and retrying once...",
-      );
-
-      const existingLabelNames = await githubGetAllLabelNames(octokit);
-      const labelsToAdd: string[] = [];
-
-      for (const label of requiredLabels) {
-        if (existingLabelNames.has(label.name)) {
-          labelsToAdd.push(label.name);
-          continue;
-        }
-
-        const ghColor = label.color?.startsWith("#")
+      if (label.createIfMissing) {
+        const ghColor = label.color.startsWith("#")
           ? label.color.slice(1)
           : label.color;
 
-        await octokit.rest.issues.createLabel({
-          owner,
-          repo,
-          name: label.name,
-          color: ghColor,
-          description: label.description,
-        });
+        try {
+          await octokit.rest.issues
+            .createLabel({
+              owner,
+              repo,
+              name: label.name,
+              color: ghColor,
+              description: label.description,
+            });
 
-        labelsToAdd.push(label.name);
+          labelsToAdd.push(label.name);
+        } catch (error) {
+          taskLogger.debug(
+            `Failed to create label ${label.name}: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
+        }
       }
-
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: Number(prNumber),
-        labels: labelsToAdd,
-      });
     }
+
+    if (labelsToAdd.length === 0) {
+      return [];
+    }
+
+    const finalResponse = await octokit.rest.issues.addLabels({
+      owner,
+      repo,
+      issue_number: Number(prNumber),
+      labels: labelsToAdd,
+    });
+
+    return finalResponse.data.map((l) => ({
+      name: l.name,
+      color: l.color,
+      description: l.description ?? undefined,
+    }));
   }
 }
 
@@ -124,6 +110,7 @@ const RawLabelsPageSchema = v.object({
   }),
 });
 
+/** @throws */
 async function githubGetAllLabelNames(
   octokit: OctokitClient,
 ): Promise<Set<string>> {
@@ -165,29 +152,59 @@ async function githubGetAllLabelNames(
 }
 
 /** @throws */
-async function githubRemoveLabelFromPullRequest(
+async function githubRemoveLabelsFromPullRequest(
   octokit: OctokitClient,
   prNumber: string,
-  label: string,
-) {
-  await octokit.rest.issues.removeLabel({
-    owner: githubGetNamespace(),
-    repo: githubGetRepositoryName(),
-    issue_number: Number(prNumber),
-    name: label,
-  });
+  labels: string[],
+): Promise<string[]> {
+  const removedLabels: string[] = [];
+
+  await consumeAsyncIterable(
+    pooledMap(5, labels, async (label) => {
+      try {
+        await octokit.rest.issues.removeLabel({
+          owner: githubGetNamespace(),
+          repo: githubGetRepositoryName(),
+          issue_number: Number(prNumber),
+          name: label,
+        });
+
+        removedLabels.push(label);
+      } catch (error) {
+        if (error instanceof RequestError && error.status === 404) {
+          removedLabels.push(label);
+          return;
+        }
+
+        const successList = removedLabels.length > 0
+          ? removedLabels.join(", ")
+          : "none";
+
+        throw new Error(
+          `Failed to remove label "${label}" from PR #${prNumber}. ` +
+            `Successfully removed so far: [${successList}]. ` +
+            `GitHub API responded with: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          { cause: error },
+        );
+      }
+    }),
+  );
+
+  return removedLabels;
 }
 
 export function makeGithubAddLabelsToPullRequest(
   getOctokit: GetOctokitFn,
 ) {
-  return (proposalId: string, labelOptions: ProviderLabelOptions) =>
-    githubAddLabelsToPullRequest(getOctokit(), proposalId, labelOptions);
+  return (proposalId: string, labels: ProviderInputLabel[]) =>
+    githubAddLabelsToPullRequest(getOctokit(), proposalId, labels);
 }
 
-export function makeGithubRemoveLabelFromPullRequest(
+export function makeGithubRemoveLabelsFromPullRequest(
   getOctokit: GetOctokitFn,
 ) {
-  return (proposalId: string, label: string) =>
-    githubRemoveLabelFromPullRequest(getOctokit(), proposalId, label);
+  return (proposalId: string, labels: string[]) =>
+    githubRemoveLabelsFromPullRequest(getOctokit(), proposalId, labels);
 }

@@ -32,4 +32,4 @@ export const LabelItemSchema = v.pipe(
 );
 
 type _LabelItemInput = v.InferInput<typeof LabelItemSchema>;
-type _LabelItemOutput = v.InferOutput<typeof LabelItemSchema>;
+export type LabelItemOutput = v.InferOutput<typeof LabelItemSchema>;
