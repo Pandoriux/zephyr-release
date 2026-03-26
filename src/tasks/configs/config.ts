@@ -203,6 +203,11 @@ export async function resolveRuntimeConfigOverride(
     { arrays: "replace" },
   );
 
+  // Preserve core structural fields
+  // workingBranchNameTemplate
+  finalConfig.review.workingBranchNameTemplate =
+    config.review.workingBranchNameTemplate;
+
   const resolvedFinalConfigResult = v.safeParse(
     ConfigSchema,
     finalConfig,

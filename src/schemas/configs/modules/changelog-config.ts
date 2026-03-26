@@ -83,6 +83,7 @@ export const ChangelogConfigSchema = v.pipe(
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
+
     releaseSectionEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
@@ -131,23 +132,6 @@ export const ChangelogConfigSchema = v.pipe(
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
-    releaseFooterTemplate: v.pipe(
-      v.optional(v.string()),
-      v.metadata({
-        description:
-          "String template for footer of a changelog release, using with string patterns.\n" +
-          "Allowed patterns to use are: all fixed and dynamic string patterns.",
-      }),
-    ),
-    releaseFooterTemplatePath: v.pipe(
-      v.optional(trimNonEmptyStringSchema),
-      v.metadata({
-        description:
-          "Path to text file containing changelog release footer. Overrides `releaseFooterTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
-      }),
-    ),
-
     releaseBodyOverride: v.pipe(
       v.optional(v.pipe(v.string(), v.nonEmpty())),
       v.metadata({
@@ -162,6 +146,23 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release body override, will take precedence over `releaseBodyOverride`.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+      }),
+    ),
+
+    releaseFooterTemplate: v.pipe(
+      v.optional(v.string()),
+      v.metadata({
+        description:
+          "String template for footer of a changelog release, using with string patterns.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
+      }),
+    ),
+    releaseFooterTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release footer. Overrides `releaseFooterTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
