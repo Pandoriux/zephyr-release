@@ -13,6 +13,7 @@ import {
 import {
   createCustomStringPatternContext,
   createFixedBaseStringPatternContext,
+  createFixedAndDynamicDatetimeStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "../tasks/string-templates-and-patterns/transformers.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
@@ -47,13 +48,18 @@ export async function bootstrapOperation(
   createCustomStringPatternContext(config.customStringPatterns);
   logger.debugStepFinish("Finished: Create custom string pattern context");
 
-  logger.debugStepStart("Starting: Create fixed base string pattern context");
+  logger.debugStepStart(
+    "Starting: Create fixed base and datetime string pattern context",
+  );
   await createFixedBaseStringPatternContext(
     provider,
     inputs.triggerBranchName,
     config,
   );
-  logger.debugStepFinish("Finished: Create fixed base string pattern context");
+  createFixedAndDynamicDatetimeStringPatternContext(config.timeZone);
+  logger.debugStepFinish(
+    "Finished: Create fixed base and datetime string pattern context",
+  );
 
   logger.stepStart("Starting: Ensure working branch is prepared");
   const workingBranchResult = await setupWorkingBranch(

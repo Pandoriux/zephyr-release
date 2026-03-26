@@ -19,6 +19,7 @@ import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
 import { taskLogger } from "./logger.ts";
+import { startTime } from "../main.ts";
 import {
   type OperationJob,
   type OperationKind,
@@ -120,6 +121,8 @@ export async function exportBaseOperationVariables(
     mode: config.mode,
     operation: operationKind,
     jobs: JSON.stringify(operationJobs),
+
+    startTime: startTime.toISOString(),
 
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
@@ -282,13 +285,16 @@ export async function exportPostPublishOperationVariables(
   });
 }
 
-export function exportFinalOperationVariables(
+export async function exportFinalOperationVariables(
   provider: PlatformProvider,
   outcome: OperationOutcome,
 ) {
   const prepareExportObject = {
     outcome,
-  } satisfies FinalOperationVariables;
+
+    patternContext: await stringifyCurrentPatternContext(),
+  } satisfies FinalOperationVariables &
+    Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debug(
     "Final operation variables to export:\n" +

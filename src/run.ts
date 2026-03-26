@@ -116,12 +116,12 @@ export async function run(provider: PlatformProvider) {
         break;
     }
 
-    exportFinalOperationVariables(provider, "success");
+    await exportFinalOperationVariables(provider, "success");
   } catch (error) {
     if (error instanceof SafeExit) {
-      exportFinalOperationVariables(provider, "skipped");
+      await exportFinalOperationVariables(provider, "skipped");
     } else {
-      exportFinalOperationVariables(provider, "failure");
+      await exportFinalOperationVariables(provider, "failure");
     }
 
     throw error;

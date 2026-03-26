@@ -25,6 +25,8 @@ export type OperationVariables =
     /** Stringified OperationJobs[] */
     jobs: string;
 
+    startTime: string;
+
     // versioning and changelog
     resolvedCommitEntries: string;
 
@@ -61,6 +63,7 @@ export type BaseOperationVariables = Pick<
   | "mode"
   | "operation"
   | "jobs"
+  | "startTime"
 >;
 
 export type DynamicOperationVariables = Pick<

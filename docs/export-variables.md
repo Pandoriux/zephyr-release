@@ -73,6 +73,11 @@ These variables are available starting from the first [`command-hooks > base > p
 - **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-proposal" or "update-proposal" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [post prepare phase](#post-prepare)  
   Export: zr-jobs; Env: ZR_JOBS
 
+<br>
+
+- **startTime:** the operation start time in ISO format  
+  Export: zr-start-time; Env: ZR_START_TIME
+
 ### Dynamic (available at all time)
 
 These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `proposalId`).

@@ -10,8 +10,14 @@ export const FixedBaseStringPatterns = {
   triggerBranchName: "triggerBranchName",
   workingBranchName: "workingBranchName",
 
-  // Date Time components
+  // Configuration
   timeZone: "timeZone",
+} as const;
+
+export type FixedBaseStringPattern =
+  typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
+
+export const FixedDatetimeStringPatterns = {
   timestamp: "timestamp",
   year: "YYYY",
   month: "MM",
@@ -21,8 +27,21 @@ export const FixedBaseStringPatterns = {
   second: "ss",
 } as const;
 
-export type FixedBaseStringPattern =
-  typeof FixedBaseStringPatterns[keyof typeof FixedBaseStringPatterns];
+export type FixedDatetimeStringPattern =
+  typeof FixedDatetimeStringPatterns[keyof typeof FixedDatetimeStringPatterns];
+
+export const DynamicDatetimeStringPatterns = {
+  nowTimestamp: "nowTimestamp",
+  nowYear: "nowYYYY",
+  nowMonth: "nowMM",
+  nowDay: "nowDD",
+  nowHour: "nowHH",
+  nowMinute: "nowmm",
+  nowSecond: "nowss",
+} as const;
+
+export type DynamicDatetimeStringPattern =
+  typeof DynamicDatetimeStringPatterns[keyof typeof DynamicDatetimeStringPatterns];
 
 const FixedPreviousVersionStringPatterns = {
   // Previous version components

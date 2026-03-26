@@ -1,12 +1,19 @@
 import { format, type SemVer } from "@std/semver";
-import { DateTimeFormatter, nativeJs, ZoneId } from "@js-joda/core";
+import {
+  DateTimeFormatter,
+  nativeJs,
+  type ZonedDateTime,
+  ZoneId,
+} from "@js-joda/core";
 import type { ConfigOutput } from "../../schemas/configs/config.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
 import { taskLogger } from "../logger.ts";
 import { startTime } from "../../main.ts";
 import type {
   DynamicChangelogStringPattern,
+  DynamicDatetimeStringPattern,
   FixedBaseStringPattern,
+  FixedDatetimeStringPattern,
   FixedPreviousVersionStringPattern,
   FixedVersionStringPattern,
 } from "../../constants/string-patterns.ts";
@@ -45,13 +52,6 @@ export async function createFixedBaseStringPatternContext(
   const { name, timeZone } = config;
   const { workingBranchNameTemplate } = config.review;
 
-  const targetZoneId = ZoneId.of(timeZone);
-  const zonedDateTime = nativeJs(startTime, targetZoneId);
-
-  function zdtFormat(pattern: string) {
-    return zonedDateTime.format(DateTimeFormatter.ofPattern(pattern));
-  }
-
   const context = {
     name: name,
     host: provider.getHost(),
@@ -63,13 +63,6 @@ export async function createFixedBaseStringPatternContext(
     triggerBranchName: triggerBranchName,
 
     timeZone: timeZone,
-    timestamp: startTime.getTime(),
-    "YYYY": zdtFormat("yyyy"),
-    "MM": zdtFormat("MM"),
-    "DD": zdtFormat("dd"),
-    "HH": zdtFormat("HH"),
-    "mm": zdtFormat("mm"),
-    "ss": zdtFormat("ss"),
   } satisfies Omit<
     Record<FixedBaseStringPattern, string | number | undefined>,
     "workingBranchName"
@@ -90,6 +83,44 @@ export async function createFixedBaseStringPatternContext(
   taskLogger.debug(
     "Fixed base string pattern context: " +
       JSON.stringify({ ...context, ...workingBranchContext }, null, 2),
+  );
+}
+
+export function createFixedAndDynamicDatetimeStringPatternContext(
+  timeZone: string,
+): void {
+  const targetZoneId = ZoneId.of(timeZone);
+  const fixedZonedDateTime = nativeJs(startTime, targetZoneId);
+
+  function zdtFormat(zdt: ZonedDateTime, pattern: string) {
+    return zdt.format(DateTimeFormatter.ofPattern(pattern));
+  }
+
+  const fixedContext = {
+    timestamp: startTime.getTime(),
+    "YYYY": zdtFormat(fixedZonedDateTime, "yyyy"),
+    "MM": zdtFormat(fixedZonedDateTime, "MM"),
+    "DD": zdtFormat(fixedZonedDateTime, "dd"),
+    "HH": zdtFormat(fixedZonedDateTime, "HH"),
+    "mm": zdtFormat(fixedZonedDateTime, "mm"),
+    "ss": zdtFormat(fixedZonedDateTime, "ss"),
+  } satisfies Record<FixedDatetimeStringPattern, string | number | undefined>;
+
+  const dynamicContext = {
+    nowTimestamp: () => new Date().getTime(),
+    nowYYYY: () => zdtFormat(nativeJs(new Date(), targetZoneId), "yyyy"),
+    nowMM: () => zdtFormat(nativeJs(new Date(), targetZoneId), "MM"),
+    nowDD: () => zdtFormat(nativeJs(new Date(), targetZoneId), "dd"),
+    nowHH: () => zdtFormat(nativeJs(new Date(), targetZoneId), "HH"),
+    nowmm: () => zdtFormat(nativeJs(new Date(), targetZoneId), "mm"),
+    nowss: () => zdtFormat(nativeJs(new Date(), targetZoneId), "ss"),
+  } satisfies Record<DynamicDatetimeStringPattern, () => string | number>;
+
+  Object.assign(BUILT_IN_CONTEXT, fixedContext, dynamicContext);
+  Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
+
+  taskLogger.debug(
+    "Fixed and dynamic datetime string pattern context initialized.",
   );
 }
 
