@@ -5,7 +5,7 @@ import {
   compareVersionToPreviousVersion,
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
-import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
+import { generatePrepareChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
 import {
   commitChangesToBranch,
@@ -135,12 +135,11 @@ export async function executeAutoStrategy(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare pre commands)",
   );
-  const _preparePreRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _preparePreRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_preparePreRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
@@ -165,7 +164,7 @@ export async function executeAutoStrategy(
   logger.stepFinish("Finished: Evaluate auto mode trigger strategy");
 
   logger.stepStart("Starting: Generate changelog release content");
-  const changelogReleaseResult = await generateChangelogReleaseContent(
+  const changelogReleaseResult = await generatePrepareChangelogReleaseContent(
     provider,
     resolvedCommitsResult.entries,
     runSettings.inputs,
@@ -237,12 +236,11 @@ export async function executeAutoStrategy(
   logger.stepStart(
     "Starting: Resolve runtime config override (prepare post commands)",
   );
-  const _preparePostRuntimeConfigResult =
-    await resolveRuntimeConfigOverride(
-      runSettings.rawConfig,
-      runSettings.config,
-      runSettings.inputs.workspacePath,
-    );
+  const _preparePostRuntimeConfigResult = await resolveRuntimeConfigOverride(
+    runSettings.rawConfig,
+    runSettings.config,
+    runSettings.inputs.workspacePath,
+  );
   if (_preparePostRuntimeConfigResult) {
     runSettings = {
       ...runSettings,
@@ -286,12 +284,11 @@ export async function executeAutoStrategy(
     logger.stepStart(
       "Starting: Resolve runtime config override (publish pre commands)",
     );
-    const _releasePreRuntimeConfigResult =
-      await resolveRuntimeConfigOverride(
-        runSettings.rawConfig,
-        runSettings.config,
-        runSettings.inputs.workspacePath,
-      );
+    const _releasePreRuntimeConfigResult = await resolveRuntimeConfigOverride(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
     if (_releasePreRuntimeConfigResult) {
       runSettings = {
         ...runSettings,
@@ -371,12 +368,11 @@ export async function executeAutoStrategy(
     logger.stepStart(
       "Starting: Resolve runtime config override (publish post commands)",
     );
-    const _releasePostRuntimeConfigResult =
-      await resolveRuntimeConfigOverride(
-        runSettings.rawConfig,
-        runSettings.config,
-        runSettings.inputs.workspacePath,
-      );
+    const _releasePostRuntimeConfigResult = await resolveRuntimeConfigOverride(
+      runSettings.rawConfig,
+      runSettings.config,
+      runSettings.inputs.workspacePath,
+    );
     if (_releasePostRuntimeConfigResult) {
       runSettings = {
         ...runSettings,

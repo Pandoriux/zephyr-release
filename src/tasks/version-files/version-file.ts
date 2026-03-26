@@ -16,6 +16,7 @@ import {
 import { updateVersionInStructuredFile } from "./vf-transformer.ts";
 import { parseRegExpFromSelector } from "../../utils/parsers/regex.ts";
 
+/** @throws */
 export function getPrimaryVersionFile(
   versionFiles: ConfigOutput["versionFiles"],
 ): VersionFileOutput {
@@ -33,6 +34,7 @@ export function getPrimaryVersionFile(
   return primaryFile;
 }
 
+/** @throws */
 export async function getVersionSemVerFromVersionFile(
   versionFile: VersionFileOutput,
   sourceMode: InputsOutput["sourceMode"],

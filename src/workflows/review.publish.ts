@@ -1,3 +1,4 @@
+import { generatePublishChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
 import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
@@ -33,11 +34,17 @@ export async function executeReviewPublishPhase(
    */
   let runSettings: OperationRunSettings = currentRunSettings;
 
-  logger.stepStart("Starting: Extract changelog from proposal body");
+  logger.stepStart("Starting: Generate changelog release content");
   const proposalChangelogRelease = extractChangelogFromProposal(
     associatedProposalForCommit,
   );
-  logger.stepFinish("Finished: Extract changelog from proposal body");
+  const changelogReleaseResult = await generatePublishChangelogReleaseContent(
+    provider,
+    proposalChangelogRelease ?? "",
+    runSettings.inputs,
+    runSettings.config,
+  );
+  logger.stepFinish("Finished: Generate changelog release content");
 
   logger.stepStart("Starting: Extract version from primary version file");
   const primaryVersionFile = getPrimaryVersionFile(
@@ -71,7 +78,10 @@ export async function executeReviewPublishPhase(
   logger.debugStepStart(
     "Starting: Create dynamic changelog string pattern contextt",
   );
-  createDynamicChangelogStringPatternContext(proposalChangelogRelease);
+  createDynamicChangelogStringPatternContext(
+    changelogReleaseResult?.release,
+    changelogReleaseResult?.releaseBody,
+  );
   logger.debugStepFinish(
     "Finished: Create dynamic changelog string pattern contextt",
   );

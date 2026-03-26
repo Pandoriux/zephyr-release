@@ -8,6 +8,8 @@ import { SafeExit } from "./errors/safe-exit.ts";
 
 export const startTime = new Date();
 
+export const failedNonCriticalTasks: string[] = [];
+
 async function main() {
   try {
     const provider = await getProvider();

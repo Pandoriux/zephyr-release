@@ -22,7 +22,7 @@ import {
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
-import { generateChangelogReleaseContent } from "../tasks/changelog.ts";
+import { generatePrepareChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
 import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
@@ -143,7 +143,7 @@ export async function executeReviewPreparePhase(
   }
 
   logger.stepStart("Starting: Generate changelog release content");
-  const changelogReleaseResult = await generateChangelogReleaseContent(
+  const changelogReleaseResult = await generatePrepareChangelogReleaseContent(
     provider,
     resolvedCommitsResult.entries,
     runSettings.inputs,

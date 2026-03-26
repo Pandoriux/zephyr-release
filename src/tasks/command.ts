@@ -6,8 +6,9 @@ import type {
   CommandHookKind,
   CommandHookOutput,
 } from "../schemas/configs/modules/components/command-hook.ts";
+import { failedNonCriticalTasks } from "../main.ts";
 
-/** @throws */
+/** @throws if `continueOnError` is false and command fails */
 export async function runCommands(
   commandHook: CommandHookOutput | undefined,
   kind: CommandHookKind,
@@ -42,6 +43,8 @@ export async function runCommands(
 
       if (continueOnError) {
         taskLogger.info(message);
+        failedNonCriticalTasks.push(message);
+
         failedCommands.push(cmdStr);
       } else {
         taskLogger.endGroup();

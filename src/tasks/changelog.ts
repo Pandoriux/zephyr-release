@@ -8,6 +8,8 @@ import { resolveStringTemplate } from "./string-templates-and-patterns/resolve-t
 import type { ChangelogReleaseEntryPattern } from "../constants/string-patterns.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { CHANGELOG_MARKERS } from "../constants/markers.ts";
+import { failedNonCriticalTasks } from "../main.ts";
+import { taskLogger } from "./logger.ts";
 
 type GenerateChangelogReleaseInputsParams = Pick<
   InputsOutput,
@@ -33,88 +35,163 @@ type GenerateChangelogReleaseConfigParams =
     >;
   };
 
-export interface GenerateChangelogReleaseResult {
+interface GeneratePrepareReleaseContentResult {
   release: string;
   releaseBody: string;
 }
 
-export async function generateChangelogReleaseContent(
+/** @throws */
+export async function generatePrepareChangelogReleaseContent(
   provider: PlatformProvider,
   resolvedCommits: ResolvedCommit[],
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<GenerateChangelogReleaseResult> {
+): Promise<GeneratePrepareReleaseContentResult> {
+  const [releaseHeader, releaseBody, releaseFooter] = await Promise.all([
+    resolveReleaseHeader(provider, inputs, config),
+    resolveReleaseBody(provider, resolvedCommits, inputs, config),
+    resolveReleaseFooter(provider, inputs, config),
+  ]);
+
+  return {
+    release: [releaseHeader, releaseBody, releaseFooter].filter(Boolean).join(
+      "\n\n",
+    ),
+    releaseBody,
+  };
+}
+
+interface GeneratePublishReleaseContentResult {
+  release: string;
+  releaseBody?: string;
+}
+
+export async function generatePublishChangelogReleaseContent(
+  provider: PlatformProvider,
+  proposalChangelogRelease: string,
+  inputs: GenerateChangelogReleaseInputsParams,
+  config: GenerateChangelogReleaseConfigParams,
+): Promise<GeneratePublishReleaseContentResult | undefined> {
+  try {
+    const { releaseBodyOverride, releaseBodyOverridePath } = config.changelog;
+
+    if (releaseBodyOverride || releaseBodyOverridePath) {
+      const [releaseHeader, releaseBody, releaseFooter] = await Promise.all([
+        resolveReleaseHeader(provider, inputs, config),
+        resolveReleaseBody(provider, undefined, inputs, config),
+        resolveReleaseFooter(provider, inputs, config),
+      ]);
+
+      return {
+        release: [releaseHeader, releaseBody, releaseFooter].filter(Boolean)
+          .join(
+            "\n\n",
+          ),
+        releaseBody,
+      };
+    }
+
+    // If no override, the value is just the proposal body.
+    return { release: proposalChangelogRelease };
+  } catch (error) {
+    const message = `Failed to generate publish changelog release content: ${
+      error instanceof Error ? error.message : String(error)
+    }`;
+
+    taskLogger.warn(message);
+    failedNonCriticalTasks.push(message);
+
+    return { release: proposalChangelogRelease };
+  }
+}
+
+async function resolveReleaseHeader(
+  provider: PlatformProvider,
+  inputs: GenerateChangelogReleaseInputsParams,
+  config: GenerateChangelogReleaseConfigParams,
+): Promise<string> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const {
-    // commitTypes,
-    changelog: {
-      releaseHeaderTemplate,
-      releaseHeaderTemplatePath,
-      // releaseSectionEntryTemplate,
-      // releaseSectionEntryTemplatePath,
-      // releaseBreakingSectionHeading,
-      // releaseBreakingSectionEntryTemplate,
-      // releaseBreakingSectionEntryTemplatePath,
-      releaseFooterTemplate,
-      releaseFooterTemplatePath,
-      releaseBodyOverride,
-      releaseBodyOverridePath,
-    },
+    changelog: { releaseHeaderTemplate, releaseHeaderTemplatePath },
   } = config;
 
-  let releaseHeader: string;
   if (releaseHeaderTemplatePath) {
     const headerTemplate = await getTextFile(
       sourceMode.overrides?.[releaseHeaderTemplatePath] ?? sourceMode.mode,
       releaseHeaderTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    releaseHeader = await resolveStringTemplate(headerTemplate);
-  } else {
-    releaseHeader = await resolveStringTemplate(
-      releaseHeaderTemplate,
+    return await resolveStringTemplate(headerTemplate);
+  }
+
+  return await resolveStringTemplate(releaseHeaderTemplate);
+}
+
+/** @throws */
+async function resolveReleaseBody(
+  provider: PlatformProvider,
+  resolvedCommits: ResolvedCommit[] | undefined,
+  inputs: GenerateChangelogReleaseInputsParams,
+  config: GenerateChangelogReleaseConfigParams,
+): Promise<string> {
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const {
+    changelog: { releaseBodyOverride, releaseBodyOverridePath },
+  } = config;
+
+  if (releaseBodyOverridePath) {
+    return await getTextFile(
+      sourceMode.overrides?.[releaseBodyOverridePath] ?? sourceMode.mode,
+      releaseBodyOverridePath,
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
   }
 
-  let releaseFooter: string | undefined;
+  if (releaseBodyOverride) {
+    return releaseBodyOverride;
+  }
+
+  if (!resolvedCommits) {
+    throw new Error(
+      "resolvedCommits must be provided to generate a release body when no override is configured",
+    );
+  }
+
+  return await generateReleaseBodyBasedOnCommits(
+    provider,
+    resolvedCommits,
+    inputs,
+    config,
+  );
+}
+
+async function resolveReleaseFooter(
+  provider: PlatformProvider,
+  inputs: GenerateChangelogReleaseInputsParams,
+  config: GenerateChangelogReleaseConfigParams,
+): Promise<string | undefined> {
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const {
+    changelog: { releaseFooterTemplate, releaseFooterTemplatePath },
+  } = config;
+
   if (releaseFooterTemplatePath) {
     const footerTemplate = await getTextFile(
       sourceMode.overrides?.[releaseFooterTemplatePath] ?? sourceMode.mode,
       releaseFooterTemplatePath,
       { provider, workspacePath: workspacePath, ref: triggerCommitHash },
     );
-    releaseFooter = await resolveStringTemplate(footerTemplate);
-  } else if (releaseFooterTemplate) {
-    releaseFooter = await resolveStringTemplate(
-      releaseFooterTemplate,
-    );
+    return await resolveStringTemplate(footerTemplate);
   }
 
-  let releaseBody: string;
-  if (releaseBodyOverridePath) {
-    releaseBody = await getTextFile(
-      sourceMode.overrides?.[releaseBodyOverridePath] ?? sourceMode.mode,
-      releaseBodyOverridePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
-    );
-  } else if (releaseBodyOverride) {
-    releaseBody = releaseBodyOverride;
-  } else {
-    releaseBody = await generateReleaseBody(
-      provider,
-      resolvedCommits,
-      inputs,
-      config,
-    );
+  if (releaseFooterTemplate) {
+    return await resolveStringTemplate(releaseFooterTemplate);
   }
 
-  return {
-    release: [releaseHeader, releaseBody, releaseFooter].join("\n\n"),
-    releaseBody,
-  };
+  return undefined;
 }
 
-async function generateReleaseBody(
+async function generateReleaseBodyBasedOnCommits(
   provider: PlatformProvider,
   resolvedCommits: ResolvedCommit[],
   inputs: GenerateChangelogReleaseInputsParams,
@@ -196,9 +273,12 @@ async function generateReleaseBody(
         : commitStr;
 
       const breakingSectionContents = sectionGroups.get(breakingSectionHeading);
+
+      // Safeguard to satisfy TypeScript types; this should theoretically be impossible to throw
+      // as the section is initialized at the start of the function.
       if (!breakingSectionContents!) {
         throw new Error(
-          `${generateChangelogReleaseContent.name} failed: Breaking Changes section has not been initialized?`,
+          `${generatePrepareChangelogReleaseContent.name} failed: Breaking Changes section has not been initialized?`,
         );
       }
 

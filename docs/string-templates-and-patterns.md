@@ -71,9 +71,9 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 #### Changelog
 
-- `{{ changelogRelease }}`: In `propose` operation (managing proposals), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body + release footer. In `release` operation (create tag and publish release), the value is the **proposal body** (this means any edits made to the proposal body will also be included)
+- `{{ changelogRelease }}`: In `propose` operation (managing proposals), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body (generated from resolved commits) + [release footer](./config-options.md#changelog--release-footer-template-optional). In `release` operation (create tag and publish release), the value is the **proposal body** (this means any edits made to the proposal body will also be included). If, however, [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)) is provided, the value will be re-evaluated to [release header](./config-options.md#changelog--release-header-template-optional) + body override + [release footer](./config-options.md#changelog--release-footer-template-optional)
 
-- `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)).
+- `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)). In `release` operation (create tag and publish release), this value is undefined if no override provided.
 
 ### Special String Patterns
 
