@@ -1,6 +1,11 @@
 import type { ParserOptions } from "conventional-commits-parser";
 import { ZEPHYR_RELEASE_COMMIT_SIGN } from "./commit.ts";
 
+export const breakingChangeKeywords = {
+  space: "BREAKING CHANGE",
+  hyphen: "BREAKING-CHANGE",
+} as const;
+
 /**
  * Builds on the library's default settings with support for modern features.
  *
@@ -50,8 +55,8 @@ export const baseConventionalCommitParserOptions = {
   revertCorrespondence: ["header", "hash"],
 
   noteKeywords: [
-    "BREAKING CHANGE",
-    "BREAKING-CHANGE",
+    breakingChangeKeywords.space,
+    breakingChangeKeywords.hyphen,
     "release as",
     "release-as",
 
