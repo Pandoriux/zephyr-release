@@ -16,7 +16,7 @@ import type { OperationRunSettings } from "./types/operation-context.ts";
 import { executeAutoStrategy } from "./workflows/auto.ts";
 import { SafeExit } from "./errors/safe-exit.ts";
 import { bootstrapOperation } from "./workflows/bootstrap.ts";
-import { createCustomStringPatternContext } from "./tasks/string-templates-and-patterns/pattern-context.ts";
+import { synchronizeRuntimeState } from "./tasks/synchronize-runtime-state.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -88,7 +88,12 @@ export async function run(provider: PlatformProvider) {
         rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
         config: _basePreRuntimeConfigResult.resolvedRuntime,
       };
-      createCustomStringPatternContext(runSettings.config.customStringPatterns);
+      await synchronizeRuntimeState({
+        provider,
+        config: runSettings.config,
+        rawConfig: runSettings.rawConfig,
+        triggerBranchName: runSettings.inputs.triggerBranchName,
+      });
       logger.stepFinish(
         "Finished: Resolve runtime config override (base pre commands)",
       );
@@ -116,12 +121,12 @@ export async function run(provider: PlatformProvider) {
         break;
     }
 
-    exportFinalOperationVariables(provider, "success");
+    await exportFinalOperationVariables(provider, "success");
   } catch (error) {
     if (error instanceof SafeExit) {
-      exportFinalOperationVariables(provider, "skipped");
+      await exportFinalOperationVariables(provider, "skipped");
     } else {
-      exportFinalOperationVariables(provider, "failure");
+      await exportFinalOperationVariables(provider, "failure");
     }
 
     throw error;

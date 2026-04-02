@@ -19,6 +19,7 @@ import { format, type SemVer } from "@std/semver";
 import type { WorkingBranchResult } from "./branch.ts";
 import type { ResolvedCommit } from "./commit.ts";
 import { taskLogger } from "./logger.ts";
+import { startTime } from "../main.ts";
 import {
   type OperationJob,
   type OperationKind,
@@ -28,7 +29,10 @@ import {
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import { STRING_PATTERN_CONTEXT } from "./string-templates-and-patterns/pattern-context.ts";
+import {
+  STRING_PATTERN_CONTEXT,
+  stringifyCurrentPatternContext,
+} from "./string-templates-and-patterns/pattern-context.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,
@@ -120,6 +124,8 @@ export async function exportBaseOperationVariables(
     mode: config.mode,
     operation: operationKind,
     jobs: JSON.stringify(operationJobs),
+
+    startTime: startTime.toISOString(),
 
     config: JSON.stringify(rawConfig, jsonValueNormalizer),
     internalConfig: JSON.stringify(config, jsonValueNormalizer),
@@ -282,13 +288,17 @@ export async function exportPostPublishOperationVariables(
   });
 }
 
-export function exportFinalOperationVariables(
+export async function exportFinalOperationVariables(
   provider: PlatformProvider,
   outcome: OperationOutcome,
 ) {
   const prepareExportObject = {
     outcome,
-  } satisfies FinalOperationVariables;
+
+    patternContext: await stringifyCurrentPatternContext(),
+  } satisfies
+    & FinalOperationVariables
+    & Pick<DynamicOperationVariables, "patternContext">;
 
   taskLogger.debug(
     "Final operation variables to export:\n" +
@@ -299,26 +309,4 @@ export function exportFinalOperationVariables(
     provider.exportOutputs(toExportOutputKey(k), v);
     provider.exportEnvVars(toExportEnvVarKey(k), v);
   });
-}
-
-async function stringifyCurrentPatternContext(): Promise<string> {
-  const resolvedContext: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
-    if (typeof value === "function") {
-      try {
-        const result = await value();
-        // If result is not another function, use it; otherwise use original value
-        resolvedContext[key] = typeof result !== "function" ? result : value;
-      } catch {
-        // If function throws, use original value
-        resolvedContext[key] = value;
-      }
-    } else {
-      resolvedContext[key] = value;
-    }
-  }
-
-  // jsonValueNormalizer will catch weird value like BigInt, ...
-  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }

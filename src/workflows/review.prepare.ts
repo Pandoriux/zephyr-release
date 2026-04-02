@@ -17,11 +17,11 @@ import {
 } from "../tasks/calculate-next-version/calculate-version.ts";
 import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import {
-  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
+import { synchronizeRuntimeState } from "../tasks/synchronize-runtime-state.ts";
 import { generatePrepareChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
 import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
@@ -132,7 +132,14 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
-    createCustomStringPatternContext(runSettings.config.customStringPatterns);
+    await synchronizeRuntimeState({
+      provider,
+      config: runSettings.config,
+      rawConfig: runSettings.rawConfig,
+      triggerBranchName: runSettings.inputs.triggerBranchName,
+      version: nextVersion,
+      previousVersion,
+    });
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
     );
@@ -269,7 +276,14 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
-    createCustomStringPatternContext(runSettings.config.customStringPatterns);
+    await synchronizeRuntimeState({
+      provider,
+      config: runSettings.config,
+      rawConfig: runSettings.rawConfig,
+      triggerBranchName: runSettings.inputs.triggerBranchName,
+      version: nextVersion,
+      previousVersion,
+    });
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",
     );

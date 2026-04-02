@@ -91,7 +91,7 @@ export const ChangelogConfigSchema = v.pipe(
       ),
       v.metadata({
         description:
-          "String template for each entries in the changelog release sections, using with fixed base and version string patterns. " +
+          "String template for each entries in the changelog release sections. " +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           "Additionally, you can use a special set of dynamic patterns which are:\n" +
           "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\n" +

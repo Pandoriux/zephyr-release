@@ -823,7 +823,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for each entries in the changelog release sections, using with fixed base and version string patterns.  
+String template for each entries in the changelog release sections.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
 Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
 
@@ -976,7 +976,7 @@ Type: `string`
 Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
-Allowed patterns to use in template are: [fixed base](./string-templates-and-patterns.md#base) and [fixed version](./string-templates-and-patterns.md#version) string patterns and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
+Allowed patterns to use in template are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### tag > type (Optional)
 

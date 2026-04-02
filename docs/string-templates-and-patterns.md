@@ -42,8 +42,11 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 <br>
 
 - `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
-- `{{ timestamp }}`: Timestamp, always UTC
-- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}` - date/time components
+
+#### Datetime
+
+- `{{ timestamp }}`: Timestamp at script start time, always UTC
+- `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}`: Date/time components at script start time
 
 #### Version (and tag)
 
@@ -74,6 +77,11 @@ These string patterns are resolved dynamically at runtime and may change each ti
 - `{{ changelogRelease }}`: In `propose` operation (managing proposals), the generated changelog content section is [release header](./config-options.md#changelog--release-header-template-optional) + body (generated from resolved commits) + [release footer](./config-options.md#changelog--release-footer-template-optional). In `release` operation (create tag and publish release), the value is the **proposal body** (this means any edits made to the proposal body will also be included). If, however, [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)) is provided, the value will be re-evaluated to [release header](./config-options.md#changelog--release-header-template-optional) + body override + [release footer](./config-options.md#changelog--release-footer-template-optional)
 
 - `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)). In `release` operation (create tag and publish release), this value is undefined if no override provided.
+
+#### Datetime (now)
+
+- `{{ nowTimestamp }}`: Timestamp at NOW, always UTC
+- `{{ nowYYYY }}`, `{{ nowMM }}`, `{{ nowDD }}`, `{{ nowHH }}`, `{{ nowmm }}`, `{{ nowss }}`: Date/time components at NOW
 
 ### Special String Patterns
 

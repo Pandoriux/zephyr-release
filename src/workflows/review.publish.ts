@@ -10,10 +10,10 @@ import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import {
-  createCustomStringPatternContext,
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
+import { synchronizeRuntimeState } from "../tasks/synchronize-runtime-state.ts";
 import { createTag } from "../tasks/tag.ts";
 import {
   getPrimaryVersionFile,
@@ -121,7 +121,13 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePreRuntimeConfigResult.resolvedRuntime,
     };
-    createCustomStringPatternContext(runSettings.config.customStringPatterns);
+    await synchronizeRuntimeState({
+      provider,
+      config: runSettings.config,
+      rawConfig: runSettings.rawConfig,
+      triggerBranchName: runSettings.inputs.triggerBranchName,
+      version,
+    });
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish pre commands)",
     );
@@ -214,7 +220,13 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePostRuntimeConfigResult.resolvedRuntime,
     };
-    createCustomStringPatternContext(runSettings.config.customStringPatterns);
+    await synchronizeRuntimeState({
+      provider,
+      config: runSettings.config,
+      rawConfig: runSettings.rawConfig,
+      triggerBranchName: runSettings.inputs.triggerBranchName,
+      version,
+    });
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish post commands)",
     );

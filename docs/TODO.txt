@@ -1,5 +1,0 @@
-refactor toan bo pipeline, chi nen throw voi core operation, nhu create PR, con lai create tag,... catch va log thoi
-
-string pattern nhung function co thuc su la fn chua, hay la gia tri
-
-export variable base chia timestamp ra rieng
