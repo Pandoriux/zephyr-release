@@ -1,5 +1,6 @@
 import * as v from "@valibot/valibot";
 import {
+  DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
   DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE,
@@ -116,12 +117,18 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     releaseBreakingSectionEntryTemplate: v.pipe(
-      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.optional(
+        v.pipe(v.string(), v.nonEmpty()),
+        DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
+      ),
       v.metadata({
         description:
           "Basically the same as `releaseSectionEntryTemplate`, but for breaking changes specifically. If not provided, falls back " +
           "to `releaseSectionEntryTemplate`.\n" +
-          "Allowed patterns to use are: all fixed and dynamic string patterns.",
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
+          `Default: ${
+            JSON.stringify(DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE)
+          }`,
       }),
     ),
     releaseBreakingSectionEntryTemplatePath: v.pipe(

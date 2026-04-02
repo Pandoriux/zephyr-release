@@ -10,6 +10,7 @@ import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import { CHANGELOG_MARKERS } from "../constants/markers.ts";
 import { failedNonCriticalTasks } from "../main.ts";
 import { taskLogger } from "./logger.ts";
+import { breakingChangeKeywords } from "../constants/conventional-commit-parser-options.ts";
 
 type GenerateChangelogReleaseInputsParams = Pick<
   InputsOutput,
@@ -299,9 +300,16 @@ async function generateReleaseBodyBasedOnCommits(
   return finalReleaseBody.join("\n\n");
 }
 
+/** @throws */
 function createCommitExtraPatterns(
   commit: ResolvedCommit,
 ): Record<ChangelogReleaseEntryPattern, unknown> {
+  const breakingDesc = commit.notes.findLast(
+    (n) =>
+      n.title === breakingChangeKeywords.space ||
+      n.title === breakingChangeKeywords.hyphen,
+  )?.text ?? commit.subject;
+
   return {
     commit,
     hash: commit.hash,
@@ -310,6 +318,7 @@ function createCommitExtraPatterns(
     desc: commit.subject,
     body: commit.body,
     footer: commit.footer,
+    breakingDesc,
     isBreaking: commit.isBreaking,
   };
 }

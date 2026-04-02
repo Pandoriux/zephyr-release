@@ -16,6 +16,9 @@ export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
   liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} [{{ hash | slice: 0, 7 }}](
   {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})`;
 
+export const DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE =
+  liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ breakingDesc }}`;
+
 // Commit
 export const DEFAULT_COMMIT_HEADER_TEMPLATE =
   liquid`chore: release v{{ version }}`;

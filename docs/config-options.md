@@ -824,16 +824,18 @@ Type: `string`
 Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for each entries in the changelog release sections.  
-Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).  
-Additionally, you can use a special set of [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns) which are:
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
-- `{{ commit }}`: The full parsed and resolved commit object. See [ResolvedCommit](../src/tasks/commit.ts#L34-L41) for the structure
+Additionally, you can use a special set of dynamic patterns (see [patterns docs](./string-templates-and-patterns.md#commitchangelog-entries) for more details):
+
+- `{{ commit }}`: string
 - `{{ hash }}`: string
 - `{{ type }}`: string
 - `{{ scope }}`: string
 - `{{ desc }}`: string
 - `{{ body }}`: string
 - `{{ footer }}`: string
+- `{{ breakingDesc }}`: string
 - `{{ isBreaking }}`: boolean
 
 #### changelog > release-section-entry-template-path (Optional)
@@ -853,7 +855,8 @@ Heading of a changelog release BREAKING section.
 
 #### changelog > release-breaking-section-entry-template (Optional)
 
-Type: `string`
+Type: `string`  
+Default: [`DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).

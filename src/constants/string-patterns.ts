@@ -41,7 +41,9 @@ export const DynamicDatetimeStringPatterns = {
 } as const;
 
 export type DynamicDatetimeStringPattern =
-  typeof DynamicDatetimeStringPatterns[keyof typeof DynamicDatetimeStringPatterns];
+  typeof DynamicDatetimeStringPatterns[
+    keyof typeof DynamicDatetimeStringPatterns
+  ];
 
 const FixedPreviousVersionStringPatterns = {
   // Previous version components
@@ -89,6 +91,7 @@ const ChangelogReleaseEntryPatterns = {
   desc: "desc",
   body: "body",
   footer: "footer",
+  breakingDesc: "breakingDesc",
   isBreaking: "isBreaking",
 } as const;
 

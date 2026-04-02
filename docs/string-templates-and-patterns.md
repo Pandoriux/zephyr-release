@@ -89,15 +89,16 @@ These are special patterns that are only available to certain templates. Make su
 
 #### Commit/Changelog Entries
 
-Usage: [release-section-entry-template](./config-options.md#changelog--release-section-entry-template-optional)
+Usage: [`release-section-entry-template`](./config-options.md#changelog--release-section-entry-template-optional) and [`release-breaking-section-entry-template`](./config-options.md#changelog--release-breaking-section-entry-template-optional)
 
 - `{{ commit }}`: The full parsed and resolved commit object. See [ResolvedCommit](../src/tasks/commit.ts#L34-L41) for the structure
-- `{{ hash }}`: string
-- `{{ type }}`: string
-- `{{ scope }}`: string
-- `{{ desc }}`: string
-- `{{ body }}`: string
-- `{{ footer }}`: string
+- `{{ hash }}`: string; commit hash
+- `{{ type }}`: string; commit type
+- `{{ scope }}`: string; commit scope
+- `{{ desc }}`: string; commit description, the text after ":" in commit header
+- `{{ body }}`: string; commit body, can span multiple paragraphs
+- `{{ footer }}`: string; commit footer
+- `{{ breakingDesc }}`: string; breaking change description. It is the text of the last breaking change footer, or falls back to the commit description if none exist
 - `{{ isBreaking }}`: boolean
 
 ## Transformers

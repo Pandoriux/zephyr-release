@@ -26,6 +26,7 @@ import type { CommitConfigOutput } from "../schemas/configs/modules/commit-confi
 import { BranchOutOfDateError } from "../errors/providers/branch.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import { VERSION } from "../version.generated.ts";
+import { breakingChangeKeywords } from "../constants/conventional-commit-parser-options.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -185,12 +186,17 @@ export async function resolveCommitsFromTriggerToLastRelease(
     if (entry.isIgnored || !isTypeAllowed || !subject) continue;
 
     const hasBreakingNote = commit.notes.some(
-      (n) => n.title === "BREAKING CHANGE" || n.title === "BREAKING-CHANGE",
+      (n) =>
+        n.title === breakingChangeKeywords.space ||
+        n.title === breakingChangeKeywords.hyphen,
     );
     const isBreaking = !!commit.breaking || hasBreakingNote;
 
     if (isBreaking && !hasBreakingNote) {
-      commit.notes.push({ title: "BREAKING CHANGE", text: subject });
+      commit.notes.push({
+        title: breakingChangeKeywords.space,
+        text: subject,
+      });
     }
 
     parsedFilteredCommits.push({
