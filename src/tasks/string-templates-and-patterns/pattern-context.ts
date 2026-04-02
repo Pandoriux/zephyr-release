@@ -19,7 +19,7 @@ import type {
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplate } from "./resolve-template.ts";
 import type { ReviewConfigOutput } from "../../schemas/configs/modules/review-config.ts";
-
+import { jsonValueNormalizer } from "../../utils/transformers/json.ts";
 
 export const STRING_PATTERN_CONTEXT: Record<string, unknown> = {};
 
@@ -198,4 +198,26 @@ export function createDynamicChangelogStringPatternContext(
     "Dynamic changelog string pattern context: " +
       JSON.stringify(context, null, 2),
   );
+}
+
+export async function stringifyCurrentPatternContext(): Promise<string> {
+  const resolvedContext: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(STRING_PATTERN_CONTEXT)) {
+    if (typeof value === "function") {
+      try {
+        const result = await value();
+        // If result is not another function, use it; otherwise use original value
+        resolvedContext[key] = typeof result !== "function" ? result : value;
+      } catch {
+        // If function throws, use original value
+        resolvedContext[key] = value;
+      }
+    } else {
+      resolvedContext[key] = value;
+    }
+  }
+
+  // jsonValueNormalizer will catch weird value like BigInt, ...
+  return JSON.stringify(resolvedContext, jsonValueNormalizer);
 }
