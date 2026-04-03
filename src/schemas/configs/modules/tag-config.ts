@@ -31,14 +31,18 @@ export const TagConfigSchema = v.pipe(
       v.optional(v.enum(TagTypeOptions), TagTypeOptions.annotated),
       v.metadata({
         description:
-          "The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.\n" +
+          "The type of Git tag to create, either lightweight, annotated or signed.\n" +
+          "- If annotated or signed, a tag message is required.\n" +
+          "- If signed, you must pre-configure the CI runner environment with GPG/SSH keys yourself (Zephyr Release " +
+          "does not manage keys for security reasons).\n" +
           `Default: ${JSON.stringify(TagTypeOptions.annotated)}`,
       }),
     ),
     messageTemplate: v.pipe(
       v.optional(v.string(), DEFAULT_TAG_MESSAGE_TEMPLATE),
       v.metadata({
-        description: "String template for the Git annotated tag message.\n" +
+        description:
+          "String template for the Git annotated or signed tag message.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_TAG_MESSAGE_TEMPLATE)}`,
       }),
@@ -47,7 +51,7 @@ export const TagConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Path to text file containing Git annotated tag message template. Overrides `messageTemplate` when both are provided.\n" +
+          "Path to text file containing Git annotated or signed tag message template. Overrides `messageTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
