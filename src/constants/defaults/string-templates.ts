@@ -38,8 +38,8 @@ export const DEFAULT_PROPOSAL_FOOTER_TEMPLATE =
 // Tag and Release
 export const DEFAULT_TAG_NAME_TEMPLATE = liquid`v{{ version }}`;
 
+export const DEFAULT_TAG_MESSAGE_TEMPLATE = liquid`Release {{ tagName }}`;
+
 export const DEFAULT_RELEASE_TITLE_TEMPLATE = liquid`{{ tagName }}`;
 
 export const DEFAULT_RELEASE_BODY_TEMPLATE = liquid`{{ changelogRelease }}`;
-
-export const DEFAULT_TAG_MESSAGE_TEMPLATE = liquid`Release {{ version }}`;
