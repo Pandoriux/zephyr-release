@@ -1,6 +1,7 @@
 export const TagTypeOptions = {
-  annotated: "annotated",
   lightweight: "lightweight",
+  annotated: "annotated",
+  signed: "signed",
 } as const;
 
 export type TagTypeOption = typeof TagTypeOptions[keyof typeof TagTypeOptions];

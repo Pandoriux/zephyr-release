@@ -983,24 +983,36 @@ Allowed patterns to use in template are: [all string patterns](./string-template
 
 #### tag > type (Optional)
 
-Type: `"annotated" | "lightweight"`  
+Type: `"lightweight" | "annotated" | "signed"`  
 Default: `"annotated"`
 
-The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.
+The type of Git tag to create.
+
+- **`lightweight`**: Creates a simple tag without a message or identity.
+- **`annotated`**: Creates a tag with a message, date, and tagger identity. (A tag message is required).
+- **`signed`**: Creates an annotated tag cryptographically signed with GPG or SSH. (A tag message is required).
+
+**Important Notes for Signed Tags:**
+
+Zephyr Release intentionally does not manage, accept, or process private cryptographic keys. To use `"signed"`, you must independently configure the Git CLI in your CI runner environment *before* Zephyr Release executes.
+
+It is highly recommended to use established CI integrations or native pipeline steps in an earlier pipeline stage to import your keys, rather than attempting to script the setup using `command-hooks`. This keeps your private secrets safely isolated from the release configuration.
+
+Furthermore, if you are using ephemeral or shared cloud runners, security best practices dictate that you should always include a final cleanup step in your CI pipeline to securely wipe the private key from the machine after Zephyr Release completes, regardless of whether the operation succeeds or fails.
 
 #### tag > message-template (Optional)
 
 Type: `string`  
 Default: [`DEFAULT_TAG_MESSAGE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for the Git annotated tag message.  
+String template for the Git annotated or signed tag message.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### tag > message-template-path (Optional)
 
 Type: `string`
 
-Path to text file containing Git annotated tag message template. Overrides `message-template` when both are provided.
+Path to text file containing Git annotated or signed tag message template. Overrides `message-template` when both are provided.
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 #### tag > tagger (Optional)

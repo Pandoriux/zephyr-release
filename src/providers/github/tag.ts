@@ -10,6 +10,8 @@ import { joinUrlSegments } from "../../utils/transformers/url.ts";
 import type { TaggerRequest } from "../../types/tag.ts";
 import type { ProviderTag } from "../../types/providers/tag.ts";
 import type { TagTypeOption } from "../../constants/release-tag-options.ts";
+import { execFileAsync } from "../../utils/child-process.ts";
+import process from "node:process";
 
 export function githubGetCompareTagUrl(tag1: string, tag2: string): string {
   let compareSegment = tag1 + "..." + tag2;
@@ -116,28 +118,56 @@ async function githubCreateTag(
 
   let finalHash = commitHash;
 
-  if (tagType === "annotated") {
-    const tagRes = await octokit.rest.git.createTag({
-      owner: owner,
-      repo: repo,
-      tag: tagName,
-      message: message,
-      object: commitHash,
-      type: "commit",
-      tagger: tagger,
+  if (tagType === "signed") {
+    const cliEnv = { ...process.env };
+
+    if (tagger) {
+      cliEnv.GIT_COMMITTER_NAME = tagger.name;
+      cliEnv.GIT_COMMITTER_EMAIL = tagger.email;
+      if (tagger.date) cliEnv.GIT_COMMITTER_DATE = tagger.date;
+    }
+
+    await execFileAsync("git", [
+      "tag",
+      "-s",
+      tagName,
+      commitHash,
+      "-m",
+      message,
+    ], {
+      env: cliEnv,
     });
 
-    finalHash = tagRes.data.sha;
+    await execFileAsync("git", ["push", "origin", `refs/tags/${tagName}`]);
+
+    const { stdout } = await execFileAsync("git", ["rev-parse", tagName]);
+    finalHash = stdout.trim();
+
+    return { name: tagName, hash: finalHash, targetHash: commitHash };
+  } else {
+    if (tagType === "annotated") {
+      const tagRes = await octokit.rest.git.createTag({
+        owner: owner,
+        repo: repo,
+        tag: tagName,
+        message: message,
+        object: commitHash,
+        type: "commit",
+        tagger: tagger,
+      });
+
+      finalHash = tagRes.data.sha;
+    }
+
+    await octokit.rest.git.createRef({
+      owner: owner,
+      repo: repo,
+      ref: "refs/tags/" + tagName,
+      sha: finalHash,
+    });
+
+    return { name: tagName, hash: finalHash, targetHash: commitHash };
   }
-
-  await octokit.rest.git.createRef({
-    owner: owner,
-    repo: repo,
-    ref: "refs/tags/" + tagName,
-    sha: finalHash,
-  });
-
-  return { name: tagName, hash: finalHash, targetHash: commitHash };
 }
 
 export function makeGithubGetCompareTagUrlFromCurrentToLatest(
