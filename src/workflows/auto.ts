@@ -12,7 +12,6 @@ import {
   prepareChangesToCommit,
   resolveCommitsFromTriggerToLastRelease,
 } from "../tasks/commit.ts";
-import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPrepareOperationVariables,
   exportPostPublishOperationVariables,
@@ -25,7 +24,6 @@ import {
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
-import { synchronizeRuntimeState } from "../tasks/synchronize-runtime-state.ts";
 import type {
   OperationRunSettings,
   OperationTriggerContext,
@@ -36,6 +34,10 @@ import { evaluateAutoModeTriggerStrategy } from "../tasks/auto-trigger-strategy.
 import { createTag } from "../tasks/tag.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import type { ProviderRelease } from "../types/providers/release.ts";
+import {
+  resolveRuntimeConfigOverride,
+  synchronizeRuntimeStateAfterOverride,
+} from "../tasks/runtime-override.ts";
 
 interface AutoWorkflowOptions {
   workingBranchResult: WorkingBranchResult;
@@ -146,7 +148,7 @@ export async function executeAutoStrategy(
       rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
@@ -254,7 +256,7 @@ export async function executeAutoStrategy(
       rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
@@ -309,7 +311,7 @@ export async function executeAutoStrategy(
         rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
         config: _releasePreRuntimeConfigResult.resolvedRuntime,
       };
-      await synchronizeRuntimeState({
+      await synchronizeRuntimeStateAfterOverride({
         provider,
         config: runSettings.config,
         rawConfig: runSettings.rawConfig,
@@ -400,7 +402,7 @@ export async function executeAutoStrategy(
         rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
         config: _releasePostRuntimeConfigResult.resolvedRuntime,
       };
-      await synchronizeRuntimeState({
+      await synchronizeRuntimeStateAfterOverride({
         provider,
         config: runSettings.config,
         rawConfig: runSettings.rawConfig,

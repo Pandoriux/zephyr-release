@@ -1,10 +1,7 @@
 import type { PlatformProvider } from "./types/providers/platform-provider.ts";
 import { logger } from "./tasks/logger.ts";
 import { getInputs } from "./tasks/inputs.ts";
-import {
-  resolveConfig,
-  resolveRuntimeConfigOverride,
-} from "./tasks/configs/config.ts";
+import { resolveConfig } from "./tasks/configs/config.ts";
 import { runCommands } from "./tasks/command.ts";
 import {
   exportBaseOperationVariables,
@@ -16,7 +13,10 @@ import type { OperationRunSettings } from "./types/operation-context.ts";
 import { executeAutoStrategy } from "./workflows/auto.ts";
 import { SafeExit } from "./errors/safe-exit.ts";
 import { bootstrapOperation } from "./workflows/bootstrap.ts";
-import { synchronizeRuntimeState } from "./tasks/synchronize-runtime-state.ts";
+import {
+  resolveRuntimeConfigOverride,
+  synchronizeRuntimeStateAfterOverride,
+} from "./tasks/runtime-override.ts";
 
 export async function run(provider: PlatformProvider) {
   logger.stepStart("Starting: Get operation inputs");
@@ -88,7 +88,7 @@ export async function run(provider: PlatformProvider) {
         rawConfig: _basePreRuntimeConfigResult.rawResolvedRuntime,
         config: _basePreRuntimeConfigResult.resolvedRuntime,
       };
-      await synchronizeRuntimeState({
+      await synchronizeRuntimeStateAfterOverride({
         provider,
         config: runSettings.config,
         rawConfig: runSettings.rawConfig,

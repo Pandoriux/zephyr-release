@@ -29,10 +29,7 @@ import {
 import type { ProviderInputs } from "../types/providers/inputs.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
-import {
-  STRING_PATTERN_CONTEXT,
-  stringifyCurrentPatternContext,
-} from "./string-templates-and-patterns/pattern-context.ts";
+import { stringifyCurrentPatternContext } from "./string-templates-and-patterns/pattern-context.ts";
 
 export async function exportBaseOperationVariables(
   provider: PlatformProvider,

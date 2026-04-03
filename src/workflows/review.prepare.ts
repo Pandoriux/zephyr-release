@@ -21,10 +21,8 @@ import {
   createFixedPreviousVersionStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
-import { synchronizeRuntimeState } from "../tasks/synchronize-runtime-state.ts";
 import { generatePrepareChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
-import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPrepareOperationVariables,
   exportPrePrepareOperationVariables,
@@ -32,6 +30,10 @@ import {
 import type { OperationRunSettings } from "../types/operation-context.ts";
 import { addLabelsToProposalOnCreate } from "../tasks/label.ts";
 import type { BootstrapResult } from "./bootstrap.ts";
+import {
+  resolveRuntimeConfigOverride,
+  synchronizeRuntimeStateAfterOverride,
+} from "../tasks/runtime-override.ts";
 
 export async function executeReviewPreparePhase(
   provider: PlatformProvider,
@@ -132,7 +134,7 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePreRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePreRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
@@ -276,7 +278,7 @@ export async function executeReviewPreparePhase(
       rawConfig: _preparePostRuntimeConfigResult.rawResolvedRuntime,
       config: _preparePostRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,

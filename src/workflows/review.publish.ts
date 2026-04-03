@@ -1,6 +1,5 @@
 import { generatePublishChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
-import { resolveRuntimeConfigOverride } from "../tasks/configs/config.ts";
 import {
   exportPostPublishOperationVariables,
   exportPrePublishOperationVariables,
@@ -10,10 +9,13 @@ import { logger } from "../tasks/logger.ts";
 import { extractChangelogFromProposal } from "../tasks/proposal.ts";
 import { attachReleaseAssets, createRelease } from "../tasks/release.ts";
 import {
+  resolveRuntimeConfigOverride,
+  synchronizeRuntimeStateAfterOverride,
+} from "../tasks/runtime-override.ts";
+import {
   createDynamicChangelogStringPatternContext,
   createFixedVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
-import { synchronizeRuntimeState } from "../tasks/synchronize-runtime-state.ts";
 import { createTag } from "../tasks/tag.ts";
 import {
   getPrimaryVersionFile,
@@ -121,7 +123,7 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePreRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePreRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
@@ -220,7 +222,7 @@ export async function executeReviewPublishPhase(
       rawConfig: _releasePostRuntimeConfigResult.rawResolvedRuntime,
       config: _releasePostRuntimeConfigResult.resolvedRuntime,
     };
-    await synchronizeRuntimeState({
+    await synchronizeRuntimeStateAfterOverride({
       provider,
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,

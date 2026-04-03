@@ -39,7 +39,7 @@
           "type": "string",
           "minLength": 1,
           "default": "zephyr-release/{{ triggerBranchName }}",
-          "description": "String template for branch name that Zephyr Release will use.\nAllowed patterns to use are: fixed base string patterns.\nDefault: \"zephyr-release/{{ triggerBranchName }}\""
+          "description": "String template for branch name that Zephyr Release will use.\nAllowed patterns to use are: fixed base string patterns.\nNote: This value is immutable at runtime and cannot be changed via `runtime_config_override`.\nDefault: \"zephyr-release/{{ triggerBranchName }}\""
         },
         "title_template": {
           "type": "string",
@@ -82,139 +82,247 @@
           "minLength": 1,
           "description": "Path to text file containing proposal footer template. Overrides `footer_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
-        "label": {
+        "labels": {
           "type": "object",
           "properties": {
             "on_create": {
               "anyOf": [
                 {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "name": {
+                  "anyOf": [
+                    {
                       "type": "string",
                       "minLength": 1
                     },
-                    "description": {
-                      "type": "string"
-                    },
-                    "color": {
-                      "type": "string",
-                      "minLength": 1,
-                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                      "default": "#ededed",
-                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "color": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                          "default": "#ededed",
+                          "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                        },
+                        "create_if_missing": {
+                          "type": "boolean",
+                          "default": false
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ]
                     }
-                  },
-                  "required": [
-                    "name"
                   ]
-                }
-              ],
-              "default": {
-                "name": "release: pending",
-                "description": "The proposal is pending release.",
-                "color": "#FBCA04"
-              }
-            },
-            "on_close": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
                 },
                 {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "color": {
-                      "type": "string",
-                      "minLength": 1,
-                      "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
-                      "default": "#ededed",
-                      "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
-                    }
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                            "default": "#ededed",
+                            "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                          },
+                          "create_if_missing": {
+                            "type": "boolean",
+                            "default": false
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
+                      }
+                    ]
                   },
-                  "required": [
-                    "name"
+                  "minItems": 1
+                }
+              ]
+            },
+            "on_merge": {
+              "type": "object",
+              "properties": {
+                "add": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "color": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                              "default": "#ededed",
+                              "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                            },
+                            "create_if_missing": {
+                              "type": "boolean",
+                              "default": false
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "color": {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                                "default": "#ededed",
+                                "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                              },
+                              "create_if_missing": {
+                                "type": "boolean",
+                                "default": false
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          }
+                        ]
+                      },
+                      "minItems": 1
+                    }
+                  ]
+                },
+                "remove": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "color": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                              "default": "#ededed",
+                              "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                            },
+                            "create_if_missing": {
+                              "type": "boolean",
+                              "default": false
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "color": {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^#(?:[\\da-fA-F]{3,4}|[\\da-fA-F]{6}|[\\da-fA-F]{8})$",
+                                "default": "#ededed",
+                                "description": "The hexadecimal color code for the label, in standard format with the leading #.\nDefault: \"#ededed\""
+                              },
+                              "create_if_missing": {
+                                "type": "boolean",
+                                "default": false
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          }
+                        ]
+                      },
+                      "minItems": 1
+                    }
                   ]
                 }
-              ],
-              "default": {
-                "name": "release: released",
-                "description": "The proposal is closed and the release has completed.",
-                "color": "#0E8A16"
-              }
+              },
+              "required": [],
+              "description": "Labels to attach and remove from proposals when merged. Can be a string, a label object, or an array containing either.\nFor remove, you can use \"<ALL_ON_CREATE>\" to remove all labels added in `on_create`."
             }
           },
           "required": [],
-          "default": {},
-          "description": "Core label used by Zephyr Release to track proposals, managed exclusively by the tool. These label should not be manually added or removed."
-        },
-        "additional_label": {
-          "type": "object",
-          "properties": {
-            "on_create_add": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "on_close_add": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            },
-            "on_close_remove": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "minItems": 1
-                }
-              ]
-            }
-          },
-          "required": [],
-          "default": {},
-          "description": "Additional labels to attach to proposals, managed and supplied by you. Unlike the core label, these labels are not automatically created if missing."
+          "description": "Labels to attach and remove from proposals on different stages."
         },
         "assignees": {
           "anyOf": [
@@ -1046,7 +1154,7 @@
       "required": [
         "path"
       ],
-      "description": "A dynamic configuration file to deep merge over the resolved config at runtime, typically generated by a `commandHook` script.\nThis file is always read from the local filesystem. If the file does not exist or empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error."
+      "description": "A dynamic configuration file to deep merge over the resolved config at runtime, typically generated by a `commandHook` script.\nThis file is always read from the local filesystem. If the file does not exist or empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error.\nNote: Some core structural fields (e.g., `review.working_branch_name_template`) are protected and cannot be overridden."
     },
     "initial_version": {
       "type": "string",
@@ -1793,7 +1901,7 @@
           "type": "string",
           "minLength": 1,
           "default": "- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} [{{ hash | slice: 0, 7 }}](\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})",
-          "description": "String template for each entries in the changelog release sections, using with fixed base and version string patterns. Allowed patterns to use are: all fixed and dynamic string patterns.\nAdditionally, you can use a special set of dynamic patterns which are:\n{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\nAbout special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional\nDefault: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} [{{ hash | slice: 0, 7 }}](\\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})\""
+          "description": "String template for each entries in the changelog release sections. Allowed patterns to use are: all fixed and dynamic string patterns.\nAdditionally, you can use a special set of dynamic patterns which are:\n{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\nAbout special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional\nDefault: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} [{{ hash | slice: 0, 7 }}](\\n  {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }})\""
         },
         "release_section_entry_template_path": {
           "type": "string",
@@ -1808,21 +1916,13 @@
         "release_breaking_section_entry_template": {
           "type": "string",
           "minLength": 1,
-          "description": "Basically the same as `release_section_entry_template`, but for breaking changes specifically. If not provided, falls back to `release_section_entry_template`.\nAllowed patterns to use are: all fixed and dynamic string patterns."
+          "default": "- {% if scope %}**{{ scope }}:** {% endif %}{{ breakingDesc }}",
+          "description": "Basically the same as `release_section_entry_template`, but for breaking changes specifically. If not provided, falls back to `release_section_entry_template`.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"- {% if scope %}**{{ scope }}:** {% endif %}{{ breakingDesc }}\""
         },
         "release_breaking_section_entry_template_path": {
           "type": "string",
           "minLength": 1,
           "description": "Path to text file containing changelog release breaking section entry template. Overrides `release_breaking_section_entry_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
-        },
-        "release_footer_template": {
-          "type": "string",
-          "description": "String template for footer of a changelog release, using with string patterns.\nAllowed patterns to use are: all fixed and dynamic string patterns."
-        },
-        "release_footer_template_path": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Path to text file containing changelog release footer. Overrides `release_footer_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
         "release_body_override": {
           "type": "string",
@@ -1833,6 +1933,15 @@
           "type": "string",
           "minLength": 1,
           "description": "Path to text file containing changelog release body override, will take precedence over `release_body_override`.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+        },
+        "release_footer_template": {
+          "type": "string",
+          "description": "String template for footer of a changelog release, using with string patterns.\nAllowed patterns to use are: all fixed and dynamic string patterns."
+        },
+        "release_footer_template_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to text file containing changelog release footer. Overrides `release_footer_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         }
       },
       "required": [],
@@ -1904,25 +2013,26 @@
           "type": "string",
           "minLength": 1,
           "default": "v{{ version }}",
-          "description": "String template for tag name, using with string patterns like {{ version }}. Available in string templates as {{ tagName }}.\nAllowed patterns to use are: fixed base and fixed version string patterns and dynamic patterns.\nDefault: \"v{{ version }}\""
+          "description": "String template for tag name, using with string patterns like {{ version }}. Available in string templates as {{ tagName }}.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"v{{ version }}\""
         },
         "type": {
           "enum": [
+            "lightweight",
             "annotated",
-            "lightweight"
+            "signed"
           ],
           "default": "annotated",
-          "description": "The type of Git tag to create, either annotated or lightweight. If annotated, a tag message is required.\nDefault: \"annotated\""
+          "description": "The type of Git tag to create, either lightweight, annotated or signed.\n- If annotated or signed, a tag message is required.\n- If signed, you must pre-configure the CI runner environment with GPG/SSH keys yourself (Zephyr Release does not manage keys for security reasons).\nDefault: \"annotated\""
         },
         "message_template": {
           "type": "string",
-          "default": "Release {{ version }}",
-          "description": "String template for the Git annotated tag message.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"Release {{ version }}\""
+          "default": "Release {{ tagName }}",
+          "description": "String template for the Git annotated or signed tag message.\nAllowed patterns to use are: all fixed and dynamic string patterns.\nDefault: \"Release {{ tagName }}\""
         },
         "message_template_path": {
           "type": "string",
           "minLength": 1,
-          "description": "Path to text file containing Git annotated tag message template. Overrides `message_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
+          "description": "Path to text file containing Git annotated or signed tag message template. Overrides `message_template` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
         "tagger": {
           "type": "object",
