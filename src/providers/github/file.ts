@@ -1,6 +1,8 @@
 import { Buffer } from "node:buffer";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
+import { RequestError } from "@octokit/request-error";
+import { FileNotFoundError } from "../../errors/file.ts";
 
 /** @throws */
 async function githubGetTextFile(
@@ -13,6 +15,12 @@ async function githubGetTextFile(
     repo: githubGetRepositoryName(),
     path: filePath,
     ref,
+  }).catch((error) => {
+    if (error instanceof RequestError && error.status === 404) {
+      throw new FileNotFoundError(`Path '${filePath}' not found on remote.`);
+    }
+
+    throw error;
   });
 
   const data = res.data;

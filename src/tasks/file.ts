@@ -5,6 +5,7 @@ import type {
   SourceModeOption,
   SourceModeOptions,
 } from "../constants/source-mode-options.ts";
+import { FileNotFoundError } from "../errors/file.ts";
 
 /** @throws */
 export async function getTextFile(
@@ -48,7 +49,17 @@ export async function getTextFile(
         );
       }
 
-      return fs.readFileSync(safePath, { encoding: "utf8" });
+      try {
+        return fs.readFileSync(safePath, { encoding: "utf8" });
+      } catch (error) {
+        if (
+          error instanceof Error && "code" in error && error.code === "ENOENT"
+        ) {
+          throw new FileNotFoundError(`Path '${safePath}' not found locally.`);
+        }
+
+        throw error;
+      }
     }
   }
 }
