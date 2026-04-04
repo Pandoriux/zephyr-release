@@ -1,6 +1,7 @@
 import { toTitleCase } from "@std/text/unstable-to-title-case";
 import type { ResolvedCommit } from "./commit.ts";
 import { getTextFile } from "./file.ts";
+import { FileNotFoundError } from "../errors/file.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { ChangelogConfigOutput } from "../schemas/configs/modules/changelog-config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
@@ -354,7 +355,13 @@ export async function prepareChangelogFileToCommit(
     changelogSourceMode,
     path,
     { provider, workspacePath: workspacePath, ref: triggerCommitHash },
-  );
+  ).catch((error) => {
+    if (error instanceof FileNotFoundError) {
+      return "";
+    }
+
+    throw error;
+  });
 
   let header: string;
   if (fileHeaderTemplatePath) {
