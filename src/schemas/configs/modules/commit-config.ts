@@ -64,7 +64,7 @@ export const CommitConfigSchema = v.pipe(
       }),
     ),
 
-    localFilesToCommit: v.pipe(
+    localChangesToCommit: v.pipe(
       v.optional(
         v.union([
           trimNonEmptyStringSchema,
@@ -79,8 +79,8 @@ export const CommitConfigSchema = v.pipe(
       }),
       v.metadata({
         description:
-          "Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. " +
-          'Paths are relative to the repo root. To include all changed files, use a glob such as "**/*".',
+          "Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. " +
+          'Paths are relative to the repo root. To include all changes, use a glob such as "**/*".',
         examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
       }),
     ),

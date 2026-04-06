@@ -299,7 +299,7 @@ type PrepareChangesConfigParams = {
     | "fileFooterTemplate"
     | "fileFooterTemplatePath"
   >;
-  commit: Pick<CommitConfigOutput, "localFilesToCommit">;
+  commit: Pick<CommitConfigOutput, "localChangesToCommit">;
 };
 
 /** @throws */
@@ -308,14 +308,14 @@ export async function prepareChangesToCommit(
   inputs: PrepareChangesInputsParams,
   config: PrepareChangesConfigParams,
   newData: { changelogRelease: string; nextVersion: string },
-): Promise<Map<string, string>> {
+): Promise<Map<string, string | null>> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles, changelog, commit } = config;
-  const { localFilesToCommit } = commit;
+  const { localChangesToCommit } = commit;
   const { writeToFile, path } = changelog;
   const { changelogRelease, nextVersion } = newData;
 
-  const changesData = new Map<string, string>();
+  const changesData = new Map<string, string | null>();
 
   taskLogger.info("Collecting changelog data to commit...");
   if (writeToFile) {
@@ -347,12 +347,15 @@ export async function prepareChangesToCommit(
     changesData.set(normalize(vfPath), vfContent);
   }
 
-  if (localFilesToCommit) {
+  if (localChangesToCommit) {
     taskLogger.info(
-      `Collecting local files data to commit using globs (${localFilesToCommit.length} globs)...`,
+      `Collecting local changes to commit using globs (${localChangesToCommit.length} globs)...`,
     );
 
-    const allChangedFiles: string[] = [];
+    const allChangedFiles: {
+      path: string;
+      isDelete: boolean;
+    }[] = [];
 
     try {
       const output = execSync("git status --porcelain", {
@@ -364,30 +367,32 @@ export async function prepareChangesToCommit(
 
       for (const line of lines) {
         const status = line.slice(0, 2);
+        let filePathPart = line.slice(3).trim();
 
-        // Skip deleted files. If a file is deleted (e.g., ' D', 'D ', 'DD'),
-        // we cannot read its content from disk via getTextFile.
-        if (status.includes("D")) {
+        if (status.includes("R") && filePathPart.includes(" -> ")) {
+          const parts = filePathPart.split(" -> ");
+          const oldPathPart = parts[0];
+          const newPathPart = parts[parts.length - 1];
+
+          if (oldPathPart && newPathPart) {
+            allChangedFiles.push({
+              path: gitUnquote(oldPathPart.trim()),
+              isDelete: true,
+            });
+            allChangedFiles.push({
+              path: gitUnquote(newPathPart.trim()),
+              isDelete: false,
+            });
+          }
+
           continue;
         }
 
-        let filePathPart = line.slice(3).trim();
-
-        // Handle renames (e.g., 'R  "old file.ts" -> "new file.ts"')
-        if (filePathPart.includes(" -> ")) {
-          const parts = filePathPart.split(" -> ");
-          filePathPart = parts[parts.length - 1] ?? "";
-        }
-
-        // Handle quotes wrapping files with spaces (e.g., '"my file.ts"')
-        if (filePathPart.startsWith('"') && filePathPart.endsWith('"')) {
-          filePathPart = filePathPart.slice(1, -1);
-          // Unescape any inner quotes Git might have escaped
-          filePathPart = filePathPart.replace(/\\"/g, '"');
-        }
+        const isDelete = status.includes("D");
+        filePathPart = gitUnquote(filePathPart);
 
         if (filePathPart.length > 0) {
-          allChangedFiles.push(filePathPart);
+          allChangedFiles.push({ path: filePathPart, isDelete });
         }
       }
     } catch (error) {
@@ -397,18 +402,24 @@ export async function prepareChangesToCommit(
     }
 
     // Match the strictly parsed git files against the user's globs
-    const isMatch = picomatch(localFilesToCommit, { dot: true });
-    const targetLocalFiles = allChangedFiles.filter((file) => isMatch(file));
+    const isMatch = picomatch(localChangesToCommit, { dot: true });
 
-    for (const filePath of targetLocalFiles) {
-      const normalizedPath = normalize(filePath);
+    for (const entry of allChangedFiles) {
+      if (!isMatch(entry.path)) continue;
+
+      const normalizedPath = normalize(entry.path);
+
+      if (entry.isDelete) {
+        changesData.set(normalizedPath, null);
+        continue;
+      }
 
       // DEDUPLICATION:
       // If "changelog.md" is already in the manifest from step 1,
-      // we do NOT overwrite it with the old version from disk.
+      // we do NOT overwrite it with the old version from disk
       if (changesData.has(normalizedPath)) continue;
 
-      const fileContent = await getTextFile("local", normalizedPath, {
+      const fileContent = await getTextFile("local", entry.path, {
         workspacePath: workspacePath,
       });
       changesData.set(normalizedPath, fileContent);
@@ -416,6 +427,13 @@ export async function prepareChangesToCommit(
   }
 
   return changesData;
+}
+
+function gitUnquote(p: string) {
+  if (p.startsWith('"') && p.endsWith('"')) {
+    return p.slice(1, -1).replace(/\\"/g, '"');
+  }
+  return p;
 }
 
 type CommitChangesInputsParams = Pick<
@@ -443,7 +461,7 @@ export async function commitChangesToBranch(
   config: CommitChangesConfigParams,
   commitData: {
     baseTreeHash: string;
-    changesToCommit: Map<string, string>;
+    changesToCommit: Map<string, string | null>;
     targetBranchName: string;
     force?: boolean;
   },
@@ -459,6 +477,11 @@ export async function commitChangesToBranch(
     footerTemplatePath,
   } = config.commit;
   const { baseTreeHash, changesToCommit, targetBranchName, force } = commitData;
+
+  const resolvedChangesToCommit = new Map<string, string | null>();
+  for (const [path, content] of changesToCommit) {
+    resolvedChangesToCommit.set(path, content);
+  }
 
   let commitHeader: string;
   if (headerTemplatePath) {

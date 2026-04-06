@@ -50,12 +50,14 @@
     }
   ],
 
-  // Ex: Include additional files using "ALL" option when creating proposal
-  "local-files-to-commit": "ALL",
-  // Ex: Include specific paths/globs
-  // "local-files-to-commit": ["docs/**/*.md", "dist/**"],
-  // Ex: Single path
-  // "local-files-to-commit": ["CHANGELOG.md"],
+  "commit": {
+    // Ex: Include additional local changes to include in the commit (add, modify, or delete files)
+    "local-changes-to-commit": "**/*"
+    // Ex: Include specific paths/globs
+    // "local-changes-to-commit": ["docs/**/*.md", "dist/**"],
+    // Ex: Single path
+    // "local-changes-to-commit": ["CHANGELOG.md"]
+  },
 
   "commit-types": [
     {
