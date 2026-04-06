@@ -28,14 +28,14 @@ export const TagConfigSchema = v.pipe(
       }),
     ),
     type: v.pipe(
-      v.optional(v.enum(TagTypeOptions), TagTypeOptions.annotated),
+      v.optional(v.enum(TagTypeOptions), TagTypeOptions.lightweight),
       v.metadata({
         description:
           "The type of Git tag to create, either lightweight, annotated or signed.\n" +
           "- If annotated or signed, a tag message is required.\n" +
           "- If signed, you must pre-configure the CI runner environment with GPG/SSH keys yourself (Zephyr Release " +
           "does not manage keys for security reasons).\n" +
-          `Default: ${JSON.stringify(TagTypeOptions.annotated)}`,
+          `Default: ${JSON.stringify(TagTypeOptions.lightweight)}`,
       }),
     ),
     messageTemplate: v.pipe(

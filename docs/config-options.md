@@ -984,7 +984,7 @@ Allowed patterns to use in template are: [all string patterns](./string-template
 #### tag > type (Optional)
 
 Type: `"lightweight" | "annotated" | "signed"`  
-Default: `"annotated"`
+Default: `"lightweight"`
 
 The type of Git tag to create.
 
@@ -998,7 +998,7 @@ Zephyr Release intentionally does not manage, accept, or process private cryptog
 
 It is highly recommended to use established CI integrations or native pipeline steps in an earlier pipeline stage to import your keys, rather than attempting to script the setup using `command-hooks`. This keeps your private secrets safely isolated from the release configuration.
 
-Furthermore, if you are using ephemeral or shared cloud runners, security best practices dictate that you should always include a final cleanup step in your CI pipeline to securely wipe the private key from the machine after Zephyr Release completes, regardless of whether the operation succeeds or fails.
+Furthermore, if you are using temporary or shared cloud runners, you should always include a final cleanup step in your CI pipeline to securely wipe the private key from the machine after Zephyr Release completes, regardless of whether the operation succeeds or fails.
 
 #### tag > message-template (Optional)
 
