@@ -1980,7 +1980,7 @@
           "minLength": 1,
           "description": "Path to text file containing commit footer template. Overrides `footerTemplate` when both are provided.\nTo customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional"
         },
-        "localFilesToCommit": {
+        "localChangesToCommit": {
           "anyOf": [
             {
               "type": "string",

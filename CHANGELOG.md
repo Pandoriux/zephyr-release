@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.9.0](https://github.com/Pandoriux/zephyr-release/compare/v0.8.0...v0.9.0) (2026-04-06)
+
+### Features
+
+- add signed tag support ([#32](https://github.com/Pandoriux/zephyr-release/issues/32)) ([b6fd10b](https://github.com/Pandoriux/zephyr-release/commit/b6fd10b759129d5b3de83441ac8512f9c959dc9c))
+- auto-create changelog file if it does not exist ([#33](https://github.com/Pandoriux/zephyr-release/issues/33)) ([e0889b7](https://github.com/Pandoriux/zephyr-release/commit/e0889b7a9ddfcc9d2dc32ec95973e4366371a2f0))
+- change default value for `DEFAULT_TAG_MESSAGE_TEMPLATE` ([a4dd31d](https://github.com/Pandoriux/zephyr-release/commit/a4dd31d7c0c0240bd0949ddb9a52a6a7be027564))
+- handle git deletions and renames in prepare changes ([#34](https://github.com/Pandoriux/zephyr-release/issues/34)) ([87622c2](https://github.com/Pandoriux/zephyr-release/commit/87622c237b12445563b8085e37d98fc146983ace))
+- prefer breaking change footer text in changelog generation ([#31](https://github.com/Pandoriux/zephyr-release/issues/31)) ([d57974d](https://github.com/Pandoriux/zephyr-release/commit/d57974dc4c1ab29bf81d0082034ae47721d65d27))
+- rework exit behavior on non critical errors ([#29](https://github.com/Pandoriux/zephyr-release/issues/29)) ([ee6e6c6](https://github.com/Pandoriux/zephyr-release/commit/ee6e6c655ae94a6fe41a3dd7c33053e27fb22af8))
+- synchronize pattern context and env vars after runtime override ([#30](https://github.com/Pandoriux/zephyr-release/issues/30)) ([ed19d09](https://github.com/Pandoriux/zephyr-release/commit/ed19d093b8a5c835cbb4ad7c96591e53bcbdf512))
+- unify review labels into a single configuration object ([#28](https://github.com/Pandoriux/zephyr-release/issues/28)) ([d495a5f](https://github.com/Pandoriux/zephyr-release/commit/d495a5f9f776ad1b78975ccced251bad7083d9c8))
+
+### Bug Fixes
+
+- correct import path ([d92c5f3](https://github.com/Pandoriux/zephyr-release/commit/d92c5f314b1179ad7e5ee28cc74a46a59ab705ca))
+
 ## [0.8.0](https://github.com/Pandoriux/zephyr-release/compare/v0.7.0...v0.8.0) (2026-03-24)
 
 ### Features
