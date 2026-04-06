@@ -151,7 +151,7 @@ async function githubCreateCommitOnBranch(
   data: {
     triggerCommitHash: string;
     baseTreeHash: string;
-    changesToCommit: Map<string, string>;
+    changesToCommit: Map<string, string | null>;
     message: string;
     targetBranchName: string;
     force?: boolean;
@@ -169,12 +169,23 @@ async function githubCreateCommitOnBranch(
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 
-  const newTreeItems = Array.from(changesToCommit, ([path, content]) => ({
-    path,
-    mode: "100644" as const,
-    type: "blob" as const,
-    content,
-  }));
+  const newTreeItems = Array.from(changesToCommit, ([path, content]) => {
+    if (content) {
+      return {
+        path,
+        mode: "100644" as const,
+        type: "blob" as const,
+        content,
+      };
+    } else {
+      return {
+        path,
+        mode: "100644" as const,
+        type: "blob" as const,
+        sha: null,
+      };
+    }
+  });
 
   const createTreeRes = await octokit.rest.git.createTree({
     owner,
@@ -279,7 +290,7 @@ export function makeGithubCreateCommitOnBranch(
   return (
     triggerCommitHash: string,
     baseTreeHash: string,
-    changesToCommit: Map<string, string>,
+    changesToCommit: Map<string, string | null>,
     message: string,
     targetBranchName: string,
     force?: boolean,

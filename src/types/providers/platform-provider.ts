@@ -81,7 +81,7 @@ export interface PlatformProvider {
   createCommitOnBranch: (
     triggerCommitHash: string,
     baseTreeHash: string,
-    changesToCommit: Map<string, string>,
+    changesToCommit: Map<string, string | null>,
     message: string,
     targetBranchName: string,
     force?: boolean,

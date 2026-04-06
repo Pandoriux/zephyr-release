@@ -181,7 +181,7 @@ export async function exportPrePrepareOperationVariables(
 export async function exportPostPrepareOperationVariables(
   provider: PlatformProvider,
   commitHash: string,
-  changesData: Map<string, string>,
+  changesData: Map<string, string | null>,
   modeRelatedData?: {
     proposalId?: string;
     config?: ConfigOutput;
