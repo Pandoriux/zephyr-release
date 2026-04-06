@@ -87,7 +87,7 @@ jobs:
         uses: Pandoriux/zephyr-release@v1
         with:
           token: ${{ secrets.CUSTOM_TOKEN }} # Omit this line to use the default GITHUB_TOKEN
-          config-path: ".github/zephyr-release-config.jsonc"
+          config-path: ".zephyr-release/config.jsonc"
           config-format: "jsonc"
 
           # Override specific config values directly in the workflow
