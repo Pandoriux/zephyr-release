@@ -117,7 +117,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [commit \> body-template-path (Optional)](#commit--body-template-path-optional)
     - [commit \> footer-template (Optional)](#commit--footer-template-optional)
     - [commit \> footer-template-path (Optional)](#commit--footer-template-path-optional)
-    - [commit \> local-files-to-commit (Optional)](#commit--local-files-to-commit-optional)
+    - [commit \> local-changes-to-commit (Optional)](#commit--local-changes-to-commit-optional)
   - [tag (Optional)](#tag-optional)
     - [tag \> create-tag (Optional)](#tag--create-tag-optional)
     - [tag \> name-template (Optional)](#tag--name-template-optional)
@@ -901,7 +901,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 ### commit (Optional)
 
 Type: `object`  
-**Properties:** [`header-template`](#commit--header-template-optional), [`header-template-path`](#commit--header-template-path-optional), [`body-template`](#commit--body-template-optional), [`body-template-path`](#commit--body-template-path-optional), [`footer-template`](#commit--footer-template-optional), [`footer-template-path`](#commit--footer-template-path-optional), [`local-files-to-commit`](#commit--local-files-to-commit-optional)
+**Properties:** [`header-template`](#commit--header-template-optional), [`header-template-path`](#commit--header-template-path-optional), [`body-template`](#commit--body-template-optional), [`body-template-path`](#commit--body-template-path-optional), [`footer-template`](#commit--footer-template-optional), [`footer-template-path`](#commit--footer-template-path-optional), [`local-changes-to-commit`](#commit--local-changes-to-commit-optional)
 
 Configuration specific to commits. These templates are used to build the commit message when Zephyr Release creates a commit.
 
@@ -951,13 +951,13 @@ Path to text file containing commit footer template. Overrides `footer-template`
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
-#### commit > local-files-to-commit (Optional)
+#### commit > local-changes-to-commit (Optional)
 
 Type: `string | string[]`
 
-Additional changed local files to include in the commit. Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. Paths are relative to the repo root.
 
-To include all changed files, you can use a glob pattern such as `"**/*"`.
+To include all changes, you can use a glob pattern such as `"**/*"`.
 
 ### tag (Optional)
 

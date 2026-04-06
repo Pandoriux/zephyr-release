@@ -299,7 +299,7 @@ type PrepareChangesConfigParams = {
     | "fileFooterTemplate"
     | "fileFooterTemplatePath"
   >;
-  commit: Pick<CommitConfigOutput, "localFilesToCommit">;
+  commit: Pick<CommitConfigOutput, "localChangesToCommit">;
 };
 
 /** @throws */
@@ -311,7 +311,7 @@ export async function prepareChangesToCommit(
 ): Promise<Map<string, string>> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles, changelog, commit } = config;
-  const { localFilesToCommit } = commit;
+  const { localChangesToCommit } = commit;
   const { writeToFile, path } = changelog;
   const { changelogRelease, nextVersion } = newData;
 
@@ -347,9 +347,9 @@ export async function prepareChangesToCommit(
     changesData.set(normalize(vfPath), vfContent);
   }
 
-  if (localFilesToCommit) {
+  if (localChangesToCommit) {
     taskLogger.info(
-      `Collecting local files data to commit using globs (${localFilesToCommit.length} globs)...`,
+      `Collecting local files data to commit using globs (${localChangesToCommit.length} globs)...`,
     );
 
     const allChangedFiles: string[] = [];
@@ -397,7 +397,7 @@ export async function prepareChangesToCommit(
     }
 
     // Match the strictly parsed git files against the user's globs
-    const isMatch = picomatch(localFilesToCommit, { dot: true });
+    const isMatch = picomatch(localChangesToCommit, { dot: true });
     const targetLocalFiles = allChangedFiles.filter((file) => isMatch(file));
 
     for (const filePath of targetLocalFiles) {
