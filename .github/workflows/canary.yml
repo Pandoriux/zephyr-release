@@ -1,0 +1,47 @@
+name: Update Canary Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  canary-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: latest
+
+      - name: Run Build
+        run: deno task build
+
+      - name: Reset Canary to Main
+        run: |
+          # 1. Try to forcefully move the existing canary branch pointer to the current main commit
+          gh api --method PATCH /repos/${{ github.repository }}/git/refs/heads/canary \
+            -f sha=${{ github.sha }} \
+            -F force=true || \
+
+          # 2. If that fails (because the branch doesn't exist yet), create it
+          gh api --method POST /repos/${{ github.repository }}/git/refs \
+            -f ref='refs/heads/canary' \
+            -f sha=${{ github.sha }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit build artifacts to canary
+        uses: iarekylew00t/verified-bot-commit@v2
+        with:
+          ref: canary
+          message: "chore: update canary build artifacts [skip ci]"
+          files: |
+            dist/**/*
+            schemas/**/*
