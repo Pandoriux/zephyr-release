@@ -131,7 +131,7 @@ These variables are available starting from the first [`command-hooks > prepare 
 #### Pre Publish
 
 - **version:** The version string used for the release  
-  Export: zr-next-version; Env: ZR_NEXT_VERSION
+  Export: zr-version; Env: ZR_VERSION
 
 #### Post Publish
 

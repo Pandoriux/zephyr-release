@@ -510,11 +510,11 @@ Config file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `t
 Type: `string`  
 Default: `"0.1.0"`
 
-The initial semantic version used when a project has no existing version defined in its main version file (for example, `version.txt`, `package.json`, `deno.json`, `cargo.toml`, etc.).
+The initial semantic version used when a project has no existing version defined in its main version file, or the existing is `0.0.0` (typically during the first setup or initialization of a project).
 
-This value serves as the starting version when the version field is missing, undefined, or empty - typically during the first setup or initialization of a project.
+If the version is missing or `0.0.0`, Zephyr Release will use this initial value exactly as the next version without calculating any bumps, ensuring your first release stays predictable even if you already have several commits. Once a version is established, subsequent releases will increment from the current value rather than this initial one.
 
-Once a version is established, subsequent releases will increment from the current value rather than this initial one.
+If you actually want your starting version to be `0.0.0`, just set it as the `initial-version` value. Zephyr Release will handles this under the hood to ensure no loops happen (like see `0.0.0`, fall back to an initial version `0.0.0`, rinse and repeat, stuck at zero forever).
 
 ### version-files (Required)
 

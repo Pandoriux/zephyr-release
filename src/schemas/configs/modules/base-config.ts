@@ -103,7 +103,8 @@ export const BaseConfigSchema = v.object({
     v.optional(v.pipe(v.string(), v.regex(SEMVER_REGEX)), "0.1.0"),
     v.metadata({
       description:
-        "Initial SemVer version applied when no existing version is found.\n" +
+        "Initial SemVer version used when no existing version is found or the existing one is `0.0.0`.\n" +
+        "You can still set this to `0.0.0` if you want it as the starting value; looping problems are handled automatically under the hood.\n" +
         'Default: "0.1.0"',
     }),
   ),

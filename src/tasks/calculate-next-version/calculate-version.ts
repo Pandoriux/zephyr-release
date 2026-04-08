@@ -59,6 +59,28 @@ export function calculateNextVersion(
     return parse(initialVersion);
   }
 
+  // Version is 0.0.0
+  if (
+    previousVersion.major === 0 &&
+    previousVersion.minor === 0 &&
+    previousVersion.patch === 0 &&
+    (previousVersion.prerelease?.length ?? 0) === 0 &&
+    (previousVersion.build?.length ?? 0) === 0 &&
+    initialVersion !== "0.0.0"
+  ) {
+    taskLogger.info(
+      "Previous version is 0.0.0, treating it as if there is no previous version and using initial version for calculation",
+    );
+
+    if (!canParse(initialVersion)) {
+      throw new Error(
+        `Initial version '${initialVersion}' is not a valid semver object`,
+      );
+    }
+
+    return parse(initialVersion);
+  }
+
   // Previous version exists, calculate the next version
   taskLogger.info(
     `Previous version got from version file is ${previousVersion}`,
