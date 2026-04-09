@@ -63,7 +63,7 @@ export async function executeAutoStrategy(
    */
   let runSettings: OperationRunSettings = currentRunSettings;
 
-  logger.subHeader("Auto mode execution (prepare): Creating commit...");
+  logger.header("Auto mode execution (prepare): Creating commit...");
 
   logger.stepStart("Starting: Get current version");
   const currentVersion = await getCurrentVersion(
@@ -276,7 +276,7 @@ export async function executeAutoStrategy(
   /////////////////////
 
   if (runSettings.config.tag.createTag) {
-    logger.subHeader(
+    logger.header(
       "Auto mode execution (publish): Creating tag and release...",
     );
 
@@ -419,7 +419,7 @@ export async function executeAutoStrategy(
       );
     }
   } else {
-    logger.subHeader(
+    logger.header(
       "Auto mode execution (publish): Skip create tag and release (disabled in config)",
     );
   }
