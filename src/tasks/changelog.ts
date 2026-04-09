@@ -96,9 +96,10 @@ export async function generatePublishChangelogReleaseContent(
     // If no override, the value is just the proposal body.
     return { release: proposalChangelogRelease };
   } catch (error) {
-    const message = `Failed to generate publish changelog release content: ${
-      error instanceof Error ? error.message : String(error)
-    }`;
+    const message =
+      `Failed to generate publish changelog release content using override: ${
+        error instanceof Error ? error.message : String(error)
+      } - falling back to using proposal body as release content.`;
 
     taskLogger.warn(message);
     failedNonCriticalTasks.push(message);

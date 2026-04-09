@@ -28,8 +28,12 @@ interface CreateReleaseConfigParams {
     | "setLatest"
     | "titleTemplate"
     | "titleTemplatePath"
+    | "headerTemplate"
+    | "headerTemplatePath"
     | "bodyTemplate"
     | "bodyTemplatePath"
+    | "footerTemplate"
+    | "footerTemplatePath"
   >;
 }
 
@@ -47,8 +51,12 @@ export async function createRelease(
     setLatest,
     titleTemplate,
     titleTemplatePath,
+    headerTemplate,
+    headerTemplatePath,
     bodyTemplate,
     bodyTemplatePath,
+    footerTemplate,
+    footerTemplatePath,
   } = config.release;
 
   let releaseNoteTitle: string | undefined;
@@ -63,6 +71,18 @@ export async function createRelease(
     releaseNoteTitle = await resolveStringTemplate(titleTemplate);
   }
 
+  let releaseNoteHeader: string | undefined;
+  if (headerTemplatePath) {
+    const releaseHeaderTemplate = await getTextFile(
+      sourceMode.overrides?.[headerTemplatePath] ?? sourceMode.mode,
+      headerTemplatePath,
+      { provider, workspacePath, ref: triggerCommitHash },
+    );
+    releaseNoteHeader = await resolveStringTemplate(releaseHeaderTemplate);
+  } else if (headerTemplate !== undefined) {
+    releaseNoteHeader = await resolveStringTemplate(headerTemplate);
+  }
+
   let releaseNoteBody: string | undefined;
   if (bodyTemplatePath) {
     const releaseBodyTemplate = await getTextFile(
@@ -75,10 +95,26 @@ export async function createRelease(
     releaseNoteBody = await resolveStringTemplate(bodyTemplate);
   }
 
+  let releaseNoteFooter: string | undefined;
+  if (footerTemplatePath) {
+    const releaseFooterTemplate = await getTextFile(
+      sourceMode.overrides?.[footerTemplatePath] ?? sourceMode.mode,
+      footerTemplatePath,
+      { provider, workspacePath, ref: triggerCommitHash },
+    );
+    releaseNoteFooter = await resolveStringTemplate(releaseFooterTemplate);
+  } else if (footerTemplate !== undefined) {
+    releaseNoteFooter = await resolveStringTemplate(footerTemplate);
+  }
+
+  const fullReleaseBody = [releaseNoteHeader, releaseNoteBody, releaseNoteFooter]
+    .filter(Boolean)
+    .join("\n\n");
+
   const createdRelease = await provider.createRelease(
     await resolveStringTemplate(tag.nameTemplate),
     releaseNoteTitle,
-    releaseNoteBody,
+    fullReleaseBody,
     { prerelease, draft, setLatest },
   );
   taskLogger.info(`Release created: ${createdRelease.url}`);
