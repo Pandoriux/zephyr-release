@@ -1,6 +1,7 @@
 export function jsonValueNormalizer(k: string, v: unknown) {
   // Allow all natively supported JSON-compatible values to pass through
   if (
+    v === undefined ||
     v === null ||
     typeof v === "string" ||
     typeof v === "boolean" ||
