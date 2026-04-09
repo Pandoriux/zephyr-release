@@ -572,7 +572,7 @@ Marks this file as the primary source of truth for the current version.
 ### commit-types (Optional)
 
 Type: `array of objects`  
-Default: `{ type: "feat", section: "Features" }, { type: "fix", section: "Bug Fixes" }, { type: "perf", section: "Performance Improvements" }, { type: "revert", section: "Reverts" }`
+Default: [`DEFAULT_COMMIT_TYPES`](../src/constants/defaults/commit.ts)
 
 **Properties:** [`type`](#commit-types--type-required), [`section`](#commit-types--section-optional), [`hidden`](#commit-types--hidden-optional)
 
