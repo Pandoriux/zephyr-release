@@ -16,12 +16,12 @@ export function registerTransformersToTemplateEngine(
       }
       if (typeof tag1 !== "string") {
         throw new Error(
-          `Transformer "wrap_compare_tag" arg 1 requires a string, received ${typeof tag1}`,
+          `Transformer "wrap_compare_tag" arg 1 "tag1" requires a string, received ${typeof tag1}`,
         );
       }
       if (typeof tag2 !== "string") {
         throw new Error(
-          `Transformer "wrap_compare_tag" arg 2 requires a string, received ${typeof tag2}`,
+          `Transformer "wrap_compare_tag" arg 2 "tag2" requires a string, received ${typeof tag2}`,
         );
       }
 
@@ -39,18 +39,18 @@ export function registerTransformersToTemplateEngine(
       }
       if (typeof currentTag !== "string") {
         throw new Error(
-          `Filter "wrap_compare_latest_tag" arg 1 requires a string, received ${typeof currentTag}`,
+          `Filter "wrap_compare_latest_tag" arg 1 "currentTag" requires a string, received ${typeof currentTag}`,
         );
       }
       if (skip !== undefined) {
         if (typeof skip !== "number") {
           throw new Error(
-            `Filter "wrap_compare_latest_tag" arg 2 requires a number (positive integer), received ${typeof skip}`,
+            `Filter "wrap_compare_latest_tag" arg 2 "skip" requires a number (positive integer), received ${typeof skip}`,
           );
         }
         if (!Number.isInteger(skip) || skip < 0) {
           throw new Error(
-            `Filter "wrap_compare_latest_tag" arg 2 must be a positive integer, received ${skip}`,
+            `Filter "wrap_compare_latest_tag" arg 2 "skip" must be a positive integer, received ${skip}`,
           );
         }
       }
