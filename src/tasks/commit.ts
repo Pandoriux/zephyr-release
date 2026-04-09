@@ -27,6 +27,7 @@ import { BranchOutOfDateError } from "../errors/providers/branch.ts";
 import { SafeExit } from "../errors/safe-exit.ts";
 import { VERSION } from "../version.generated.ts";
 import { breakingChangeKeywords } from "../constants/conventional-commit-parser-options.ts";
+import { NoCommitFoundError } from "../errors/providers/commit.ts";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -138,7 +139,7 @@ export interface ResolvedCommitsResult {
   entries: ResolvedCommit[];
 }
 
-/** @throws */
+/** @throws {Error | SafeExit} */
 export async function resolveCommitsFromTriggerToLastRelease(
   provider: PlatformProvider,
   inputs: ResolveCommitsInputsParams,
@@ -150,7 +151,12 @@ export async function resolveCommitsFromTriggerToLastRelease(
   const rawCommits = await provider.findCommitsFromGivenToPreviousTagged(
     triggerCommitHash,
     stopResolvingCommitAt,
-  );
+  ).catch((error) => {
+    if (error instanceof NoCommitFoundError) {
+      throw new SafeExit(error.message);
+    }
+    throw error;
+  });
 
   taskLogger.debugWrap((dLogger) => {
     dLogger.startGroup("Raw collected commits:");
