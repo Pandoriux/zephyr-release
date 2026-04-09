@@ -141,8 +141,12 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> set-latest (Optional)](#release--set-latest-optional)
     - [release \> title-template (Optional)](#release--title-template-optional)
     - [release \> title-template-path (Optional)](#release--title-template-path-optional)
+    - [release \> header-template (Optional)](#release--header-template-optional)
+    - [release \> header-template-path (Optional)](#release--header-template-path-optional)
     - [release \> body-template (Optional)](#release--body-template-optional)
     - [release \> body-template-path (Optional)](#release--body-template-path-optional)
+    - [release \> footer-template (Optional)](#release--footer-template-optional)
+    - [release \> footer-template-path (Optional)](#release--footer-template-path-optional)
     - [release \> assets (Optional)](#release--assets-optional)
 - [Type Definitions](#type-definitions)
   - [AutoStrategy](#autostrategy)
@@ -1055,7 +1059,7 @@ If omitted, defaults to the platform native behavior (recommended).
 ### release (Optional)
 
 Type: `object`  
-**Properties:** [`create-release`](#release--create-release-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`assets`](#release--assets-optional)
+**Properties:** [`create-release`](#release--create-release-optional), [`prerelease`](#release--prerelease-optional), [`draft`](#release--draft-optional), [`set-latest`](#release--set-latest-optional), [`title-template`](#release--title-template-optional), [`title-template-path`](#release--title-template-path-optional), [`header-template`](#release--header-template-optional), [`header-template-path`](#release--header-template-path-optional), [`body-template`](#release--body-template-optional), [`body-template-path`](#release--body-template-path-optional), [`footer-template`](#release--footer-template-optional), [`footer-template-path`](#release--footer-template-path-optional), [`assets`](#release--assets-optional)
 
 Configuration specific to releases.
 
@@ -1103,6 +1107,21 @@ Path to text file containing release title template. Overrides `title-template` 
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
+#### release > header-template (Optional)
+
+Type: `string`
+
+String template for release note header, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### release > header-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing release header template. Overrides `header-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
 #### release > body-template (Optional)
 
 Type: `string`  
@@ -1116,6 +1135,21 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing release body template. Overrides `body-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+#### release > footer-template (Optional)
+
+Type: `string`
+
+String template for release note footer, using with string patterns.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+#### release > footer-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing release footer template. Overrides `footer-template` when both are provided.
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 

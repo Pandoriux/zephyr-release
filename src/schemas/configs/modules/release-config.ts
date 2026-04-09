@@ -54,6 +54,22 @@ export const ReleaseConfigSchema = v.pipe(
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
+    headerTemplate: v.pipe(
+      v.optional(v.string()),
+      v.metadata({
+        description:
+          "String template for release note header, using with string patterns.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
+      }),
+    ),
+    headerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing release header template. Overrides `headerTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+      }),
+    ),
     bodyTemplate: v.pipe(
       v.optional(v.string(), DEFAULT_RELEASE_BODY_TEMPLATE),
       v.metadata({
@@ -68,6 +84,22 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.\n" +
+          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+      }),
+    ),
+    footerTemplate: v.pipe(
+      v.optional(v.string()),
+      v.metadata({
+        description:
+          "String template for release note footer, using with string patterns.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.",
+      }),
+    ),
+    footerTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing release footer template. Overrides `footerTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
       }),
     ),
