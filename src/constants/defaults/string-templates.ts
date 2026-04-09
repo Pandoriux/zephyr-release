@@ -9,7 +9,7 @@ export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
 export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
 
 export const DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE =
-  liquid`## {{ tagName | wrap_compare_latest_tag }} (
+  liquid`## {{ nextVersion | wrap_compare_latest_tag: tagName }} (
     {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- timezone: {{ timeZone }} -->`;
 
 export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
