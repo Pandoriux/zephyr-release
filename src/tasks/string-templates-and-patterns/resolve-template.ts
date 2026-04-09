@@ -21,7 +21,7 @@ export async function resolveStringTemplate(
     const renderedTemplate = await liquidEngine.render(
       parsedTemplate,
       additionalContext
-        ? { ...STRING_PATTERN_CONTEXT, additionalContext }
+        ? { ...STRING_PATTERN_CONTEXT, ...additionalContext }
         : STRING_PATTERN_CONTEXT,
     );
 
