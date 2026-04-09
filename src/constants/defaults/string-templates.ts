@@ -27,8 +27,7 @@ export const DEFAULT_COMMIT_HEADER_TEMPLATE =
 export const DEFAULT_PROPOSAL_TITLE_TEMPLATE =
   liquid`chore: release v{{ nextVersion }}`;
 
-export const DEFAULT_PROPOSAL_HEADER_TEMPLATE =
-  "🤖 New release prepared. Awaiting approval~";
+export const DEFAULT_PROPOSAL_HEADER_TEMPLATE = "Release Proposal";
 
 export const DEFAULT_PROPOSAL_BODY_TEMPLATE = liquid`{{ changelogRelease }}`;
 
