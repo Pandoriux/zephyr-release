@@ -2,9 +2,9 @@ import { format } from "@std/semver";
 import type { WorkingBranchResult } from "../tasks/branch.ts";
 import {
   calculateNextVersion,
-  compareVersionToPreviousVersion,
+  compareNextVersionToCurrentVersion,
 } from "../tasks/calculate-next-version/calculate-version.ts";
-import { getPreviousVersion } from "../tasks/calculate-next-version/previous-version.ts";
+import { getCurrentVersion } from "../tasks/calculate-next-version/previous-version.ts";
 import { generatePrepareChangelogReleaseContent } from "../tasks/changelog.ts";
 import { runCommands } from "../tasks/command.ts";
 import {
@@ -21,8 +21,8 @@ import {
 import { logger } from "../tasks/logger.ts";
 import {
   createDynamicChangelogStringPatternContext,
-  createFixedPreviousVersionStringPatternContext,
-  createFixedVersionStringPatternContext,
+  createFixedCurrentVersionStringPatternContext,
+  createFixedNextVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import type {
   OperationRunSettings,
@@ -65,13 +65,13 @@ export async function executeAutoStrategy(
 
   logger.subHeader("Auto mode execution (prepare): Creating commit...");
 
-  logger.stepStart("Starting: Get previous version");
-  const previousVersion = await getPreviousVersion(
+  logger.stepStart("Starting: Get current version");
+  const currentVersion = await getCurrentVersion(
     provider,
     runSettings.inputs,
     runSettings.config,
   );
-  logger.stepFinish("Finished: Get previous version");
+  logger.stepFinish("Finished: Get current version");
 
   logger.stepStart("Starting: Resolve commits from trigger to last release");
   const resolvedCommitsResult = await resolveCommitsFromTriggerToLastRelease(
@@ -85,38 +85,38 @@ export async function executeAutoStrategy(
   const nextVersion = calculateNextVersion(
     resolvedCommitsResult,
     runSettings.config,
-    previousVersion,
+    currentVersion,
   );
   logger.stepFinish("Finished: Calculate next version");
 
   logger.stepStart(
-    "Starting: Compare calculated next version with previous version",
+    "Starting: Compare calculated next version with current version",
   );
-  compareVersionToPreviousVersion(
+  compareNextVersionToCurrentVersion(
     nextVersion,
-    previousVersion,
+    currentVersion,
   );
   logger.stepFinish(
-    "Finished: Compare calculated next version with previous version",
+    "Finished: Compare calculated next version with current version",
   );
 
   logger.debugStepStart(
-    "Starting: Create fixed version and previous version string pattern context",
+    "Starting: Create fixed current version and next version string pattern context",
   );
-  createFixedPreviousVersionStringPatternContext(previousVersion);
-  await createFixedVersionStringPatternContext(
+  createFixedCurrentVersionStringPatternContext(currentVersion);
+  await createFixedNextVersionStringPatternContext(
     nextVersion,
     runSettings.config.tag.nameTemplate,
   );
   logger.debugStepFinish(
-    "Finished: Create fixed version string pattern context",
+    "Finished: Create fixed current version and next version string pattern context",
   );
 
   logger.debugStepStart("Starting: Export pre prepare operation variables");
   await exportPrePrepareOperationVariables(
     provider,
     resolvedCommitsResult.entries,
-    previousVersion,
+    currentVersion,
     nextVersion,
   );
   logger.debugStepFinish("Finished: Export pre prepare operation variables");
@@ -153,8 +153,8 @@ export async function executeAutoStrategy(
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      version: nextVersion,
-      previousVersion,
+      nextVersion,
+      currentVersion,
     });
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare pre commands)",
@@ -261,8 +261,8 @@ export async function executeAutoStrategy(
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      version: nextVersion,
-      previousVersion,
+      nextVersion,
+      currentVersion,
     });
     logger.stepFinish(
       "Finished: Resolve runtime config override (prepare post commands)",
@@ -316,8 +316,8 @@ export async function executeAutoStrategy(
         config: runSettings.config,
         rawConfig: runSettings.rawConfig,
         triggerBranchName: runSettings.inputs.triggerBranchName,
-        version: nextVersion,
-        previousVersion,
+        nextVersion,
+        currentVersion,
       });
       logger.stepFinish(
         "Finished: Resolve runtime config override (publish pre commands)",
@@ -407,8 +407,8 @@ export async function executeAutoStrategy(
         config: runSettings.config,
         rawConfig: runSettings.rawConfig,
         triggerBranchName: runSettings.inputs.triggerBranchName,
-        version: nextVersion,
-        previousVersion,
+        nextVersion,
+        currentVersion,
       });
       logger.stepFinish(
         "Finished: Resolve runtime config override (publish post commands)",

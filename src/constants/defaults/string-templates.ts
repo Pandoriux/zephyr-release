@@ -21,11 +21,11 @@ export const DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE =
 
 // Commit
 export const DEFAULT_COMMIT_HEADER_TEMPLATE =
-  liquid`chore: release v{{ version }}`;
+  liquid`chore: release v{{ nextVersion }}`;
 
 // Proposal (PR, MR, ...)
 export const DEFAULT_PROPOSAL_TITLE_TEMPLATE =
-  liquid`chore: release v{{ version }}`;
+  liquid`chore: release v{{ nextVersion }}`;
 
 export const DEFAULT_PROPOSAL_HEADER_TEMPLATE =
   "🤖 New release prepared. Awaiting approval~";
@@ -36,7 +36,7 @@ export const DEFAULT_PROPOSAL_FOOTER_TEMPLATE =
   "Generated with [Zephyr Release](https://github.com/Pandoriux/zephyr-release)";
 
 // Tag and Release
-export const DEFAULT_TAG_NAME_TEMPLATE = liquid`v{{ version }}`;
+export const DEFAULT_TAG_NAME_TEMPLATE = liquid`v{{ nextVersion }}`;
 
 export const DEFAULT_TAG_MESSAGE_TEMPLATE = liquid`Release {{ tagName }}`;
 

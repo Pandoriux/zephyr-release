@@ -32,7 +32,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for changelog file header, using with string patterns like {{ version }}. Placed above any changelog content.\n" +
+          "String template for changelog file header, using with string patterns like {{ nextVersion }}. Placed above any changelog content.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE)}`,
       }),
@@ -49,7 +49,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "String template for changelog file footer, using with string patterns like {{ version }}. Placed below any changelog content.\n" +
+          "String template for changelog file footer, using with string patterns like {{ nextVersion }}. Placed below any changelog content.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.",
       }),
     ),
@@ -69,7 +69,7 @@ export const ChangelogConfigSchema = v.pipe(
       ),
       v.metadata({
         description:
-          "String template for header of a changelog release, using with string patterns like {{ version }}.\n" +
+          "String template for header of a changelog release, using with string patterns like {{ nextVersion }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE)

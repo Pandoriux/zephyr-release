@@ -6,8 +6,8 @@ To inject values into your templates, put [patterns](#available-string-patterns)
 
 Example:
 
-- [Proposal title template](./config-options.md#review--title-template-optional): `chore: release {{ name | upper }} version {{ version }}`
-- [Tag template](./config-options.md#tag--name-template-optional): `v{{ version }}`
+- [Proposal title template](./config-options.md#review--title-template-optional): `chore: release {{ name | upper }} version {{ nextVersion }}`
+- [Tag template](./config-options.md#tag--name-template-optional): `v{{ nextVersion }}`
 
 <br>
 
@@ -48,25 +48,25 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 - `{{ timestamp }}`: Timestamp at script start time, always UTC
 - `{{ YYYY }}`, `{{ MM }}`, `{{ DD }}`, `{{ HH }}`, `{{ mm }}`, `{{ ss }}`: Date/time components at script start time
 
-#### Version (and tag)
+#### Current Version
 
-- `{{ version }}`: The calculated next full semantic version (SemVer)
-- `{{ versionCore }}`: The calculated next core part of the semantic version (major.minor.patch)
-- `{{ versionPre }}`: The calculated next prerelease identifier of the semantic version
-- `{{ versionBld }}`: The calculated next build metadata of the semantic version
+Only available in "auto" mode or "review" mode propose operation. Can be undefined if the project has no version yet (the calculated version is initial version)
+
+- `{{ currentVersion }}`: The current full semantic version (SemVer)
+- `{{ currentVersionCore }}`: The current core part of the semantic version (major.minor.patch)
+- `{{ currentVersionPre }}`: The current prerelease identifier of the semantic version
+- `{{ currentVersionBld }}`: The current build metadata of the semantic version
+
+#### Next Version (and tag)
+
+- `{{ nextVersion }}`: The calculated next full semantic version (SemVer)
+- `{{ nextVersionCore }}`: The calculated next core part of the semantic version (major.minor.patch)
+- `{{ nextVersionPre }}`: The calculated next prerelease identifier of the semantic version
+- `{{ nextVersionBld }}`: The calculated next build metadata of the semantic version
 
 <br>
 
 - `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#tag--name-template-optional))
-
-#### Previous Version
-
-Only available in "auto" mode or "review" mode propose operation. Can be undefined if the project has no version yet (the calculated version is initial version)
-
-- `{{ previousVersion }}`: The previous full semantic version (SemVer)
-- `{{ previousVersionCore }}`: The previous core part of the semantic version (major.minor.patch)
-- `{{ previousVersionPre }}`: The previous prerelease identifier of the semantic version
-- `{{ previousVersionBld }}`: The previous build metadata of the semantic version
 
 ### Dynamic String Patterns
 
