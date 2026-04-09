@@ -37,7 +37,7 @@ export const ReviewConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_PROPOSAL_TITLE_TEMPLATE),
       v.metadata({
         description:
-          "String template for proposal title, using with string patterns like {{ version }}.\n" +
+          "String template for proposal title, using with string patterns like {{ nextVersion }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PROPOSAL_TITLE_TEMPLATE)}`,
       }),
@@ -54,7 +54,7 @@ export const ReviewConfigSchema = v.pipe(
       v.optional(v.string(), DEFAULT_PROPOSAL_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for proposal header, using with string patterns like {{ version }}.\n" +
+          "String template for proposal header, using with string patterns like {{ nextVersion }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${JSON.stringify(DEFAULT_PROPOSAL_HEADER_TEMPLATE)}`,
       }),

@@ -8,26 +8,26 @@ import {
 } from "../version-files/version-file.ts";
 import { taskLogger } from "../logger.ts";
 
-type GetPreviousVersionInputsParams = Pick<
+type GetCurrentVersionInputsParams = Pick<
   InputsOutput,
   "triggerCommitHash" | "workspacePath" | "sourceMode"
 >;
 
-type GetPreviousVersionConfigParams = Pick<
+type GetCurrentVersionConfigParams = Pick<
   ConfigOutput,
   "versionFiles"
 >;
 
 /** @throws */
-export async function getPreviousVersion(
+export async function getCurrentVersion(
   provider: PlatformProvider,
-  inputs: GetPreviousVersionInputsParams,
-  config: GetPreviousVersionConfigParams,
+  inputs: GetCurrentVersionInputsParams,
+  config: GetCurrentVersionConfigParams,
 ): Promise<SemVer | undefined> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles } = config;
 
-  taskLogger.info("Getting previous version from primary version files...");
+  taskLogger.info("Getting current version from primary version files...");
   const primaryVersionFile = getPrimaryVersionFile(versionFiles);
   const primaryVersion = await getVersionSemVerFromVersionFile(
     primaryVersionFile,

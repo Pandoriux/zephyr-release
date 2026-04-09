@@ -40,38 +40,38 @@ export const DynamicDatetimeStringPatterns = {
   nowSecond: "nowss",
 } as const;
 
-export type DynamicDatetimeStringPattern =
-  typeof DynamicDatetimeStringPatterns[
-    keyof typeof DynamicDatetimeStringPatterns
-  ];
+export type DynamicDatetimeStringPattern = typeof DynamicDatetimeStringPatterns[
+  keyof typeof DynamicDatetimeStringPatterns
+];
 
-const FixedPreviousVersionStringPatterns = {
-  // Previous version components
-  previousVersion: "previousVersion",
-  previousVersionCore: "previousVersionCore",
-  previousVersionPrerelease: "previousVersionPre",
-  previousVersionBuild: "previousVersionBld",
+const FixedCurrentVersionStringPatterns = {
+  // Current version components
+  currentVersion: "currentVersion",
+  currentVersionCore: "currentVersionCore",
+  currentVersionPrerelease: "currentVersionPre",
+  currentVersionBuild: "currentVersionBld",
 };
 
-export type FixedPreviousVersionStringPattern =
-  typeof FixedPreviousVersionStringPatterns[
-    keyof typeof FixedPreviousVersionStringPatterns
+export type FixedCurrentVersionStringPattern =
+  typeof FixedCurrentVersionStringPatterns[
+    keyof typeof FixedCurrentVersionStringPatterns
   ];
 
-const FixedVersionStringPatterns = {
+const FixedNextVersionStringPatterns = {
   // Version components
-  version: "version",
-  versionCore: "versionCore",
-  versionPrerelease: "versionPre",
-  versionBuild: "versionBld",
+  nextVersion: "nextVersion",
+  nextVersionCore: "nextVersionCore",
+  nextVersionPrerelease: "nextVersionPre",
+  nextVersionBuild: "nextVersionBld",
 
   // Tag
   tagName: "tagName",
 } as const;
 
-export type FixedVersionStringPattern = typeof FixedVersionStringPatterns[
-  keyof typeof FixedVersionStringPatterns
-];
+export type FixedNextVersionStringPattern =
+  typeof FixedNextVersionStringPatterns[
+    keyof typeof FixedNextVersionStringPatterns
+  ];
 
 const DynamicChangelogStringPatterns = {
   changelogRelease: "changelogRelease",

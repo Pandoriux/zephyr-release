@@ -21,7 +21,7 @@ type CalculateNextVersionConfigParams = Pick<
 export function calculateNextVersion(
   resolvedCommitsResult: ResolvedCommitsResult,
   config: CalculateNextVersionConfigParams,
-  previousVersion: SemVer | undefined,
+  currentVersion: SemVer | undefined,
 ): SemVer {
   const { resolvedTriggerCommit, entries } = resolvedCommitsResult;
   const {
@@ -44,10 +44,10 @@ export function calculateNextVersion(
     return manualReleaseAsVersion;
   }
 
-  // No previous version, return initial version
-  if (!previousVersion) {
+  // No current version, return initial version
+  if (!currentVersion) {
     taskLogger.info(
-      `No previous version found, using initial version: ${initialVersion}`,
+      `No current version found, using initial version: ${initialVersion}`,
     );
 
     if (!canParse(initialVersion)) {
@@ -61,15 +61,15 @@ export function calculateNextVersion(
 
   // Version is 0.0.0
   if (
-    previousVersion.major === 0 &&
-    previousVersion.minor === 0 &&
-    previousVersion.patch === 0 &&
-    (previousVersion.prerelease?.length ?? 0) === 0 &&
-    (previousVersion.build?.length ?? 0) === 0 &&
+    currentVersion.major === 0 &&
+    currentVersion.minor === 0 &&
+    currentVersion.patch === 0 &&
+    (currentVersion.prerelease?.length ?? 0) === 0 &&
+    (currentVersion.build?.length ?? 0) === 0 &&
     initialVersion !== "0.0.0"
   ) {
     taskLogger.info(
-      "Previous version is 0.0.0, treating it as if there is no previous version and using initial version for calculation",
+      "Current version is 0.0.0, treating it as if there is no current version and using initial version for calculation",
     );
 
     if (!canParse(initialVersion)) {
@@ -81,20 +81,20 @@ export function calculateNextVersion(
     return parse(initialVersion);
   }
 
-  // Previous version exists, calculate the next version
+  // Current version exists, calculate the next version
   taskLogger.info(
-    `Previous version got from version file is ${previousVersion}`,
+    `Current version got from version file is ${currentVersion}`,
   );
 
-  // Calculate next version from previous version
+  // Calculate next version from current version
   const nextCoreSemVer = calculateNextCoreSemVer(
-    previousVersion,
+    currentVersion,
     entries,
     bumpStrategy,
   );
 
   const nextExtensionSemVer = calculateNextExtensionsSemVer(
-    previousVersion,
+    currentVersion,
     nextCoreSemVer,
     bumpStrategy,
     timeZone,
@@ -170,27 +170,27 @@ function isReleaseAsAllowed(
 }
 
 /** @throws {SafeExit} */
-export function compareVersionToPreviousVersion(
-  version: SemVer,
-  previousVersion: SemVer | undefined,
+export function compareNextVersionToCurrentVersion(
+  nextVersion: SemVer,
+  currentVersion: SemVer | undefined,
 ) {
-  if (!previousVersion) {
+  if (!currentVersion) {
     taskLogger.info(
-      "Previous version is undefined; calculated next version is considered valid",
+      "Current version is undefined; calculated next version is considered valid",
     );
     return;
   }
 
-  const versionStr = format(version);
-  const previousVersionStr = format(previousVersion);
+  const nextVersionStr = format(nextVersion);
+  const currentVersionStr = format(currentVersion);
 
-  if (versionStr === previousVersionStr) {
+  if (nextVersionStr === currentVersionStr) {
     throw new SafeExit(
-      `Calculated next version (${versionStr}) is unchanged compared to previous version (${previousVersionStr})`,
+      `Calculated next version (${nextVersionStr}) is unchanged compared to current version (${currentVersionStr})`,
     );
   } else {
     taskLogger.info(
-      `Calculated next version (${versionStr}) is different from previous version (${previousVersionStr}). Proceeding...`,
+      `Calculated next version (${nextVersionStr}) is different from current version (${currentVersionStr}). Proceeding...`,
     );
     return;
   }

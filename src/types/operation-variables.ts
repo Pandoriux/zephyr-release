@@ -30,8 +30,8 @@ export type OperationVariables =
     // versioning and changelog
     resolvedCommitEntries: string;
 
-    previousVersion: string;
-    version: string;
+    currentVersion: string;
+    nextVersion: string;
 
     commitHash: string;
     committedFilePaths: string;
@@ -76,7 +76,7 @@ export type DynamicOperationVariables = Pick<
 
 export type PrePrepareOperationVariables = Pick<
   OperationVariables,
-  "resolvedCommitEntries" | "previousVersion" | "version"
+  "resolvedCommitEntries" | "currentVersion" | "nextVersion"
 >;
 
 export type PostPrepareOperationVariables = Pick<
@@ -86,7 +86,7 @@ export type PostPrepareOperationVariables = Pick<
 
 export type PrePublishOperationVariables = Pick<
   OperationVariables,
-  "version"
+  "nextVersion"
 >;
 
 export type PostPublishOperationVariables = Pick<
