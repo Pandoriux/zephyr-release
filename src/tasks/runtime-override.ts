@@ -14,8 +14,8 @@ import {
   createCustomStringPatternContext,
   createFixedAndDynamicDatetimeStringPatternContext,
   createFixedBaseStringPatternContext,
-  createFixedPreviousVersionStringPatternContext,
-  createFixedVersionStringPatternContext,
+  createFixedCurrentVersionStringPatternContext,
+  createFixedNextVersionStringPatternContext,
   stringifyCurrentPatternContext,
 } from "./string-templates-and-patterns/pattern-context.ts";
 import {
@@ -102,8 +102,8 @@ interface SynchronizeRuntimeStateParams {
   config: ConfigOutput;
   rawConfig: object;
   triggerBranchName: string;
-  version?: SemVer;
-  previousVersion?: SemVer;
+  nextVersion?: SemVer;
+  currentVersion?: SemVer;
 }
 
 /**
@@ -125,8 +125,8 @@ export async function synchronizeRuntimeStateAfterOverride(
     config,
     rawConfig,
     triggerBranchName,
-    version,
-    previousVersion,
+    nextVersion,
+    currentVersion,
   } = params;
 
   taskLogger.debug("Synchronizing runtime state after config override...");
@@ -153,13 +153,13 @@ export async function synchronizeRuntimeStateAfterOverride(
 
   // 4. Refresh version context if version is available at this lifecycle stage.
   // Also affect tag name
-  if (previousVersion) {
-    createFixedPreviousVersionStringPatternContext(previousVersion);
+  if (currentVersion) {
+    createFixedCurrentVersionStringPatternContext(currentVersion);
   }
 
-  if (version) {
-    await createFixedVersionStringPatternContext(
-      version,
+  if (nextVersion) {
+    await createFixedNextVersionStringPatternContext(
+      nextVersion,
       config.tag.nameTemplate,
     );
   }

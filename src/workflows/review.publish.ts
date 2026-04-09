@@ -14,7 +14,7 @@ import {
 } from "../tasks/runtime-override.ts";
 import {
   createDynamicChangelogStringPatternContext,
-  createFixedVersionStringPatternContext,
+  createFixedNextVersionStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { createTag } from "../tasks/tag.ts";
 import {
@@ -48,33 +48,33 @@ export async function executeReviewPublishPhase(
   );
   logger.stepFinish("Finished: Generate changelog release content");
 
-  logger.stepStart("Starting: Extract version from primary version file");
+  logger.stepStart("Starting: Extract next version from primary version file");
   const primaryVersionFile = getPrimaryVersionFile(
     runSettings.config.versionFiles,
   );
-  const version = await getVersionSemVerFromVersionFile(
+  const nextVersion = await getVersionSemVerFromVersionFile(
     primaryVersionFile,
     runSettings.inputs.sourceMode,
     provider,
     runSettings.inputs.workspacePath,
     runSettings.inputs.triggerCommitHash,
   );
-  if (!version) {
-    throw new Error("Failed to extract version from primary version file");
+  if (!nextVersion) {
+    throw new Error("Failed to extract next version from primary version file");
   }
   logger.stepFinish(
-    "Finished: Extract version from primary version file",
+    "Finished: Extract next version from primary version file",
   );
 
   logger.debugStepStart(
-    "Starting: Create fixed version string pattern context",
+    "Starting: Create fixed next version string pattern context",
   );
-  await createFixedVersionStringPatternContext(
-    version,
+  await createFixedNextVersionStringPatternContext(
+    nextVersion,
     runSettings.config.tag.nameTemplate,
   );
   logger.debugStepFinish(
-    "Finished: Create fixed version string pattern context",
+    "Finished: Create fixed next version string pattern context",
   );
 
   logger.debugStepStart(
@@ -91,7 +91,7 @@ export async function executeReviewPublishPhase(
   logger.debugStepStart("Starting: Export pre publish operation variables");
   await exportPrePublishOperationVariables(
     provider,
-    version,
+    nextVersion,
     associatedProposalForCommit.id,
   );
   logger.debugStepFinish("Finished: Export pre publish operation variables");
@@ -128,7 +128,7 @@ export async function executeReviewPublishPhase(
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      version,
+      nextVersion,
     });
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish pre commands)",
@@ -227,7 +227,7 @@ export async function executeReviewPublishPhase(
       config: runSettings.config,
       rawConfig: runSettings.rawConfig,
       triggerBranchName: runSettings.inputs.triggerBranchName,
-      version,
+      nextVersion,
     });
     logger.stepFinish(
       "Finished: Resolve runtime config override (publish post commands)",

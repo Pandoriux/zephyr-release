@@ -1,2 +1,1 @@
-test trong practice xem liệu TagTypeOptions.annotated có đúng là default nên xài? như 
-khi không có key thì nó có thành unsigned trên web không
+check lai logic cachs tim primary file, dua tren desc trong doc

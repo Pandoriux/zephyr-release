@@ -10,7 +10,7 @@ export const CommitConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_COMMIT_HEADER_TEMPLATE),
       v.metadata({
         description:
-          "String template for commit header, using with string patterns like {{ version }}. You can optionally include a " +
+          "String template for commit header, using with string patterns like {{ nextVersion }}. You can optionally include a " +
           "CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` " +
           "for GitHub, GitLab, and Bitbucket).\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +

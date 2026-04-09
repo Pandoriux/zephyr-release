@@ -13,9 +13,9 @@ import type {
   DynamicChangelogStringPattern,
   DynamicDatetimeStringPattern,
   FixedBaseStringPattern,
+  FixedCurrentVersionStringPattern,
   FixedDatetimeStringPattern,
-  FixedPreviousVersionStringPattern,
-  FixedVersionStringPattern,
+  FixedNextVersionStringPattern,
 } from "../../constants/string-patterns.ts";
 import { resolveStringTemplate } from "./resolve-template.ts";
 import type { ReviewConfigOutput } from "../../schemas/configs/modules/review-config.ts";
@@ -124,45 +124,48 @@ export function createFixedAndDynamicDatetimeStringPatternContext(
   );
 }
 
-export function createFixedPreviousVersionStringPatternContext(
-  previousVersion?: SemVer,
+export function createFixedCurrentVersionStringPatternContext(
+  currentVersion?: SemVer,
 ) {
-  if (!previousVersion) return;
+  if (!currentVersion) return;
 
   const versionContext = {
-    previousVersion: format(previousVersion),
-    previousVersionCore:
-      `${previousVersion.major}.${previousVersion.minor}.${previousVersion.patch}`,
-    previousVersionPre: previousVersion?.prerelease?.length
-      ? previousVersion.prerelease.join(".")
+    currentVersion: format(currentVersion),
+    currentVersionCore:
+      `${currentVersion.major}.${currentVersion.minor}.${currentVersion.patch}`,
+    currentVersionPre: currentVersion?.prerelease?.length
+      ? currentVersion.prerelease.join(".")
       : undefined,
-    previousVersionBld: previousVersion?.build?.length
-      ? previousVersion.build.join(".")
+    currentVersionBld: currentVersion?.build?.length
+      ? currentVersion.build.join(".")
       : undefined,
-  } satisfies Record<FixedPreviousVersionStringPattern, string | undefined>;
+  } satisfies Record<FixedCurrentVersionStringPattern, string | undefined>;
 
   Object.assign(BUILT_IN_CONTEXT, versionContext);
   Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
-    "Fixed previous version string pattern context: " +
+    "Fixed current version string pattern context: " +
       JSON.stringify(versionContext, null, 2),
   );
 }
 
-export async function createFixedVersionStringPatternContext(
-  version: SemVer,
+export async function createFixedNextVersionStringPatternContext(
+  nextVersion: SemVer,
   tagTemplate: string,
 ) {
   const versionContext = {
-    version: format(version),
-    versionCore: `${version.major}.${version.minor}.${version.patch}`,
-    versionPre: version.prerelease?.length
-      ? version.prerelease.join(".")
+    nextVersion: format(nextVersion),
+    nextVersionCore:
+      `${nextVersion.major}.${nextVersion.minor}.${nextVersion.patch}`,
+    nextVersionPre: nextVersion.prerelease?.length
+      ? nextVersion.prerelease.join(".")
       : undefined,
-    versionBld: version.build?.length ? version.build.join(".") : undefined,
+    nextVersionBld: nextVersion.build?.length
+      ? nextVersion.build.join(".")
+      : undefined,
   } satisfies Omit<
-    Record<FixedVersionStringPattern, string | undefined>,
+    Record<FixedNextVersionStringPattern, string | undefined>,
     "tagName"
   >;
 
@@ -171,13 +174,13 @@ export async function createFixedVersionStringPatternContext(
 
   const tagContext = {
     tagName: await resolveStringTemplate(tagTemplate),
-  } satisfies Pick<Record<FixedVersionStringPattern, string>, "tagName">;
+  } satisfies Pick<Record<FixedNextVersionStringPattern, string>, "tagName">;
 
   Object.assign(BUILT_IN_CONTEXT, tagContext);
   Object.assign(STRING_PATTERN_CONTEXT, CUSTOM_CONTEXT, BUILT_IN_CONTEXT);
 
   taskLogger.debug(
-    "Fixed version string pattern context: " +
+    "Fixed next version string pattern context: " +
       JSON.stringify({ ...versionContext, ...tagContext }, null, 2),
   );
 }

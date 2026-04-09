@@ -1,7 +1,13 @@
 # Configuration options <!-- omit from toc -->
 
-All possible config options of the Zephyr Release Configuration file. Most options are optional - if you don't provide them, default values will be used.  
-Except: [version-files](#version-files-required)
+All possible config options of the Zephyr Release Configuration file.
+
+Most options are optional - if you don't provide them, default values will be used.  
+Required options:
+
+- [version-files](#version-files-required)
+
+<br>
 
 It is recommended to use [`JSON Schema (v1)`](https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/config-v1.json) when writing the config JSON.
 
@@ -208,7 +214,7 @@ Allowed patterns to use are: fixed base string patterns.
 Type: `string`  
 Default: [`DEFAULT_PROPOSAL_TITLE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for proposal title, using with string patterns like {{ version }}.  
+String template for proposal title, using with string patterns like {{ nextVersion }}.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > title-template-path (Optional)
@@ -223,7 +229,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `string`  
 Default: [`DEFAULT_PROPOSAL_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for proposal header, using with string patterns like {{ version }}.  
+String template for proposal header, using with string patterns like {{ nextVersion }}.  
 Allowed patterns to use are: all fixed and dynamic string patterns.
 
 #### review > header-template-path (Optional)
@@ -776,7 +782,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `string`  
 Default: [`DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for changelog file header, using with string patterns like `{{ version }}`. Placed above any changelog content.  
+String template for changelog file header, using with string patterns like `{{ nextVersion }}`. Placed above any changelog content.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-header-template-path (Optional)
@@ -791,7 +797,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 
 Type: `string`
 
-String template for changelog file footer, using with string patterns like `{{ version }}`. Placed below any changelog content.  
+String template for changelog file footer, using with string patterns like `{{ nextVersion }}`. Placed below any changelog content.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > file-footer-template-path (Optional)
@@ -807,7 +813,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `string`  
 Default: `"## {{ tagName | md_link_compare_tag_from_current_to_latest }} ({{- YYYY }}-{{ MM }}-{{ DD }}) <!-- time-zone: {{ timeZone }} -->"`
 
-String template for header of a changelog release, using with string patterns like `{{ version }}`.  
+String template for header of a changelog release, using with string patterns like `{{ nextVersion }}`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### changelog > release-header-template-path (Optional)
@@ -910,7 +916,7 @@ Configuration specific to commits. These templates are used to build the commit 
 Type: `string`  
 Default: [`DEFAULT_COMMIT_HEADER_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for commit header, using with string patterns like `{{ version }}`. You can optionally include a CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).  
+String template for commit header, using with string patterns like `{{ nextVersion }}`. You can optionally include a CI skip token here (or body/footer) to prevent downstream pipeline runs (e.g., `[skip ci]` or `[ci skip]` for GitHub, GitLab, and Bitbucket).  
 Allowed patterns to use are: [all fixed and dynamic string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### commit > header-template-path (Optional)
@@ -978,7 +984,7 @@ Enable/disable tag creation. If disabled, create release note will also be skipp
 Type: `string`  
 Default: [`DEFAULT_TAG_NAME_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
-String template for tag name, using with string patterns like `{{ version }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
+String template for tag name, using with string patterns like `{{ nextVersion }}`. Available in [string templates](./string-templates-and-patterns.md) as `{{ tagName }}`.  
 Allowed patterns to use in template are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
 
 #### tag > type (Optional)

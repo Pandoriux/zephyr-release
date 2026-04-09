@@ -107,11 +107,11 @@ These variables are available starting from the first [`command-hooks > prepare 
 - **resolvedCommitEntries:** Array of resolved commit entries (parsed and filtered) from the trigger commit to the last release (JSON stringified). Each entry contains fields such as hash, type, scope, subject, isBreaking, etc. See: [commit.ts](../src/tasks/commit.ts)  
   Export: zr-resolved-commit-entries; Env: ZR_RESOLVED_COMMIT_ENTRIES
 
-- **previousVersion:** Previous version string (the current version of your project)  
-  Export: zr-previous-version; Env: ZR_PREVIOUS_VERSION
+- **currentVersion:** Current version string (the current version of your project)  
+  Export: zr-current-version; Env: ZR_CURRENT_VERSION
 
-- **version:** Calculated next version string  
-  Export: zr-version; Env: ZR_VERSION
+- **nextVersion:** Calculated next version string  
+  Export: zr-next-version; Env: ZR_NEXT_VERSION
 
 #### Post Prepare
 
@@ -130,8 +130,8 @@ These variables are available starting from the first [`command-hooks > prepare 
 
 #### Pre Publish
 
-- **version:** The version string used for the release  
-  Export: zr-version; Env: ZR_VERSION
+- **nextVersion:** The version string used for the release  
+  Export: zr-next-version; Env: ZR_NEXT_VERSION
 
 #### Post Publish
 

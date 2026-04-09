@@ -150,14 +150,14 @@ export async function exportBaseOperationVariables(
 export async function exportPrePrepareOperationVariables(
   provider: PlatformProvider,
   resolvedCommitEntries: ResolvedCommit[],
-  previousVersion: SemVer | undefined,
-  version: SemVer,
+  currentVersion: SemVer | undefined,
+  nextVersion: SemVer,
 ) {
   const prepareExportObject = {
     resolvedCommitEntries: JSON.stringify(resolvedCommitEntries),
 
-    previousVersion: previousVersion ? format(previousVersion) : "",
-    version: format(version),
+    currentVersion: currentVersion ? format(currentVersion) : "",
+    nextVersion: format(nextVersion),
 
     patternContext: await stringifyCurrentPatternContext(),
   } satisfies
@@ -229,11 +229,11 @@ export async function exportPostPrepareOperationVariables(
 
 export async function exportPrePublishOperationVariables(
   provider: PlatformProvider,
-  version: SemVer,
+  nextVersion: SemVer,
   proposalId?: string,
 ) {
   const prepareExportObject = {
-    version: format(version),
+    nextVersion: format(nextVersion),
 
     proposalId: proposalId,
     patternContext: await stringifyCurrentPatternContext(),
