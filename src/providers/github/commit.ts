@@ -1,7 +1,7 @@
 import { RequestError } from "@octokit/request-error";
 import { BranchOutOfDateError } from "../../errors/providers/branch.ts";
+import { NoCommitFoundError } from "../../errors/providers/commit.ts";
 import type { GetOctokitFn, OctokitClient } from "./octokit.ts";
-import * as v from "@valibot/valibot";
 import { githubGetNamespace, githubGetRepositoryName } from "./repository.ts";
 import type {
   ProviderCommit,
@@ -9,78 +9,60 @@ import type {
   ProviderCompareCommits,
 } from "../../types/providers/commit.ts";
 
-const RawCommitNodeSchema = v.object({
-  oid: v.string(),
-  messageHeadline: v.string(),
-  messageBody: v.string(),
-  message: v.string(),
-  tree: v.object({
-    oid: v.string(),
-  }),
-  refs: v.object({
-    nodes: v.array(
-      v.object({
-        name: v.string(),
-      }),
-    ),
-  }),
-});
-
 /** @throws */
 async function githubFindCommitsFromGivenToPreviousTagged(
   octokit: OctokitClient,
   commitHash: string,
   stopResolvingCommitAt?: number | string,
 ): Promise<ProviderCommit[]> {
-  const collectedCommits: ProviderCommit[] = [];
+  const owner = githubGetNamespace();
+  const repo = githubGetRepositoryName();
 
-  const paginatedIterator = octokit.graphql.paginate.iterator(
-    `
-    query getHistory($owner: String!, $repo: String!, $sha: String!, $cursor: String) {
-      repository(owner: $owner, name: $repo) {
-        object(expression: $sha) {
-          ... on Commit {
-            history(first: 100, after: $cursor, firstParent: true) @paginate {
-              nodes {
-                oid
-                messageHeadline
-                messageBody
-                message
-                tree { oid }
-                refs(refPrefix: "refs/tags/", first: 1) {
-                  nodes { name }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `,
+  const tagMap = new Map<string, string>();
+  let tagCount = 0;
+  const TAG_LIMIT = 500;
+
+  const tagsIterator = octokit.paginate.iterator(
+    octokit.rest.repos.listTags,
     {
-      owner: githubGetNamespace(),
-      repo: githubGetRepositoryName(),
-      sha: commitHash,
+      owner,
+      repo,
+      per_page: 100,
     },
   );
 
-  for await (const response of paginatedIterator) {
-    const rawNodes = response.repository.object.history.nodes;
+  tagsLoop: for await (const response of tagsIterator) {
+    for (const tag of response.data) {
+      if (!tagMap.has(tag.commit.sha)) {
+        tagMap.set(tag.commit.sha, tag.name);
+      }
 
-    if (!Array.isArray(rawNodes)) {
-      throw new Error("Failed to retrieve commit history nodes from GitHub");
+      tagCount++;
+      if (tagCount >= TAG_LIMIT) {
+        break tagsLoop;
+      }
     }
+  }
 
-    for (const rawNode of rawNodes) {
-      const commit = v.parse(RawCommitNodeSchema, rawNode, {
-        message: "Received malformed commit data from GitHub GraphQL API",
-      });
+  const collectedCommits: ProviderCommit[] = [];
 
-      const tagName = commit.refs.nodes[0]?.name;
+  const commitsIterator = octokit.paginate.iterator(
+    octokit.rest.repos.listCommits,
+    {
+      owner,
+      repo,
+      sha: commitHash,
+      per_page: 100,
+    },
+  );
+
+  for await (const response of commitsIterator) {
+    for (const commit of response.data) {
+      const tagName = tagMap.get(commit.sha);
 
       if (tagName) {
         if (collectedCommits.length === 0) {
-          throw new Error(
+          throw new NoCommitFoundError(
             `No new commits found. The starting commit ${
               commitHash.substring(0, 7)
             } is already tagged (${tagName}).`,
@@ -90,11 +72,11 @@ async function githubFindCommitsFromGivenToPreviousTagged(
       }
 
       collectedCommits.push({
-        hash: commit.oid,
-        header: commit.messageHeadline,
-        body: commit.messageBody,
-        message: commit.message,
-        treeHash: commit.tree.oid,
+        hash: commit.sha,
+        header: commit.commit.message.split("\n")[0] ?? "",
+        body: commit.commit.message.split("\n").slice(1).join("\n").trim(),
+        message: commit.commit.message,
+        treeHash: commit.commit.tree.sha,
       });
 
       if (stopResolvingCommitAt) {
@@ -109,7 +91,7 @@ async function githubFindCommitsFromGivenToPreviousTagged(
         // Check hash boundary
         if (
           typeof stopResolvingCommitAt === "string" &&
-          commit.oid === stopResolvingCommitAt
+          commit.sha === stopResolvingCommitAt
         ) {
           return collectedCommits;
         }
@@ -118,7 +100,7 @@ async function githubFindCommitsFromGivenToPreviousTagged(
   }
 
   if (collectedCommits.length === 0) {
-    throw new Error(
+    throw new NoCommitFoundError(
       `No commits found for hash ${commitHash.substring(0, 7)}`,
     );
   }

@@ -16,8 +16,8 @@ export async function executeReviewStrategy(
   let runSettings: OperationRunSettings = currentRunSettings;
 
   if (!bootstrapData.associatedProposalForCommit) {
-    logger.subHeader(
-      "Review mode execution (prepare): Creating/Updating release proposal (PR, MR, etc.)...",
+    logger.header(
+      "Review mode execution (prepare): Creating/Updating release proposal",
     );
     runSettings = await executeReviewPreparePhase(
       provider,
@@ -25,8 +25,8 @@ export async function executeReviewStrategy(
       bootstrapData,
     );
   } else if (runSettings.config.tag.createTag) {
-    logger.subHeader(
-      "Review mode execution (publish): Creating tag and release...",
+    logger.header(
+      "Review mode execution (publish): Creating tag and release",
     );
     runSettings = await executeReviewPublishPhase(
       provider,

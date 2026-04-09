@@ -65,7 +65,7 @@ export interface PlatformProvider {
     targetBranch: string,
   ) => Promise<ProviderProposal | undefined>;
 
-  /** @throws */
+  /** @throws {Error | NoCommitFoundError} */
   findCommitsFromGivenToPreviousTagged: (
     commitHash: string,
     stopResolvingCommitAt?: number | string,
