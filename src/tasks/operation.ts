@@ -40,13 +40,17 @@ export function validateCurrentOperationTriggerCtx(
     operationContext.latestTriggerCommit.message,
   );
 
-  const isZephyrReleaseSignCommit = parsedLatestTriggerCommit.notes.some((n) =>
-    n.title.toLowerCase() === ZEPHYR_RELEASE_COMMIT_SIGN.toLowerCase()
-  );
-  if (isZephyrReleaseSignCommit) {
-    throw new SafeExit(
-      "Detected Zephyr Release bot signature in the trigger commit. Exiting safely to prevent an infinite CI loop",
-    );
+  if (mode === "auto") {
+    const isZephyrReleaseSignCommit = parsedLatestTriggerCommit.notes
+      .some((n) =>
+        n.title.toLowerCase() === ZEPHYR_RELEASE_COMMIT_SIGN.toLowerCase()
+      );
+
+    if (isZephyrReleaseSignCommit) {
+      throw new SafeExit(
+        "Detected Zephyr Release bot signature in the trigger commit. Exiting safely to prevent an infinite CI loop",
+      );
+    }
   }
 
   const parsedTriggerCommits = operationContext.triggerCommits.map((c) =>
