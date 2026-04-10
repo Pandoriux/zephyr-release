@@ -87,7 +87,13 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 These are special patterns that are only available to certain templates. Make sure to check the template description to see which templates explicitly support these patterns.
 
-#### Commit/Changelog Entries
+#### Changelog Section Heading
+
+Usage: [`release-section-heading-template`](./config-options.md#changelog--release-section-heading-template-optional)
+
+- `{{ section }}`: string; the section names defined in [`commit-types`](./config-options.md#commit-types-optional) (e.g., "Features", "Bug Fixes")
+
+#### Changelog Entries
 
 Usage: [`release-section-entry-template`](./config-options.md#changelog--release-section-entry-template-optional) and [`release-breaking-section-entry-template`](./config-options.md#changelog--release-breaking-section-entry-template-optional)
 

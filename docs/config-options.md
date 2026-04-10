@@ -107,6 +107,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> file-footer-template-path (Optional)](#changelog--file-footer-template-path-optional)
     - [changelog \> release-header-template (Optional)](#changelog--release-header-template-optional)
     - [changelog \> release-header-template-path (Optional)](#changelog--release-header-template-path-optional)
+    - [changelog \> release-section-heading-template (Optional)](#changelog--release-section-heading-template-optional)
     - [changelog \> release-section-entry-template (Optional)](#changelog--release-section-entry-template-optional)
     - [changelog \> release-section-entry-template-path (Optional)](#changelog--release-section-entry-template-path-optional)
     - [changelog \> release-breaking-section-heading (Optional)](#changelog--release-breaking-section-heading-optional)
@@ -828,6 +829,18 @@ Path to text file containing changelog release header. Overrides `release-header
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
+#### changelog > release-section-heading-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for heading of a changelog release section, using with string patterns like `{{ section }}`.  
+Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
+
+Additionally, you can use a special dynamic pattern (see [patterns docs](./string-templates-and-patterns.md#changelog-section-heading) for more details):
+
+- `{{ section }}`: string
+
 #### changelog > release-section-entry-template (Optional)
 
 Type: `string`  
@@ -836,7 +849,7 @@ Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/
 String template for each entries in the changelog release sections.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
 
-Additionally, you can use a special set of dynamic patterns (see [patterns docs](./string-templates-and-patterns.md#commitchangelog-entries) for more details):
+Additionally, you can use a special set of dynamic patterns (see [patterns docs](./string-templates-and-patterns.md#changelog-entries) for more details):
 
 - `{{ commit }}`: string
 - `{{ hash }}`: string

@@ -25,6 +25,7 @@ type GenerateChangelogReleaseConfigParams =
       ChangelogConfigOutput,
       | "releaseHeaderTemplate"
       | "releaseHeaderTemplatePath"
+      | "releaseSectionHeadingTemplate"
       | "releaseSectionEntryTemplate"
       | "releaseSectionEntryTemplatePath"
       | "releaseBreakingSectionHeading"
@@ -203,6 +204,7 @@ async function generateReleaseBodyBasedOnCommits(
   const {
     commitTypes,
     changelog: {
+      releaseSectionHeadingTemplate,
       releaseSectionEntryTemplate,
       releaseSectionEntryTemplatePath,
       releaseBreakingSectionHeading,
@@ -295,7 +297,11 @@ async function generateReleaseBodyBasedOnCommits(
   for (const [section, entries] of sectionGroups) {
     if (entries.length === 0) continue;
 
-    finalReleaseBody.push(section);
+    const heading = section === breakingSectionHeading
+      ? section
+      : await resolveStringTemplate(releaseSectionHeadingTemplate, { section });
+
+    finalReleaseBody.push(heading);
     finalReleaseBody.push(entries.sort().join("\n"));
   }
 

@@ -4,6 +4,7 @@ import {
   DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE,
+  DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 
@@ -85,6 +86,21 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
 
+    releaseSectionHeadingTemplate: v.pipe(
+      v.optional(
+        v.pipe(v.string(), v.nonEmpty()),
+        DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE,
+      ),
+      v.metadata({
+        description:
+          "String template for heading of a changelog release section, using with string patterns like {{ section }}.\n" +
+          "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
+          "Additionally, you can use a special dynamic pattern which is: {{ section }}.\n" +
+          `Default: ${
+            JSON.stringify(DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE)
+          }`,
+      }),
+    ),
     releaseSectionEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
@@ -111,7 +127,7 @@ export const ChangelogConfigSchema = v.pipe(
       }),
     ),
     releaseBreakingSectionHeading: v.pipe(
-      v.optional(v.string(), "⚠ BREAKING CHANGES"),
+      v.optional(v.string(), "### ⚠ BREAKING CHANGES"),
       v.metadata({
         description: "Heading of a changelog release BREAKING section.",
       }),
