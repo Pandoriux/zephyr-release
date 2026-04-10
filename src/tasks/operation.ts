@@ -57,27 +57,29 @@ export function validateCurrentOperationTriggerCtx(
     commitParser.parse(c.message)
   );
 
-  const parsedOperationContext = {
-    latestTriggerCommit: {
-      parsedCommit: parsedLatestTriggerCommit,
-      treeHash: operationContext.latestTriggerCommit.treeHash,
-    },
-    parsedTriggerCommits: parsedTriggerCommits,
-  } satisfies OperationTriggerContext;
-
-  const hasAllowedType = (parsedLatestTriggerCommit.type &&
+  const commitHasAllowedType = (parsedLatestTriggerCommit.type &&
     allowedTypes.has(parsedLatestTriggerCommit.type)) ||
     parsedTriggerCommits.some((c) => c.type && allowedTypes.has(c.type));
 
-  if (!hasAllowedType) {
+  if (!commitHasAllowedType) {
     if (mode === "auto") {
       taskLogger.info(
         'No commits with an allowed type found. But operation continues because execution mode is "auto"',
       );
     } else {
-      throw new SafeExit("No commits with an allowed type found");
+      // throw new SafeExit("No commits with an allowed type found");
+      taskLogger.info(
+        "No commits with an allowed type found. But operation continues so a later step can verify if this is a merged release proposal",
+      );
     }
   }
 
-  return parsedOperationContext;
+  return {
+    latestTriggerCommit: {
+      parsedCommit: parsedLatestTriggerCommit,
+      treeHash: operationContext.latestTriggerCommit.treeHash,
+    },
+    parsedTriggerCommits: parsedTriggerCommits,
+    commitHasAllowedType,
+  };
 }
