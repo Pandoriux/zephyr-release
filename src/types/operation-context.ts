@@ -6,6 +6,7 @@ import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 export interface OperationTriggerContext {
   latestTriggerCommit: { parsedCommit: Commit; treeHash: string };
   parsedTriggerCommits: Commit[];
+  commitHasAllowedType: boolean;
 }
 
 export interface OperationRunSettings {

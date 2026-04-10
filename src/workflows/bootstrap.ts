@@ -1,3 +1,4 @@
+import { SafeExit } from "../errors/safe-exit.ts";
 import type { ConfigOutput } from "../schemas/configs/config.ts";
 import type { InputsOutput } from "../schemas/inputs/inputs.ts";
 import {
@@ -12,8 +13,8 @@ import {
 } from "../tasks/proposal.ts";
 import {
   createCustomStringPatternContext,
-  createFixedBaseStringPatternContext,
   createFixedAndDynamicDatetimeStringPatternContext,
+  createFixedBaseStringPatternContext,
 } from "../tasks/string-templates-and-patterns/pattern-context.ts";
 import { registerTransformersToTemplateEngine } from "../tasks/string-templates-and-patterns/transformers.ts";
 import type { OperationTriggerContext } from "../types/operation-context.ts";
@@ -78,6 +79,13 @@ export async function bootstrapOperation(
       workingBranchResult.name,
       inputs,
     );
+
+    if (!triggerContext.commitHasAllowedType && !associatedProposalForCommit) {
+      throw new SafeExit(
+        "The trigger commit lacks an allowed type and we verified it is not a merged release proposal",
+      );
+    }
+
     associatedProposalFromBranch = await findOpenProposal(
       provider,
       workingBranchResult.name,
