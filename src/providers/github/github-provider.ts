@@ -1,4 +1,4 @@
-﻿import { githubLogger } from "./logger.ts";
+import { githubLogger } from "./logger.ts";
 import { githubGetRawInputs } from "./inputs.ts";
 import { makeGithubGetTextFile } from "./file.ts";
 import {
@@ -17,7 +17,7 @@ import {
   githubGetRepositoryName,
 } from "./repository.ts";
 import type { PlatformProvider } from "../../types/providers/platform-provider.ts";
-import { githubExportEnvVars, githubExportOutputs } from "./export.ts";
+import { githubSetEnv, githubSetOutput } from "./export.ts";
 import { makeGithubEnsureBranchExist } from "./branch.ts";
 import {
   makeGithubCompareCommits,
@@ -125,8 +125,8 @@ export function createGitHubProvider(): PlatformProvider {
     createRelease: makeGithubCreateRelease(getOctokit),
     attachReleaseAsset: makeGithubAttachReleaseAsset(getOctokit),
 
-    exportOutputs: githubExportOutputs,
-    exportEnvVars: githubExportEnvVars,
+    setOutput: githubSetOutput,
+    setEnv: githubSetEnv,
 
     getConventionalCommitParserOptions:
       githubGetConventionalCommitParserOptions,

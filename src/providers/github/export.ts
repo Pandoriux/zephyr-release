@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 
-export function githubExportOutputs(
+export function githubSetOutput(
   k: string,
   v: string | number | null | undefined,
 ) {
@@ -8,7 +8,7 @@ export function githubExportOutputs(
   core.setOutput(k, String(v));
 }
 
-export function githubExportEnvVars(
+export function githubSetEnv(
   k: string,
   v: string | number | null | undefined,
 ) {

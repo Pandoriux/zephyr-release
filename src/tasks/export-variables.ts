@@ -11,8 +11,8 @@ import type {
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
 import type { ProviderProposal } from "../types/providers/proposal.ts";
 import {
-  toExportEnvVarKey,
-  toExportOutputKey,
+  toOutputKey,
+  toEnvKey,
 } from "../utils/transformers/case.ts";
 import { jsonValueNormalizer } from "../utils/transformers/json.ts";
 import { format, type SemVer } from "@std/semver";
@@ -142,8 +142,8 @@ export async function exportBaseOperationVariables(
   });
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
 
@@ -173,8 +173,8 @@ export async function exportPrePrepareOperationVariables(
   });
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
 
@@ -222,8 +222,8 @@ export async function exportPostPrepareOperationVariables(
   });
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
 
@@ -250,8 +250,8 @@ export async function exportPrePublishOperationVariables(
   });
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
 
@@ -280,8 +280,8 @@ export async function exportPostPublishOperationVariables(
   });
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
 
@@ -303,7 +303,7 @@ export async function exportFinalOperationVariables(
   );
 
   Object.entries(prepareExportObject).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 }
