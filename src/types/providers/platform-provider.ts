@@ -148,8 +148,8 @@ export interface PlatformProvider {
     asset: ProviderAssetParams,
   ) => Promise<void>;
 
-  exportOutputs: (k: string, v: string | number | null | undefined) => void;
-  exportEnvVars: (k: string, v: string | number | null | undefined) => void;
+  setOutput: (k: string, v: string | number | null | undefined) => void;
+  setEnv: (k: string, v: string | number | null | undefined) => void;
 
   getConventionalCommitParserOptions: () => ParserOptions;
 }

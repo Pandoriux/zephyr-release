@@ -19,8 +19,8 @@ import {
   stringifyCurrentPatternContext,
 } from "./string-templates-and-patterns/pattern-context.ts";
 import {
-  toExportEnvVarKey,
-  toExportOutputKey,
+  toOutputKey,
+  toEnvKey,
 } from "../utils/transformers/case.ts";
 
 interface ResolvedRuntimeConfigResult {
@@ -172,8 +172,8 @@ export async function synchronizeRuntimeStateAfterOverride(
   };
 
   Object.entries(staleExports).forEach(([k, v]) => {
-    provider.exportOutputs(toExportOutputKey(k), v);
-    provider.exportEnvVars(toExportEnvVarKey(k), v);
+    provider.setOutput(toOutputKey(k), v);
+    provider.setEnv(toEnvKey(k), v);
   });
 
   taskLogger.debug("Runtime state synchronized.");
