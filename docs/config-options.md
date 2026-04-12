@@ -507,7 +507,7 @@ Redirects major version bumps to minor in pre-1.0 (0.x.x).
 #### bump-strategy > bump-patch-for-minor-pre-stable (Optional)
 
 Type: `boolean`  
-Default: `false`
+Default: `true`
 
 Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 

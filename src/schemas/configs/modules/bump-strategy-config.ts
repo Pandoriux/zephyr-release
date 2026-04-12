@@ -19,11 +19,11 @@ export const BumpStrategyConfigSchema = v.pipe(
       }),
     ),
     bumpPatchForMinorPreStable: v.pipe(
-      v.optional(v.boolean(), false),
+      v.optional(v.boolean(), true),
       v.metadata({
         description:
           "Redirects minor version bumps to patch in pre-1.0 (0.2.x).\n" +
-          "Default: false",
+          "Default: true",
       }),
     ),
 
