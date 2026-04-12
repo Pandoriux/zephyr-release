@@ -10,6 +10,23 @@ import { transformObjKeyToKebabCase } from "../../../utils/transformers/object.t
 
 export const BumpStrategyConfigSchema = v.pipe(
   v.object({
+    bumpMinorForMajorPreStable: v.pipe(
+      v.optional(v.boolean(), true),
+      v.metadata({
+        description:
+          "Redirects major version bumps to minor in pre-1.0 (0.x.3).\n" +
+          "Default: true",
+      }),
+    ),
+    bumpPatchForMinorPreStable: v.pipe(
+      v.optional(v.boolean(), false),
+      v.metadata({
+        description:
+          "Redirects minor version bumps to patch in pre-1.0 (0.2.x).\n" +
+          "Default: false",
+      }),
+    ),
+
     major: v.pipe(
       v.optional(BumpRuleCoreSchema, DEFAULT_MAJOR_BUMP_STRATEGY),
       v.metadata({
@@ -60,23 +77,6 @@ export const BumpStrategyConfigSchema = v.pipe(
       v.optional(BumpRuleExtensionSchema, {}),
       v.metadata({
         description: "Strategy for bumping build metadata (1.2.3+x.x).",
-      }),
-    ),
-
-    bumpMinorForMajorPreStable: v.pipe(
-      v.optional(v.boolean(), true),
-      v.metadata({
-        description:
-          "Redirects major version bumps to minor in pre-1.0 (0.x.3).\n" +
-          "Default: true",
-      }),
-    ),
-    bumpPatchForMinorPreStable: v.pipe(
-      v.optional(v.boolean(), false),
-      v.metadata({
-        description:
-          "Redirects minor version bumps to patch in pre-1.0 (0.2.x).\n" +
-          "Default: false",
       }),
     ),
   }),

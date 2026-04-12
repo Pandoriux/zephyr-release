@@ -1,5 +1,5 @@
 import * as v from "@valibot/valibot";
-import { BaseConfigSchema } from "./modules/base-config.ts";
+import { BaseCoreConfigSchema, BaseLifecycleConfigSchema } from "./modules/base-config.ts";
 import { BumpStrategyConfigSchema } from "./modules/bump-strategy-config.ts";
 import { ReleaseConfigSchema } from "./modules/release-config.ts";
 import { ChangelogConfigSchema } from "./modules/changelog-config.ts";
@@ -8,7 +8,7 @@ import { TagConfigSchema } from "./modules/tag-config.ts";
 
 export const ConfigSchema = v.pipe(
   v.object({
-    ...BaseConfigSchema.entries,
+    ...BaseCoreConfigSchema.entries,
 
     bumpStrategy: v.optional(BumpStrategyConfigSchema, {}),
 
@@ -19,6 +19,8 @@ export const ConfigSchema = v.pipe(
     tag: v.optional(TagConfigSchema, {}),
 
     release: v.optional(ReleaseConfigSchema, {}),
+
+    ...BaseLifecycleConfigSchema.entries,
   }),
   v.metadata({
     title: "Zephyr Release configuration file",
