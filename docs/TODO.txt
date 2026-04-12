@@ -1,1 +1,27 @@
-check lai logic cachs tim primary file, dua tren desc trong doc
+### 🤔 Maybe Consider: Logger "Task Wrapper" Pattern
+
+**The Idea:**
+Instead of manually writing `if/else` checks in the main orchestrator to decide whether to log "Starting" or "Skipped", abstract the logging lifecycle into a generic wrapper method. This keeps the top-level CI pipeline clean, maintains the architectural rule of keeping logs in the caller, but removes the repetitive boilerplate.
+
+**Pseudocode:**
+
+```typescript
+// In the CI orchestrator file (clean and readable):
+
+await logger.executeStep("Execute base pre commands", async (step) => {
+  const hooks = runSettings.config.commandHooks.base;
+  
+  // 1. Bail early. The wrapper catches this and logs: "↷ Skipped: ... (empty)"
+  if (!hooks || hooks.length === 0) {
+    return step.skip("(empty)"); 
+  }
+
+  // 2. If we reach here, the wrapper automatically logs: "⏳ Starting: ..."
+  const result = await runCommands(hooks, "pre");
+  
+  // 3. The wrapper catches the result and logs: "✔ Finished: ..."
+  return step.finish(result);
+});
+```
+
+doi default value cua "bumpPatchForMinorPreStable" sang true

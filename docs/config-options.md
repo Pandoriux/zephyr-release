@@ -49,23 +49,6 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [auto (Optional)](#auto-optional)
     - [auto \> trigger-strategy (Optional)](#auto--trigger-strategy-optional)
       - [... \> trigger-strategy \> type (Required)](#--trigger-strategy--type-required)
-  - [command-hooks (Optional)](#command-hooks-optional)
-    - [command-hooks \> base (Optional)](#command-hooks--base-optional)
-      - [... \> base \> timeout (Optional)](#--base--timeout-optional)
-      - [... \> base \> continue-on-error (Optional)](#--base--continue-on-error-optional)
-      - [... \> base \> pre (Optional)](#--base--pre-optional)
-        - [... \> pre \> cmd (Required)](#--pre--cmd-required)
-        - [... \> pre \> timeout (Optional)](#--pre--timeout-optional)
-        - [... \> pre \> continue-on-error (Optional)](#--pre--continue-on-error-optional)
-      - [... \> base \> post (Optional)](#--base--post-optional)
-        - [... \> post \> same properties as `command-hooks > base > pre`](#--post--same-properties-as-command-hooks--base--pre)
-    - [command-hooks \> prepare (Optional)](#command-hooks--prepare-optional)
-      - [... \> prepare \> same properties as `command-hooks > base`](#--prepare--same-properties-as-command-hooks--base)
-    - [command-hooks \> publish (Optional)](#command-hooks--publish-optional)
-      - [... \> publish \> same properties as `command-hooks > base`](#--publish--same-properties-as-command-hooks--base)
-  - [runtime-config-override (Optional)](#runtime-config-override-optional)
-    - [runtime-config-override \> path (Required)](#runtime-config-override--path-required)
-    - [runtime-config-override \> format (Optional)](#runtime-config-override--format-optional)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
     - [version-files \> path (Required)](#version-files--path-required)
@@ -80,6 +63,8 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [stop-resolving-commit-at (Optional)](#stop-resolving-commit-at-optional)
   - [allowed-release-as-commit-types (Optional)](#allowed-release-as-commit-types-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
+    - [bump-strategy \> bump-minor-for-major-pre-stable (Optional)](#bump-strategy--bump-minor-for-major-pre-stable-optional)
+    - [bump-strategy \> bump-patch-for-minor-pre-stable (Optional)](#bump-strategy--bump-patch-for-minor-pre-stable-optional)
     - [bump-strategy \> major (Optional)](#bump-strategy--major-optional)
       - [... \> major \> types (Optional)](#--major--types-optional)
       - [... \> major \> count-breaking-as (Optional)](#--major--count-breaking-as-optional)
@@ -96,8 +81,6 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
         - [... \> extensions \> type (Required)](#--extensions--type-required)
     - [bump-strategy \> build (Optional)](#bump-strategy--build-optional)
       - [... \> build \> same properties as `bump-strategy > prerelease`](#--build--same-properties-as-bump-strategy--prerelease)
-    - [bump-strategy \> bump-minor-for-major-pre-stable (Optional)](#bump-strategy--bump-minor-for-major-pre-stable-optional)
-    - [bump-strategy \> bump-patch-for-minor-pre-stable (Optional)](#bump-strategy--bump-patch-for-minor-pre-stable-optional)
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> write-to-file (Optional)](#changelog--write-to-file-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
@@ -118,13 +101,13 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-footer-template (Optional)](#changelog--release-footer-template-optional)
     - [changelog \> release-footer-template-path (Optional)](#changelog--release-footer-template-path-optional)
   - [commit (Optional)](#commit-optional)
+    - [commit \> local-changes-to-commit (Optional)](#commit--local-changes-to-commit-optional)
     - [commit \> header-template (Optional)](#commit--header-template-optional)
     - [commit \> header-template-path (Optional)](#commit--header-template-path-optional)
     - [commit \> body-template (Optional)](#commit--body-template-optional)
     - [commit \> body-template-path (Optional)](#commit--body-template-path-optional)
     - [commit \> footer-template (Optional)](#commit--footer-template-optional)
     - [commit \> footer-template-path (Optional)](#commit--footer-template-path-optional)
-    - [commit \> local-changes-to-commit (Optional)](#commit--local-changes-to-commit-optional)
   - [tag (Optional)](#tag-optional)
     - [tag \> create-tag (Optional)](#tag--create-tag-optional)
     - [tag \> name-template (Optional)](#tag--name-template-optional)
@@ -149,6 +132,23 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> footer-template (Optional)](#release--footer-template-optional)
     - [release \> footer-template-path (Optional)](#release--footer-template-path-optional)
     - [release \> assets (Optional)](#release--assets-optional)
+  - [command-hooks (Optional)](#command-hooks-optional)
+    - [command-hooks \> base (Optional)](#command-hooks--base-optional)
+      - [... \> base \> timeout (Optional)](#--base--timeout-optional)
+      - [... \> base \> continue-on-error (Optional)](#--base--continue-on-error-optional)
+      - [... \> base \> pre (Optional)](#--base--pre-optional)
+        - [... \> pre \> cmd (Required)](#--pre--cmd-required)
+        - [... \> pre \> timeout (Optional)](#--pre--timeout-optional)
+        - [... \> pre \> continue-on-error (Optional)](#--pre--continue-on-error-optional)
+      - [... \> base \> post (Optional)](#--base--post-optional)
+        - [... \> post \> same properties as `command-hooks > base > pre`](#--post--same-properties-as-command-hooks--base--pre)
+    - [command-hooks \> prepare (Optional)](#command-hooks--prepare-optional)
+      - [... \> prepare \> same properties as `command-hooks > base`](#--prepare--same-properties-as-command-hooks--base)
+    - [command-hooks \> publish (Optional)](#command-hooks--publish-optional)
+      - [... \> publish \> same properties as `command-hooks > base`](#--publish--same-properties-as-command-hooks--base)
+  - [runtime-config-override (Optional)](#runtime-config-override-optional)
+    - [runtime-config-override \> path (Required)](#runtime-config-override--path-required)
+    - [runtime-config-override \> format (Optional)](#runtime-config-override--format-optional)
 - [Type Definitions](#type-definitions)
   - [AutoStrategy](#autostrategy)
   - [SemverExtension](#semverextension)
@@ -383,139 +383,6 @@ Type: `"commit-types" | "commit-footer" | "flag"`
 
 The strategy type used for automated releases. See [`AutoStrategy`](#autostrategy) for full configuration details of each type.
 
-### command-hooks (Optional)
-
-Type: `object`  
-**Properties:** [`base`](#command-hooks--base-optional), [`prepare`](#command-hooks--prepare-optional), [`publish`](#command-hooks--publish-optional)
-
-Command hooks to run at different phases of the operation. Each command runs from the repository root.
-
-#### command-hooks > base (Optional)
-
-Type: `object`
-
-Pre/post commands to run around the main operation. Each command runs from the repository root.  
-Post commands will always run regardless of operation outcome (success, skipped or failure). It is recommended to check the outcome export variable if your script should only run under specific conditions.  
-Available variables that cmds can use: see [Export operation variables](./export-variables.md).
-
-##### ... > base > timeout (Optional)
-
-Type: `number | string`  
-Default: `60000` (1 min)
-
-Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended).
-
-##### ... > base > continue-on-error (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-Base default behavior for all commands in `pre` and `post`, can be overridden per command.
-
-##### ... > base > pre (Optional)
-
-Type: `(string | object)[]`
-
-Commands to run before the operation.  
-Each command can be either a `string` or an `object`.  
-List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-###### ... > pre > cmd (Required)
-
-Type: `string`
-
-The command string to execute.
-
-###### ... > pre > timeout (Optional)
-
-Type: `number | string`  
-Default: Base default timeout
-
-Timeout in milliseconds, use Infinity to never timeout (not recommended).
-
-###### ... > pre > continue-on-error (Optional)
-
-Type: `boolean`  
-Default: Base default continue-on-error
-
-Continue or stop the process on commands error.
-
-##### ... > base > post (Optional)
-
-Type: `(string | object)[]`
-
-Commands to run after the operation.  
-Each command can be either a `string` or an `object`.  
-List of exposed env variables: see [Export operation variables](./export-variables.md).
-
-###### ... > post > same properties as `command-hooks > base > pre`
-
-Same as [`command-hooks > base > pre`](#--base--pre-optional).
-
-- [`cmd`](#--pre--cmd-required)
-- [`timeout`](#--pre--timeout-optional)
-- [`continue-on-error`](#--pre--continue-on-error-optional)
-
-#### command-hooks > prepare (Optional)
-
-Type: `object`
-
-Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.  
-Available variables that cmds can use: see [Export operation variables](./export-variables.md).
-
-##### ... > prepare > same properties as `command-hooks > base`
-
-Same as [`command-hooks > base`](#command-hooks--base-optional).
-
-- [`timeout`](#--base--timeout-optional)
-- [`continue-on-error`](#--base--continue-on-error-optional)
-- [`pre`](#--base--pre-optional)
-- [`post`](#--base--post-optional)
-
-#### command-hooks > publish (Optional)
-
-Type: `object`
-
-Pre/post commands to run around the release operation. Each command runs from the repository root.  
-Available variables that cmds can use: see [Export operation variables](./export-variables.md).
-
-##### ... > publish > same properties as `command-hooks > base`
-
-Same as [`command-hooks > base`](#command-hooks--base-optional).
-
-- [`timeout`](#--base--timeout-optional)
-- [`continue-on-error`](#--base--continue-on-error-optional)
-- [`pre`](#--base--pre-optional)
-- [`post`](#--base--post-optional)
-
-### runtime-config-override (Optional)
-
-Type: `object`  
-**Properties:** [`path`](#runtime-config-override--path-required), [`format`](#runtime-config-override--format-optional)
-
-A dynamic configuration file to deep-merge over the resolved config at runtime, typically generated by a [`command-hooks`](#command-hooks-optional) script.
-
-This file is always read from the local filesystem. If the file does not exist or is empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error.
-
-**Immutable Fields:** For security and structural consistency, certain core fields are protected and cannot be overridden at runtime. Any values provided for these fields in the override file will be ignored, and the original configuration values will be preserved.
-
-Currently protected fields:
-
-- [`review > working-branch-name-template`](#review--working-branch-name-template-optional)
-
-#### runtime-config-override > path (Required)
-
-Type: `string`
-
-Path to the runtime override config file, read from the local filesystem.
-
-#### runtime-config-override > format (Optional)
-
-Type: `string`  
-Default: `"auto"`
-
-Config file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`.
-
 ### initial-version (Optional)
 
 Type: `string`  
@@ -626,9 +493,23 @@ About `release-as`: <https://github.com/Pandoriux/zephyr-release?tab=readme-ov-f
 ### bump-strategy (Optional)
 
 Type: `object`  
-**Properties:** [`major`](#bump-strategy--major-optional), [`minor`](#bump-strategy--minor-optional), [`patch`](#bump-strategy--patch-optional), [`prerelease`](#bump-strategy--prerelease-optional), [`build`](#bump-strategy--build-optional), [`bump-minor-for-major-pre-stable`](#bump-strategy--bump-minor-for-major-pre-stable-optional), [`bump-patch-for-minor-pre-stable`](#bump-strategy--bump-patch-for-minor-pre-stable-optional)
+**Properties:** [`bump-minor-for-major-pre-stable`](#bump-strategy--bump-minor-for-major-pre-stable-optional), [`bump-patch-for-minor-pre-stable`](#bump-strategy--bump-patch-for-minor-pre-stable-optional), [`major`](#bump-strategy--major-optional), [`minor`](#bump-strategy--minor-optional), [`patch`](#bump-strategy--patch-optional), [`prerelease`](#bump-strategy--prerelease-optional), [`build`](#bump-strategy--build-optional)
 
 Configuration options that determine how version numbers are calculated.
+
+#### bump-strategy > bump-minor-for-major-pre-stable (Optional)
+
+Type: `boolean`  
+Default: `true`
+
+Redirects major version bumps to minor in pre-1.0 (0.x.x).
+
+#### bump-strategy > bump-patch-for-minor-pre-stable (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 
 #### bump-strategy > major (Optional)
 
@@ -744,20 +625,6 @@ Same as [`bump-strategy > prerelease`](#bump-strategy--prerelease-optional).
 - [`override`](#--prerelease--override-optional)
 - [`treat-override-as-significant`](#--prerelease--treat-override-as-significant-optional)
 - [`extensions`](#--prerelease--extensions-optional)
-
-#### bump-strategy > bump-minor-for-major-pre-stable (Optional)
-
-Type: `boolean`  
-Default: `true`
-
-Redirects major version bumps to minor in pre-1.0 (0.x.x).
-
-#### bump-strategy > bump-patch-for-minor-pre-stable (Optional)
-
-Type: `boolean`  
-Default: `false`
-
-Redirects minor version bumps to patch in pre-1.0 (0.x.x).
 
 ### changelog (Optional)
 
@@ -924,9 +791,17 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 ### commit (Optional)
 
 Type: `object`  
-**Properties:** [`header-template`](#commit--header-template-optional), [`header-template-path`](#commit--header-template-path-optional), [`body-template`](#commit--body-template-optional), [`body-template-path`](#commit--body-template-path-optional), [`footer-template`](#commit--footer-template-optional), [`footer-template-path`](#commit--footer-template-path-optional), [`local-changes-to-commit`](#commit--local-changes-to-commit-optional)
+**Properties:** [`local-changes-to-commit`](#commit--local-changes-to-commit-optional), [`header-template`](#commit--header-template-optional), [`header-template-path`](#commit--header-template-path-optional), [`body-template`](#commit--body-template-optional), [`body-template-path`](#commit--body-template-path-optional), [`footer-template`](#commit--footer-template-optional), [`footer-template-path`](#commit--footer-template-path-optional)
 
 Configuration specific to commits. These templates are used to build the commit message when Zephyr Release creates a commit.
+
+#### commit > local-changes-to-commit (Optional)
+
+Type: `string | string[]`
+
+Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. Paths are relative to the repo root.
+
+To include all changes, you can use a glob pattern such as `"**/*"`.
 
 #### commit > header-template (Optional)
 
@@ -973,14 +848,6 @@ Type: `string`
 Path to text file containing commit footer template. Overrides `footer-template` when both are provided.
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
-
-#### commit > local-changes-to-commit (Optional)
-
-Type: `string | string[]`
-
-Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. Paths are relative to the repo root.
-
-To include all changes, you can use a glob pattern such as `"**/*"`.
 
 ### tag (Optional)
 
@@ -1171,6 +1038,139 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 Type: `string | string[]`
 
 List of local asset path(s) to attach to the release. Accepts a single string or an array of strings. Paths are relative to the repository root.
+
+### command-hooks (Optional)
+
+Type: `object`  
+**Properties:** [`base`](#command-hooks--base-optional), [`prepare`](#command-hooks--prepare-optional), [`publish`](#command-hooks--publish-optional)
+
+Command hooks to run at different phases of the operation. Each command runs from the repository root.
+
+#### command-hooks > base (Optional)
+
+Type: `object`
+
+Pre/post commands to run around the main operation. Each command runs from the repository root.  
+Post commands will always run regardless of operation outcome (success, skipped or failure). It is recommended to check the outcome export variable if your script should only run under specific conditions.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
+
+##### ... > base > timeout (Optional)
+
+Type: `number | string`  
+Default: `60000` (1 min)
+
+Base default timeout (ms) for all commands in `pre` and `post`, can be overridden per command. Use `Infinity`, `"Infinity"`, or `"infinity"` to never timeout (not recommended).
+
+##### ... > base > continue-on-error (Optional)
+
+Type: `boolean`  
+Default: `false`
+
+Base default behavior for all commands in `pre` and `post`, can be overridden per command.
+
+##### ... > base > pre (Optional)
+
+Type: `(string | object)[]`
+
+Commands to run before the operation.  
+Each command can be either a `string` or an `object`.  
+List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+###### ... > pre > cmd (Required)
+
+Type: `string`
+
+The command string to execute.
+
+###### ... > pre > timeout (Optional)
+
+Type: `number | string`  
+Default: Base default timeout
+
+Timeout in milliseconds, use Infinity to never timeout (not recommended).
+
+###### ... > pre > continue-on-error (Optional)
+
+Type: `boolean`  
+Default: Base default continue-on-error
+
+Continue or stop the process on commands error.
+
+##### ... > base > post (Optional)
+
+Type: `(string | object)[]`
+
+Commands to run after the operation.  
+Each command can be either a `string` or an `object`.  
+List of exposed env variables: see [Export operation variables](./export-variables.md).
+
+###### ... > post > same properties as `command-hooks > base > pre`
+
+Same as [`command-hooks > base > pre`](#--base--pre-optional).
+
+- [`cmd`](#--pre--cmd-required)
+- [`timeout`](#--pre--timeout-optional)
+- [`continue-on-error`](#--pre--continue-on-error-optional)
+
+#### command-hooks > prepare (Optional)
+
+Type: `object`
+
+Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
+
+##### ... > prepare > same properties as `command-hooks > base`
+
+Same as [`command-hooks > base`](#command-hooks--base-optional).
+
+- [`timeout`](#--base--timeout-optional)
+- [`continue-on-error`](#--base--continue-on-error-optional)
+- [`pre`](#--base--pre-optional)
+- [`post`](#--base--post-optional)
+
+#### command-hooks > publish (Optional)
+
+Type: `object`
+
+Pre/post commands to run around the release operation. Each command runs from the repository root.  
+Available variables that cmds can use: see [Export operation variables](./export-variables.md).
+
+##### ... > publish > same properties as `command-hooks > base`
+
+Same as [`command-hooks > base`](#command-hooks--base-optional).
+
+- [`timeout`](#--base--timeout-optional)
+- [`continue-on-error`](#--base--continue-on-error-optional)
+- [`pre`](#--base--pre-optional)
+- [`post`](#--base--post-optional)
+
+### runtime-config-override (Optional)
+
+Type: `object`  
+**Properties:** [`path`](#runtime-config-override--path-required), [`format`](#runtime-config-override--format-optional)
+
+A dynamic configuration file to deep-merge over the resolved config at runtime, typically generated by a [`command-hooks`](#command-hooks-optional) script.
+
+This file is always read from the local filesystem. If the file does not exist or is empty, it is safely ignored. However, if the file exists but the merged result fails schema validation, the operation will throw an error.
+
+**Immutable Fields:** For security and structural consistency, certain core fields are protected and cannot be overridden at runtime. Any values provided for these fields in the override file will be ignored, and the original configuration values will be preserved.
+
+Currently protected fields:
+
+- [`review > working-branch-name-template`](#review--working-branch-name-template-optional)
+
+#### runtime-config-override > path (Required)
+
+Type: `string`
+
+Path to the runtime override config file, read from the local filesystem.
+
+#### runtime-config-override > format (Optional)
+
+Type: `string`  
+Default: `"auto"`
+
+Config file format. Allowed values: `auto`, `json`, `jsonc`, `json5`, `yaml`, `toml`.
 
 ## Type Definitions
 

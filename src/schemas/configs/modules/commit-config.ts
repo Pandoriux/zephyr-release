@@ -6,6 +6,27 @@ import { trimNonEmptyStringSchema } from "../../string.ts";
 
 export const CommitConfigSchema = v.pipe(
   v.object({
+    localChangesToCommit: v.pipe(
+      v.optional(
+        v.union([
+          trimNonEmptyStringSchema,
+          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
+        ]),
+      ),
+      v.transform((input) => {
+        if (input !== undefined) {
+          return Array.isArray(input) ? input : [input];
+        }
+        return input;
+      }),
+      v.metadata({
+        description:
+          "Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. " +
+          'Paths are relative to the repo root. To include all changes, use a glob such as "**/*".',
+        examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
+      }),
+    ),
+
     headerTemplate: v.pipe(
       v.optional(trimNonEmptyStringSchema, DEFAULT_COMMIT_HEADER_TEMPLATE),
       v.metadata({
@@ -61,27 +82,6 @@ export const CommitConfigSchema = v.pipe(
         description:
           "Path to text file containing commit footer template. Overrides `footerTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
-      }),
-    ),
-
-    localChangesToCommit: v.pipe(
-      v.optional(
-        v.union([
-          trimNonEmptyStringSchema,
-          v.pipe(v.array(trimNonEmptyStringSchema), v.nonEmpty()),
-        ]),
-      ),
-      v.transform((input) => {
-        if (input !== undefined) {
-          return Array.isArray(input) ? input : [input];
-        }
-        return input;
-      }),
-      v.metadata({
-        description:
-          "Additional local changes to include in the commit (add, modify, or delete files). Accepts a path or an array of paths/globs. " +
-          'Paths are relative to the repo root. To include all changes, use a glob such as "**/*".',
-        examples: [["some/path"], ["src/release-artifacts/*"], ["**/*"]],
       }),
     ),
   }),
