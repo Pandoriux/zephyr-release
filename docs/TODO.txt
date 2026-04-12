@@ -23,5 +23,3 @@ await logger.executeStep("Execute base pre commands", async (step) => {
   return step.finish(result);
 });
 ```
-
-doi default value cua "bumpPatchForMinorPreStable" sang true
