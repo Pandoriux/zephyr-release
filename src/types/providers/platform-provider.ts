@@ -66,9 +66,10 @@ export interface PlatformProvider {
   ) => Promise<ProviderProposal | undefined>;
 
   /** @throws {Error | NoCommitFoundError} */
-  findCommitsFromGivenToPreviousTagged: (
+  listCommitsFromGivenToLastRelease: (
     commitHash: string,
-    stopResolvingCommitAt?: number | string,
+    maxCommitsToResolve: number,
+    resolveUntilCommitHash?: string,
   ) => Promise<ProviderCommit[]>;
   /** @throws */
   compareCommits: (

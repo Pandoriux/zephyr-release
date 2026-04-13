@@ -92,13 +92,22 @@ export const BaseCoreConfigSchema = v.object({
         }`,
     }),
   ),
-  stopResolvingCommitAt: v.pipe(
-    v.optional(v.union([v.number(), trimNonEmptyStringSchema])),
+  maxCommitsToResolve: v.pipe(
+    v.optional(v.number(), 100),
     v.metadata({
       description:
-        "Defines the boundary for resolving Git commit history. Can be a number or a string.\n" +
-        "- Number: The maximum amount of commits to resolve (e.g., 50).\n" +
-        "- String: The specific Git commit hash to stop at.",
+        "The maximum number of commits allowed to resolve, the rest will be truncated.\n" +
+        "Default: 100",
+    }),
+  ),
+  resolveUntilCommitHash: v.pipe(
+    v.optional(trimNonEmptyStringSchema),
+    v.metadata({
+      description:
+        "Forces the tool to keep resolving commits until it reaches this specific hash, completely bypassing the " +
+        "standard resolve behavior.\n" +
+        "This still respects the `maxCommitsToResolve` safety limit.\n" +
+        "Avoid hardcoding this in your static config file, set it dynamically.",
     }),
   ),
   allowedReleaseAsCommitTypes: v.pipe(

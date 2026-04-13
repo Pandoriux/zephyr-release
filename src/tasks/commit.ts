@@ -36,7 +36,7 @@ type ResolveCommitsInputsParams = Pick<
 
 type ResolveCommitsConfigParams = Pick<
   ConfigOutput,
-  "commitTypes" | "stopResolvingCommitAt"
+  "commitTypes" | "maxCommitsToResolve" | "resolveUntilCommitHash"
 >;
 
 /**
@@ -146,11 +146,12 @@ export async function resolveCommitsFromTriggerToLastRelease(
   config: ResolveCommitsConfigParams,
 ): Promise<ResolvedCommitsResult> {
   const { triggerCommitHash } = inputs;
-  const { commitTypes, stopResolvingCommitAt } = config;
+  const { commitTypes, maxCommitsToResolve, resolveUntilCommitHash } = config;
 
-  const rawCommits = await provider.findCommitsFromGivenToPreviousTagged(
+  const rawCommits = await provider.listCommitsFromGivenToLastRelease(
     triggerCommitHash,
-    stopResolvingCommitAt,
+    maxCommitsToResolve,
+    resolveUntilCommitHash,
   ).catch((error) => {
     if (error instanceof NoCommitFoundError) {
       throw new SafeExit(error.message);

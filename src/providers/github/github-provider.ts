@@ -22,8 +22,8 @@ import { makeGithubEnsureBranchExist } from "./branch.ts";
 import {
   makeGithubCompareCommits,
   makeGithubCreateCommitOnBranch,
-  makeGithubFindCommitsFromGivenToPreviousTagged,
   makeGithubGetCommit,
+  makeGithubListCommitsFromGivenToLastRelease,
 } from "./commit.ts";
 import { githubGetConventionalCommitParserOptions } from "./conventional-commit.ts";
 import {
@@ -92,8 +92,8 @@ export function createGitHubProvider(): PlatformProvider {
       getOctokit,
     ),
 
-    findCommitsFromGivenToPreviousTagged:
-      makeGithubFindCommitsFromGivenToPreviousTagged(getOctokit),
+    listCommitsFromGivenToLastRelease:
+      makeGithubListCommitsFromGivenToLastRelease(getOctokit),
     compareCommits: makeGithubCompareCommits(getOctokit),
     getCommit: makeGithubGetCommit(getOctokit),
     createCommitOnBranch: makeGithubCreateCommitOnBranch(

@@ -8,38 +8,73 @@ import type {
   ProviderCommitDetails,
   ProviderCompareCommits,
 } from "../../types/providers/commit.ts";
+import { parseLooseSemVer } from "../../utils/parsers/semver.ts";
 
 /** @throws */
-async function githubFindCommitsFromGivenToPreviousTagged(
+async function githubListCommitsFromGivenToLastRelease(
   octokit: OctokitClient,
   commitHash: string,
-  stopResolvingCommitAt?: number | string,
+  maxCommitsToResolve: number,
+  resolveUntilCommitHash?: string,
 ): Promise<ProviderCommit[]> {
   const owner = githubGetNamespace();
   const repo = githubGetRepositoryName();
 
-  const tagMap = new Map<string, string>();
-  let tagCount = 0;
-  const TAG_LIMIT = 500;
+  let platformReleaseTargetSha: string | undefined = undefined;
+  const coercedTagMap = new Map<string, string>();
 
-  const tagsIterator = octokit.paginate.iterator(
-    octokit.rest.repos.listTags,
-    {
-      owner,
-      repo,
-      per_page: 100,
-    },
-  );
+  if (!resolveUntilCommitHash) {
+    try {
+      const releasesIterator = octokit.paginate.iterator(
+        octokit.rest.repos.listReleases,
+        {
+          owner,
+          repo,
+          per_page: 100,
+        },
+      );
 
-  tagsLoop: for await (const response of tagsIterator) {
-    for (const tag of response.data) {
-      if (!tagMap.has(tag.commit.sha)) {
-        tagMap.set(tag.commit.sha, tag.name);
+      for await (const response of releasesIterator) {
+        const validRelease = response.data.find((r) => r.draft === false);
+
+        if (validRelease) {
+          const commitRes = await octokit.rest.repos.getCommit({
+            owner,
+            repo,
+            ref: validRelease.tag_name,
+          });
+
+          platformReleaseTargetSha = commitRes.data.sha;
+          break;
+        }
       }
+    } catch { /* ignore */ }
+  }
 
-      tagCount++;
-      if (tagCount >= TAG_LIMIT) {
-        break tagsLoop;
+  if (!resolveUntilCommitHash && !platformReleaseTargetSha) {
+    let tagCount = 0;
+    const TAG_LIMIT = 100;
+
+    const tagsIterator = octokit.paginate.iterator(
+      octokit.rest.repos.listTags,
+      {
+        owner,
+        repo,
+        per_page: 100,
+      },
+    );
+
+    tagsLoop: for await (const response of tagsIterator) {
+      for (const tag of response.data) {
+        if (!coercedTagMap.has(tag.commit.sha)) {
+          const coerced = parseLooseSemVer(tag.name, true);
+          if (coerced) {
+            coercedTagMap.set(tag.commit.sha, tag.name);
+          }
+        }
+
+        tagCount++;
+        if (tagCount >= TAG_LIMIT) break tagsLoop;
       }
     }
   }
@@ -58,17 +93,35 @@ async function githubFindCommitsFromGivenToPreviousTagged(
 
   for await (const response of commitsIterator) {
     for (const commit of response.data) {
-      const tagName = tagMap.get(commit.sha);
+      // The Force (Explicit Hash Override) --
+      if (resolveUntilCommitHash && commit.sha === resolveUntilCommitHash) {
+        return collectedCommits;
+      }
 
-      if (tagName) {
+      // Happy case (Platform Release)
+      if (
+        !resolveUntilCommitHash && platformReleaseTargetSha &&
+        commit.sha === platformReleaseTargetSha
+      ) {
         if (collectedCommits.length === 0) {
           throw new NoCommitFoundError(
-            `No new commits found. The starting commit ${
-              commitHash.substring(0, 7)
-            } is already tagged (${tagName}).`,
+            `No new commits found. The starting commit is already released.`,
           );
         }
         return collectedCommits;
+      }
+
+      // Local Fallback (Coerced Tag)
+      if (!resolveUntilCommitHash && !platformReleaseTargetSha) {
+        const coercedTagName = coercedTagMap.get(commit.sha);
+        if (coercedTagName) {
+          if (collectedCommits.length === 0) {
+            throw new NoCommitFoundError(
+              `No new commits found. The starting commit is already tagged (${coercedTagName}).`,
+            );
+          }
+          return collectedCommits;
+        }
       }
 
       collectedCommits.push({
@@ -79,22 +132,8 @@ async function githubFindCommitsFromGivenToPreviousTagged(
         treeHash: commit.commit.tree.sha,
       });
 
-      if (stopResolvingCommitAt) {
-        // Check number limit
-        if (
-          typeof stopResolvingCommitAt === "number" &&
-          collectedCommits.length === stopResolvingCommitAt
-        ) {
-          return collectedCommits;
-        }
-
-        // Check hash boundary
-        if (
-          typeof stopResolvingCommitAt === "string" &&
-          commit.sha === stopResolvingCommitAt
-        ) {
-          return collectedCommits;
-        }
+      if (collectedCommits.length >= maxCommitsToResolve) {
+        return collectedCommits;
       }
     }
   }
@@ -247,17 +286,19 @@ async function githubGetCommit(
   };
 }
 
-export function makeGithubFindCommitsFromGivenToPreviousTagged(
+export function makeGithubListCommitsFromGivenToLastRelease(
   getOctokit: GetOctokitFn,
 ) {
   return (
     commitHash: string,
-    stopResolvingCommitAt?: number | string,
+    maxCommitsToResolve: number,
+    resolveUntilCommitHash?: string,
   ) =>
-    githubFindCommitsFromGivenToPreviousTagged(
+    githubListCommitsFromGivenToLastRelease(
       getOctokit(),
       commitHash,
-      stopResolvingCommitAt,
+      maxCommitsToResolve,
+      resolveUntilCommitHash,
     );
 }
 

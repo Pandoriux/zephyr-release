@@ -60,7 +60,8 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [commit-types \> type (Required)](#commit-types--type-required)
     - [commit-types \> section (Optional)](#commit-types--section-optional)
     - [commit-types \> hidden (Optional)](#commit-types--hidden-optional)
-  - [stop-resolving-commit-at (Optional)](#stop-resolving-commit-at-optional)
+  - [max-commits-to-resolve (Optional)](#max-commits-to-resolve-optional)
+  - [resolve-until-commit-hash (Optional)](#resolve-until-commit-hash-optional)
   - [allowed-release-as-commit-types (Optional)](#allowed-release-as-commit-types-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
     - [bump-strategy \> bump-minor-for-major-pre-stable (Optional)](#bump-strategy--bump-minor-for-major-pre-stable-optional)
@@ -549,14 +550,32 @@ Exclude this commit type from changelog generation (does not affect version bump
 
 [⬆ Back to top](#table-of-content)
 
-### stop-resolving-commit-at (Optional)
+### max-commits-to-resolve (Optional)
 
-Type: `number | string`
+Type: `number`  
+Default: `100`
 
-Defines the boundary for resolving Git commit history. Can be a number or a string.
+The maximum number of commits allowed to resolve, the rest will be truncated.
 
-- **Number**: The maximum amount of commits to resolve (e.g., `50`).
-- **String**: The specific Git commit hash to stop at (e.g., `"abc123def456"`).
+[⬆ Back to top](#table-of-content)
+
+### resolve-until-commit-hash (Optional)
+
+Type: `string`
+
+Forces the tool to keep resolving commits until it reaches this specific hash, completely bypassing the standard resolve behavior.
+
+By default, Zephyr Release automatically finds your last release by querying the platform's Release API, or falls back to semantic version numbers from your Git tags. However, sometimes automatic detection is impossible:
+
+- **No Platform Releases:** You are running locally, on a host without a formal Release API, or you just dont use the Release feature ([`create-release`](#release--create-release-optional) is false).
+- **Noisy/Custom Tags:** You tag non-release commits (e.g., `test-deploy`) and do not use Semantic Versioning in tag name, causing the tag fallback to fail.
+- **Custom Boundaries:** You need to forcefully generate a changelog from a highly specific point in time.
+
+In those cases, `resolve-until-commit-hash` acts as your explicit manual override, telling the tool exactly which commit hash to anchor to.
+
+While this property overrides standard behavior, it **does not** override your safety limits. The resolution process still strictly respects `max-commits-to-resolve`. If the specified hash is not found before the maximum commit limit is reached, the tool will safely stop and return the commits gathered up to that point.
+
+**Note:** Avoid hardcoding this in your static config file. Instead, set it dynamically via [`input config override`](./input-options.md#config-override-optional) or `command-hooks`.
 
 [⬆ Back to top](#table-of-content)
 
