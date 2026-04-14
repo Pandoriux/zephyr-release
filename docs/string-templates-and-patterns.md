@@ -21,13 +21,64 @@ export const liquidEngine = new Liquid({ jsTruthy: true });
 
 ## Available String Patterns
 
+These patterns let you inject dynamic values into your templates. Because Zephyr Release runs in several stages, certain patterns are only available after specific phases.
+
+### Lifecycle Overview
+
+#### Base (available at all time)
+
+These patterns are available starting from the bootstrap phase, meaning they can be used across the entire release operation.
+
+- Custom Patterns
+- name, host, namespace, repository, commitPathPart, referencePathPart
+- triggerBranchName, workingBranchName
+- timeZone
+- timestamp, YYYY, MM, DD, HH, mm, ss (Fixed)
+- nowTimestamp, nowYYYY, nowMM, nowDD, nowHH, nowmm, nowss (Dynamic)
+
+#### Prepare Phase
+
+These patterns become available sequentially as the prepare operation (managing proposals or automated commits) progresses:
+
+Available after resolving commits and calculating the versions:
+
+- currentVersion, nextVersion (and their components like **Core**, **Pre**, **Bld**)
+- tagName
+
+Available after generating the changelog release content based on the resolved commits:
+
+- changelogRelease, changelogReleaseBody
+
+#### Publish Phase
+
+These patterns become available sequentially when merging a proposal and triggering the actual platform release:
+
+Available after extracting the changelog from the proposal body or re-generating the changelog:
+
+- changelogRelease, changelogReleaseBody
+
+Available after extracting the next version natively from the primary version file in the codebase:
+
+- nextVersion (and its components like **Core**, **Pre**, **Bld**)
+- tagName
+
+### Pattern Details
+
+#### Custom Patterns
+
+Custom string patterns defined in your configuration file using the [`custom-string-patterns`](./config-options.md#custom-string-patterns-optional) option. If a custom pattern key matches a built-in pattern, the built-in takes priority and your custom one is ignored. Usage: `{{ yourCustomKey }}`.
+
 ### Fixed String Patterns  
 
 These string patterns are resolved at runtime and remain fixed for the lifetime of the process.
 
 #### Base
 
-- `{{ name }}`: Project name (set via [name](./config-options.md#name-optional))
+- **Custom Patterns**: Custom string patterns defined in your configuration file using the [`custom-string-patterns`](./config-options.md#custom-string-patterns-optional) option. `{{ yourCustomKey }}`.
+
+<br>
+
+- `{{ name }}`: Project name (set via [`name`](./config-options.md#name-optional))
 - `{{ host }}`: Repository host
 - `{{ namespace }}`: Repository namespace (organization or user)
 - `{{ repository }}`: Repository name
@@ -41,7 +92,7 @@ These string patterns are resolved at runtime and remain fixed for the lifetime 
 
 <br>
 
-- `{{ timeZone }}`: IANA time zone (set via [time-zone](./config-options.md#time-zone-optional))
+- `{{ timeZone }}`: IANA time zone (set via [`time-zone`](./config-options.md#time-zone-optional))
 
 #### Datetime
 
@@ -66,7 +117,7 @@ Only available in "auto" mode or "review" mode propose operation. Can be undefin
 
 <br>
 
-- `{{ tagName }}`: Tag name (set via [tag-name-template](./config-options.md#tag--name-template-optional))
+- `{{ tagName }}`: Tag name (set via [`tag-name-template`](./config-options.md#tag--name-template-optional))
 
 ### Dynamic String Patterns
 

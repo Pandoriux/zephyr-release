@@ -17,141 +17,293 @@ By default, all environment variables available on your system are automatically
 
 Zephyr Release additional operation-scoped variables. These variables are not all immediately available, but become available as the operation progresses through each stage.
 
-### Base (available at all time)
+### Lifecycle Overview
+
+#### Base (available at all time)
 
 These variables are available starting from the first [`command-hooks > base > pre`](./config-options.md#command-hooks-optional) command runs.
 
-- **triggerCommitHash:** Trigger commit hash  
-  Output: zr-trigger-commit-hash; Env: ZR_TRIGGER_COMMIT_HASH
+- [triggerCommitHash](#triggercommithash)
+- [triggerBranchName](#triggerbranchname)
+- [workspacePath](#workspacepath)
+- [configPath](#configpath)
+- [configFormat](#configformat)
+- [configOverride](#configoverride)
+- [configOverrideFormat](#configoverrideformat)
+- [sourceMode](#sourcemode)
+- [internalSourceMode](#internalsourcemode)
+- [parsedTriggerCommit](#parsedtriggercommit)
+- [parsedTriggerCommitList](#parsedtriggercommitlist)
+- [workingBranchName](#workingbranchname)
+- [workingBranchRef](#workingbranchref)
+- [workingBranchHash](#workingbranchhash)
+- [mode](#mode)
+- [operation](#operation)
+- [jobs](#jobs)
+- [startTime](#starttime)
 
-- **triggerBranchName:** Trigger branch name  
-  Output: zr-trigger-branch-name; Env: ZR_TRIGGER_BRANCH_NAME
-
-- **workspacePath:** Workspace path  
-  Output: zr-workspace-path; Env: ZR_WORKSPACE_PATH
-
-- **configPath:** Config file path  
-  Output: zr-config-path; Env: ZR_CONFIG_PATH
-
-- **configFormat:** Config file format  
-  Output: zr-config-format; Env: ZR_CONFIG_FORMAT
-
-- **configOverride:** Config override string  
-  Output: zr-config-override; Env: ZR_CONFIG_OVERRIDE
-
-- **configOverrideFormat:** Config override format  
-  Output: zr-config-override-format; Env: ZR_CONFIG_OVERRIDE_FORMAT
-
-- **sourceMode:** Source mode string from inputs, preserved as-is (JSON stringified)  
-  Output: zr-source-mode-str; Env: ZR_SOURCE_MODE_STR
-
-- **internalSourceMode:** Internally resolved source mode object (JSON stringified). The object has the shape `{ mode: "remote" | "local", overrides?: Record<string, "remote" | "local"> }`, where `overrides` is a map of file paths to mode values. See [source mode docs](./input-options.md#source-mode-optional).  
-  Output: zr-internal-source-mode; Env: ZR_INTERNAL_SOURCE_MODE
-
-<br>
-
-- **parsedTriggerCommit:** Parsed commit object for the latest commit that triggered the operation (JSON stringified). [View the commit object structure](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser#usage)  
-  Output: zr-trigger-commit; Env: ZR_TRIGGER_COMMIT
-
-- **parsedTriggerCommitList:** Array of parsed commit objects that triggered the operation (JSON stringified). A list can contain multiple commits, for example when you push multiple local commits at once. [View the commit object structure](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser#usage)  
-  Output: zr-trigger-commit-list; Env: ZR_TRIGGER_COMMIT_LIST
-
-<br>
-
-- **workingBranchName:** Working branch name used by the operation  
-  Output: zr-working-branch-name; Env: ZR_WORKING_BRANCH_NAME
-
-- **workingBranchRef:** Working branch ref (e.g. `refs/heads/feature-login`)  
-  Output: zr-working-branch-ref; Env: ZR_WORKING_BRANCH_REF
-
-- **workingBranchHash:** Working branch HEAD commit hash  
-  Output: zr-working-branch-hash; Env: ZR_WORKING_BRANCH_HASH
-
-<br>
-
-- **mode:** The execution mode. It is the same as the config [`mode`](./config-options.md#mode-optional) option and is included here for convenience  
-  Output: zr-mode; Env: ZR_MODE
-- **operation:** For [`mode`](./config-options.md#mode-optional) "review", value is "propose" in "prepare" phase (when creating or updating proposal), "release" in "publish" phase (when creating tag or publishing release). For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"  
-  Output: zr-operation; Env: ZR_OPERATION
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is "create-proposal" or "update-proposal" when **operation** is "propose", and "create-tag" and/or "create-release" when **operation** is "release". For [`mode`](./config-options.md#mode-optional) "auto", the value is available at [post prepare phase](#post-prepare)  
-  Output: zr-jobs; Env: ZR_JOBS
-
-<br>
-
-- **startTime:** the operation start time in ISO format  
-  Output: zr-start-time; Env: ZR_START_TIME
-
-### Dynamic (available at all time)
+#### Dynamic (available at all time)
 
 These variables are exposed continuously throughout the operation, and their values are updated for each stage. Additionally, although they are labeled as available at all times, a value might or might not exist during some stages (such as `proposalId`).
 
-- **config:** **Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution, ensuring it always reflects the active configuration rules.  
-  Output: zr-config; Env: ZR_CONFIG
+- [config](#config)
+- [internalConfig](#internalconfig)
+- [patternContext](#patterncontext)
+- [proposalId](#proposalid)
 
-- **internalConfig:** **Current** internally resolved config object, with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). This value also updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution. For schema shape see: [config.ts](../src/schemas/configs/config.ts)  
-  Output: zr-internal-config; Env: ZR_INTERNAL_CONFIG
+#### Prepare Phase
 
-<br>
-
-- **patternContext:** **Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts)  
-  For example, the patternContext exposed at `command-hooks > base > pre` might be differ compared to the patternContext exposed at `command-hooks > prepare > pre`  
-  Output: zr-pattern-context; Env: ZR_PATTERN_CONTEXT
-
-- **proposalId:** Proposal ID (pull request number, ...). For "propose" operation (create/update proposal), it is the proposal ID we are working with. For "release" operation, it is the proposal ID we just merged into. Will be undefined if proposal not found  
-  For example, when there is no proposal open for "propose" operation yet, the initial value will be undefined. Then the "create-proposal" job will create the proposal, and re-update the number. The value can now be accessed in the next cmds like ([`command-hooks > prepare > post`](./config-options.md#command-hooks-optional))  
-  Output: zr-proposal-id; Env: ZR_PROPOSAL_ID
-
-### Prepare Phase
-
-#### Pre Prepare
+##### Pre Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > pre`](./config-options.md#command-hooks-optional) command runs.
 
-- **resolvedCommitEntries:** Array of resolved commit entries (parsed and filtered) from the trigger commit to the last release (JSON stringified). Each entry contains fields such as hash, type, scope, subject, isBreaking, etc. See: [commit.ts](../src/tasks/commit.ts)  
-  Output: zr-resolved-commit-entries; Env: ZR_RESOLVED_COMMIT_ENTRIES
+- [resolvedCommitEntries](#resolvedcommitentries)
+- [currentVersion](#currentversion)
+- [nextVersion](#nextversion)
 
-- **currentVersion:** Current version string (the current version of your project)  
-  Output: zr-current-version; Env: ZR_CURRENT_VERSION
-
-- **nextVersion:** Calculated next version string  
-  Output: zr-next-version; Env: ZR_NEXT_VERSION
-
-#### Post Prepare
+##### Post Prepare
 
 These variables are available starting from the first [`command-hooks > prepare > post`](./config-options.md#command-hooks-optional) command runs.
 
-- **commitHash:** The committed commit hash. For [`mode`](./config-options.md#mode-optional) "review", it is the commit on the working branch. For [`mode`](./config-options.md#mode-optional) "auto", it is the commit on the trigger branch  
-  Output: zr-commit-hash; Env: ZR_COMMIT_HASH
+- [commitHash](#commithash)
+- [committedFilePaths](#committedfilepaths)
+- [jobs](#jobs)
 
-- **committedFilePaths:** Stringified array of file paths that have been committed  
-  Output: zr-committed-file-paths; Env: ZR_COMMITTED_FILE_PATHS
+#### Publish Phase
 
-- **jobs:** Stringified array of jobs. For [`mode`](./config-options.md#mode-optional) "review", the value is already avaiable at [base](#base-available-at-all-time). For [`mode`](./config-options.md#mode-optional) "auto", the value is "create-commit" and/or "create-tag" and/or "create-release"  
-  Output: zr-jobs; Env: ZR_JOBS
+##### Pre Publish
 
-### Publish Phase
+- [nextVersion](#nextversion)
 
-#### Pre Publish
-
-- **nextVersion:** The version string used for the release  
-  Output: zr-next-version; Env: ZR_NEXT_VERSION
-
-#### Post Publish
+##### Post Publish
 
 These variables are available starting from the first [`command-hooks > publish > post`](./config-options.md#command-hooks-optional) command runs.
 
-- **tagHash:** Git tag hash created for the release  
-  Output: zr-tag-hash; Env: ZR_TAG_HASH
+- [tagHash](#taghash)
+- [releaseId](#releaseid)
+- [releaseUploadUrl](#releaseuploadurl)
 
-- **releaseId:** Platform-specific release identifier (for example, GitHub release ID). May be empty if no release was created (for example, when `createReleaseNote` is disabled or the platform does not support releases)  
-  Output: zr-release-id; Env: ZR_RELEASE_ID
-
-- **releaseUploadUrl:** Platform-specific upload URL for release assets (for example, GitHub release upload URL). May be empty if not supported or no release was created  
-  Output: zr-release-upload-url; Env: ZR_RELEASE_UPLOAD_URL
-
-### Final (available at the end)
+#### Final (available at the end)
 
 These variables are available for [`command-hooks > base > post`](./config-options.md#command-hooks-optional) command runs.
 
-- **outcome:** The outcome status of the operation. Possible values are "success" (completed successfully), "skipped" (exited intentionally and safely, e.g., no version bump required), or "failure" (stopped by an unexpected error)  
-  Output: zr-outcome; Env: ZR_OUTCOME
+- [outcome](#outcome)
+
+### Variable Details
+
+#### triggerCommitHash
+
+Trigger commit hash
+
+- Output: `zr-trigger-commit-hash`
+- Env: `ZR_TRIGGER_COMMIT_HASH`
+
+#### triggerBranchName
+
+Trigger branch name
+
+- Output: `zr-trigger-branch-name`
+- Env: `ZR_TRIGGER_BRANCH_NAME`
+
+#### workspacePath
+
+Workspace path
+
+- Output: `zr-workspace-path`
+- Env: `ZR_WORKSPACE_PATH`
+
+#### configPath
+
+Config file path
+
+- Output: `zr-config-path`
+- Env: `ZR_CONFIG_PATH`
+
+#### configFormat
+
+Config file format
+
+- Output: `zr-config-format`
+- Env: `ZR_CONFIG_FORMAT`
+
+#### configOverride
+
+Config override string
+
+- Output: `zr-config-override`
+- Env: `ZR_CONFIG_OVERRIDE`
+
+#### configOverrideFormat
+
+Config override format
+
+- Output: `zr-config-override-format`
+- Env: `ZR_CONFIG_OVERRIDE_FORMAT`
+
+#### sourceMode
+
+Source mode string from inputs, preserved as-is (JSON stringified)
+
+- Output: `zr-source-mode-str`
+- Env: `ZR_SOURCE_MODE_STR`
+
+#### internalSourceMode
+
+Internally resolved source mode object (JSON stringified). The object has the shape `{ mode: "remote" | "local", overrides?: Record<string, "remote" | "local"> }`, where `overrides` is a map of file paths to mode values. See [source mode docs](./input-options.md#source-mode-optional).
+
+- Output: `zr-internal-source-mode`
+- Env: `ZR_INTERNAL_SOURCE_MODE`
+
+#### parsedTriggerCommit
+
+Parsed commit object for the latest commit that triggered the operation (JSON stringified). [View the commit object structure](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser#usage)
+
+- Output: `zr-trigger-commit`
+- Env: `ZR_TRIGGER_COMMIT`
+
+#### parsedTriggerCommitList
+
+Array of parsed commit objects that triggered the operation (JSON stringified). A list can contain multiple commits, for example when you push multiple local commits at once. [View the commit object structure](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser#usage)
+
+- Output: `zr-trigger-commit-list`
+- Env: `ZR_TRIGGER_COMMIT_LIST`
+
+#### workingBranchName
+
+Working branch name used by the operation
+
+- Output: `zr-working-branch-name`
+- Env: `ZR_WORKING_BRANCH_NAME`
+
+#### workingBranchRef
+
+Working branch ref (e.g. `refs/heads/feature-login`)
+
+- Output: `zr-working-branch-ref`
+- Env: `ZR_WORKING_BRANCH_REF`
+
+#### workingBranchHash
+
+Working branch HEAD commit hash
+
+- Output: `zr-working-branch-hash`
+- Env: `ZR_WORKING_BRANCH_HASH`
+
+#### mode
+
+The execution mode. It is the same as the config [`mode`](./config-options.md#mode-optional) option and is included here for convenience
+
+- Output: `zr-mode`
+- Env: `ZR_MODE`
+
+#### operation
+
+For [`mode`](./config-options.md#mode-optional) "review", value is "propose" in "prepare" phase (when creating or updating proposal), "release" in "publish" phase (when creating tag or publishing release). For [`mode`](./config-options.md#mode-optional) "auto", value is "autorelease"
+
+- Output: `zr-operation`
+- Env: `ZR_OPERATION`
+
+#### jobs
+
+Stringified array of jobs being executed. For [`mode`](./config-options.md#mode-optional) "review", available from the base phase with values "create-proposal" or "update-proposal" during "propose" operation, and "create-tag"/"create-release" during "release" operation. For [`mode`](./config-options.md#mode-optional) "auto", available after the prepare phase with values "create-commit", "create-tag", and/or "create-release".
+
+- Output: `zr-jobs`
+- Env: `ZR_JOBS`
+
+#### startTime
+
+The operation start time in ISO format
+
+- Output: `zr-start-time`
+- Env: `ZR_START_TIME`
+
+#### config
+
+**Current** resolved config object taken directly from the user, preserved as-is (JSON stringified). This value updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution, ensuring it always reflects the active configuration rules.
+
+- Output: `zr-config`
+- Env: `ZR_CONFIG`
+
+#### internalConfig
+
+**Current** internally resolved config object, with camelCase keys and normalized values (e.g., a prop that accepts a string or an array is normalized to an array containing a single string) (JSON stringified). This value also updates dynamically if a [`runtime-config-override`](./config-options.md#runtime-config-override-optional) is applied during execution. For schema shape see: [config.ts](../src/schemas/configs/config.ts)
+
+- Output: `zr-internal-config`
+- Env: `ZR_INTERNAL_CONFIG`
+
+#### patternContext
+
+**Current** string pattern context object (JSON stringified). Contains all available string pattern variables that can be used in string templates. Dynamic values (functions or async functions) are resolved at stringify time, ensuring the exported context reflects the **current** state of all pattern variables. See: [pattern-context.ts](../src/tasks/string-templates-and-patterns/pattern-context.ts). For example, the patternContext exposed at `command-hooks > base > pre` might be differ compared to the patternContext exposed at `command-hooks > prepare > pre`
+
+- Output: `zr-pattern-context`
+- Env: `ZR_PATTERN_CONTEXT`
+
+#### proposalId
+
+Proposal ID (pull request number, ...). For "propose" operation (create/update proposal), it is the proposal ID we are working with. For "release" operation, it is the proposal ID we just merged into. Will be undefined if proposal not found. For example, when there is no proposal open for "propose" operation yet, the initial value will be undefined. Then the "create-proposal" job will create the proposal, and re-update the number. The value can now be accessed in the next cmds like ([`command-hooks > prepare > post`](./config-options.md#command-hooks-optional))
+
+- Output: `zr-proposal-id`
+- Env: `ZR_PROPOSAL_ID`
+
+#### resolvedCommitEntries
+
+Array of resolved commit entries (parsed and filtered) from the trigger commit to the last release (JSON stringified). Each entry contains fields such as hash, type, scope, subject, isBreaking, etc. See: [commit.ts](../src/tasks/commit.ts)
+
+- Output: `zr-resolved-commit-entries`
+- Env: `ZR_RESOLVED_COMMIT_ENTRIES`
+
+#### currentVersion
+
+Current version string (the current version of your project)
+
+- Output: `zr-current-version`
+- Env: `ZR_CURRENT_VERSION`
+
+#### nextVersion
+
+The calculated next version string to be used for the release.
+
+- Output: `zr-next-version`
+- Env: `ZR_NEXT_VERSION`
+
+#### commitHash
+
+The committed commit hash. For [`mode`](./config-options.md#mode-optional) "review", it is the commit on the working branch. For [`mode`](./config-options.md#mode-optional) "auto", it is the commit on the trigger branch
+
+- Output: `zr-commit-hash`
+- Env: `ZR_COMMIT_HASH`
+
+#### committedFilePaths
+
+Stringified array of file paths that have been committed
+
+- Output: `zr-committed-file-paths`
+- Env: `ZR_COMMITTED_FILE_PATHS`
+
+#### tagHash
+
+Git tag hash created for the release
+
+- Output: `zr-tag-hash`
+- Env: `ZR_TAG_HASH`
+
+#### releaseId
+
+Platform-specific release identifier (for example, GitHub release ID). May be empty if no release was created (for example, when `createReleaseNote` is disabled or the platform does not support releases)
+
+- Output: `zr-release-id`
+- Env: `ZR_RELEASE_ID`
+
+#### releaseUploadUrl
+
+Platform-specific upload URL for release assets (for example, GitHub release upload URL). May be empty if not supported or no release was created
+
+- Output: `zr-release-upload-url`
+- Env: `ZR_RELEASE_UPLOAD_URL`
+
+#### outcome
+
+The outcome status of the operation. Possible values are "success" (completed successfully), "skipped" (exited intentionally and safely, e.g., no version bump required), or "failure" (stopped by an unexpected error)
+
+- Output: `zr-outcome`
+- Env: `ZR_OUTCOME`
