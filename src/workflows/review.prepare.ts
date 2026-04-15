@@ -166,6 +166,8 @@ export async function executeReviewPreparePhase(
   createDynamicChangelogStringPatternContext(
     changelogReleaseResult.release,
     changelogReleaseResult.releaseBody,
+    changelogReleaseResult.releaseAlt,
+    changelogReleaseResult.releaseBodyAlt,
   );
   logger.debugStepFinish(
     "Finished: Create dynamic changelog string pattern context",

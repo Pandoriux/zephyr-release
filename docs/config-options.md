@@ -34,21 +34,21 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [review \> footer-template (Optional)](#review--footer-template-optional)
     - [review \> footer-template-path (Optional)](#review--footer-template-path-optional)
     - [review \> labels (Optional)](#review--labels-optional)
-      - [... \> labels \> on-create (Optional)](#--labels--on-create-optional)
-        - [... \> on-create \> name (Required)](#--on-create--name-required)
-        - [... \> on-create \> description (Optional)](#--on-create--description-optional)
-        - [... \> on-create \> color (Optional)](#--on-create--color-optional)
-        - [... \> on-create \> create-if-missing (Optional)](#--on-create--create-if-missing-optional)
-      - [... \> labels \> on-merge (Optional)](#--labels--on-merge-optional)
-        - [... \> on-merge \> add (Optional)](#--on-merge--add-optional)
-        - [... \> add \> same properties as `review > labels > on-create`](#--add--same-properties-as-review--labels--on-create)
-        - [... \> on-merge \> remove (Optional)](#--on-merge--remove-optional)
-        - [... \> remove \> same properties as `review > labels > on-create`](#--remove--same-properties-as-review--labels--on-create)
+      - [\> labels \> on-create (Optional)](#-labels--on-create-optional)
+        - [\> on-create \> name (Required)](#-on-create--name-required)
+        - [\> on-create \> description (Optional)](#-on-create--description-optional)
+        - [\> on-create \> color (Optional)](#-on-create--color-optional)
+        - [\> on-create \> create-if-missing (Optional)](#-on-create--create-if-missing-optional)
+      - [\> labels \> on-merge (Optional)](#-labels--on-merge-optional)
+        - [\> on-merge \> add (Optional)](#-on-merge--add-optional)
+        - [\> add \> same properties as review \> labels \> on-createe\`](#-add--same-properties-as-review--labels--on-createe)
+        - [\> on-merge \> remove (Optional)](#-on-merge--remove-optional)
+        - [\> remove \> same properties as review \> labels \> on-createe\`](#-remove--same-properties-as-review--labels--on-createe)
     - [review \> assignees (Optional)](#review--assignees-optional)
     - [review \> reviewers (Optional)](#review--reviewers-optional)
   - [auto (Optional)](#auto-optional)
     - [auto \> trigger-strategy (Optional)](#auto--trigger-strategy-optional)
-      - [... \> trigger-strategy \> type (Required)](#--trigger-strategy--type-required)
+      - [\> trigger-strategy \> type (Required)](#-trigger-strategy--type-required)
   - [initial-version (Optional)](#initial-version-optional)
   - [version-files (Required)](#version-files-required)
     - [version-files \> path (Required)](#version-files--path-required)
@@ -59,6 +59,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [commit-types (Optional)](#commit-types-optional)
     - [commit-types \> type (Required)](#commit-types--type-required)
     - [commit-types \> section (Optional)](#commit-types--section-optional)
+    - [commit-types \> sectionAlt (Optional)](#commit-types--sectionalt-optional)
     - [commit-types \> hidden (Optional)](#commit-types--hidden-optional)
   - [max-commits-to-resolve (Optional)](#max-commits-to-resolve-optional)
   - [resolve-until-commit-hash (Optional)](#resolve-until-commit-hash-optional)
@@ -67,21 +68,21 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [bump-strategy \> bump-minor-for-major-pre-stable (Optional)](#bump-strategy--bump-minor-for-major-pre-stable-optional)
     - [bump-strategy \> bump-patch-for-minor-pre-stable (Optional)](#bump-strategy--bump-patch-for-minor-pre-stable-optional)
     - [bump-strategy \> major (Optional)](#bump-strategy--major-optional)
-      - [... \> major \> types (Optional)](#--major--types-optional)
-      - [... \> major \> count-breaking-as (Optional)](#--major--count-breaking-as-optional)
-      - [... \> major \> commits-per-bump (Optional)](#--major--commits-per-bump-optional)
+      - [\> major \> types (Optional)](#-major--types-optional)
+      - [\> major \> count-breaking-as (Optional)](#-major--count-breaking-as-optional)
+      - [\> major \> commits-per-bump (Optional)](#-major--commits-per-bump-optional)
     - [bump-strategy \> minor (Optional)](#bump-strategy--minor-optional)
-      - [... \> minor \> same properties as `bump-strategy > major`](#--minor--same-properties-as-bump-strategy--major)
+      - [\> minor \> same properties as bump-strategy \> major\`](#-minor--same-properties-as-bump-strategy--major)
     - [bump-strategy \> patch (Optional)](#bump-strategy--patch-optional)
-      - [... \> patch \> same properties as `bump-strategy > major`](#--patch--same-properties-as-bump-strategy--major)
+      - [\> patch \> same properties as bump-strategy \> major\`](#-patch--same-properties-as-bump-strategy--major)
     - [bump-strategy \> prerelease (Optional)](#bump-strategy--prerelease-optional)
-      - [... \> prerelease \> enabled (Optional)](#--prerelease--enabled-optional)
-      - [... \> prerelease \> override (Optional)](#--prerelease--override-optional)
-      - [... \> prerelease \> treat-override-as-significant (Optional)](#--prerelease--treat-override-as-significant-optional)
-      - [... \> prerelease \> extensions (Optional)](#--prerelease--extensions-optional)
-        - [... \> extensions \> type (Required)](#--extensions--type-required)
+      - [\> prerelease \> enabled (Optional)](#-prerelease--enabled-optional)
+      - [\> prerelease \> override (Optional)](#-prerelease--override-optional)
+      - [\> prerelease \> treat-override-as-significant (Optional)](#-prerelease--treat-override-as-significant-optional)
+      - [\> prerelease \> extensions (Optional)](#-prerelease--extensions-optional)
+        - [\> extensions \> type (Required)](#-extensions--type-required)
     - [bump-strategy \> build (Optional)](#bump-strategy--build-optional)
-      - [... \> build \> same properties as `bump-strategy > prerelease`](#--build--same-properties-as-bump-strategy--prerelease)
+      - [\> build \> same properties as bump-strategy \> prereleasee\`](#-build--same-properties-as-bump-strategy--prereleasee)
   - [changelog (Optional)](#changelog-optional)
     - [changelog \> write-to-file (Optional)](#changelog--write-to-file-optional)
     - [changelog \> path (Optional)](#changelog--path-optional)
@@ -101,6 +102,18 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-body-override-path (Optional)](#changelog--release-body-override-path-optional)
     - [changelog \> release-footer-template (Optional)](#changelog--release-footer-template-optional)
     - [changelog \> release-footer-template-path (Optional)](#changelog--release-footer-template-path-optional)
+    - [changelog \> release-header-template-alt (Optional)](#changelog--release-header-template-alt-optional)
+    - [changelog \> release-header-template-alt-path (Optional)](#changelog--release-header-template-alt-path-optional)
+    - [changelog \> release-section-heading-template-alt (Optional)](#changelog--release-section-heading-template-alt-optional)
+    - [changelog \> release-section-entry-template-alt (Optional)](#changelog--release-section-entry-template-alt-optional)
+    - [changelog \> release-section-entry-template-alt-path (Optional)](#changelog--release-section-entry-template-alt-path-optional)
+    - [changelog \> release-breaking-section-heading-alt (Optional)](#changelog--release-breaking-section-heading-alt-optional)
+    - [changelog \> release-breaking-section-entry-template-alt (Optional)](#changelog--release-breaking-section-entry-template-alt-optional)
+    - [changelog \> release-breaking-section-entry-template-alt-path (Optional)](#changelog--release-breaking-section-entry-template-alt-path-optional)
+    - [changelog \> release-body-override-alt (Optional)](#changelog--release-body-override-alt-optional)
+    - [changelog \> release-body-override-alt-path (Optional)](#changelog--release-body-override-alt-path-optional)
+    - [changelog \> release-footer-template-alt (Optional)](#changelog--release-footer-template-alt-optional)
+    - [changelog \> release-footer-template-alt-path (Optional)](#changelog--release-footer-template-alt-path-optional)
   - [commit (Optional)](#commit-optional)
     - [commit \> local-changes-to-commit (Optional)](#commit--local-changes-to-commit-optional)
     - [commit \> header-template (Optional)](#commit--header-template-optional)
@@ -116,9 +129,9 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [tag \> message-template (Optional)](#tag--message-template-optional)
     - [tag \> message-template-path (Optional)](#tag--message-template-path-optional)
     - [tag \> tagger (Optional)](#tag--tagger-optional)
-      - [... \> tagger \> name (Required)](#--tagger--name-required)
-      - [... \> tagger \> email (Required)](#--tagger--email-required)
-      - [... \> tagger \> date (Optional)](#--tagger--date-optional)
+      - [\> tagger \> name (Required)](#-tagger--name-required)
+      - [\> tagger \> email (Required)](#-tagger--email-required)
+      - [\> tagger \> date (Optional)](#-tagger--date-optional)
   - [release (Optional)](#release-optional)
     - [release \> create-release (Optional)](#release--create-release-optional)
     - [release \> prerelease (Optional)](#release--prerelease-optional)
@@ -135,25 +148,25 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [release \> assets (Optional)](#release--assets-optional)
   - [command-hooks (Optional)](#command-hooks-optional)
     - [command-hooks \> base (Optional)](#command-hooks--base-optional)
-      - [... \> base \> timeout (Optional)](#--base--timeout-optional)
-      - [... \> base \> continue-on-error (Optional)](#--base--continue-on-error-optional)
-      - [... \> base \> pre (Optional)](#--base--pre-optional)
-        - [... \> pre \> cmd (Required)](#--pre--cmd-required)
-        - [... \> pre \> timeout (Optional)](#--pre--timeout-optional)
-        - [... \> pre \> continue-on-error (Optional)](#--pre--continue-on-error-optional)
-      - [... \> base \> post (Optional)](#--base--post-optional)
-        - [... \> post \> same properties as `command-hooks > base > pre`](#--post--same-properties-as-command-hooks--base--pre)
+      - [\> base \> timeout (Optional)](#-base--timeout-optional)
+      - [\> base \> continue-on-error (Optional)](#-base--continue-on-error-optional)
+      - [\> base \> pre (Optional)](#-base--pre-optional)
+        - [\> pre \> cmd (Required)](#-pre--cmd-required)
+        - [\> pre \> timeout (Optional)](#-pre--timeout-optional)
+        - [\> pre \> continue-on-error (Optional)](#-pre--continue-on-error-optional)
+      - [\> base \> post (Optional)](#-base--post-optional)
+        - [\> post \> same properties as command-hooks \> base \> pree\`](#-post--same-properties-as-command-hooks--base--pree)
     - [command-hooks \> prepare (Optional)](#command-hooks--prepare-optional)
-      - [... \> prepare \> same properties as `command-hooks > base`](#--prepare--same-properties-as-command-hooks--base)
+      - [\> prepare \> same properties as command-hooks \> basee\`](#-prepare--same-properties-as-command-hooks--basee)
     - [command-hooks \> publish (Optional)](#command-hooks--publish-optional)
-      - [... \> publish \> same properties as `command-hooks > base`](#--publish--same-properties-as-command-hooks--base)
+      - [\> publish \> same properties as command-hooks \> basee\`](#-publish--same-properties-as-command-hooks--basee)
   - [runtime-config-override (Optional)](#runtime-config-override-optional)
     - [runtime-config-override \> path (Required)](#runtime-config-override--path-required)
     - [runtime-config-override \> format (Optional)](#runtime-config-override--format-optional)
 - [Type Definitions](#type-definitions)
   - [AutoStrategy](#autostrategy)
   - [SemverExtension](#semverextension)
-  
+
 ## Properties
 
 ### name (Optional)
@@ -314,7 +327,7 @@ Labels to attach and remove from proposals on different stages.
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > labels > on-create (Optional)
+##### > labels > on-create (Optional)
 
 Type: `string | object | (string | object)[]`
 
@@ -322,7 +335,7 @@ Labels to attach to proposals when created. Can be a string, a label object, or 
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-create > name (Required)
+###### > on-create > name (Required)
 
 Type: `string`
 
@@ -330,7 +343,7 @@ Label name.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-create > description (Optional)
+###### > on-create > description (Optional)
 
 Type: `string`
 
@@ -338,7 +351,7 @@ Label description.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-create > color (Optional)
+###### > on-create > color (Optional)
 
 Type: `string`  
 Default: `"#ededed"`
@@ -347,7 +360,7 @@ The hexadecimal color code for the label, in standard format with the leading #.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-create > create-if-missing (Optional)
+###### > on-create > create-if-missing (Optional)
 
 Type: `boolean`  
 Default: `false`
@@ -356,7 +369,7 @@ If enabled, the label will be created if it does not exist on the platform.
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > labels > on-merge (Optional)
+##### > labels > on-merge (Optional)
 
 Type: `object`
 
@@ -364,7 +377,7 @@ Labels to attach and remove from proposals when merged and release operation has
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-merge > add (Optional)
+###### > on-merge > add (Optional)
 
 Type: `string | object | (string | object)[]`
 
@@ -372,18 +385,18 @@ Labels to add when proposal is merged.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > add > same properties as `review > labels > on-create`
+###### > add > same properties as review > labels > on-createe`
 
-Same as [`review > labels > on-create`](#--labels--on-create-optional).
+Same as [`review > labels > on-create`](#-labels--on-create-optional).
 
-- [`name`](#--on-create--name-required)
-- [`description`](#--on-create--description-optional)
-- [`color`](#--on-create--color-optional)
-- [`create-if-missing`](#--on-create--create-if-missing-optional)
+- [`name`](#-on-create--name-required)
+- [`description`](#-on-create--description-optional)
+- [`color`](#-on-create--color-optional)
+- [`create-if-missing`](#-on-create--create-if-missing-optional)
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > on-merge > remove (Optional)
+###### > on-merge > remove (Optional)
 
 Type: `string | object | (string | object)[]`
 
@@ -391,14 +404,14 @@ Labels to remove when proposal is merged. Use `"<ALL_ON_CREATE>"` to remove all 
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > remove > same properties as `review > labels > on-create`
+###### > remove > same properties as review > labels > on-createe`
 
-Same as [`review > labels > on-create`](#--labels--on-create-optional).
+Same as [`review > labels > on-create`](#-labels--on-create-optional).
 
-- [`name`](#--on-create--name-required)
-- [`description`](#--on-create--description-optional)
-- [`color`](#--on-create--color-optional)
-- [`create-if-missing`](#--on-create--create-if-missing-optional)
+- [`name`](#-on-create--name-required)
+- [`description`](#-on-create--description-optional)
+- [`color`](#-on-create--color-optional)
+- [`create-if-missing`](#-on-create--create-if-missing-optional)
 
 [⬆ Back to top](#table-of-content)
 
@@ -438,7 +451,7 @@ Defines the conditions under which a release will be automatically triggered and
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > trigger-strategy > type (Required)
+##### > trigger-strategy > type (Required)
 
 Type: `"commit-types" | "commit-footer" | "flag"`
 
@@ -519,7 +532,7 @@ Marks this file as the primary source of truth for the current version.
 Type: `array of objects`  
 Default: [`DEFAULT_COMMIT_TYPES`](../src/constants/defaults/commit.ts)
 
-**Properties:** [`type`](#commit-types--type-required), [`section`](#commit-types--section-optional), [`hidden`](#commit-types--hidden-optional)
+**Properties:** [`type`](#commit-types--type-required), [`section`](#commit-types--section-optional), [`sectionAlt`](#commit-types--sectionalt-optional), [`hidden`](#commit-types--hidden-optional)
 
 List of commit types that the application will track and record. Only commits with these types will be considered when calculating version bumps and generating release notes.
 
@@ -538,6 +551,14 @@ Commit type name (e.g., "feat", "fix").
 Type: `string`
 
 Changelog section heading for this commit type. When empty, the `type` value is used.
+
+[⬆ Back to top](#table-of-content)
+
+#### commit-types > sectionAlt (Optional)
+
+Type: `string`
+
+Changelog alternative section heading for this commit type. When empty, the `section` value is used.
 
 [⬆ Back to top](#table-of-content)
 
@@ -633,7 +654,7 @@ Strategy for major version bumps (x.0.0).
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > major > types (Optional)
+##### > major > types (Optional)
 
 Type: `string[]`
 
@@ -641,7 +662,7 @@ Array of commit types (from base [`commit-types`](#commit-types-optional)) that 
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > major > count-breaking-as (Optional)
+##### > major > count-breaking-as (Optional)
 
 Type: `"none" | "commit" | "bump"`  
 Default: `"none"`
@@ -651,7 +672,7 @@ Usually this should only be set for a single semver level (major, minor, or patc
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > major > commits-per-bump (Optional)
+##### > major > commits-per-bump (Optional)
 
 Type: `number | string`  
 Default: `Infinity`
@@ -671,13 +692,13 @@ Strategy for minor version bumps (0.x.0).
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > minor > same properties as `bump-strategy > major`
+##### > minor > same properties as bump-strategy > major`
 
 Same as [`bump-strategy > major`](#bump-strategy--major-optional).
 
-- [`types`](#--major--types-optional)
-- [`count-breaking-as`](#--major--count-breaking-as-optional)
-- [`commits-per-bump`](#--major--commits-per-bump-optional)
+- [`types`](#-major--types-optional)
+- [`count-breaking-as`](#-major--count-breaking-as-optional)
+- [`commits-per-bump`](#-major--commits-per-bump-optional)
 
 [⬆ Back to top](#table-of-content)
 
@@ -690,13 +711,13 @@ Strategy for patch version bumps (0.0.x).
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > patch > same properties as `bump-strategy > major`
+##### > patch > same properties as bump-strategy > major`
 
 Same as [`bump-strategy > major`](#bump-strategy--major-optional).
 
-- [`types`](#--major--types-optional)
-- [`count-breaking-as`](#--major--count-breaking-as-optional)
-- [`commits-per-bump`](#--major--commits-per-bump-optional)
+- [`types`](#-major--types-optional)
+- [`count-breaking-as`](#-major--count-breaking-as-optional)
+- [`commits-per-bump`](#-major--commits-per-bump-optional)
 
 [⬆ Back to top](#table-of-content)
 
@@ -709,7 +730,7 @@ Strategy for bumping prerelease version (1.2.3-x.x).
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > prerelease > enabled (Optional)
+##### > prerelease > enabled (Optional)
 
 Type: `boolean`  
 Default: `false`
@@ -718,7 +739,7 @@ Enable/disable handling of SemVer extensions (pre-release identifiers / build me
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > prerelease > override (Optional)
+##### > prerelease > override (Optional)
 
 Type: `any[]`
 
@@ -726,7 +747,7 @@ Overrides extension items to use for the next version. When provided, these valu
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > prerelease > treat-override-as-significant (Optional)
+##### > prerelease > treat-override-as-significant (Optional)
 
 Type: `boolean`  
 Default: `false`
@@ -735,7 +756,7 @@ If set to `true`, the presence of an `override` is strictly treated as a structu
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > prerelease > extensions (Optional)
+##### > prerelease > extensions (Optional)
 
 Type: [`SemverExtension[]`](#semverextension)
 
@@ -743,7 +764,7 @@ Specifies the items to use for SemVer extensions.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > extensions > type (Required)
+###### > extensions > type (Required)
 
 Type: `"static" | "dynamic" | "incremental" | "timestamp" | "date"`
 
@@ -760,21 +781,21 @@ Strategy for bumping build metadata (1.2.3+x.x).
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > build > same properties as `bump-strategy > prerelease`
+##### > build > same properties as bump-strategy > prereleasee`
 
 Same as [`bump-strategy > prerelease`](#bump-strategy--prerelease-optional).
 
-- [`enabled`](#--prerelease--enabled-optional)
-- [`override`](#--prerelease--override-optional)
-- [`treat-override-as-significant`](#--prerelease--treat-override-as-significant-optional)
-- [`extensions`](#--prerelease--extensions-optional)
+- [`enabled`](#-prerelease--enabled-optional)
+- [`override`](#-prerelease--override-optional)
+- [`treat-override-as-significant`](#-prerelease--treat-override-as-significant-optional)
+- [`extensions`](#-prerelease--extensions-optional)
 
 [⬆ Back to top](#table-of-content)
 
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`write-to-file`](#changelog--write-to-file-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional)
+**Properties:** [`write-to-file`](#changelog--write-to-file-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-heading-template`](#changelog--release-section-heading-template-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional), [`release-header-template-alt`](#changelog--release-header-template-alt-optional), [`release-header-template-alt-path`](#changelog--release-header-template-alt-path-optional), [`release-section-heading-template-alt`](#changelog--release-section-heading-template-alt-optional), [`release-section-entry-template-alt`](#changelog--release-section-entry-template-alt-optional), [`release-section-entry-template-alt-path`](#changelog--release-section-entry-template-alt-path-optional), [`release-breaking-section-heading-alt`](#changelog--release-breaking-section-heading-alt-optional), [`release-breaking-section-entry-template-alt`](#changelog--release-breaking-section-entry-template-alt-optional), [`release-breaking-section-entry-template-alt-path`](#changelog--release-breaking-section-entry-template-alt-path-optional), [`release-body-override-alt`](#changelog--release-body-override-alt-optional), [`release-body-override-alt-path`](#changelog--release-body-override-alt-path-optional), [`release-footer-template-alt`](#changelog--release-footer-template-alt-optional), [`release-footer-template-alt-path`](#changelog--release-footer-template-alt-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in string templates as `{{ changelogRelease }}` (release header + body) or `{{ changelogReleaseHeader }}` and `{{ changelogReleaseBody }}`.
 
@@ -870,6 +891,7 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Additionally, you can use a special dynamic pattern (see [patterns docs](./string-templates-and-patterns.md#changelog-section-heading) for more details):
 
 - `{{ section }}`: string
+- `{{ sectionAlt }}`: string
 
 [⬆ Back to top](#table-of-content)
 
@@ -968,6 +990,102 @@ Type: `string`
 Path to text file containing changelog release footer. Overrides `release-footer-template` when both are provided.
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-header-template-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-header-template`](#changelog--release-header-template-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-header-template-alt-path (Optional)
+
+Type: `string`
+
+Alternative value for [`release-header-template-path`](#changelog--release-header-template-path-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-section-heading-template-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-section-heading-template`](#changelog--release-section-heading-template-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-section-entry-template-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-section-entry-template`](#changelog--release-section-entry-template-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-section-entry-template-alt-path (Optional)
+
+Type: `string`
+
+Alternative value for [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-breaking-section-heading-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-breaking-section-entry-template-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-breaking-section-entry-template-alt-path (Optional)
+
+Type: `string`
+
+Alternative value for [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-body-override-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-body-override`](#changelog--release-body-override-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-body-override-alt-path (Optional)
+
+Type: `string`
+
+Alternative value for [`release-body-override-path`](#changelog--release-body-override-path-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-footer-template-alt (Optional)
+
+Type: `string`
+
+Alternative value for [`release-footer-template`](#changelog--release-footer-template-optional). When not provided, fall back to the original.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-footer-template-alt-path (Optional)
+
+Type: `string`
+
+Alternative value for [`release-footer-template-path`](#changelog--release-footer-template-path-optional). When not provided, fall back to the original.
 
 [⬆ Back to top](#table-of-content)
 
@@ -1124,7 +1242,7 @@ Custom identity and timestamp information for the Git tag. If omitted, defaults 
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > tagger > name (Required)
+##### > tagger > name (Required)
 
 Type: `string`
 
@@ -1132,7 +1250,7 @@ The name of the tag creator.
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > tagger > email (Required)
+##### > tagger > email (Required)
 
 Type: `string`
 
@@ -1140,7 +1258,7 @@ The email of the tag creator.
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > tagger > date (Optional)
+##### > tagger > date (Optional)
 
 Type: `string`
 
@@ -1305,7 +1423,7 @@ Available variables that cmds can use: see [Export operation variables](./export
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > base > timeout (Optional)
+##### > base > timeout (Optional)
 
 Type: `number | string`  
 Default: `60000` (1 min)
@@ -1314,7 +1432,7 @@ Base default timeout (ms) for all commands in `pre` and `post`, can be overridde
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > base > continue-on-error (Optional)
+##### > base > continue-on-error (Optional)
 
 Type: `boolean`  
 Default: `false`
@@ -1323,7 +1441,7 @@ Base default behavior for all commands in `pre` and `post`, can be overridden pe
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > base > pre (Optional)
+##### > base > pre (Optional)
 
 Type: `(string | object)[]`
 
@@ -1333,7 +1451,7 @@ List of exposed env variables: see [Export operation variables](./export-variabl
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > pre > cmd (Required)
+###### > pre > cmd (Required)
 
 Type: `string`
 
@@ -1341,7 +1459,7 @@ The command string to execute.
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > pre > timeout (Optional)
+###### > pre > timeout (Optional)
 
 Type: `number | string`  
 Default: Base default timeout
@@ -1350,7 +1468,7 @@ Timeout in milliseconds, use Infinity to never timeout (not recommended).
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > pre > continue-on-error (Optional)
+###### > pre > continue-on-error (Optional)
 
 Type: `boolean`  
 Default: Base default continue-on-error
@@ -1359,7 +1477,7 @@ Continue or stop the process on commands error.
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > base > post (Optional)
+##### > base > post (Optional)
 
 Type: `(string | object)[]`
 
@@ -1369,13 +1487,13 @@ List of exposed env variables: see [Export operation variables](./export-variabl
 
 [⬆ Back to top](#table-of-content)
 
-###### ... > post > same properties as `command-hooks > base > pre`
+###### > post > same properties as command-hooks > base > pree`
 
-Same as [`command-hooks > base > pre`](#--base--pre-optional).
+Same as [`command-hooks > base > pre`](#-base--pre-optional).
 
-- [`cmd`](#--pre--cmd-required)
-- [`timeout`](#--pre--timeout-optional)
-- [`continue-on-error`](#--pre--continue-on-error-optional)
+- [`cmd`](#-pre--cmd-required)
+- [`timeout`](#-pre--timeout-optional)
+- [`continue-on-error`](#-pre--continue-on-error-optional)
 
 [⬆ Back to top](#table-of-content)
 
@@ -1388,14 +1506,14 @@ Available variables that cmds can use: see [Export operation variables](./export
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > prepare > same properties as `command-hooks > base`
+##### > prepare > same properties as command-hooks > basee`
 
 Same as [`command-hooks > base`](#command-hooks--base-optional).
 
-- [`timeout`](#--base--timeout-optional)
-- [`continue-on-error`](#--base--continue-on-error-optional)
-- [`pre`](#--base--pre-optional)
-- [`post`](#--base--post-optional)
+- [`timeout`](#-base--timeout-optional)
+- [`continue-on-error`](#-base--continue-on-error-optional)
+- [`pre`](#-base--pre-optional)
+- [`post`](#-base--post-optional)
 
 [⬆ Back to top](#table-of-content)
 
@@ -1408,14 +1526,14 @@ Available variables that cmds can use: see [Export operation variables](./export
 
 [⬆ Back to top](#table-of-content)
 
-##### ... > publish > same properties as `command-hooks > base`
+##### > publish > same properties as command-hooks > basee`
 
 Same as [`command-hooks > base`](#command-hooks--base-optional).
 
-- [`timeout`](#--base--timeout-optional)
-- [`continue-on-error`](#--base--continue-on-error-optional)
-- [`pre`](#--base--pre-optional)
-- [`post`](#--base--post-optional)
+- [`timeout`](#-base--timeout-optional)
+- [`continue-on-error`](#-base--continue-on-error-optional)
+- [`pre`](#-base--pre-optional)
+- [`post`](#-base--post-optional)
 
 [⬆ Back to top](#table-of-content)
 

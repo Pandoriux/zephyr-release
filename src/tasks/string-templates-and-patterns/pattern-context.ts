@@ -188,10 +188,14 @@ export async function createFixedNextVersionStringPatternContext(
 export function createDynamicChangelogStringPatternContext(
   changelogRelease?: string,
   changelogReleaseBody?: string,
+  changelogReleaseAlt?: string,
+  changelogReleaseBodyAlt?: string,
 ) {
   const context = {
     changelogRelease,
     changelogReleaseBody,
+    changelogReleaseAlt,
+    changelogReleaseBodyAlt,
   } satisfies Record<DynamicChangelogStringPattern, string | undefined>;
 
   Object.assign(BUILT_IN_CONTEXT, context);

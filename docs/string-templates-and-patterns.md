@@ -47,7 +47,7 @@ Available after resolving commits and calculating the versions:
 
 Available after generating the changelog release content based on the resolved commits:
 
-- changelogRelease, changelogReleaseBody
+- changelogRelease, changelogReleaseBody, changelogReleaseAlt, changelogReleaseBodyAlt
 
 #### Publish Phase
 
@@ -55,7 +55,7 @@ These patterns become available sequentially when merging a proposal and trigger
 
 Available after extracting the changelog from the proposal body or re-generating the changelog:
 
-- changelogRelease, changelogReleaseBody
+- changelogRelease, changelogReleaseBody, changelogReleaseAlt, changelogReleaseBodyAlt
 
 Available after extracting the next version natively from the primary version file in the codebase:
 
@@ -129,6 +129,10 @@ These string patterns are resolved dynamically at runtime and may change each ti
 
 - `{{ changelogReleaseBody }}`: The generated changelog release body. You can override it dynamically via [release-body-override](./config-options.md#changelog--release-body-override-optional) (or [release-body-override-path](./config-options.md#changelog--release-body-override-path-optional)). In `release` operation (create tag and publish release), this value is undefined if no override provided.
 
+- `{{ changelogReleaseAlt }}`: An alternative value for `{{ changelogRelease }}`. It is computed by combining the alternative header ([`release-header-template-alt`](./config-options.md#changelog--release-header-template-alt-optional)), the alternative body, and the alternative footer ([`release-footer-template-alt`](./config-options.md#changelog--release-footer-template-alt-optional)). It is useful when a distinct style of release notes (such as a "lite" version) is required alongside the standard output. If no alternative templates are defined, it falls back to the original `{{ changelogRelease }}` content.
+
+- `{{ changelogReleaseBodyAlt }}`: An alternative value for `{{ changelogReleaseBody }}`. It is computed using alternative section-level templates like [`release-section-heading-template-alt`](./config-options.md#changelog--release-section-heading-template-alt-optional) or [`release-section-entry-template-alt`](./config-options.md#changelog--release-section-entry-template-alt-optional). It can also be overridden via [`release-body-override-alt`](./config-options.md#changelog--release-body-override-alt-optional) or [`release-body-override-alt-path`](./config-options.md#changelog--release-body-override-alt-path-optional). If no alternative configuration is provided, it falls back to the original `{{ changelogReleaseBody }}` content.
+
 #### Datetime (now)
 
 - `{{ nowTimestamp }}`: Timestamp at NOW, always UTC
@@ -143,6 +147,7 @@ These are special patterns that are only available to certain templates. Make su
 Usage: [`release-section-heading-template`](./config-options.md#changelog--release-section-heading-template-optional)
 
 - `{{ section }}`: string; the section names defined in [`commit-types`](./config-options.md#commit-types-optional) (e.g., "Features", "Bug Fixes")
+- `{{ sectionAlt }}`: string; the alternative section names (fall back to section) defined in [`commit-types`](./config-options.md#commit-types-optional)
 
 #### Changelog Entries
 

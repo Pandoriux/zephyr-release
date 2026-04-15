@@ -76,6 +76,8 @@ export type FixedNextVersionStringPattern =
 const DynamicChangelogStringPatterns = {
   changelogRelease: "changelogRelease",
   changelogReleaseBody: "changelogReleaseBody",
+  changelogReleaseAlt: "changelogReleaseAlt",
+  changelogReleaseBodyAlt: "changelogReleaseBodyAlt",
 } as const;
 
 export type DynamicChangelogStringPattern =

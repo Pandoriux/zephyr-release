@@ -14,6 +14,13 @@ export const CommitTypeSchema = v.object({
         "Changelog section heading for this commit type. When not provided, `type` value is used.\n",
     }),
   ),
+  sectionAlt: v.pipe(
+    v.optional(trimNonEmptyStringSchema),
+    v.metadata({
+      description:
+        "Changelog alternative section heading for this commit type. When not provided, `section` value is used.\n",
+    }),
+  ),
   hidden: v.pipe(
     v.optional(v.boolean(), false),
     v.metadata({

@@ -95,7 +95,7 @@ export const ChangelogConfigSchema = v.pipe(
         description:
           "String template for heading of a changelog release section, using with string patterns like {{ section }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
-          "Additionally, you can use a special dynamic pattern which is: {{ section }}.\n" +
+          "Additionally, you can use special dynamic patterns like: {{ section }}, {{ sectionAlt }}.\n" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE)
           }`,
@@ -111,7 +111,7 @@ export const ChangelogConfigSchema = v.pipe(
           "String template for each entries in the changelog release sections. " +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           "Additionally, you can use a special set of dynamic patterns which are:\n" +
-          "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ isBreaking }}.\n" +
+          "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ breakingDesc }}, {{ isBreaking }}.\n" +
           "About special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional\n" +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE)
@@ -187,6 +187,91 @@ export const ChangelogConfigSchema = v.pipe(
         description:
           "Path to text file containing changelog release footer. Overrides `releaseFooterTemplate` when both are provided.\n" +
           "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+      }),
+    ),
+
+    releaseHeaderTemplateAlt: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Alternative value for `releaseHeaderTemplate`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseHeaderTemplateAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Alternative value for `releaseHeaderTemplatePath`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseSectionHeadingTemplateAlt: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Alternative value for `releaseSectionHeadingTemplate`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseSectionEntryTemplateAlt: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Alternative value for `releaseSectionEntryTemplate`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseSectionEntryTemplateAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Alternative value for `releaseSectionEntryTemplatePath`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseBreakingSectionHeadingAlt: v.pipe(
+      v.optional(v.string()),
+      v.metadata({
+        description:
+          "Alternative value for `releaseBreakingSectionHeading`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseBreakingSectionEntryTemplateAlt: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Alternative value for `releaseBreakingSectionEntryTemplate`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseBreakingSectionEntryTemplateAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Alternative value for `releaseBreakingSectionEntryTemplatePath`. When not provided, fall back to the original.",
+      }),
+    ),
+    releaseBodyOverrideAlt: v.pipe(
+      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.metadata({
+        description:
+          "Alternative value for `releaseBodyOverride`. When not provide, fall back to the original.",
+      }),
+    ),
+    releaseBodyOverrideAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Alternative value for `releaseBodyOverridePath`. When not provide, fall back to the original.",
+      }),
+    ),
+    releaseFooterTemplateAlt: v.pipe(
+      v.optional(v.string()),
+      v.metadata({
+        description:
+          "Alternative value for `releaseFooterTemplate`. When not provide, fall back to the original.",
+      }),
+    ),
+    releaseFooterTemplateAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Alternative value for `releaseFooterTemplatePath`. When not provide, fall back to the original.",
       }),
     ),
   }),

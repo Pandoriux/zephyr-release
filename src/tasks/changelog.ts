@@ -35,12 +35,26 @@ type GenerateChangelogReleaseConfigParams =
       | "releaseFooterTemplatePath"
       | "releaseBodyOverride"
       | "releaseBodyOverridePath"
+      | "releaseHeaderTemplateAlt"
+      | "releaseHeaderTemplateAltPath"
+      | "releaseSectionHeadingTemplateAlt"
+      | "releaseSectionEntryTemplateAlt"
+      | "releaseSectionEntryTemplateAltPath"
+      | "releaseBreakingSectionHeadingAlt"
+      | "releaseBreakingSectionEntryTemplateAlt"
+      | "releaseBreakingSectionEntryTemplateAltPath"
+      | "releaseFooterTemplateAlt"
+      | "releaseFooterTemplateAltPath"
+      | "releaseBodyOverrideAlt"
+      | "releaseBodyOverrideAltPath"
     >;
   };
 
 interface GeneratePrepareReleaseContentResult {
   release: string;
   releaseBody: string;
+  releaseAlt: string;
+  releaseBodyAlt: string;
 }
 
 /** @throws */
@@ -57,16 +71,22 @@ export async function generatePrepareChangelogReleaseContent(
   ]);
 
   return {
-    release: [releaseHeader, releaseBody, releaseFooter].filter(Boolean).join(
-      "\n\n",
-    ),
-    releaseBody,
+    release: [releaseHeader.base, releaseBody.base, releaseFooter.base]
+      .filter(Boolean)
+      .join("\n\n"),
+    releaseBody: releaseBody.base,
+    releaseAlt: [releaseHeader.alt, releaseBody.alt, releaseFooter.alt]
+      .filter(Boolean)
+      .join("\n\n"),
+    releaseBodyAlt: releaseBody.alt,
   };
 }
 
 interface GeneratePublishReleaseContentResult {
   release: string;
   releaseBody?: string;
+  releaseAlt?: string;
+  releaseBodyAlt?: string;
 }
 
 export async function generatePublishChangelogReleaseContent(
@@ -76,9 +96,19 @@ export async function generatePublishChangelogReleaseContent(
   config: GenerateChangelogReleaseConfigParams,
 ): Promise<GeneratePublishReleaseContentResult | undefined> {
   try {
-    const { releaseBodyOverride, releaseBodyOverridePath } = config.changelog;
+    const {
+      releaseBodyOverride,
+      releaseBodyOverridePath,
+      releaseBodyOverrideAlt,
+      releaseBodyOverrideAltPath,
+    } = config.changelog;
 
-    if (releaseBodyOverride || releaseBodyOverridePath) {
+    if (
+      releaseBodyOverride ||
+      releaseBodyOverridePath ||
+      releaseBodyOverrideAlt ||
+      releaseBodyOverrideAltPath
+    ) {
       const [releaseHeader, releaseBody, releaseFooter] = await Promise.all([
         resolveReleaseHeader(provider, inputs, config),
         resolveReleaseBody(provider, undefined, inputs, config),
@@ -86,11 +116,14 @@ export async function generatePublishChangelogReleaseContent(
       ]);
 
       return {
-        release: [releaseHeader, releaseBody, releaseFooter].filter(Boolean)
-          .join(
-            "\n\n",
-          ),
-        releaseBody,
+        release: [releaseHeader.base, releaseBody.base, releaseFooter.base]
+          .filter(Boolean)
+          .join("\n\n"),
+        releaseBody: releaseBody.base,
+        releaseAlt: [releaseHeader.alt, releaseBody.alt, releaseFooter.alt]
+          .filter(Boolean)
+          .join("\n\n"),
+        releaseBodyAlt: releaseBody.alt,
       };
     }
 
@@ -109,26 +142,67 @@ export async function generatePublishChangelogReleaseContent(
   }
 }
 
+interface ResolvedReleaseText {
+  base: string;
+  alt: string;
+}
+
 async function resolveReleaseHeader(
   provider: PlatformProvider,
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<string> {
-  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+): Promise<ResolvedReleaseText> {
   const {
-    changelog: { releaseHeaderTemplate, releaseHeaderTemplatePath },
-  } = config;
+    releaseHeaderTemplate,
+    releaseHeaderTemplatePath,
+    releaseHeaderTemplateAlt,
+    releaseHeaderTemplateAltPath,
+  } = config.changelog;
 
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const getTextOpts = { provider, workspacePath, ref: triggerCommitHash };
+
+  let baseTemplate: string;
   if (releaseHeaderTemplatePath) {
-    const headerTemplate = await getTextFile(
+    baseTemplate = await getTextFile(
       sourceMode.overrides?.[releaseHeaderTemplatePath] ?? sourceMode.mode,
       releaseHeaderTemplatePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
+      getTextOpts,
     );
-    return await resolveStringTemplate(headerTemplate);
+  } else {
+    baseTemplate = releaseHeaderTemplate;
   }
 
-  return await resolveStringTemplate(releaseHeaderTemplate);
+  let altTemplate: string;
+  const resolvedAltPath = releaseHeaderTemplateAltPath ??
+    releaseHeaderTemplatePath;
+  const resolvedAltTemplate = releaseHeaderTemplateAlt ?? releaseHeaderTemplate;
+
+  if (
+    resolvedAltPath === releaseHeaderTemplatePath &&
+    resolvedAltTemplate === releaseHeaderTemplate
+  ) {
+    altTemplate = baseTemplate;
+  } else if (resolvedAltPath) {
+    altTemplate = await getTextFile(
+      sourceMode.overrides?.[resolvedAltPath] ?? sourceMode.mode,
+      resolvedAltPath,
+      getTextOpts,
+    );
+  } else {
+    altTemplate = resolvedAltTemplate;
+  }
+
+  if (baseTemplate === altTemplate) {
+    const resolved = await resolveStringTemplate(baseTemplate);
+    return { base: resolved, alt: resolved };
+  } else {
+    const [base, alt] = await Promise.all([
+      resolveStringTemplate(baseTemplate),
+      resolveStringTemplate(altTemplate),
+    ]);
+    return { base, alt };
+  }
 }
 
 /** @throws */
@@ -137,22 +211,49 @@ async function resolveReleaseBody(
   resolvedCommits: ResolvedCommit[] | undefined,
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<string> {
-  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+): Promise<ResolvedReleaseText> {
   const {
-    changelog: { releaseBodyOverride, releaseBodyOverridePath },
-  } = config;
+    releaseBodyOverride,
+    releaseBodyOverridePath,
+    releaseBodyOverrideAlt,
+    releaseBodyOverrideAltPath,
+  } = config.changelog;
 
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const getTextOpts = { provider, workspacePath, ref: triggerCommitHash };
+
+  let baseTemplateOverride: string | undefined;
   if (releaseBodyOverridePath) {
-    return await getTextFile(
+    baseTemplateOverride = await getTextFile(
       sourceMode.overrides?.[releaseBodyOverridePath] ?? sourceMode.mode,
       releaseBodyOverridePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
+      getTextOpts,
     );
+  } else {
+    baseTemplateOverride = releaseBodyOverride;
   }
 
-  if (releaseBodyOverride) {
-    return releaseBodyOverride;
+  let altTemplateOverride: string | undefined;
+  const resolvedAltPath = releaseBodyOverrideAltPath ?? releaseBodyOverridePath;
+  const resolvedAltTemplate = releaseBodyOverrideAlt ?? releaseBodyOverride;
+
+  if (
+    resolvedAltPath === releaseBodyOverridePath &&
+    resolvedAltTemplate === releaseBodyOverride
+  ) {
+    altTemplateOverride = baseTemplateOverride;
+  } else if (resolvedAltPath) {
+    altTemplateOverride = await getTextFile(
+      sourceMode.overrides?.[resolvedAltPath] ?? sourceMode.mode,
+      resolvedAltPath,
+      getTextOpts,
+    );
+  } else {
+    altTemplateOverride = resolvedAltTemplate;
+  }
+
+  if (baseTemplateOverride !== undefined && altTemplateOverride !== undefined) {
+    return { base: baseTemplateOverride, alt: altTemplateOverride };
   }
 
   if (!resolvedCommits) {
@@ -161,38 +262,88 @@ async function resolveReleaseBody(
     );
   }
 
-  return await generateReleaseBodyBasedOnCommits(
+  const generated = await generateReleaseBodyBasedOnCommits(
     provider,
     resolvedCommits,
     inputs,
     config,
   );
+
+  return {
+    base: baseTemplateOverride ?? generated.base,
+    alt: altTemplateOverride ?? generated.alt,
+  };
 }
 
 async function resolveReleaseFooter(
   provider: PlatformProvider,
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<string | undefined> {
-  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+): Promise<Partial<ResolvedReleaseText>> {
   const {
-    changelog: { releaseFooterTemplate, releaseFooterTemplatePath },
-  } = config;
+    releaseFooterTemplate,
+    releaseFooterTemplatePath,
+    releaseFooterTemplateAlt,
+    releaseFooterTemplateAltPath,
+  } = config.changelog;
 
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const getTextOpts = { provider, workspacePath, ref: triggerCommitHash };
+
+  let baseTemplate: string | undefined;
   if (releaseFooterTemplatePath) {
-    const footerTemplate = await getTextFile(
+    baseTemplate = await getTextFile(
       sourceMode.overrides?.[releaseFooterTemplatePath] ?? sourceMode.mode,
       releaseFooterTemplatePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
+      getTextOpts,
     );
-    return await resolveStringTemplate(footerTemplate);
+  } else {
+    baseTemplate = releaseFooterTemplate;
   }
 
-  if (releaseFooterTemplate) {
-    return await resolveStringTemplate(releaseFooterTemplate);
+  let altTemplate: string | undefined;
+  const resolvedAltPath = releaseFooterTemplateAltPath ??
+    releaseFooterTemplatePath;
+  const resolvedAltTemplate = releaseFooterTemplateAlt ?? releaseFooterTemplate;
+
+  if (
+    resolvedAltPath === releaseFooterTemplatePath &&
+    resolvedAltTemplate === releaseFooterTemplate
+  ) {
+    altTemplate = baseTemplate;
+  } else if (resolvedAltPath) {
+    altTemplate = await getTextFile(
+      sourceMode.overrides?.[resolvedAltPath] ?? sourceMode.mode,
+      resolvedAltPath,
+      getTextOpts,
+    );
+  } else {
+    altTemplate = resolvedAltTemplate;
   }
 
-  return undefined;
+  if (baseTemplate === altTemplate) {
+    if (baseTemplate) {
+      const resolved = await resolveStringTemplate(baseTemplate);
+      return { base: resolved, alt: resolved };
+    }
+  } else {
+    const resolves = await Promise.all([
+      baseTemplate
+        ? resolveStringTemplate(baseTemplate)
+        : Promise.resolve(undefined),
+      altTemplate
+        ? resolveStringTemplate(altTemplate)
+        : Promise.resolve(undefined),
+    ]);
+    return { base: resolves[0], alt: resolves[1] };
+  }
+
+  return { base: undefined, alt: undefined };
+}
+
+interface SectionGroupData {
+  entries: string[];
+  sectionInfo: { section: string; sectionAlt: string };
 }
 
 async function generateReleaseBodyBasedOnCommits(
@@ -200,7 +351,7 @@ async function generateReleaseBodyBasedOnCommits(
   resolvedCommits: ResolvedCommit[],
   inputs: GenerateChangelogReleaseInputsParams,
   config: GenerateChangelogReleaseConfigParams,
-): Promise<string> {
+): Promise<ResolvedReleaseText> {
   const {
     commitTypes,
     changelog: {
@@ -210,102 +361,235 @@ async function generateReleaseBodyBasedOnCommits(
       releaseBreakingSectionHeading,
       releaseBreakingSectionEntryTemplate,
       releaseBreakingSectionEntryTemplatePath,
+      releaseSectionHeadingTemplateAlt,
+      releaseSectionEntryTemplateAlt,
+      releaseSectionEntryTemplateAltPath,
+      releaseBreakingSectionHeadingAlt,
+      releaseBreakingSectionEntryTemplateAlt,
+      releaseBreakingSectionEntryTemplateAltPath,
     },
   } = config;
-  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
 
-  // Section -> Commits
-  const sectionGroups = new Map<string, string[]>();
-  // Type -> Section
-  const typeToSection = new Map<string, string>();
+  const baseSectionGroups = new Map<string, SectionGroupData>();
+  const altSectionGroups = new Map<string, SectionGroupData>();
 
-  const breakingSectionHeading = await resolveStringTemplate(
+  const typeToSection = new Map<
+    string,
+    { baseSection: string; altSection: string }
+  >();
+
+  const breakingSectionHeadingBase = await resolveStringTemplate(
     releaseBreakingSectionHeading,
   );
-  sectionGroups.set(breakingSectionHeading, []);
+  const breakingSectionHeadingAlt = await resolveStringTemplate(
+    releaseBreakingSectionHeadingAlt ?? releaseBreakingSectionHeading,
+  );
+
+  baseSectionGroups.set(breakingSectionHeadingBase, {
+    entries: [],
+    sectionInfo: {
+      section: breakingSectionHeadingBase,
+      sectionAlt: breakingSectionHeadingAlt,
+    },
+  });
+  altSectionGroups.set(breakingSectionHeadingAlt, {
+    entries: [],
+    sectionInfo: {
+      section: breakingSectionHeadingBase,
+      sectionAlt: breakingSectionHeadingAlt,
+    },
+  });
 
   for (const ct of commitTypes) {
     if (ct.hidden) continue;
 
-    const sectionName = ct.section ?? toTitleCase(ct.type);
-    typeToSection.set(ct.type, sectionName);
+    const sectionBase = ct.section ?? toTitleCase(ct.type);
+    const sectionAlt = ct.sectionAlt ?? sectionBase;
 
-    if (!sectionGroups.has(sectionName)) {
-      sectionGroups.set(sectionName, []);
+    typeToSection.set(ct.type, {
+      baseSection: sectionBase,
+      altSection: sectionAlt,
+    });
+
+    const sectionInfo = { section: sectionBase, sectionAlt: sectionAlt };
+    if (!baseSectionGroups.has(sectionBase)) {
+      baseSectionGroups.set(sectionBase, { entries: [], sectionInfo });
+    }
+    if (!altSectionGroups.has(sectionAlt)) {
+      altSectionGroups.set(sectionAlt, { entries: [], sectionInfo });
     }
   }
 
-  const sectionEntryTemplate = releaseSectionEntryTemplatePath
-    ? await getTextFile(
+  const { triggerCommitHash, workspacePath, sourceMode } = inputs;
+  const getTextOpts = { provider, workspacePath, ref: triggerCommitHash };
+
+  let sectionEntryTemplateBase: string;
+  if (releaseSectionEntryTemplatePath) {
+    sectionEntryTemplateBase = await getTextFile(
       sourceMode.overrides?.[releaseSectionEntryTemplatePath] ??
         sourceMode.mode,
       releaseSectionEntryTemplatePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
-    )
-    : releaseSectionEntryTemplate;
+      getTextOpts,
+    );
+  } else {
+    sectionEntryTemplateBase = releaseSectionEntryTemplate;
+  }
 
-  const breakingSectionEntryTemplate = releaseBreakingSectionEntryTemplatePath
-    ? await getTextFile(
+  let sectionEntryTemplateAlt: string;
+  const resolvedSectionEntryAltPath = releaseSectionEntryTemplateAltPath ??
+    releaseSectionEntryTemplatePath;
+  const resolvedSectionEntryAltTemplate = releaseSectionEntryTemplateAlt ??
+    releaseSectionEntryTemplate;
+
+  if (
+    resolvedSectionEntryAltPath === releaseSectionEntryTemplatePath &&
+    resolvedSectionEntryAltTemplate === releaseSectionEntryTemplate
+  ) {
+    sectionEntryTemplateAlt = sectionEntryTemplateBase;
+  } else if (resolvedSectionEntryAltPath) {
+    sectionEntryTemplateAlt = await getTextFile(
+      sourceMode.overrides?.[resolvedSectionEntryAltPath] ?? sourceMode.mode,
+      resolvedSectionEntryAltPath,
+      getTextOpts,
+    );
+  } else {
+    sectionEntryTemplateAlt = resolvedSectionEntryAltTemplate;
+  }
+
+  let breakingEntryTemplateBase: string;
+  if (releaseBreakingSectionEntryTemplatePath) {
+    breakingEntryTemplateBase = await getTextFile(
       sourceMode.overrides?.[releaseBreakingSectionEntryTemplatePath] ??
         sourceMode.mode,
       releaseBreakingSectionEntryTemplatePath,
-      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
-    )
-    : releaseBreakingSectionEntryTemplate;
+      getTextOpts,
+    );
+  } else {
+    breakingEntryTemplateBase = releaseBreakingSectionEntryTemplate;
+  }
+
+  let breakingEntryTemplateAlt: string;
+  const resolvedBreakingEntryAltPath =
+    releaseBreakingSectionEntryTemplateAltPath ??
+      releaseBreakingSectionEntryTemplatePath;
+  const resolvedBreakingEntryAltTemplate =
+    releaseBreakingSectionEntryTemplateAlt ??
+      releaseBreakingSectionEntryTemplate;
+
+  if (
+    resolvedBreakingEntryAltPath === releaseBreakingSectionEntryTemplatePath &&
+    resolvedBreakingEntryAltTemplate === releaseBreakingSectionEntryTemplate
+  ) {
+    breakingEntryTemplateAlt = breakingEntryTemplateBase;
+  } else if (resolvedBreakingEntryAltPath) {
+    breakingEntryTemplateAlt = await getTextFile(
+      sourceMode.overrides?.[resolvedBreakingEntryAltPath] ?? sourceMode.mode,
+      resolvedBreakingEntryAltPath,
+      getTextOpts,
+    );
+  } else {
+    breakingEntryTemplateAlt = resolvedBreakingEntryAltTemplate;
+  }
 
   // Process Commits
   for (const commit of resolvedCommits) {
-    const section = typeToSection.get(commit.type);
-    if (!section) continue;
+    const typeInfo = typeToSection.get(commit.type);
+    if (!typeInfo) continue;
 
-    const sectionContents = sectionGroups.get(section);
-    if (!sectionContents) continue;
+    const baseSectionGroup = baseSectionGroups.get(typeInfo.baseSection);
+    const altSectionGroup = altSectionGroups.get(typeInfo.altSection);
+
+    if (!baseSectionGroup || !altSectionGroup) continue;
 
     const commitPatterns = createCommitExtraPatterns(commit);
 
-    const commitStr = await resolveStringTemplate(
-      sectionEntryTemplate,
+    const commitStrBase = await resolveStringTemplate(
+      sectionEntryTemplateBase,
       commitPatterns,
     );
-    sectionContents.push(commitStr);
+
+    const commitStrAlt = sectionEntryTemplateBase === sectionEntryTemplateAlt
+      ? commitStrBase
+      : await resolveStringTemplate(
+        sectionEntryTemplateAlt,
+        commitPatterns,
+      );
+
+    baseSectionGroup.entries.push(commitStrBase);
+    altSectionGroup.entries.push(commitStrAlt);
 
     if (commit.isBreaking) {
-      const commitBreakingStr = breakingSectionEntryTemplate
-        ? await resolveStringTemplate(
-          breakingSectionEntryTemplate,
-          commitPatterns,
-        )
-        : commitStr;
+      const commitBreakingStrBase = breakingEntryTemplateBase
+        ? await resolveStringTemplate(breakingEntryTemplateBase, commitPatterns)
+        : commitStrBase;
 
-      const breakingSectionContents = sectionGroups.get(breakingSectionHeading);
+      let commitBreakingStrAlt: string;
+      if (breakingEntryTemplateAlt) {
+        if (breakingEntryTemplateBase === breakingEntryTemplateAlt) {
+          commitBreakingStrAlt = commitBreakingStrBase;
+        } else {
+          commitBreakingStrAlt = await resolveStringTemplate(
+            breakingEntryTemplateAlt,
+            commitPatterns,
+          );
+        }
+      } else {
+        commitBreakingStrAlt = commitStrAlt;
+      }
 
-      // Safeguard to satisfy TypeScript types; this should theoretically be impossible to throw
-      // as the section is initialized at the start of the function.
-      if (!breakingSectionContents!) {
+      const baseBreakingGroup = baseSectionGroups.get(
+        breakingSectionHeadingBase,
+      );
+      const altBreakingGroup = altSectionGroups.get(breakingSectionHeadingAlt);
+
+      if (!baseBreakingGroup || !altBreakingGroup) {
         throw new Error(
           `${generatePrepareChangelogReleaseContent.name} failed: Breaking Changes section has not been initialized?`,
         );
       }
 
-      breakingSectionContents.push(commitBreakingStr);
+      baseBreakingGroup.entries.push(commitBreakingStrBase);
+      altBreakingGroup.entries.push(commitBreakingStrAlt);
     }
   }
 
-  // Final Polish: Sort each folder and join into one string
-  const finalReleaseBody: string[] = [];
+  const finalReleaseBodyBase: string[] = [];
+  for (const [key, group] of baseSectionGroups) {
+    if (group.entries.length === 0) continue;
 
-  for (const [section, entries] of sectionGroups) {
-    if (entries.length === 0) continue;
+    const heading = key === breakingSectionHeadingBase
+      ? key
+      : await resolveStringTemplate(
+        releaseSectionHeadingTemplate,
+        group.sectionInfo,
+      );
 
-    const heading = section === breakingSectionHeading
-      ? section
-      : await resolveStringTemplate(releaseSectionHeadingTemplate, { section });
-
-    finalReleaseBody.push(heading);
-    finalReleaseBody.push(entries.sort().join("\n"));
+    finalReleaseBodyBase.push(heading);
+    finalReleaseBodyBase.push(group.entries.sort().join("\n"));
   }
 
-  return finalReleaseBody.join("\n\n");
+  const finalReleaseBodyAlt: string[] = [];
+  const resolvedHeadingTemplateAlt = releaseSectionHeadingTemplateAlt ??
+    releaseSectionHeadingTemplate;
+
+  for (const [key, group] of altSectionGroups) {
+    if (group.entries.length === 0) continue;
+
+    const heading = key === breakingSectionHeadingAlt
+      ? key
+      : await resolveStringTemplate(
+        resolvedHeadingTemplateAlt,
+        group.sectionInfo,
+      );
+
+    finalReleaseBodyAlt.push(heading);
+    finalReleaseBodyAlt.push(group.entries.sort().join("\n"));
+  }
+
+  return {
+    base: finalReleaseBodyBase.join("\n\n"),
+    alt: finalReleaseBodyAlt.join("\n\n"),
+  };
 }
 
 /** @throws */
