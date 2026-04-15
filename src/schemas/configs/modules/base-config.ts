@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import { TimeZoneSchema } from "./components/timezone.ts";
 import { CommitTypeSchema } from "./components/commit-type.ts";
 import { VersionFileSchema } from "./components/version-file.ts";
@@ -71,7 +72,7 @@ export const BaseCoreConfigSchema = v.object({
         "Version file(s). Accepts a single file object or an array of file objects. If a single object, it becomes the " +
         "primary file. If arrays, the first file with `primary: true` becomes the primary; if none are marked, " +
         "the first file in the array will be used.\n" +
-        "About primary file: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#version-files-required",
+        `About primary file: ${DOCS_EXT_REF_TOKEN}/docs/config-options.md#version-files-required`,
     }),
   ),
 
@@ -123,7 +124,7 @@ export const BaseCoreConfigSchema = v.object({
       description:
         "List of commit type(s) allowed to trigger 'release-as'. Accepts single or array of strings.\n" +
         'Use "<ALL>" to accept any commit type; use "<COMMIT_TYPES>" to use the list defined in `commitTypes`. You can combine "<COMMIT_TYPES>" with other types (for example: ["<COMMIT_TYPES>","docs"]).\n' +
-        "About 'release-as': https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version \n" +
+        `About 'release-as': ${DOCS_EXT_REF_TOKEN}?tab=readme-ov-file#force-a-specific-version \n` +
         'Default: "<ALL>"',
       examples: ["<COMMIT_TYPES>", ["<COMMIT_TYPES>", "chore", "ci", "cd"]],
     }),
@@ -144,7 +145,7 @@ export const BaseLifecycleConfigSchema = v.object({
               "Pre/post commands to run around the main operation. Each command runs from the repository root.\n" +
               "Post commands will always run regardless of operation outcome (success, skipped or failure). " +
               "It is recommended to check the outcome export variable if your script should only run under specific conditions.\n" +
-              "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+              `Available variables that cmds can use: ${DOCS_EXT_REF_TOKEN}/docs/export-variables.md`,
           }),
         ),
         prepare: v.pipe(
@@ -152,7 +153,7 @@ export const BaseLifecycleConfigSchema = v.object({
           v.metadata({
             description:
               "Pre/post commands to run around the proposal (PR, MR, ...) operation. Each command runs from the repository root.\n" +
-              "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+              `Available variables that cmds can use: ${DOCS_EXT_REF_TOKEN}/docs/export-variables.md`,
           }),
         ),
         publish: v.pipe(
@@ -160,7 +161,7 @@ export const BaseLifecycleConfigSchema = v.object({
           v.metadata({
             description:
               "Pre/post commands to run around the release operation. Each command runs from the repository root.\n" +
-              "Available variables that cmds can use: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+              `Available variables that cmds can use: ${DOCS_EXT_REF_TOKEN}/docs/export-variables.md`,
           }),
         ),
       }),

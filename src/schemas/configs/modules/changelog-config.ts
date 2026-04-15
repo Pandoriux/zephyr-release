@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import {
   DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
   DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
@@ -24,7 +25,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to the file where the generated changelog will be written to, relative to the project root.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional \n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional \n` +
           'Default: "CHANGELOG.md"',
       }),
     ),
@@ -43,7 +44,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog file header. Overrides `fileHeaderTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     fileFooterTemplate: v.pipe(
@@ -59,7 +60,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog file footer. Overrides `fileFooterTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 
@@ -82,7 +83,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release header. Overrides `releaseHeaderTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 
@@ -112,7 +113,7 @@ export const ChangelogConfigSchema = v.pipe(
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           "Additionally, you can use a special set of dynamic patterns which are:\n" +
           "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ breakingDesc }}, {{ isBreaking }}.\n" +
-          "About special patterns: https://github.com/Pandoriux/zephyr-release/blob/main/docs/config-options.md#changelog--release-section-entry-template-optional\n" +
+          `About special patterns: ${DOCS_EXT_REF_TOKEN}/docs/config-options.md#changelog--release-section-entry-template-optional\n` +
           `Default: ${
             JSON.stringify(DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE)
           }`,
@@ -123,7 +124,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release section entry template. Overrides `releaseSectionEntryTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseBreakingSectionHeading: v.pipe(
@@ -152,7 +153,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release breaking section entry template. Overrides `releaseBreakingSectionEntryTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseBodyOverride: v.pipe(
@@ -169,7 +170,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release body override, will take precedence over `releaseBodyOverride`.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 
@@ -186,7 +187,7 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog release footer. Overrides `releaseFooterTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 

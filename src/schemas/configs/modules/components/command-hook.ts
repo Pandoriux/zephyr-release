@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../../token.ts";
 import { CommandSchema } from "./command.ts";
 
 export const CommandHookSchema = v.object({
@@ -41,7 +42,7 @@ export const CommandHookSchema = v.object({
     }),
     v.metadata({
       description: "Commands to run before the operation.\n" +
-        "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+        `List of exposed env variables: ${DOCS_EXT_REF_TOKEN}/docs/export-variables.md`,
     }),
   ),
   post: v.pipe(
@@ -54,7 +55,7 @@ export const CommandHookSchema = v.object({
     }),
     v.metadata({
       description: "Commands to run after the operation.\n" +
-        "List of exposed env variables: https://github.com/Pandoriux/zephyr-release/blob/main/docs/export-variables.md",
+        `List of exposed env variables: ${DOCS_EXT_REF_TOKEN}/docs/export-variables.md`,
     }),
   ),
 });

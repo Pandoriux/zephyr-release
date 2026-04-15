@@ -4,6 +4,7 @@ import { toJsonSchema } from "@valibot/to-json-schema";
 import traverse from "@json-schema-tools/traverse";
 import { ConfigSchema } from "../src/schemas/configs/config.ts";
 import { TimeZoneSchema } from "../src/schemas/configs/modules/components/timezone.ts";
+import { DOCS_EXT_REF_TOKEN } from "../src/schemas/token.ts";
 
 type GenJsonSchemaConfig = {
   outputFile: string;
@@ -27,6 +28,8 @@ const SCHEMA_CONFIG: GenJsonSchemaConfig[] = [
     casingFn: toSnakeCase,
   },
 ];
+
+const DOCS_REF_URL = "https://github.com/Pandoriux/zephyr-release/blob/main";
 
 // Base config json schema based on valibot schema
 const baseSchema = toJsonSchema(ConfigSchema, {
@@ -111,17 +114,19 @@ function createTransformers(casingFn: GenJsonSchemaConfig["casingFn"]) {
     if (schema && typeof schema === "object") {
       // description
       if ("description" in schema && typeof schema.description === "string") {
-        schema.description = schema.description.replace(
-          /`([^`]+)`/g,
-          (_match, content: string) => {
-            const transformedContent = content
-              .split(".")
-              .map((part) => schemaPropertyNameMap.get(part) ?? part)
-              .join(".");
+        schema.description = schema.description
+          .replaceAll(DOCS_EXT_REF_TOKEN, DOCS_REF_URL)
+          .replace(
+            /`([^`]+)`/g,
+            (_match, content: string) => {
+              const transformedContent = content
+                .split(".")
+                .map((part) => schemaPropertyNameMap.get(part) ?? part)
+                .join(".");
 
-            return "`" + transformedContent + "`";
-          },
-        );
+              return "`" + transformedContent + "`";
+            },
+          );
       }
     }
 

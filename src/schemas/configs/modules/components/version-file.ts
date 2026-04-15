@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../../token.ts";
 import { FileFormatsWithAuto } from "../../../../constants/file-formats.ts";
 import { VersionFileExtractorsWithAuto } from "../../../../constants/version-file-options.ts";
 import { trimNonEmptyStringSchema } from "../../../string.ts";
@@ -7,9 +8,8 @@ export const VersionFileSchema = v.object({
   path: v.pipe(
     trimNonEmptyStringSchema,
     v.metadata({
-      description:
-        "Path to the version file, relative to the project root.\n" +
-        "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+      description: "Path to the version file, relative to the project root.\n" +
+        `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
     }),
   ),
   format: v.pipe(

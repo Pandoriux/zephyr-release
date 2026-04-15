@@ -1,0 +1,1 @@
+export const DOCS_EXT_REF_TOKEN = "<DOCS_EXTERNAL_REF_TOKEN>";

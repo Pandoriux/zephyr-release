@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import {
   DEFAULT_PROPOSAL_BODY_TEMPLATE,
@@ -47,7 +48,7 @@ export const ReviewConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing proposal title template. Overrides `titleTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     headerTemplate: v.pipe(
@@ -64,7 +65,7 @@ export const ReviewConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing proposal header template. Overrides `headerTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     bodyTemplate: v.pipe(
@@ -81,7 +82,7 @@ export const ReviewConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing proposal body template. Overrides `bodyTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     footerTemplate: v.pipe(
@@ -98,7 +99,7 @@ export const ReviewConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing proposal footer template. Overrides `footerTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 

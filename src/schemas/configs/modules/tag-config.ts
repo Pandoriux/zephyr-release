@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 import {
   DEFAULT_TAG_MESSAGE_TEMPLATE,
@@ -52,7 +53,7 @@ export const TagConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing Git annotated or signed tag message template. Overrides `messageTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     tagger: v.pipe(

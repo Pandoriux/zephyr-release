@@ -1,4 +1,5 @@
 import * as v from "@valibot/valibot";
+import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import {
   DEFAULT_RELEASE_BODY_TEMPLATE,
   DEFAULT_RELEASE_TITLE_TEMPLATE,
@@ -51,7 +52,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release title template. Overrides `titleTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     headerTemplate: v.pipe(
@@ -67,7 +68,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release header template. Overrides `headerTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     bodyTemplate: v.pipe(
@@ -84,7 +85,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release body template. Overrides `bodyTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     footerTemplate: v.pipe(
@@ -100,7 +101,7 @@ export const ReleaseConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing release footer template. Overrides `footerTemplate` when both are provided.\n" +
-          "To customize whether this file is fetched locally or remotely, see source mode: https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional",
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
 
