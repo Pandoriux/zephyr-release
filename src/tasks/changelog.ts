@@ -26,6 +26,7 @@ type GenerateChangelogReleaseConfigParams =
       | "releaseHeaderTemplate"
       | "releaseHeaderTemplatePath"
       | "releaseSectionHeadingTemplate"
+      | "releaseSectionHeadingTemplatePath"
       | "releaseSectionEntryTemplate"
       | "releaseSectionEntryTemplatePath"
       | "releaseBreakingSectionHeading"
@@ -38,6 +39,7 @@ type GenerateChangelogReleaseConfigParams =
       | "releaseHeaderTemplateAlt"
       | "releaseHeaderTemplateAltPath"
       | "releaseSectionHeadingTemplateAlt"
+      | "releaseSectionHeadingTemplateAltPath"
       | "releaseSectionEntryTemplateAlt"
       | "releaseSectionEntryTemplateAltPath"
       | "releaseBreakingSectionHeadingAlt"
@@ -356,12 +358,14 @@ async function generateReleaseBodyBasedOnCommits(
     commitTypes,
     changelog: {
       releaseSectionHeadingTemplate,
+      releaseSectionHeadingTemplatePath,
       releaseSectionEntryTemplate,
       releaseSectionEntryTemplatePath,
       releaseBreakingSectionHeading,
       releaseBreakingSectionEntryTemplate,
       releaseBreakingSectionEntryTemplatePath,
       releaseSectionHeadingTemplateAlt,
+      releaseSectionHeadingTemplateAltPath,
       releaseSectionEntryTemplateAlt,
       releaseSectionEntryTemplateAltPath,
       releaseBreakingSectionHeadingAlt,
@@ -422,6 +426,38 @@ async function generateReleaseBodyBasedOnCommits(
 
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const getTextOpts = { provider, workspacePath, ref: triggerCommitHash };
+
+  let sectionHeadingTemplateBase: string;
+  if (releaseSectionHeadingTemplatePath) {
+    sectionHeadingTemplateBase = await getTextFile(
+      sourceMode.overrides?.[releaseSectionHeadingTemplatePath] ??
+        sourceMode.mode,
+      releaseSectionHeadingTemplatePath,
+      getTextOpts,
+    );
+  } else {
+    sectionHeadingTemplateBase = releaseSectionHeadingTemplate;
+  }
+
+  let sectionHeadingTemplateAlt: string;
+  const resolvedSectionHeadingAltPath = releaseSectionHeadingTemplateAltPath ??
+    releaseSectionHeadingTemplatePath;
+  const resolvedSectionHeadingAltTemplate = releaseSectionHeadingTemplateAlt;
+
+  if (
+    resolvedSectionHeadingAltPath === releaseSectionHeadingTemplatePath &&
+    resolvedSectionHeadingAltTemplate === releaseSectionHeadingTemplate
+  ) {
+    sectionHeadingTemplateAlt = sectionHeadingTemplateBase;
+  } else if (resolvedSectionHeadingAltPath) {
+    sectionHeadingTemplateAlt = await getTextFile(
+      sourceMode.overrides?.[resolvedSectionHeadingAltPath] ?? sourceMode.mode,
+      resolvedSectionHeadingAltPath,
+      getTextOpts,
+    );
+  } else {
+    sectionHeadingTemplateAlt = resolvedSectionHeadingAltTemplate;
+  }
 
   let sectionEntryTemplateBase: string;
   if (releaseSectionEntryTemplatePath) {
@@ -560,7 +596,7 @@ async function generateReleaseBodyBasedOnCommits(
     const heading = key === breakingSectionHeadingBase
       ? key
       : await resolveStringTemplate(
-        releaseSectionHeadingTemplate,
+        sectionHeadingTemplateBase,
         group.sectionInfo,
       );
 
@@ -569,16 +605,13 @@ async function generateReleaseBodyBasedOnCommits(
   }
 
   const finalReleaseBodyAlt: string[] = [];
-  const resolvedHeadingTemplateAlt = releaseSectionHeadingTemplateAlt ??
-    releaseSectionHeadingTemplate;
-
   for (const [key, group] of altSectionGroups) {
     if (group.entries.length === 0) continue;
 
     const heading = key === breakingSectionHeadingAlt
       ? key
       : await resolveStringTemplate(
-        resolvedHeadingTemplateAlt,
+        sectionHeadingTemplateAlt,
         group.sectionInfo,
       );
 

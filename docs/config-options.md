@@ -95,6 +95,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-header-template (Optional)](#changelog--release-header-template-optional)
     - [changelog \> release-header-template-path (Optional)](#changelog--release-header-template-path-optional)
     - [changelog \> release-section-heading-template (Optional)](#changelog--release-section-heading-template-optional)
+    - [changelog \> release-section-heading-template-path (Optional)](#changelog--release-section-heading-template-path-optional)
     - [changelog \> release-section-entry-template (Optional)](#changelog--release-section-entry-template-optional)
     - [changelog \> release-section-entry-template-path (Optional)](#changelog--release-section-entry-template-path-optional)
     - [changelog \> release-breaking-section-heading (Optional)](#changelog--release-breaking-section-heading-optional)
@@ -107,6 +108,7 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> release-header-template-alt (Optional)](#changelog--release-header-template-alt-optional)
     - [changelog \> release-header-template-alt-path (Optional)](#changelog--release-header-template-alt-path-optional)
     - [changelog \> release-section-heading-template-alt (Optional)](#changelog--release-section-heading-template-alt-optional)
+    - [changelog \> release-section-heading-template-alt-path (Optional)](#changelog--release-section-heading-template-alt-path-optional)
     - [changelog \> release-section-entry-template-alt (Optional)](#changelog--release-section-entry-template-alt-optional)
     - [changelog \> release-section-entry-template-alt-path (Optional)](#changelog--release-section-entry-template-alt-path-optional)
     - [changelog \> release-breaking-section-heading-alt (Optional)](#changelog--release-breaking-section-heading-alt-optional)
@@ -905,7 +907,7 @@ To customize whether this file is fetched locally or remotely, see [source mode]
 #### changelog > release-section-heading-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for heading of a changelog release section, using with string patterns like `{{ section }}`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns).
@@ -917,10 +919,20 @@ Additionally, you can use a special dynamic pattern (see [patterns docs](./strin
 
 [⬆ Back to top](#table-of-content)
 
+#### changelog > release-section-heading-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release section heading template. Overrides `release-section-heading-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+[⬆ Back to top](#table-of-content)
+
 #### changelog > release-section-entry-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_RELEASE_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 String template for each entries in the changelog release sections.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
@@ -961,7 +973,7 @@ Heading of a changelog release BREAKING section.
 #### changelog > release-breaking-section-entry-template (Optional)
 
 Type: `string`  
-Default: [`DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+Default: [`DEFAULT_RELEASE_BREAKING_SECTION_ENTRY_TEMPLATE`](../src/constants/defaults/string-templates.ts)
 
 Basically the same as `release-section-entry-template`, but for breaking changes specifically. If not provided, falls back to `release-section-entry-template`.  
 Allowed patterns to use are: [all string patterns](./string-templates-and-patterns.md#available-string-patterns) and [dynamic patterns](./string-templates-and-patterns.md#dynamic-string-patterns).
@@ -1027,15 +1039,28 @@ Alternative value for [`release-header-template`](#changelog--release-header-tem
 
 Type: `string`
 
-Alternative value for [`release-header-template-path`](#changelog--release-header-template-path-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release header. Overrides `release-header-template-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 
 #### changelog > release-section-heading-template-alt (Optional)
 
+Type: `string`  
+Default: [`DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE_ALT`](../src/constants/defaults/string-templates.ts)
+
+String template for alternative heading of a changelog release section. Allowed string patterns and special dynamic patterns are the same as [`release-section-heading-template`](#changelog--release-section-heading-template-optional).
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > release-section-heading-template-alt-path (Optional)
+
 Type: `string`
 
-Alternative value for [`release-section-heading-template`](#changelog--release-section-heading-template-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release section heading template. Overrides `release-section-heading-template-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 
@@ -1051,7 +1076,9 @@ Alternative value for [`release-section-entry-template`](#changelog--release-sec
 
 Type: `string`
 
-Alternative value for [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release section entry template. Overrides `release-section-entry-template-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 
@@ -1075,7 +1102,9 @@ Alternative value for [`release-breaking-section-entry-template`](#changelog--re
 
 Type: `string`
 
-Alternative value for [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release breaking section entry template. Overrides `release-breaking-section-entry-template-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 
@@ -1091,7 +1120,9 @@ Alternative value for [`release-body-override`](#changelog--release-body-overrid
 
 Type: `string`
 
-Alternative value for [`release-body-override-path`](#changelog--release-body-override-path-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release body override. Overrides `release-body-override-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 
@@ -1107,7 +1138,9 @@ Alternative value for [`release-footer-template`](#changelog--release-footer-tem
 
 Type: `string`
 
-Alternative value for [`release-footer-template-path`](#changelog--release-footer-template-path-optional). When not provided, fall back to the original.
+Path to text file containing alternative changelog release footer. Overrides `release-footer-template-alt` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
 [⬆ Back to top](#table-of-content)
 

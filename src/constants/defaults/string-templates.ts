@@ -9,19 +9,22 @@ export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
 export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
 export const DEFAULT_CHANGELOG_RELEASE_TEMPLATE = "{{ changelogRelease }}";
 
-export const DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE =
+export const DEFAULT_RELEASE_HEADER_TEMPLATE =
   liquid`## {{ nextVersion | wrap_compare_latest_tag: tagName }} (
     {{- YYYY }}-{{ MM }}-{{ DD }}) <!-- timezone: {{ timeZone }} -->`;
 
-export const DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE =
+export const DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE =
   liquid`### {{ section }}`;
 
-export const DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE =
+export const DEFAULT_RELEASE_SECTION_ENTRY_TEMPLATE =
   liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ desc | format_commit_references: commit }} ([{{ hash | slice: 0, 7 }}](
   {{- host }}/{{ namespace }}/{{ repository }}/{{ commitPathPart }}/{{ hash }}))`;
 
-export const DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE =
+export const DEFAULT_RELEASE_BREAKING_SECTION_ENTRY_TEMPLATE =
   liquid`- {% if scope %}**{{ scope }}:** {% endif %}{{ breakingDesc }}`;
+
+export const DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE_ALT =
+  liquid`### {{ sectionAlt }}`;
 
 // Commit
 export const DEFAULT_COMMIT_HEADER_TEMPLATE =

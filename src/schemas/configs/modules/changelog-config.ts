@@ -1,12 +1,13 @@
 import * as v from "@valibot/valibot";
 import { DOCS_EXT_REF_TOKEN } from "../../token.ts";
 import {
-  DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
+  DEFAULT_RELEASE_BREAKING_SECTION_ENTRY_TEMPLATE,
   DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
-  DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE,
+  DEFAULT_RELEASE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_RELEASE_TEMPLATE,
-  DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE,
-  DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE,
+  DEFAULT_RELEASE_SECTION_ENTRY_TEMPLATE,
+  DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE,
+  DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE_ALT,
 } from "../../../constants/defaults/string-templates.ts";
 import { trimNonEmptyStringSchema } from "../../string.ts";
 
@@ -85,14 +86,14 @@ export const ChangelogConfigSchema = v.pipe(
     releaseHeaderTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE,
+        DEFAULT_RELEASE_HEADER_TEMPLATE,
       ),
       v.metadata({
         description:
           "String template for header of a changelog release, using with string patterns like {{ nextVersion }}.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${
-            JSON.stringify(DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE)
+            JSON.stringify(DEFAULT_RELEASE_HEADER_TEMPLATE)
           }`,
       }),
     ),
@@ -108,7 +109,7 @@ export const ChangelogConfigSchema = v.pipe(
     releaseSectionHeadingTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE,
+        DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE,
       ),
       v.metadata({
         description:
@@ -116,14 +117,22 @@ export const ChangelogConfigSchema = v.pipe(
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           "Additionally, you can use special dynamic patterns like: {{ section }}, {{ sectionAlt }}.\n" +
           `Default: ${
-            JSON.stringify(DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE)
+            JSON.stringify(DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE)
           }`,
+      }),
+    ),
+    releaseSectionHeadingTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release section heading template. Overrides `releaseSectionHeadingTemplate` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseSectionEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE,
+        DEFAULT_RELEASE_SECTION_ENTRY_TEMPLATE,
       ),
       v.metadata({
         description:
@@ -133,7 +142,7 @@ export const ChangelogConfigSchema = v.pipe(
           "{{ hash }}, {{ type }}, {{ scope }}, {{ desc }}, {{ body }}, {{ footer }}, {{ breakingDesc }}, {{ isBreaking }}.\n" +
           `About special patterns: ${DOCS_EXT_REF_TOKEN}/docs/config-options.md#changelog--release-section-entry-template-optional\n` +
           `Default: ${
-            JSON.stringify(DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE)
+            JSON.stringify(DEFAULT_RELEASE_SECTION_ENTRY_TEMPLATE)
           }`,
       }),
     ),
@@ -154,7 +163,7 @@ export const ChangelogConfigSchema = v.pipe(
     releaseBreakingSectionEntryTemplate: v.pipe(
       v.optional(
         v.pipe(v.string(), v.nonEmpty()),
-        DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
+        DEFAULT_RELEASE_BREAKING_SECTION_ENTRY_TEMPLATE,
       ),
       v.metadata({
         description:
@@ -162,7 +171,7 @@ export const ChangelogConfigSchema = v.pipe(
           "to `releaseSectionEntryTemplate`.\n" +
           "Allowed patterns to use are: all fixed and dynamic string patterns.\n" +
           `Default: ${
-            JSON.stringify(DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE)
+            JSON.stringify(DEFAULT_RELEASE_BREAKING_SECTION_ENTRY_TEMPLATE)
           }`,
       }),
     ),
@@ -220,14 +229,29 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Alternative value for `releaseHeaderTemplatePath`. When not provided, fall back to the original.",
+          "Path to text file containing alternative changelog release header. Overrides `releaseHeaderTemplateAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseSectionHeadingTemplateAlt: v.pipe(
-      v.optional(v.pipe(v.string(), v.nonEmpty())),
+      v.optional(
+        v.pipe(v.string(), v.nonEmpty()),
+        DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE_ALT,
+      ),
       v.metadata({
         description:
-          "Alternative value for `releaseSectionHeadingTemplate`. When not provided, fall back to the original.",
+          "String template for alternative heading of a changelog release section. Allowed string patterns and special dynamic patterns are the same as `releaseSectionHeadingTemplate`.\n" +
+          `Default: ${
+            JSON.stringify(DEFAULT_RELEASE_SECTION_HEADING_TEMPLATE_ALT)
+          }`,
+      }),
+    ),
+    releaseSectionHeadingTemplateAltPath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing alternative changelog release section heading template. Overrides `releaseSectionHeadingTemplateAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseSectionEntryTemplateAlt: v.pipe(
@@ -241,7 +265,8 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Alternative value for `releaseSectionEntryTemplatePath`. When not provided, fall back to the original.",
+          "Path to text file containing alternative changelog release section entry template. Overrides `releaseSectionEntryTemplateAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseBreakingSectionHeadingAlt: v.pipe(
@@ -262,35 +287,38 @@ export const ChangelogConfigSchema = v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Alternative value for `releaseBreakingSectionEntryTemplatePath`. When not provided, fall back to the original.",
+          "Path to text file containing alternative changelog release breaking section entry template. Overrides `releaseBreakingSectionEntryTemplateAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseBodyOverrideAlt: v.pipe(
       v.optional(v.pipe(v.string(), v.nonEmpty())),
       v.metadata({
         description:
-          "Alternative value for `releaseBodyOverride`. When not provide, fall back to the original.",
+          "Alternative value for `releaseBodyOverride`. When not provided, fall back to the original.",
       }),
     ),
     releaseBodyOverrideAltPath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Alternative value for `releaseBodyOverridePath`. When not provide, fall back to the original.",
+          "Path to text file containing alternative changelog release body override. Overrides `releaseBodyOverrideAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
     releaseFooterTemplateAlt: v.pipe(
       v.optional(v.string()),
       v.metadata({
         description:
-          "Alternative value for `releaseFooterTemplate`. When not provide, fall back to the original.",
+          "Alternative value for `releaseFooterTemplate`. When not provided, fall back to the original.",
       }),
     ),
     releaseFooterTemplateAltPath: v.pipe(
       v.optional(trimNonEmptyStringSchema),
       v.metadata({
         description:
-          "Alternative value for `releaseFooterTemplatePath`. When not provide, fall back to the original.",
+          "Path to text file containing alternative changelog release footer. Overrides `releaseFooterTemplateAlt` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),
   }),
