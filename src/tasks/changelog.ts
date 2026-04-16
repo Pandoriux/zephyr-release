@@ -620,6 +620,8 @@ type PrepareChangelogParams = Pick<
   | "path"
   | "fileHeaderTemplate"
   | "fileHeaderTemplatePath"
+  | "fileReleaseTemplate"
+  | "fileReleaseTemplatePath"
   | "fileFooterTemplate"
   | "fileFooterTemplatePath"
 >;
@@ -629,19 +631,21 @@ export async function prepareChangelogFileToCommit(
   changelogConfig: PrepareChangelogParams,
   sourceMode: InputsOutput["sourceMode"],
   workspacePath: string,
-  releaseContent: string,
   triggerCommitHash: string,
 ): Promise<string> {
   const {
     path,
     fileHeaderTemplate,
     fileHeaderTemplatePath,
+    fileReleaseTemplate,
+    fileReleaseTemplatePath,
     fileFooterTemplate,
     fileFooterTemplatePath,
   } = changelogConfig;
 
   const changelogSourceMode = sourceMode.overrides?.[path] ?? sourceMode.mode;
 
+  // If current changelog file not exist, we auto create a brand new one
   const currentFileContent = await getTextFile(
     changelogSourceMode,
     path,
@@ -664,6 +668,18 @@ export async function prepareChangelogFileToCommit(
     header = await resolveStringTemplate(headerTemplate);
   } else header = await resolveStringTemplate(fileHeaderTemplate);
 
+  let releaseContentBlock: string;
+  if (fileReleaseTemplatePath) {
+    const releaseTemplate = await getTextFile(
+      sourceMode.overrides?.[fileReleaseTemplatePath] ?? sourceMode.mode,
+      fileReleaseTemplatePath,
+      { provider, workspacePath: workspacePath, ref: triggerCommitHash },
+    );
+    releaseContentBlock = await resolveStringTemplate(releaseTemplate);
+  } else {
+    releaseContentBlock = await resolveStringTemplate(fileReleaseTemplate);
+  }
+
   let footer: string | undefined;
   if (fileFooterTemplatePath) {
     const footerTemplate = await getTextFile(
@@ -679,7 +695,7 @@ export async function prepareChangelogFileToCommit(
   if (!currentFileContent.trim()) {
     const bodyWithMarkers = [
       CHANGELOG_MARKERS.bodyStart,
-      releaseContent,
+      releaseContentBlock,
       CHANGELOG_MARKERS.bodyEnd,
     ].join("\n");
 
@@ -703,7 +719,7 @@ export async function prepareChangelogFileToCommit(
 
       const bodyWithMarkers = [
         CHANGELOG_MARKERS.bodyStart,
-        releaseContent,
+        releaseContentBlock,
         CHANGELOG_MARKERS.bodyEnd,
       ].join("\n");
 
@@ -722,8 +738,8 @@ export async function prepareChangelogFileToCommit(
       ).trim();
 
       const updatedBody = existingBodyContent
-        ? [releaseContent, existingBodyContent].join("\n\n")
-        : releaseContent;
+        ? [releaseContentBlock, existingBodyContent].join("\n\n")
+        : releaseContentBlock;
 
       const updatedBodyWithMarkers = [
         CHANGELOG_MARKERS.bodyStart,

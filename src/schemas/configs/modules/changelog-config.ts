@@ -4,6 +4,7 @@ import {
   DEFAULT_CHANGELOG_BREAKING_SECTION_ENTRY_TEMPLATE,
   DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE,
   DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE,
+  DEFAULT_CHANGELOG_RELEASE_TEMPLATE,
   DEFAULT_CHANGELOG_SECTION_ENTRY_TEMPLATE,
   DEFAULT_CHANGELOG_SECTION_HEADING_TEMPLATE,
 } from "../../../constants/defaults/string-templates.ts";
@@ -44,6 +45,23 @@ export const ChangelogConfigSchema = v.pipe(
       v.metadata({
         description:
           "Path to text file containing changelog file header. Overrides `fileHeaderTemplate` when both are provided.\n" +
+          `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
+      }),
+    ),
+    fileReleaseTemplate: v.pipe(
+      v.optional(v.string(), DEFAULT_CHANGELOG_RELEASE_TEMPLATE),
+      v.metadata({
+        description:
+          "String template for the individual release block inserted into the changelog file.\n" +
+          'To use your alternative configuration, set this to "{{ changelogReleaseAlt }}".\n' +
+          `Default: ${JSON.stringify(DEFAULT_CHANGELOG_RELEASE_TEMPLATE)}`,
+      }),
+    ),
+    fileReleaseTemplatePath: v.pipe(
+      v.optional(trimNonEmptyStringSchema),
+      v.metadata({
+        description:
+          "Path to text file containing changelog release template. Overrides `fileReleaseTemplate` when both are provided.\n" +
           `To customize whether this file is fetched locally or remotely, see source mode: ${DOCS_EXT_REF_TOKEN}/docs/input-options.md#source-mode-optional`,
       }),
     ),

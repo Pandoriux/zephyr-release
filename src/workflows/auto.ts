@@ -1,4 +1,3 @@
-import { format } from "@std/semver";
 import type { WorkingBranchResult } from "../tasks/branch.ts";
 import {
   calculateNextVersion,
@@ -199,10 +198,7 @@ export async function executeAutoStrategy(
     provider,
     runSettings.inputs,
     runSettings.config,
-    {
-      changelogRelease: changelogReleaseResult.release,
-      nextVersion: format(nextVersion),
-    },
+    nextVersion,
   );
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 

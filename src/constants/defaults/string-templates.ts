@@ -7,6 +7,7 @@ export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
 
 // Changelog
 export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
+export const DEFAULT_CHANGELOG_RELEASE_TEMPLATE = "{{ changelogRelease }}";
 
 export const DEFAULT_CHANGELOG_RELEASE_HEADER_TEMPLATE =
   liquid`## {{ nextVersion | wrap_compare_latest_tag: tagName }} (

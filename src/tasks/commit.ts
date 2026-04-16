@@ -28,6 +28,7 @@ import { SafeExit } from "../errors/safe-exit.ts";
 import { VERSION } from "../version.generated.ts";
 import { breakingChangeKeywords } from "../constants/conventional-commit-parser-options.ts";
 import { NoCommitFoundError } from "../errors/providers/commit.ts";
+import { format, type SemVer } from "@std/semver";
 
 type ResolveCommitsInputsParams = Pick<
   InputsOutput,
@@ -303,6 +304,8 @@ type PrepareChangesConfigParams = {
     | "path"
     | "fileHeaderTemplate"
     | "fileHeaderTemplatePath"
+    | "fileReleaseTemplate"
+    | "fileReleaseTemplatePath"
     | "fileFooterTemplate"
     | "fileFooterTemplatePath"
   >;
@@ -314,13 +317,12 @@ export async function prepareChangesToCommit(
   provider: PlatformProvider,
   inputs: PrepareChangesInputsParams,
   config: PrepareChangesConfigParams,
-  newData: { changelogRelease: string; nextVersion: string },
+  nextVersion: SemVer,
 ): Promise<Map<string, string | null>> {
   const { triggerCommitHash, workspacePath, sourceMode } = inputs;
   const { versionFiles, changelog, commit } = config;
   const { localChangesToCommit } = commit;
   const { writeToFile, path } = changelog;
-  const { changelogRelease, nextVersion } = newData;
 
   const changesData = new Map<string, string | null>();
 
@@ -331,7 +333,6 @@ export async function prepareChangesToCommit(
       changelog,
       sourceMode,
       workspacePath,
-      changelogRelease,
       triggerCommitHash,
     );
     changesData.set(normalize(path), clContent);
@@ -347,7 +348,7 @@ export async function prepareChangesToCommit(
     versionFiles,
     sourceMode,
     workspacePath,
-    nextVersion,
+    format(nextVersion),
     triggerCommitHash,
   );
   for (const [vfPath, vfContent] of vfChangesData) {

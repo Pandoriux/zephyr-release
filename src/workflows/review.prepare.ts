@@ -10,7 +10,6 @@ import {
   createOrUpdateProposal,
 } from "../tasks/proposal.ts";
 import type { PlatformProvider } from "../types/providers/platform-provider.ts";
-import { format } from "@std/semver";
 import {
   calculateNextVersion,
   compareNextVersionToCurrentVersion,
@@ -178,10 +177,7 @@ export async function executeReviewPreparePhase(
     provider,
     runSettings.inputs,
     runSettings.config,
-    {
-      changelogRelease: changelogReleaseResult.release,
-      nextVersion: format(nextVersion),
-    },
+    nextVersion,
   );
   logger.stepFinish("Finished: Prepare and collect changes data to commit");
 

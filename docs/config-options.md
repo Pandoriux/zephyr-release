@@ -88,6 +88,8 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
     - [changelog \> path (Optional)](#changelog--path-optional)
     - [changelog \> file-header-template (Optional)](#changelog--file-header-template-optional)
     - [changelog \> file-header-template-path (Optional)](#changelog--file-header-template-path-optional)
+    - [changelog \> file-release-template (Optional)](#changelog--file-release-template-optional)
+    - [changelog \> file-release-template-path (Optional)](#changelog--file-release-template-path-optional)
     - [changelog \> file-footer-template (Optional)](#changelog--file-footer-template-optional)
     - [changelog \> file-footer-template-path (Optional)](#changelog--file-footer-template-path-optional)
     - [changelog \> release-header-template (Optional)](#changelog--release-header-template-optional)
@@ -795,7 +797,7 @@ Same as [`bump-strategy > prerelease`](#bump-strategy--prerelease-optional).
 ### changelog (Optional)
 
 Type: `object`  
-**Properties:** [`write-to-file`](#changelog--write-to-file-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-heading-template`](#changelog--release-section-heading-template-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional), [`release-header-template-alt`](#changelog--release-header-template-alt-optional), [`release-header-template-alt-path`](#changelog--release-header-template-alt-path-optional), [`release-section-heading-template-alt`](#changelog--release-section-heading-template-alt-optional), [`release-section-entry-template-alt`](#changelog--release-section-entry-template-alt-optional), [`release-section-entry-template-alt-path`](#changelog--release-section-entry-template-alt-path-optional), [`release-breaking-section-heading-alt`](#changelog--release-breaking-section-heading-alt-optional), [`release-breaking-section-entry-template-alt`](#changelog--release-breaking-section-entry-template-alt-optional), [`release-breaking-section-entry-template-alt-path`](#changelog--release-breaking-section-entry-template-alt-path-optional), [`release-body-override-alt`](#changelog--release-body-override-alt-optional), [`release-body-override-alt-path`](#changelog--release-body-override-alt-path-optional), [`release-footer-template-alt`](#changelog--release-footer-template-alt-optional), [`release-footer-template-alt-path`](#changelog--release-footer-template-alt-path-optional)
+**Properties:** [`write-to-file`](#changelog--write-to-file-optional), [`path`](#changelog--path-optional), [`file-header-template`](#changelog--file-header-template-optional), [`file-header-template-path`](#changelog--file-header-template-path-optional), [`file-release-template`](#changelog--file-release-template-optional), [`file-release-template-path`](#changelog--file-release-template-path-optional), [`file-footer-template`](#changelog--file-footer-template-optional), [`file-footer-template-path`](#changelog--file-footer-template-path-optional), [`release-header-template`](#changelog--release-header-template-optional), [`release-header-template-path`](#changelog--release-header-template-path-optional), [`release-section-heading-template`](#changelog--release-section-heading-template-optional), [`release-section-entry-template`](#changelog--release-section-entry-template-optional), [`release-section-entry-template-path`](#changelog--release-section-entry-template-path-optional), [`release-breaking-section-heading`](#changelog--release-breaking-section-heading-optional), [`release-breaking-section-entry-template`](#changelog--release-breaking-section-entry-template-optional), [`release-breaking-section-entry-template-path`](#changelog--release-breaking-section-entry-template-path-optional), [`release-footer-template`](#changelog--release-footer-template-optional), [`release-footer-template-path`](#changelog--release-footer-template-path-optional), [`release-body-override`](#changelog--release-body-override-optional), [`release-body-override-path`](#changelog--release-body-override-path-optional), [`release-header-template-alt`](#changelog--release-header-template-alt-optional), [`release-header-template-alt-path`](#changelog--release-header-template-alt-path-optional), [`release-section-heading-template-alt`](#changelog--release-section-heading-template-alt-optional), [`release-section-entry-template-alt`](#changelog--release-section-entry-template-alt-optional), [`release-section-entry-template-alt-path`](#changelog--release-section-entry-template-alt-path-optional), [`release-breaking-section-heading-alt`](#changelog--release-breaking-section-heading-alt-optional), [`release-breaking-section-entry-template-alt`](#changelog--release-breaking-section-entry-template-alt-optional), [`release-breaking-section-entry-template-alt-path`](#changelog--release-breaking-section-entry-template-alt-path-optional), [`release-body-override-alt`](#changelog--release-body-override-alt-optional), [`release-body-override-alt-path`](#changelog--release-body-override-alt-path-optional), [`release-footer-template-alt`](#changelog--release-footer-template-alt-optional), [`release-footer-template-alt-path`](#changelog--release-footer-template-alt-path-optional)
 
 Configuration specific to changelogs. All generated changelog content are available in string templates as `{{ changelogRelease }}` (release header + body) or `{{ changelogReleaseHeader }}` and `{{ changelogReleaseBody }}`.
 
@@ -836,6 +838,26 @@ Allowed patterns to use are: [all string patterns](./string-templates-and-patter
 Type: `string`
 
 Path to text file containing changelog file header. Overrides `file-header-template` when both are provided.
+
+To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > file-release-template (Optional)
+
+Type: `string`  
+Default: [`DEFAULT_CHANGELOG_RELEASE_TEMPLATE`](../src/constants/defaults/string-templates.ts)
+
+String template for the individual release block inserted into the changelog file.  
+To use your alternative configuration, set this to `"{{ changelogReleaseAlt }}"`.
+
+[⬆ Back to top](#table-of-content)
+
+#### changelog > file-release-template-path (Optional)
+
+Type: `string`
+
+Path to text file containing changelog release template. Overrides `file-release-template` when both are provided.
 
 To customize whether this file is fetched locally or remotely, see [source mode](./input-options.md#source-mode-optional).
 
