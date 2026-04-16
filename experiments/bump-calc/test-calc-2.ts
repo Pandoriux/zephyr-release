@@ -5,8 +5,8 @@ import { calculateNextCoreSemVer } from "../../src/tasks/calculate-next-version/
 const currentVersion = parse("0.1.0")!;
 
 const defaultStrategy = {
-  bumpMinorForMajorPreStable: true,
-  bumpPatchForMinorPreStable: true,
+  treatMajorAsMinorPreStable: true,
+  treatMinorAsPatchPreStable: true,
   major: {
     types: undefined,
     countBreakingAs: "commit", // default is "bump"

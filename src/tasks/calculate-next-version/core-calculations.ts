@@ -36,7 +36,7 @@ export function calculateNextCoreSemVer(
     const origMinor = { ...rawCounts.minor };
 
     if (
-      strategy.bumpMinorForMajorPreStable &&
+      strategy.treatMajorAsMinorPreStable &&
       (origMajor.commits > 0 || origMajor.directBumps > 0)
     ) {
       // Downgrade Major -> Minor
@@ -46,7 +46,7 @@ export function calculateNextCoreSemVer(
     }
 
     if (
-      strategy.bumpPatchForMinorPreStable &&
+      strategy.treatMinorAsPatchPreStable &&
       (origMinor.commits > 0 || origMinor.directBumps > 0)
     ) {
       // Downgrade original Minor -> Patch (excludes downgraded majors)

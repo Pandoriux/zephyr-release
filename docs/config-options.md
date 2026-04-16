@@ -65,8 +65,8 @@ Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/mai
   - [resolve-until-commit-hash (Optional)](#resolve-until-commit-hash-optional)
   - [allowed-release-as-commit-types (Optional)](#allowed-release-as-commit-types-optional)
   - [bump-strategy (Optional)](#bump-strategy-optional)
-    - [bump-strategy \> bump-minor-for-major-pre-stable (Optional)](#bump-strategy--bump-minor-for-major-pre-stable-optional)
-    - [bump-strategy \> bump-patch-for-minor-pre-stable (Optional)](#bump-strategy--bump-patch-for-minor-pre-stable-optional)
+    - [bump-strategy \> treat-major-as-minor-pre-stable (Optional)](#bump-strategy--treat-major-as-minor-pre-stable-optional)
+    - [bump-strategy \> treat-minor-as-patch-pre-stable (Optional)](#bump-strategy--treat-minor-as-patch-pre-stable-optional)
     - [bump-strategy \> major (Optional)](#bump-strategy--major-optional)
       - [\> major \> types (Optional)](#-major--types-optional)
       - [\> major \> count-breaking-as (Optional)](#-major--count-breaking-as-optional)
@@ -631,28 +631,28 @@ Configuration options that determine how version numbers are calculated.
 
 [⬆ Back to top](#table-of-content)
 
-#### bump-strategy > bump-minor-for-major-pre-stable (Optional)
+#### bump-strategy > treat-major-as-minor-pre-stable (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Redirects major version bumps to minor in pre-1.0 (0.x.x).
+Treats major changes as minor version bumps in pre-1.0 (0.x.x) releases.
 
 [⬆ Back to top](#table-of-content)
 
-#### bump-strategy > bump-patch-for-minor-pre-stable (Optional)
+#### bump-strategy > treat-minor-as-patch-pre-stable (Optional)
 
 Type: `boolean`  
 Default: `true`
 
-Redirects minor version bumps to patch in pre-1.0 (0.x.x).
+Treats minor changes as patch version bumps in pre-1.0 (0.x.x) releases.
 
 [⬆ Back to top](#table-of-content)
 
 #### bump-strategy > major (Optional)
 
 Type: `object`  
-Default: `{ count-breaking-as: "bump" }`
+Default: [`DEFAULT_MAJOR_BUMP_STRATEGY`](../src/constants/defaults/bump-strategy.ts)
 
 Strategy for major version bumps (x.0.0).
 
@@ -690,7 +690,7 @@ Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you
 #### bump-strategy > minor (Optional)
 
 Type: `object`  
-Default: `{ types: ["feat"] }`
+Default: [`DEFAULT_MINOR_BUMP_STRATEGY`](../src/constants/defaults/bump-strategy.ts)
 
 Strategy for minor version bumps (0.x.0).
 
@@ -709,7 +709,7 @@ Same as [`bump-strategy > major`](#bump-strategy--major-optional).
 #### bump-strategy > patch (Optional)
 
 Type: `object`  
-Default: `{ types: ["fix", "perf"] }`
+Default: [`DEFAULT_PATCH_BUMP_STRATEGY`](../src/constants/defaults/bump-strategy.ts)
 
 Strategy for patch version bumps (0.0.x).
 

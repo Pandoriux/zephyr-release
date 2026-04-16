@@ -1,7 +1,7 @@
 <!-- Test Date: 2026-04-16T11:08:53Z (UTC) / 2026-04-16T18:08:53+07:00 (Local) -->
 # Bump Calculation Report (Pre-Stable / 0.x.x)
 
-We tested the `calculateNextCoreSemVer` logic handling pre-stable versions (`0.1.0`), and specifically its cascade-downgrade logic (`bumpMinorForMajorPreStable`, `bumpPatchForMinorPreStable`).
+We tested the `calculateNextCoreSemVer` logic handling pre-stable versions (`0.1.0`), and specifically its cascade-downgrade logic (`treatMajorAsMinorPreStable`, `treatMinorAsPatchPreStable`).
 
 ### Test Results vs Requirements
 

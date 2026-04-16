@@ -60,12 +60,12 @@ This guarantees the limit algorithm treats the downgraded bundle correctly.
 ### Trap B: The Cascading Downgrade
 The original code performed redirection sequentially inside the same computed variables:
 ```typescript
-if (bumpMinor && majorBumps > 0) {
+if (treatMajorAsMinor && majorBumps > 0) {
     minorBumps += majorBumps; // 1. Major becomes Minor
     majorBumps = 0;
 }
 
-if (bumpPatch && minorBumps > 0) { // 2. Traps the downgraded Major!
+if (treatMinorAsPatch && minorBumps > 0) { // 2. Traps the downgraded Major!
     patchBumps += minorBumps;     // 3. Minor becomes Patch
     minorBumps = 0;
 }
