@@ -13,12 +13,12 @@ export const BumpRuleCoreSchema = v.object({
     }),
   ),
   countBreakingAs: v.pipe(
-    v.optional(v.enum(countBreakingAsOptions), "none"),
+    v.optional(v.enum(countBreakingAsOptions), "commit"),
     v.metadata({
       description:
-        "Count a breaking change as none / one commit / one bump directly regardless of current chosen `types`, as long as " +
+        "Count a breaking change as none, or one commit, or one bump directly regardless of current chosen `types`, as long as " +
         "the commit type exists in base `commitTypes` list.\n" +
-        'Default: "none"',
+        'Default: "commit"',
     }),
   ),
   commitsPerBump: v.pipe(
@@ -36,8 +36,8 @@ export const BumpRuleCoreSchema = v.object({
     ),
     v.metadata({
       description:
-        "Number of commits required for additional version bump after the first. Use Infinity to always bump once, even " +
-        "if breaking changes are counted as bumps.\n" +
+        "Number of commits required for additional version bump after the first. Use Infinity to always bump once, unless " +
+        '`countBreakingAs` is set to "bump".\n' +
         "Default: Infinity",
     }),
   ),

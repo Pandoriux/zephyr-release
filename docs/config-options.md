@@ -669,7 +669,7 @@ Array of commit types (from base [`commit-types`](#commit-types-optional)) that 
 ##### > major > count-breaking-as (Optional)
 
 Type: `"none" | "commit" | "bump"`  
-Default: `"none"`
+Default: `"commit"`
 
 How to treat breaking changes regardless of `types`.  
 Usually this should only be set for a single semver level (major, minor, or patch) to avoid double counting.
@@ -681,7 +681,7 @@ Usually this should only be set for a single semver level (major, minor, or patc
 Type: `number | string`  
 Default: `Infinity`
 
-Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, even if breaking changes are counted as bumps.
+Number of commits required for each additional bump after the first. Use `Infinity`, `"Infinity"`, or `"infinity"` to always bump once, unless `countBreakingAs` is set to `"bump"`.
 
 Note: In JSON/JSONC files you can use `"Infinity"` or `"infinity"`; in JSON5 you can use `Infinity` directly.
 
