@@ -379,7 +379,7 @@ async function generateReleaseBodyBasedOnCommits(
 
   const typeToSection = new Map<
     string,
-    { baseSection: string; altSection: string }
+    { baseSection: string; altSection: string; hidden: boolean }
   >();
 
   const breakingSectionHeadingBase = await resolveStringTemplate(
@@ -405,16 +405,17 @@ async function generateReleaseBodyBasedOnCommits(
   });
 
   for (const ct of commitTypes) {
-    if (ct.hidden) continue;
-
     const sectionBase = ct.section ?? toTitleCase(ct.type);
     const sectionAlt = ct.sectionAlt ?? sectionBase;
 
     typeToSection.set(ct.type, {
       baseSection: sectionBase,
       altSection: sectionAlt,
+      hidden: ct.hidden,
     });
 
+    // Hidden types still need their sections registered so that breaking
+    // commits from those types can be rendered under their own heading.
     const sectionInfo = { section: sectionBase, sectionAlt: sectionAlt };
     if (!baseSectionGroups.has(sectionBase)) {
       baseSectionGroups.set(sectionBase, { entries: [], sectionInfo });
@@ -531,6 +532,10 @@ async function generateReleaseBodyBasedOnCommits(
   for (const commit of resolvedCommits) {
     const typeInfo = typeToSection.get(commit.type);
     if (!typeInfo) continue;
+
+    // Hidden commit types are excluded from the changelog unless the commit
+    // is a breaking change, in which case it must still be shown.
+    if (typeInfo.hidden && !commit.isBreaking) continue;
 
     const baseSectionGroup = baseSectionGroups.get(typeInfo.baseSection);
     const altSectionGroup = altSectionGroups.get(typeInfo.altSection);
