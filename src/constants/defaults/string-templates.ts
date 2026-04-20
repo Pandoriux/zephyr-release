@@ -6,7 +6,7 @@ export const DEFAULT_WORKING_BRANCH_NAME_TEMPLATE =
   "zephyr-release/{{ triggerBranchName }}";
 
 // Changelog
-export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br/>\n";
+export const DEFAULT_CHANGELOG_FILE_HEADER_TEMPLATE = "# Changelog\n\n<br>";
 export const DEFAULT_CHANGELOG_RELEASE_TEMPLATE = "{{ changelogRelease }}";
 
 export const DEFAULT_RELEASE_HEADER_TEMPLATE =
