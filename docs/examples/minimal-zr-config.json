@@ -1,6 +1,6 @@
 {
   "$schema": "../../schemas/v1/config-v1.kebab.json",
-  // "$schema": "https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/v1/config-v1.kebab.json",
+  // "$schema": "https://raw.githubusercontent.com/ptphongkmf/zephyr-release/refs/heads/main/schemas/v1/config-v1.kebab.json",
 
   "version-files": {
     "path": "deno.json",

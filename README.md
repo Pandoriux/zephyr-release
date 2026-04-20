@@ -33,7 +33,7 @@ below is a minimal working one
 ```json
 {
   // or *.camel.json / *.snake.json
-  "$schema": "https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/v1/config-v1.kebab.json",
+  "$schema": "https://raw.githubusercontent.com/ptphongkmf/zephyr-release/refs/heads/main/schemas/v1/config-v1.kebab.json",
 
   // you need at least 1 primary version file, this is your "source of truth" version
   "version-files": {
@@ -83,7 +83,7 @@ jobs:
       #   uses: actions/checkout@v4
 
       - name: Run Zephyr Release
-        uses: Pandoriux/zephyr-release@v1
+        uses: ptphongkmf/zephyr-release@v1
         with:
           token: ${{ secrets.CUSTOM_TOKEN }} # Omit this line to use the default GITHUB_TOKEN
           config-path: ".zephyr-release/config.jsonc"
@@ -96,7 +96,7 @@ jobs:
             }
 
           # See docs for all available source-mode options:
-          # https://github.com/Pandoriux/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
+          # https://github.com/ptphongkmf/zephyr-release/blob/main/docs/input-options.md#source-mode-optional
           source-mode: "local"
 ```
 

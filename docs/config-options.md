@@ -9,11 +9,11 @@ Required options:
 
 <br>
 
-It is recommended to use [`JSON Schema (v1)`](https://raw.githubusercontent.com/Pandoriux/zephyr-release/refs/heads/main/schemas/config-v1.json) when writing the config JSON.
+It is recommended to use [`JSON Schema (v1)`](../schemas/v1/) when writing the config JSON.
 
 To know more about templates, see [string-templates-and-patterns.md](./string-templates-and-patterns.md).
 
-Some example [config files](https://github.com/Pandoriux/zephyr-release/tree/main/docs/examples).
+Some example [config files](./examples/).
 
 ## Table of Content <!-- auto-generated, do not edit --> <!-- omit from toc -->
 
@@ -618,7 +618,7 @@ List of commit type(s) allowed to trigger `release-as`. Accepts a single string 
 
 You can combine `"<COMMIT_TYPES>"` with other commit types. For example: `["<COMMIT_TYPES>", "chore", "ci", "cd"]` will allow commits with types from `commit-types` plus `"chore"`, `"ci"`, and `"cd"`.
 
-About `release-as`: <https://github.com/Pandoriux/zephyr-release?tab=readme-ov-file#force-a-specific-version>
+About `release-as`: [README.md → Force a Specific Version](../README.md#force-a-specific-version)
 
 [⬆ Back to top](#table-of-content)
 

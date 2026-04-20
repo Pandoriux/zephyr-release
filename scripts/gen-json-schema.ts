@@ -29,7 +29,7 @@ const SCHEMA_CONFIG: GenJsonSchemaConfig[] = [
   },
 ];
 
-const DOCS_REF_URL = "https://github.com/Pandoriux/zephyr-release/blob/main";
+const DOCS_REF_URL = "https://github.com/ptphongkmf/zephyr-release/blob/main";
 
 // Base config json schema based on valibot schema
 const baseSchema = toJsonSchema(ConfigSchema, {
