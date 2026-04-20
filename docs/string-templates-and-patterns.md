@@ -178,7 +178,7 @@ Custom transformers.
   - tag2: `string`
   - Usage: `{{ text | wrap_compare_tag: tag1, tag2 }}`
 
-- `wrap_compare_latest_tag: currentTag, skip`: Wraps the current text in a markdown link comparing the current given tag to the latest tag
+- `wrap_compare_latest_tag: currentTag, skip`: Wraps the current text in a markdown link comparing the current given tag to the latest tag. If the repository has no prior tags (first release), the text is returned as-is. Otherwise, if `skip` exceeds the number of available tags, an error is thrown
   - currentTag: `string`
   - skip (optional): `number` (positive integer), `DEFAULT: 0`  
     how many tags back from the latest tag to compare against (`0` = latest tag, `1` = tag before the latest, etc.)

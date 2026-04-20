@@ -67,6 +67,10 @@ async function githubGetCompareTagUrlFromCurrentToLatest(
 
   const targetTag = tags[skip];
   if (!targetTag) {
+    if (tags.length === 0) {
+      // First release - no prior tags exist to compare against, return plain text.
+      return currentTag;
+    }
     throw new Error(
       `Cannot skip ${skip} tag(s) from latest; repository only contains ${tags.length} tag(s) total`,
     );
