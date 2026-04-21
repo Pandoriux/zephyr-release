@@ -14,12 +14,15 @@ async function githubFindMergedProposalPrByCommit(
   sourceBranch: string,
   targetBranch: string,
 ): Promise<ProviderProposal | undefined> {
+  const owner = githubGetNamespace();
+  const repo = githubGetRepositoryName();
+
   try {
     const paginatedIterator = octokit.paginate.iterator(
       octokit.rest.repos.listPullRequestsAssociatedWithCommit,
       {
-        owner: githubGetNamespace(),
-        repo: githubGetRepositoryName(),
+        owner,
+        repo,
         commit_sha: commitHash,
         per_page: 100,
       },
@@ -45,7 +48,38 @@ async function githubFindMergedProposalPrByCommit(
       }
     }
 
-    // If the loop exhausts all pages and finishes, no matching PR exists
+    // Fallback: querying directly from the Pulls API.
+    // This bypasses the GitHub search/commit index delays if the commit-association misses.
+    const fallbackResponse = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: "closed",
+      head: `${owner}:${sourceBranch}`,
+      base: targetBranch,
+      sort: "updated",
+      direction: "desc",
+      per_page: 5,
+    });
+
+    for (const pr of fallbackResponse.data) {
+      if (pr.merged_at !== null && pr.merge_commit_sha === commitHash) {
+        taskLogger.notice(
+          `Retrieved merged PR #${pr.number} via fallback query (bypassing GitHub API indexing delay for commit ${
+            commitHash.substring(0, 7)
+          }).`,
+        );
+
+        return {
+          id: String(pr.number),
+          sourceBranch: pr.head.ref,
+          targetBranch: pr.base.ref,
+          title: pr.title,
+          body: pr.body || "",
+        };
+      }
+    }
+
+    // If both strategies exhaust all options, no matching PR exists.
     return undefined;
   } catch (error) {
     if (error instanceof RequestError && error.status === 404) {
